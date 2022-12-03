@@ -35,12 +35,8 @@ namespace EDDNClient
                 await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
                 await using IProducer producer = await connection.CreateProducerAsync("EDDN", RoutingType.Anycast, cancellationToken);
 
-                using SubscriberSocket client = new();
-                client.Connect(Configuration.GetValue<string>("EDDN:Address") ?? throw new Exception("No EDDN address configured!"));
-                client.SubscribeToAnyTopic();
-
                 using NetMQRuntime runtime = new();
-                runtime.Run(cancellationToken, ReceiveData(client, producer, cancellationToken));
+                runtime.Run(cancellationToken, ReceiveData(producer, cancellationToken));
                 Log.LogInformation("Client started");
                 await Task.Delay(Timeout.Infinite, cancellationToken);
             }
@@ -50,8 +46,12 @@ namespace EDDNClient
             }
         }
 
-        private async Task ReceiveData(SubscriberSocket client, IProducer producer, CancellationToken cancellationToken)
+        private async Task ReceiveData(IProducer producer, CancellationToken cancellationToken)
         {
+            using SubscriberSocket client = new();
+            client.Connect(Configuration.GetValue<string>("EDDN:Address") ?? throw new Exception("No EDDN address configured!"));
+            client.SubscribeToAnyTopic();
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
