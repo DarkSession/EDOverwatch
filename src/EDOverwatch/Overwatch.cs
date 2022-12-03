@@ -159,7 +159,7 @@ namespace EDOverwatch
                         CycleStart = currentThargoidCycle,
                     };
                     await dbContext.SaveChangesAsync(cancellationToken);
-                    await starSystemThargoidLevelChangedProducer.SendAsync(new(JsonConvert.SerializeObject(new StarSystemThargoidLevelChanged(starSystem.SystemAddress))), transaction, cancellationToken);
+                    // await starSystemThargoidLevelChangedProducer.SendAsync(new(JsonConvert.SerializeObject(new StarSystemThargoidLevelChanged(starSystem.SystemAddress))), transaction, cancellationToken);
                 }
             }
         }
