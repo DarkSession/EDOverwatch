@@ -13,6 +13,7 @@
 
         public async Task StartAsync()
         {
+            Log.LogDebug("StartAsync");
             while (true)
             {
                 try

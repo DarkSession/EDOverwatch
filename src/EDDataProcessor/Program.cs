@@ -32,6 +32,7 @@ namespace EDDataProcessor
                 .AddLogging(builder =>
                 {
                     builder.AddConsole();
+                    builder.AddConfiguration(Configuration.GetSection("Logging"));
                 })
                 .AddSingleton<EDDNProcessor>()
                 .AddDbContext<EdDbContext>()

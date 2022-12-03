@@ -1,6 +1,7 @@
 ﻿global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Configuration;
 
 namespace EDDNClient
 {
@@ -25,6 +26,7 @@ namespace EDDNClient
                 .AddLogging(builder =>
                 {
                     builder.AddConsole();
+                    builder.AddConfiguration(Configuration.GetSection("Logging"));
                 })
                 .AddTransient<Client>()
                 .AddSingleton<Watchdog>()

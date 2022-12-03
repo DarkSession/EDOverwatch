@@ -28,6 +28,7 @@ namespace EDOverwatch
                 .AddLogging(builder =>
                 {
                     builder.AddConsole();
+                    builder.AddConfiguration(Configuration.GetSection("Logging"));
                 })
                 .AddDbContext<EdDbContext>()
                 .AddSingleton<Overwatch>()
