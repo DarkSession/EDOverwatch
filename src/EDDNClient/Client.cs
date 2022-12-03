@@ -21,27 +21,34 @@ namespace EDDNClient
 
         public async Task ProcessAsync(CancellationToken cancellationToken)
         {
-            Log.LogInformation("Starting client");
+            try
+            {
+                Log.LogInformation("Starting client");
 
-            Endpoint activeMqEndpont = Endpoint.Create(
-               Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
-               Configuration.GetValue<int?>("ActiveMQ:Port") ?? throw new Exception("No ActiveMQ port configured"),
-               Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
-               Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
+                Endpoint activeMqEndpont = Endpoint.Create(
+                   Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
+                   Configuration.GetValue<int?>("ActiveMQ:Port") ?? throw new Exception("No ActiveMQ port configured"),
+                   Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
+                   Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
 
-            ConnectionFactory connectionFactory = new();
-            await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
-            await using IProducer producer = await connection.CreateProducerAsync("EDDN", RoutingType.Anycast, cancellationToken);
+                ConnectionFactory connectionFactory = new();
+                await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
+                await using IProducer producer = await connection.CreateProducerAsync("EDDN", RoutingType.Anycast, cancellationToken);
 
-            using SubscriberSocket client = new();
-            client.Connect(Configuration.GetValue<string>("EDDN:Address") ?? throw new Exception("No EDDN address configured!"));
-            client.SubscribeToAnyTopic();
+                using SubscriberSocket client = new();
+                client.Connect(Configuration.GetValue<string>("EDDN:Address") ?? throw new Exception("No EDDN address configured!"));
+                client.SubscribeToAnyTopic();
 
-            Log.LogInformation("Client started");
+                Log.LogInformation("Client started");
 
-            using NetMQRuntime runtime = new();
-            runtime.Run(cancellationToken, ReceiveData(client, producer, cancellationToken));
-            await Task.Delay(Timeout.Infinite, cancellationToken);
+                using NetMQRuntime runtime = new();
+                runtime.Run(cancellationToken, ReceiveData(client, producer, cancellationToken));
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                Log.LogError(e, "Process exception");
+            }
         }
 
         private async Task ReceiveData(SubscriberSocket client, IProducer producer, CancellationToken cancellationToken)

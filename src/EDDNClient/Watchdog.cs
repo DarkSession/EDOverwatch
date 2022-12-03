@@ -18,6 +18,8 @@
                 try
                 {
                     await StartClient();
+                    Log.LogWarning("Client stopped...");
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
                 catch (Exception e)
                 {
