@@ -67,8 +67,14 @@ namespace EDDataProcessor.EDDN
                                 Log.LogError("Unable to connect to database...");
                                 await transaction.RollbackAsync(cancellationToken);
                                 await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+                                continue;
                             }
+                            Log.LogDebug("Received EDDN message");
                             await eddnEvent.ProcessEvent(dbContext, anonymousProducer, transaction, cancellationToken);
+                        }
+                        else
+                        {
+                            Log.LogWarning("Received EDDN message with an invalid/known schema.");
                         }
                         await transaction.CommitAsync(cancellationToken);
                     }

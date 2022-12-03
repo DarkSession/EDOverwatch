@@ -39,10 +39,9 @@ namespace EDDNClient
                 client.Connect(Configuration.GetValue<string>("EDDN:Address") ?? throw new Exception("No EDDN address configured!"));
                 client.SubscribeToAnyTopic();
 
-                Log.LogInformation("Client started");
-
                 using NetMQRuntime runtime = new();
                 runtime.Run(cancellationToken, ReceiveData(client, producer, cancellationToken));
+                Log.LogInformation("Client started");
                 await Task.Delay(Timeout.Infinite, cancellationToken);
             }
             catch (Exception e)
@@ -71,7 +70,12 @@ namespace EDDNClient
                         !string.IsNullOrEmpty(schema) &&
                         (Configuration.GetSection("EDDN:Schemas").Get<List<string>>()?.Contains(schema) ?? false))
                     {
+                        Log.LogDebug("Received and sent EDDN message to ActiveMQ.");
                         await producer.SendAsync(new Message(jsonString), cancellationToken);
+                    }
+                    else
+                    {
+                        Log.LogDebug("Received and dropped EDDN message.");
                     }
                 }
                 catch (Exception e)
