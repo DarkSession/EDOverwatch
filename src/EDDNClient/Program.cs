@@ -13,11 +13,11 @@ namespace EDDNClient
         static Task Main(string[] args)
         {
             Configuration = new ConfigurationBuilder()
-                .AddEnvironmentVariables()
                 .AddJsonFile("appsettings.json", optional: true)
 #if DEBUG
                 .AddJsonFile("appsettings.dev.json", optional: true)
 #endif
+                .AddEnvironmentVariables()
                 .AddUserSecrets<Program>()
                 .Build();
 
