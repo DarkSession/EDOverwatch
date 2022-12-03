@@ -24,20 +24,31 @@ namespace EDOverwatch
 
         public async Task RunAsync(CancellationToken cancellationToken = default)
         {
-            Endpoint activeMqEndpont = Endpoint.Create(
-                Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
-                Configuration.GetValue<int>("ActiveMQ:Port"),
-                Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
-                Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
+            try
+            {
+                Log.LogInformation("Starting Overwatch");
 
-            ConnectionFactory connectionFactory = new();
-            await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
-            await using IProducer starSystemThargoidLevelChangedProducer = await connection.CreateProducerAsync("StarSystem.ThargoidLevelChanged", RoutingType.Anycast, cancellationToken);
+                Endpoint activeMqEndpont = Endpoint.Create(
+                    Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
+                    Configuration.GetValue<int>("ActiveMQ:Port"),
+                    Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
+                    Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
 
-            _ = StarSystemUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
-            _ = StarSystemFssSignalsUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
+                ConnectionFactory connectionFactory = new();
+                await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
+                await using IProducer starSystemThargoidLevelChangedProducer = await connection.CreateProducerAsync("StarSystem.ThargoidLevelChanged", RoutingType.Anycast, cancellationToken);
 
-            await Task.Delay(Timeout.Infinite, cancellationToken);
+                _ = StarSystemUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
+                _ = StarSystemFssSignalsUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
+
+                Log.LogInformation("Overwatch started");
+
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                Log.LogError(e, "Overwatch exception");
+            }
         }
 
         private async Task StarSystemUpdatedEventConsumer(IConnection connection, IProducer starSystemThargoidLevelChangedProducer, CancellationToken cancellationToken)
