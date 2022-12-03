@@ -53,56 +53,76 @@ namespace EDOverwatch
 
         private async Task StarSystemUpdatedEventConsumer(IConnection connection, IProducer starSystemThargoidLevelChangedProducer, CancellationToken cancellationToken)
         {
-            await using IConsumer consumer = await connection.CreateConsumerAsync("StarSystem.Updated", RoutingType.Anycast, cancellationToken);
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                try
+                await using IConsumer consumer = await connection.CreateConsumerAsync("StarSystem.Updated", RoutingType.Anycast, cancellationToken);
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    Message message = await consumer.ReceiveAsync(cancellationToken);
-                    await using Transaction transaction = new();
-                    await consumer.AcceptAsync(message, transaction, cancellationToken);
-
-                    string jsonString = message.GetBody<string>();
-                    StarSystemUpdated? starSystemUpdated = JsonConvert.DeserializeObject<StarSystemUpdated>(jsonString);
-                    if (starSystemUpdated != null)
+                    try
                     {
-                        using AsyncLockInstance l = await Lock(cancellationToken);
-                        await CheckStarSystem(starSystemUpdated.SystemAddress, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
-                    }
+                        Message message = await consumer.ReceiveAsync(cancellationToken);
 
-                    await transaction.CommitAsync(cancellationToken);
+                        Log.LogDebug("StarSystem.Updated received");
+
+                        await using Transaction transaction = new();
+                        await consumer.AcceptAsync(message, transaction, cancellationToken);
+
+                        string jsonString = message.GetBody<string>();
+                        StarSystemUpdated? starSystemUpdated = JsonConvert.DeserializeObject<StarSystemUpdated>(jsonString);
+                        if (starSystemUpdated != null)
+                        {
+                            using AsyncLockInstance l = await Lock(cancellationToken);
+                            await CheckStarSystem(starSystemUpdated.SystemAddress, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
+                        }
+
+                        await transaction.CommitAsync(cancellationToken);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.LogError(e, "Exception while processing star system updated event");
+                    }
                 }
-                catch (Exception e)
-                {
-                    Log.LogError(e, "Exception while processing star system updated event");
-                }
+            }
+            catch (Exception e)
+            {
+                Log.LogError(e, "StarSystemUpdatedEventConsumer exception");
             }
         }
 
         private async Task StarSystemFssSignalsUpdatedEventConsumer(IConnection connection, IProducer starSystemThargoidLevelChangedProducer, CancellationToken cancellationToken)
         {
-            await using IConsumer consumer = await connection.CreateConsumerAsync("StarSystem.FssSignalsUpdated", RoutingType.Anycast, cancellationToken);
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                try
+                await using IConsumer consumer = await connection.CreateConsumerAsync("StarSystem.FssSignalsUpdated", RoutingType.Anycast, cancellationToken);
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    Message message = await consumer.ReceiveAsync(cancellationToken);
-                    await using Transaction transaction = new();
-                    await consumer.AcceptAsync(message, transaction, cancellationToken);
-
-                    string jsonString = message.GetBody<string>();
-                    StarSystemFssSignalsUpdated? starSystemFssSignalsUpdated = JsonConvert.DeserializeObject<StarSystemFssSignalsUpdated>(jsonString);
-                    if (starSystemFssSignalsUpdated != null)
+                    try
                     {
-                        using AsyncLockInstance l = await Lock(cancellationToken);
-                        await CheckStarSystem(starSystemFssSignalsUpdated.SystemAddress, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
+                        Message message = await consumer.ReceiveAsync(cancellationToken);
+
+                        Log.LogDebug("StarSystem.FssSignalsUpdated");
+
+                        await using Transaction transaction = new();
+                        await consumer.AcceptAsync(message, transaction, cancellationToken);
+
+                        string jsonString = message.GetBody<string>();
+                        StarSystemFssSignalsUpdated? starSystemFssSignalsUpdated = JsonConvert.DeserializeObject<StarSystemFssSignalsUpdated>(jsonString);
+                        if (starSystemFssSignalsUpdated != null)
+                        {
+                            using AsyncLockInstance l = await Lock(cancellationToken);
+                            await CheckStarSystem(starSystemFssSignalsUpdated.SystemAddress, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
+                        }
+                        await transaction.CommitAsync(cancellationToken);
                     }
-                    await transaction.CommitAsync(cancellationToken);
+                    catch (Exception e)
+                    {
+                        Log.LogError(e, "Exception while processing fss signals updated event");
+                    }
                 }
-                catch (Exception e)
-                {
-                    Log.LogError(e, "Exception while processing fss signals updated event");
-                }
+            }
+            catch (Exception e)
+            {
+                Log.LogError(e, "StarSystemFssSignalsUpdatedEventConsumer exception");
             }
         }
 
