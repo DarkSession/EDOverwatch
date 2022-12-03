@@ -148,7 +148,7 @@ namespace EDDataProcessor.EDDN
             }
             if (starSystemSignalsUpdated.Any())
             {
-                await activeMqProducer.SendAsync("StarSystem.FssSignalsUpdated", new(JsonConvert.SerializeObject(new StarSystemFssSignalsUpdated(Message.SystemAddress))), activeMqTransaction, cancellationToken);
+                await activeMqProducer.SendAsync("StarSystem.FssSignalsUpdated", RoutingType.Anycast, new(JsonConvert.SerializeObject(new StarSystemFssSignalsUpdated(Message.SystemAddress))), activeMqTransaction, cancellationToken);
             }
         }
     }
