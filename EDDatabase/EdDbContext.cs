@@ -17,7 +17,9 @@ namespace EDDatabase
         public DbSet<StarSystemSecurity> StarSystemSecurities { get; set; }
 
         public DbSet<Station> Stations { get; set; }
-        public DbSet<StationType> StationTypes { get; set;
+        public DbSet<StationType> StationTypes
+        {
+            get; set;
         }
         public DbSet<ThargoidCycle> ThargoidCycles { get; set; }
         public DbSet<ThargoidMaelstrom> ThargoidMaelstroms { get; set; }
@@ -57,11 +59,11 @@ namespace EDDatabase
                 .WithOne(s => s.StarSystem);
         }
 
-        public async Task<ThargoidCycle> GetThargoidCycle(int weekOffset = 0)
+        public async Task<ThargoidCycle> GetThargoidCycle(DateTimeOffset dateTimeOffset, CancellationToken cancellationToken, int weekOffset = 0)
         {
             DateTimeOffset cycleTime;
             {
-                int dayOffset = DateTimeOffset.UtcNow.DayOfWeek switch
+                int dayOffset = dateTimeOffset.DayOfWeek switch
                 {
                     DayOfWeek.Sunday => -3,
                     DayOfWeek.Monday => -4,
@@ -72,16 +74,16 @@ namespace EDDatabase
                     DayOfWeek.Saturday => -2,
                     _ => 0,
                 };
-                DateTimeOffset lastThursday = DateTimeOffset.UtcNow.AddDays(dayOffset);
+                DateTimeOffset lastThursday = dateTimeOffset.AddDays(dayOffset);
                 DateTimeOffset lastThursdayCycle = new(lastThursday.Year, lastThursday.Month, lastThursday.Day, 7, 0, 0, TimeSpan.Zero);
                 cycleTime = lastThursdayCycle.AddDays(weekOffset * 7);
             }
-            ThargoidCycle? thargoidCycle = await ThargoidCycles.FirstOrDefaultAsync(t => t.Start == cycleTime);
+            ThargoidCycle? thargoidCycle = await ThargoidCycles.FirstOrDefaultAsync(t => t.Start == cycleTime, cancellationToken);
             if (thargoidCycle == null)
             {
                 thargoidCycle = new(0, cycleTime, cycleTime.AddDays(7));
                 ThargoidCycles.Add(thargoidCycle);
-                await SaveChangesAsync();
+                await SaveChangesAsync(cancellationToken);
             }
             return thargoidCycle;
         }

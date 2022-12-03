@@ -2,6 +2,7 @@
 {
     [Table("StarSystem")]
     [Index(nameof(SystemAddress), IsUnique = true)]
+    [Index(nameof(LocationX), nameof(LocationY), nameof(LocationZ))]
     public class StarSystem
     {
         [Column]
@@ -42,7 +43,6 @@
 
         [Column]
         public DateTimeOffset Updated { get; set; }
-
 
         public IEnumerable<StarSystemThargoidLevel>? ThargoidLevelHistory { get; set; }
 

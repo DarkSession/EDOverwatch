@@ -2,6 +2,6 @@
 {
     internal interface IEDDNEvent
     {
-        public ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer);
+        public ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken);
     }
 }

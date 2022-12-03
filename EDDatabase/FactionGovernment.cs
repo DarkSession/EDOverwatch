@@ -38,17 +38,17 @@ namespace EDDatabase
             return s;
         }
 
-        public static async Task<FactionGovernment?> GetByName(string input, EdDbContext dbContext)
+        public static async Task<FactionGovernment?> GetByName(string input, EdDbContext dbContext, CancellationToken cancellationToken = default)
         {
             string name = GetInternalString(input);
             if (!string.IsNullOrEmpty(name))
             {
-                FactionGovernment? government = await dbContext.FactionGovernments.SingleOrDefaultAsync(c => c.Name == name);
+                FactionGovernment? government = await dbContext.FactionGovernments.SingleOrDefaultAsync(c => c.Name == name, cancellationToken);
                 if (government == null)
                 {
                     government = new FactionGovernment(0, name);
                     dbContext.FactionGovernments.Add(government);
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 return government;
             }

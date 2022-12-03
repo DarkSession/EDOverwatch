@@ -37,5 +37,6 @@
         FleetCarrier,
         Maelstrom,
         AXCZ,
+        ThargoidActivity,
     }
 }

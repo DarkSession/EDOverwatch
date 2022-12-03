@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
@@ -27,7 +26,7 @@ namespace EDDataProcessor.EDDN
             }
         }
 
-        public async Task ProcessMessages()
+        public async Task ProcessMessages(CancellationToken cancellationToken = default)
         {
             Endpoint activeMqEndpont = Endpoint.Create(
                 Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
@@ -36,15 +35,17 @@ namespace EDDataProcessor.EDDN
                 Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
 
             ConnectionFactory connectionFactory = new();
-            await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont);
-            await using IConsumer consumer = await connection.CreateConsumerAsync("EDDN", RoutingType.Anycast);
-            await using IAnonymousProducer anonymousProducer = await connection.CreateAnonymousProducerAsync();
+            await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
+            await using IConsumer consumer = await connection.CreateConsumerAsync("EDDN", RoutingType.Anycast, cancellationToken);
+            await using IAnonymousProducer anonymousProducer = await connection.CreateAnonymousProducerAsync(cancellationToken);
 
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    Message message = await consumer.ReceiveAsync();
+                    Message message = await consumer.ReceiveAsync(cancellationToken);
+                    await using Transaction transaction = new();
+                    await consumer.AcceptAsync(message, transaction, cancellationToken);
                     string jsonString = message.GetBody<string>();
                     JObject json = JObject.Parse(jsonString);
                     if (json.TryGetValue("$schemaRef", out JToken? schemaRef) &&
@@ -55,13 +56,20 @@ namespace EDDataProcessor.EDDN
                     {
                         using IServiceScope serviceScope = ServiceProvider.CreateScope();
                         EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                        await eddnEvent.ProcessEvent(dbContext, anonymousProducer);
+                        if (!await dbContext.Database.CanConnectAsync(cancellationToken))
+                        {
+                            Log.LogError("Unable to connect to database...");
+                            await transaction.RollbackAsync(cancellationToken);
+                            await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+                        }
+                        await eddnEvent.ProcessEvent(dbContext, anonymousProducer, transaction, cancellationToken);
                     }
-                    await consumer.AcceptAsync(message);
+                    await transaction.CommitAsync(cancellationToken);
                 }
                 catch (Exception e)
                 {
                     Log.LogError(e, "Processing message exception");
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
                 }
             }
         }

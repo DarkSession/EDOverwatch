@@ -20,19 +20,19 @@
             NameEnglish = nameEnglish;
         }
 
-        public static async Task<StationType> GetByName(string name, EdDbContext dbContext)
+        public static async Task<StationType> GetByName(string name, EdDbContext dbContext, CancellationToken cancellationToken = default)
         {
-            StationType? stationType = await dbContext.StationTypes.SingleOrDefaultAsync(c => c.Name == name);
+            StationType? stationType = await dbContext.StationTypes.SingleOrDefaultAsync(c => c.Name == name, cancellationToken);
             if (stationType == null)
             {
                 stationType = new StationType(0, name, name);
                 dbContext.StationTypes.Add(stationType);
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             return stationType;
         }
 
-        public static Task<StationType> GetFleetCarrier(EdDbContext dbContext) => GetByName("FleetCarrier", dbContext);
+        public static Task<StationType> GetFleetCarrier(EdDbContext dbContext, CancellationToken cancellationToken = default) => GetByName("FleetCarrier", dbContext, cancellationToken);
 
         [NotMapped]
         public string NameFull => !string.IsNullOrEmpty(NameEnglish) ? NameEnglish : Name;

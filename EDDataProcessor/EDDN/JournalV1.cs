@@ -15,7 +15,7 @@ namespace EDDataProcessor.EDDN
         [JsonProperty("message", Required = Required.Always)]
         public JournalV1Message Message { get; set; } = new();
 
-        public async ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer)
+        public async ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
             if (!Header.IsLive)
             {
@@ -36,7 +36,7 @@ namespace EDDataProcessor.EDDN
                         StarSystem? starSystem = await dbContext.StarSystems
                                                                 .Include(s => s.Allegiance)
                                                                 .Include(s => s.Security)
-                                                                .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress);
+                                                                .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
                         if (starSystem == null)
                         {
                             isNew = true;
@@ -62,7 +62,7 @@ namespace EDDataProcessor.EDDN
                             }
                             if (!string.IsNullOrEmpty(Message.SystemAllegiance))
                             {
-                                FactionAllegiance allegiance = await FactionAllegiance.GetByName(Message.SystemAllegiance, dbContext);
+                                FactionAllegiance allegiance = await FactionAllegiance.GetByName(Message.SystemAllegiance, dbContext, cancellationToken);
                                 if (starSystem.Allegiance?.Id != allegiance.Id)
                                 {
                                     starSystem.Allegiance = allegiance;
@@ -71,17 +71,17 @@ namespace EDDataProcessor.EDDN
                             }
                             if (!string.IsNullOrEmpty(Message.SystemSecurity))
                             {
-                                StarSystemSecurity starSystemSecurity = await StarSystemSecurity.GetByName(Message.SystemSecurity, dbContext);
+                                StarSystemSecurity starSystemSecurity = await StarSystemSecurity.GetByName(Message.SystemSecurity, dbContext, cancellationToken);
                                 if (starSystem.Security?.Id != starSystemSecurity.Id)
                                 {
                                     starSystem.Security = starSystemSecurity;
                                     changed = true;
                                 }
                             }
-                            await dbContext.SaveChangesAsync();
+                            await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
                             {
-                                await activeMqProducer.SendAsync("StarSystem.Updated", new(JsonConvert.SerializeObject(new StarSystemUpdated(Message.SystemAddress))));
+                                await activeMqProducer.SendAsync("StarSystem.Updated", new(JsonConvert.SerializeObject(new StarSystemUpdated(Message.SystemAddress))), activeMqTransaction, cancellationToken);
                             }
                         }
                         break;
@@ -98,7 +98,7 @@ namespace EDDataProcessor.EDDN
                             break;
                         }
 
-                        StarSystem? starSystem = await dbContext.StarSystems.SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress);
+                        StarSystem? starSystem = await dbContext.StarSystems.SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
                         if (starSystem == null)
                         {
                             break;
@@ -106,12 +106,14 @@ namespace EDDataProcessor.EDDN
                         bool isNew = false;
                         Station? station = await dbContext.Stations
                             .Include(s => s.Government)
-                            .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID);
+                            .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
                         if (station == null)
                         {
                             isNew = true;
-                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, Message.Timestamp, Message.Timestamp);
-                            station.Type = await StationType.GetByName(Message.StationType, dbContext);
+                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, Message.Timestamp, Message.Timestamp)
+                            {
+                                Type = await StationType.GetByName(Message.StationType, dbContext, cancellationToken)
+                            };
                             dbContext.Stations.Add(station);
                         }
                         if (station.Updated < Message.Timestamp || isNew)
@@ -130,7 +132,7 @@ namespace EDDataProcessor.EDDN
                             }
                             if (!string.IsNullOrEmpty(Message.StationEconomy))
                             {
-                                Economy? economy = await Economy.GetByName(Message.StationEconomy, dbContext);
+                                Economy? economy = await Economy.GetByName(Message.StationEconomy, dbContext, cancellationToken);
                                 if (economy != null)
                                 {
                                     if (station.PrimaryEconomy?.Id != economy.Id)
@@ -138,13 +140,13 @@ namespace EDDataProcessor.EDDN
                                         station.PrimaryEconomy = economy;
                                         changed = true;
                                     }
-                                    if ((Message.StationEconomies?.Count() ?? 0) > 1)
+                                    if ((Message.StationEconomies?.Count ?? 0) > 1)
                                     {
                                         DockedStationEconomy stationSecondaryEconomy = Message.StationEconomies!
                                             .OrderBy(s => s.Proportion)
                                             .Skip(1)
                                             .First();
-                                        Economy? secondaryEconomy = await Economy.GetByName(stationSecondaryEconomy.Name, dbContext);
+                                        Economy? secondaryEconomy = await Economy.GetByName(stationSecondaryEconomy.Name, dbContext, cancellationToken);
                                         if (secondaryEconomy != null && station.SecondaryEconomy?.Id != secondaryEconomy.Id)
                                         {
                                             station.SecondaryEconomy = secondaryEconomy;
@@ -155,17 +157,17 @@ namespace EDDataProcessor.EDDN
                             }
                             if (!string.IsNullOrEmpty(Message.StationGovernment))
                             {
-                                FactionGovernment? government = await FactionGovernment.GetByName(Message.StationGovernment, dbContext);
+                                FactionGovernment? government = await FactionGovernment.GetByName(Message.StationGovernment, dbContext, cancellationToken);
                                 if (government != null && station.Government?.Id != government.Id)
                                 {
                                     station.Government = government;
                                     changed = true;
                                 }
                             }
-                            await dbContext.SaveChangesAsync();
+                            await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
                             {
-                                await activeMqProducer.SendAsync("StarSystem.Updated", new(JsonConvert.SerializeObject(new StationUpdated(Message.MarketID, Message.SystemAddress))));
+                                // await activeMqProducer.SendAsync("Station.Updated", new(JsonConvert.SerializeObject(new StationUpdated(Message.MarketID, Message.SystemAddress))), transaction, cancellationToken);
                             }
                         }
                         break;

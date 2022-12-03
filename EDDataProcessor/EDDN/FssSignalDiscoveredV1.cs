@@ -23,7 +23,7 @@ namespace EDDataProcessor.EDDN
         private static partial Regex MaelstromRegexGenerator();
         private static Regex MaelstromRegex { get; } = MaelstromRegexGenerator();
 
-        public async ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer)
+        public async ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
             if (!Header.IsLive)
             {
@@ -38,9 +38,10 @@ namespace EDDataProcessor.EDDN
                         return;
                     }
             }
+            List<long> starSystemSignalsUpdated = new();
             foreach (Signals signal in Message.Signals)
             {
-                if (await dbContext.StarSystems.FirstOrDefaultAsync(s => s.SystemAddress == Message.SystemAddress) is not StarSystem starSystem)
+                if (await dbContext.StarSystems.FirstOrDefaultAsync(s => s.SystemAddress == Message.SystemAddress, cancellationToken) is not StarSystem starSystem)
                 {
                     continue;
                 }
@@ -59,13 +60,13 @@ namespace EDDataProcessor.EDDN
                             bool isNew = false;
                             Station? station = await dbContext.Stations
                                 .Include(s => s.StarSystem)
-                                .FirstOrDefaultAsync(s => s.Name == carrierId);
+                                .FirstOrDefaultAsync(s => s.Name == carrierId, cancellationToken);
                             if (station == null)
                             {
                                 isNew = true;
                                 station = new(0, carrierId, 0, 0, 4, 4, 8, signal.Timestamp, signal.Timestamp);
                                 station.StarSystem = starSystem;
-                                station.Type = await StationType.GetFleetCarrier(dbContext);
+                                station.Type = await StationType.GetFleetCarrier(dbContext, cancellationToken);
                                 dbContext.Stations.Add(station);
                             }
                             if (isNew || station.Updated < signal.Timestamp)
@@ -77,10 +78,10 @@ namespace EDDataProcessor.EDDN
                                     station.StarSystem = starSystem;
                                     changed = true;
                                 }
-                                await dbContext.SaveChangesAsync();
+                                await dbContext.SaveChangesAsync(cancellationToken);
                                 if (changed)
                                 {
-                                    await activeMqProducer.SendAsync("StarSystem.Updated", new(JsonConvert.SerializeObject(new StationUpdated(station.MarketId, Message.SystemAddress))));
+                                    await activeMqProducer.SendAsync("StarSystem.Updated", new(JsonConvert.SerializeObject(new StationUpdated(station.MarketId, Message.SystemAddress))), activeMqTransaction, cancellationToken);
                                 }
                             }
                         }
@@ -95,14 +96,14 @@ namespace EDDataProcessor.EDDN
                         string maelStromName = maelstromMatch.Groups[1].Value;
                         ThargoidMaelstrom? thargoidMaelstrom = await dbContext.ThargoidMaelstroms
                             .Include(t => t.StarSystem)
-                            .FirstOrDefaultAsync(t => t.Name == maelStromName);
+                            .FirstOrDefaultAsync(t => t.Name == maelStromName, cancellationToken);
                         if (thargoidMaelstrom == null)
                         {
                             thargoidMaelstrom = new(0, maelStromName, Message.Timestamp);
                             thargoidMaelstrom.StarSystem = starSystem;
-                            await dbContext.SaveChangesAsync();
+                            await dbContext.SaveChangesAsync(cancellationToken);
                             starSystem.Maelstrom = thargoidMaelstrom;
-                            await dbContext.SaveChangesAsync();
+                            await dbContext.SaveChangesAsync(cancellationToken);
                         }
                         else if (thargoidMaelstrom.Updated < Message.Timestamp)
                         {
@@ -118,21 +119,36 @@ namespace EDDataProcessor.EDDN
                     {
                         type = StarSystemFssSignalType.AXCZ;
                     }
+                    else if (signalName == "$USS_NonHumanSignalSource;")
+                    {
+                        type = StarSystemFssSignalType.ThargoidActivity;
+                    }
                 }
+                bool signalUpdated = false;
                 StarSystemFssSignal? starSystemFssSignal = await dbContext.StarSystemFssSignals
-                    .FirstOrDefaultAsync(s => s.StarSystem == starSystem && s.Type == type && s.Name == signalName);
+                    .FirstOrDefaultAsync(s => s.StarSystem == starSystem && s.Type == type && s.Name == signalName, cancellationToken);
                 if (starSystemFssSignal == null)
                 {
                     starSystemFssSignal = new(0, signalName, type, Message.Timestamp, Message.Timestamp);
                     starSystemFssSignal.StarSystem = starSystem;
                     dbContext.StarSystemFssSignals.Add(starSystemFssSignal);
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(cancellationToken);
+                    signalUpdated = true;
                 }
                 else if (starSystemFssSignal.LastSeen < Message.Timestamp)
                 {
                     starSystemFssSignal.LastSeen = Message.Timestamp;
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(cancellationToken);
+                    signalUpdated = true;
                 }
+                if (signalUpdated && !starSystemSignalsUpdated.Contains(starSystem!.SystemAddress))
+                {
+                    starSystemSignalsUpdated.Add(starSystem.SystemAddress);
+                }
+            }
+            if (starSystemSignalsUpdated.Any())
+            {
+                await activeMqProducer.SendAsync("StarSystem.FssSignalsUpdated", new(JsonConvert.SerializeObject(new StarSystemFssSignalsUpdated(Message.SystemAddress))), activeMqTransaction, cancellationToken);
             }
         }
     }
@@ -170,23 +186,6 @@ namespace EDDataProcessor.EDDN
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.MinLength(1)]
         public ICollection<Signals> Signals { get; set; } = new System.Collections.ObjectModel.Collection<Signals>();
-
-        /// <summary>
-        /// Should be added by the sender
-        /// </summary>
-        [JsonProperty("StarSystem", Required = Required.Always)]
-        public string StarSystem { get; set; }
-
-        /// <summary>
-        /// Should be added by the sender
-        /// </summary>
-        [JsonProperty("StarPos", Required = Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.MinLength(3)]
-        [System.ComponentModel.DataAnnotations.MaxLength(3)]
-        public ICollection<double> StarPos { get; set; } = new System.Collections.ObjectModel.Collection<double>();
-
-
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.7.2.0 (Newtonsoft.Json v13.0.0.0)")]
@@ -204,29 +203,18 @@ namespace EDDataProcessor.EDDN
     public partial class Signals
     {
         [JsonProperty("timestamp", Required = Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset Timestamp { get; set; }
 
         [JsonProperty("SignalName", Required = Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string SignalName { get; set; }
+        public string SignalName { get; set; } = string.Empty;
 
         [JsonProperty("IsStation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public bool IsStation { get; set; }
 
         [JsonProperty("USSType", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string USSType { get; set; }
-
-        [JsonProperty("SpawningState", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string SpawningState { get; set; }
-
-        [JsonProperty("SpawningFaction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string SpawningFaction { get; set; }
+        public string USSType { get; set; } = string.Empty;
 
         [JsonProperty("ThreatLevel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public int ThreatLevel { get; set; }
-
-        [JsonProperty("patternProperties", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public object PatternProperties { get; set; }
     }
 }

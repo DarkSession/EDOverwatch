@@ -12,6 +12,7 @@
         [Column]
         public DateTimeOffset Updated { get; set; }
 
+        [ForeignKey("StarSystemId")]
         public StarSystem? StarSystem { get; set; }
 
         public ThargoidMaelstrom(int id, string name, DateTimeOffset updated)

@@ -1,22 +1,18 @@
 ﻿global using ActiveMQ.Artemis.Client;
 global using ActiveMQ.Artemis.Client.Transactions;
 global using EDDatabase;
-global using Messages;
-global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
-global using Newtonsoft.Json;
-using EDDataProcessor.EDDN;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace EDDataProcessor
+namespace EDOverwatch
 {
     internal class Program
     {
         public static IConfiguration? Configuration { get; private set; }
         public static IServiceProvider? Services { get; private set; }
 
-        static async Task Main(string[] args)
+        static Task Main(string[] args)
         {
             Configuration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
@@ -33,12 +29,12 @@ namespace EDDataProcessor
                 {
                     builder.AddConsole();
                 })
-                .AddSingleton<EDDNProcessor>()
                 .AddDbContext<EdDbContext>()
+                .AddSingleton<Overwatch>()
                 .BuildServiceProvider();
 
-            EDDNProcessor eddnProcessor = Services.GetRequiredService<EDDNProcessor>();
-            await eddnProcessor.ProcessMessages();
+            Overwatch overwatch = Services.GetRequiredService<Overwatch>();
+            return overwatch.RunAsync();
         }
     }
 }

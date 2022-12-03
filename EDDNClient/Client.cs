@@ -4,7 +4,6 @@ using NetMQ;
 using NetMQ.Sockets;
 using Newtonsoft.Json.Linq;
 using System.Text;
-using System.Threading;
 
 namespace EDDNClient
 {

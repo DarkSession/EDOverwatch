@@ -38,15 +38,15 @@ namespace EDDatabase
             return s;
         }
 
-        public static async Task<StarSystemSecurity> GetByName(string input, EdDbContext dbContext)
+        public static async Task<StarSystemSecurity> GetByName(string input, EdDbContext dbContext, CancellationToken cancellationToken = default)
         {
             string name = GetInternalString(input);
-            StarSystemSecurity? starSystemSecurity = await dbContext.StarSystemSecurities.SingleOrDefaultAsync(c => c.Name == name);
+            StarSystemSecurity? starSystemSecurity = await dbContext.StarSystemSecurities.SingleOrDefaultAsync(c => c.Name == name, cancellationToken);
             if (starSystemSecurity == null)
             {
                 starSystemSecurity = new StarSystemSecurity(0, name);
                 dbContext.StarSystemSecurities.Add(starSystemSecurity);
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             return starSystemSecurity;
         }

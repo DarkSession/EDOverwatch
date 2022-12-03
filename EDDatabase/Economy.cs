@@ -38,17 +38,17 @@ namespace EDDatabase
             return s;
         }
 
-        public static async Task<Economy?> GetByName(string input, EdDbContext dbContext)
+        public static async Task<Economy?> GetByName(string input, EdDbContext dbContext, CancellationToken cancellationToken = default)
         {
             string name = GetInternalString(input);
             if (!string.IsNullOrEmpty(name))
             {
-                Economy? economy = await dbContext.Economies.SingleOrDefaultAsync(c => c.Name == name);
+                Economy? economy = await dbContext.Economies.SingleOrDefaultAsync(c => c.Name == name, cancellationToken);
                 if (economy == null)
                 {
                     economy = new Economy(0, name);
                     dbContext.Economies.Add(economy);
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 return economy;
             }

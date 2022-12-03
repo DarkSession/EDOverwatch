@@ -16,16 +16,19 @@
             Name = name;
         }
 
-        public static async Task<FactionAllegiance> GetByName(string name, EdDbContext dbContext)
+        public static async Task<FactionAllegiance> GetByName(string name, EdDbContext dbContext, CancellationToken cancellationToken = default)
         {
-            FactionAllegiance? allegiance = await dbContext.FactionAllegiances.SingleOrDefaultAsync(c => c.Name == name);
+            FactionAllegiance? allegiance = await dbContext.FactionAllegiances.SingleOrDefaultAsync(c => c.Name == name, cancellationToken);
             if (allegiance == null)
             {
                 allegiance = new FactionAllegiance(0, name);
                 dbContext.FactionAllegiances.Add(allegiance);
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             return allegiance;
         }
+
+        [NotMapped]
+        public bool IsThargoid => Name == "Thargoid";
     }
 }
