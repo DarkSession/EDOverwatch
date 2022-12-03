@@ -6,24 +6,37 @@ namespace EDDatabase
 {
     public class EdDbContext : DbContext
     {
+        public DbSet<Economy> Economies { get; set; }
+
         public DbSet<FactionAllegiance> FactionAllegiances { get; set; }
+        public DbSet<FactionGovernment> FactionGovernments { get; set; }
+
         public DbSet<StarSystem> StarSystems { get; set; }
         public DbSet<StarSystemFssSignal> StarSystemFssSignals { get; set; }
         public DbSet<StarSystemThargoidLevel> StarSystemThargoidLevels { get; set; }
+        public DbSet<StarSystemSecurity> StarSystemSecurities { get; set; }
+
+        public DbSet<Station> Stations { get; set; }
+        public DbSet<StationType> StationTypes { get; set;
+        }
         public DbSet<ThargoidCycle> ThargoidCycles { get; set; }
         public DbSet<ThargoidMaelstrom> ThargoidMaelstroms { get; set; }
 
-        private IConfiguration Configuration { get; }
+        private string ConnectionString { get; }
 
         public EdDbContext(IConfiguration configuration)
         {
-            Configuration = configuration;
+            ConnectionString = configuration.GetValue<string>("ConnectionString") ?? string.Empty;
+        }
+
+        internal EdDbContext(string connectionString)
+        {
+            ConnectionString = connectionString;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connectionString = Configuration.GetValue<string>("ConnectionString") ?? string.Empty;
-            optionsBuilder.UseMySql(connectionString,
+            optionsBuilder.UseMySql(ConnectionString,
                 new MariaDbServerVersion(new Version(10, 3, 25)),
                 options =>
                 {
@@ -39,20 +52,8 @@ namespace EDDatabase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<StarSystemThargoidLevel>()
-                .HasOne(s => s.StarSystem)
-                .WithMany(s => s.ThargoidLevelHistory);
-
-            modelBuilder.Entity<StarSystemThargoidLevel>()
-                .HasOne(s => s.StarSystem)
-                .WithOne(s => s.ThargoidLevel);
-
             modelBuilder.Entity<StarSystem>()
                 .HasMany(s => s.ThargoidLevelHistory)
-                .WithOne(s => s.StarSystem);
-
-            modelBuilder.Entity<StarSystem>()
-                .HasOne(s => s.ThargoidLevel)
                 .WithOne(s => s.StarSystem);
         }
 

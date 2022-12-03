@@ -28,6 +28,9 @@
         [ForeignKey("AllegianceId")]
         public FactionAllegiance? Allegiance { get; set; }
 
+        [ForeignKey("SecurityId")]
+        public StarSystemSecurity? Security { get; set; }
+
         [ForeignKey("MaelstromId")]
         public ThargoidMaelstrom? Maelstrom { get; set; }
 
@@ -39,6 +42,7 @@
 
         [Column]
         public DateTimeOffset Updated { get; set; }
+
 
         public IEnumerable<StarSystemThargoidLevel>? ThargoidLevelHistory { get; set; }
 

@@ -1,9 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Net.Sockets;
+using System.Runtime.Serialization;
 
 namespace EDDataProcessor.EDDN
 {
     [EDDNSchema("https://eddn.edcd.io/schemas/journal/1")]
-    public class JournalV1 : IEDDNEvent
+    internal class JournalV1 : IEDDNEvent
     {
         [JsonProperty("$schemaRef", Required = Required.Always)]
         public string SchemaRef { get; set; } = string.Empty;
@@ -29,18 +30,19 @@ namespace EDDataProcessor.EDDN
                         List<double> starPos = Message.StarPos?.ToList() ?? new();
                         if (starPos.Count != 3)
                         {
-                            return;
+                            break;
                         }
                         bool isNew = false;
                         StarSystem? starSystem = await dbContext.StarSystems
                                                                 .Include(s => s.Allegiance)
+                                                                .Include(s => s.Security)
                                                                 .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress);
                         if (starSystem == null)
                         {
                             isNew = true;
                             starSystem = new(0,
                                 Message.SystemAddress,
-                                Message.Name,
+                                Message.StarSystem,
                                 (decimal)starPos[0],
                                 (decimal)starPos[1],
                                 (decimal)starPos[2],
@@ -51,11 +53,11 @@ namespace EDDataProcessor.EDDN
                         }
                         if (starSystem.Updated < Message.Timestamp || isNew)
                         {
-                            bool changed = false;
+                            bool changed = isNew;
                             starSystem.Updated = Message.Timestamp;
-                            if (starSystem.Name != Message.Name)
+                            if (starSystem.Name != Message.StarSystem)
                             {
-                                starSystem.Name = Message.Name;
+                                starSystem.Name = Message.StarSystem;
                                 changed = true;
                             }
                             if (!string.IsNullOrEmpty(Message.SystemAllegiance))
@@ -64,6 +66,15 @@ namespace EDDataProcessor.EDDN
                                 if (starSystem.Allegiance?.Id != allegiance.Id)
                                 {
                                     starSystem.Allegiance = allegiance;
+                                    changed = true;
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(Message.SystemSecurity))
+                            {
+                                StarSystemSecurity starSystemSecurity = await StarSystemSecurity.GetByName(Message.SystemSecurity, dbContext);
+                                if (starSystem.Security?.Id != starSystemSecurity.Id)
+                                {
+                                    starSystem.Security = starSystemSecurity;
                                     changed = true;
                                 }
                             }
@@ -84,7 +95,78 @@ namespace EDDataProcessor.EDDN
                     {
                         if (Message.MarketID == 0 || (Message.Event == MessageEvent.Location && !Message.Docked))
                         {
-                            return;
+                            break;
+                        }
+
+                        StarSystem? starSystem = await dbContext.StarSystems.SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress);
+                        if (starSystem == null)
+                        {
+                            break;
+                        }
+                        bool isNew = false;
+                        Station? station = await dbContext.Stations
+                            .Include(s => s.Government)
+                            .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID);
+                        if (station == null)
+                        {
+                            isNew = true;
+                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, Message.Timestamp, Message.Timestamp);
+                            station.Type = await StationType.GetByName(Message.StationType, dbContext);
+                            dbContext.Stations.Add(station);
+                        }
+                        if (station.Updated < Message.Timestamp || isNew)
+                        {
+                            bool changed = isNew;
+                            station.Updated = Message.Timestamp;
+                            if (station.StarSystem?.Id != starSystem.Id)
+                            {
+                                station.StarSystem = starSystem;
+                                changed = true;
+                            }
+                            if (station.DistanceFromStarLS != Message.DistFromStarLS)
+                            {
+                                station.DistanceFromStarLS = Message.DistFromStarLS;
+                                changed = true;
+                            }
+                            if (!string.IsNullOrEmpty(Message.StationEconomy))
+                            {
+                                Economy? economy = await Economy.GetByName(Message.StationEconomy, dbContext);
+                                if (economy != null)
+                                {
+                                    if (station.PrimaryEconomy?.Id != economy.Id)
+                                    {
+                                        station.PrimaryEconomy = economy;
+                                        changed = true;
+                                    }
+                                    if ((Message.StationEconomies?.Count() ?? 0) > 1)
+                                    {
+                                        DockedStationEconomy stationSecondaryEconomy = Message.StationEconomies!
+                                            .OrderBy(s => s.Proportion)
+                                            .Skip(1)
+                                            .First();
+                                        Economy? secondaryEconomy = await Economy.GetByName(stationSecondaryEconomy.Name, dbContext);
+                                        if (secondaryEconomy != null && station.SecondaryEconomy?.Id != secondaryEconomy.Id)
+                                        {
+                                            station.SecondaryEconomy = secondaryEconomy;
+                                            changed = true;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(Message.StationGovernment))
+                            {
+                                FactionGovernment? government = await FactionGovernment.GetByName(Message.StationGovernment, dbContext);
+                                if (government != null && station.Government?.Id != government.Id)
+                                {
+                                    station.Government = government;
+                                    changed = true;
+                                }
+                            }
+                            await dbContext.SaveChangesAsync();
+                            if (changed)
+                            {
+                                await activeMqProducer.SendAsync("StarSystem.Updated", new(JsonConvert.SerializeObject(new StationUpdated(Message.MarketID, Message.SystemAddress))));
+                            }
                         }
                         break;
                     }
@@ -143,64 +225,57 @@ namespace EDDataProcessor.EDDN
 
         [JsonProperty("Docked")]
         public bool Docked { get; set; }
-        /*
+
         [JsonProperty("DistFromStarLS")]
         public decimal DistFromStarLS { get; set; }
 
         [JsonProperty("StationName")]
-        public string StationName { get; set; }
+        public string StationName { get; set; } = string.Empty;
 
         [JsonProperty("StationType")]
-        public string StationType { get; set; }
+        public string StationType { get; set; } = string.Empty;
 
         [JsonProperty("StationEconomy")]
-        public string StationEconomy { get; set; }
+        public string StationEconomy { get; set; } = string.Empty;
 
         [JsonProperty("StationEconomies")]
-        public ICollection<DockedStationEconomy> StationEconomies { get; set; }
+        public ICollection<DockedStationEconomy>? StationEconomies { get; set; }
 
         [JsonProperty("StationGovernment")]
-        public string StationGovernment { get; set; }
-
-        [JsonProperty("StationServices")]
-        public ICollection<string> StationServices { get; set; }
+        public string StationGovernment { get; set; } = string.Empty;
 
         [JsonProperty("StationFaction")]
-        public DockedStationFaction StationFaction { get; set; }
+        public DockedStationFaction? StationFaction { get; set; }
 
         [JsonProperty("LandingPads")]
-        public DockedLandingPads LandingPads { get; set; }
+        public DockedLandingPads? LandingPads { get; set; }
+    }
 
-        [JsonProperty("BodyID")]
-        public short BodyID { get; set; }
+    public class DockedLandingPads
+    {
+        [JsonProperty("Small")]
+        public short Small { get; set; }
 
-        [JsonProperty("BodyName")]
-        public string BodyName { get; set; }
+        [JsonProperty("Medium")]
+        public short Medium { get; set; }
 
-        [JsonProperty("StarType")]
-        public string StarType { get; set; }
+        [JsonProperty("Large")]
+        public short Large { get; set; }
+    }
 
-        [JsonProperty("PlanetClass")]
-        public string PlanetClass { get; set; }
+    public class DockedStationEconomy
+    {
+        [JsonProperty("Name")]
+        public string Name { get; set; } = string.Empty;
 
-        [JsonProperty("Signals")]
-        public List<SAASignalsFoundSignal> Signals { get; set; }
+        [JsonProperty("Proportion")]
+        public decimal Proportion { get; set; }
+    }
 
-        [JsonProperty("Rings")]
-        public List<ScanBodyRing> Rings { get; set; }
-
-        [JsonProperty("ReserveLevel")]
-        public string ReserveLevel { get; set; }
-
-        [JsonProperty("Category")]
-        public string Category { get; set; }
-
-        [JsonProperty("SubCategory")]
-        public string SubCategory { get; set; }
-
-        [JsonProperty("Region")]
-        public string Region { get; set; }
-        */
+    public class DockedStationFaction
+    {
+        [JsonProperty("Name")]
+        public string Name { get; set; } = string.Empty;
     }
 
     public enum MessageEvent

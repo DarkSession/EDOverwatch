@@ -4,6 +4,7 @@ using NetMQ;
 using NetMQ.Sockets;
 using Newtonsoft.Json.Linq;
 using System.Text;
+using System.Threading;
 
 namespace EDDNClient
 {
@@ -39,6 +40,13 @@ namespace EDDNClient
 
             Log.LogInformation("Client started");
 
+            using NetMQRuntime runtime = new();
+            runtime.Run(cancellationToken, ReceiveData(client, producer, cancellationToken));
+            await Task.Delay(Timeout.Infinite, cancellationToken);
+        }
+
+        private async Task ReceiveData(SubscriberSocket client, IProducer producer, CancellationToken cancellationToken)
+        {
             while (!cancellationToken.IsCancellationRequested)
             {
                 try

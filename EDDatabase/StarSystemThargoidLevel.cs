@@ -6,7 +6,7 @@
         [Column]
         public int Id { get; set; }
 
-        [ForeignKey("StarSystemId")]
+        // [ForeignKey("StarSystemId")]
         public StarSystem? StarSystem { get; set; }
 
         [Column]
@@ -35,4 +35,15 @@
         Maelstrom = 50,
         Recapture = 60,
     }
+
+    /*
+     Invasion time:
+        33.000 pop: 5 weeks
+        95.000 pop: 5 weeks
+       128.000 pop: 7 weeks
+       145.000 pop: 6 weeks
+     2.900.000 pop: 7 weeks
+     5.100.000 pop: 5 weeks
+     ....
+    */
 }

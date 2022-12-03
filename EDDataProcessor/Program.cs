@@ -15,8 +15,7 @@ namespace EDDataProcessor
         public static IConfiguration? Configuration { get; private set; }
         public static IServiceProvider? Services { get; private set; }
 
-
-        static Task Main(string[] args)
+        static async Task Main(string[] args)
         {
             Configuration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
@@ -37,8 +36,13 @@ namespace EDDataProcessor
                 .AddDbContext<EdDbContext>()
                 .BuildServiceProvider();
 
+            EdDbContext dbContext = Services.GetRequiredService<EdDbContext>();
+            bool canConnect = await dbContext.Database.CanConnectAsync();
+
+            await dbContext.FactionAllegiances.FirstOrDefaultAsync();
+
             EDDNProcessor eddnProcessor = Services.GetRequiredService<EDDNProcessor>();
-            return eddnProcessor.ProcessMessages();
+            await eddnProcessor.ProcessMessages();
         }
     }
 }
