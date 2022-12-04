@@ -1,0 +1,26 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+@import 'material-icons/iconfont/material-icons.css';
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: rgb(22, 22, 22);
+  color: #fff;
+}
+
+body {
+  margin: 0;
+  font-family: Tahoma, sans-serif;
+}
+
+h1, h2, h3 {
+  font-weight: bold;
+}

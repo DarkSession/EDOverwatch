@@ -1,0 +1,18 @@
+.header {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    font-size: 300%;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+.footer {
+    font-size: 60%;
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+}

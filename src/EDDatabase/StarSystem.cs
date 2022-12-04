@@ -3,6 +3,7 @@
     [Table("StarSystem")]
     [Index(nameof(SystemAddress), IsUnique = true)]
     [Index(nameof(LocationX), nameof(LocationY), nameof(LocationZ))]
+    [Index(nameof(WarRelevantSystem))]
     public class StarSystem
     {
         [Column]
@@ -39,6 +40,9 @@
         public StarSystemThargoidLevel? ThargoidLevel { get; set; }
 
         [Column]
+        public bool WarRelevantSystem { get; set; }
+
+        [Column]
         public DateTimeOffset Created { get; set; }
 
         [Column]
@@ -56,6 +60,7 @@
             decimal locationY,
             decimal locationZ,
             long population,
+            bool warRelevantSystem,
             DateTimeOffset created,
             DateTimeOffset updated)
         {
@@ -66,8 +71,12 @@
             LocationY = locationY;
             LocationZ = locationZ;
             Population = population;
+            WarRelevantSystem = warRelevantSystem;
             Created = created;
             Updated = updated;
         }
+
+        [NotMapped]
+        public bool IsWarRelevantSystem => Population > 0 && EDDatabase.Util.Math.DistanceFromSol((float)LocationX, (float)LocationY, (float)LocationZ) <= 1000f;
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace EDDatabase
 {
     [Table("StarSystemThargoidLevel")]
+    [Index(nameof(State))]
     public class StarSystemThargoidLevel
     {
         [Column]
         public int Id { get; set; }
 
-        // [ForeignKey("StarSystemId")]
         public StarSystem? StarSystem { get; set; }
 
         [Column]
@@ -27,8 +27,7 @@
 
     public enum StarSystemThargoidLevelState : byte
     {
-        Unknown = 0,
-        None = 10,
+        None = 0,
         Alert = 20,
         Invasion = 30,
         Controlled = 40,

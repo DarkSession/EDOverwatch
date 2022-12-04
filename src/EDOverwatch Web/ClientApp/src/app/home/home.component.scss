@@ -1,0 +1,166 @@
+.main-container {
+  position: relative;
+  min-width: calc(100vh * 1.55);
+}
+
+.sides {
+  display: flex;
+}
+
+.side {
+  width: 50vw;
+  min-width: calc(50vh * 1.55);
+  display: flex;
+  position: relative;
+}
+
+.side-human {
+  justify-content: flex-end;
+}
+
+.side-content-container {
+  flex-grow: 1;
+  padding: 8px;
+  display: flex;
+}
+
+.side-content-container-human {
+  background-color: rgb(33, 29, 104);
+  justify-content: flex-end;
+}
+
+.side-content-container-thargoid {
+  background-color: #846a24;
+  justify-content: flex-start;
+}
+
+.side-content {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  margin-top: 10%;
+}
+
+.side-content-thargoid {
+  align-items: flex-end;
+}
+
+.key-highlight,
+.text,
+.key-highlight-description {
+  font-size: 80%;
+  line-height: 1;
+}
+
+.text-item {
+  margin: 12px;
+}
+
+.text {
+  padding: 8px;
+
+  .highlight {
+    font-weight: bold;
+    font-size: 160%;
+    font-family: 'Trebuchet MS', sans-serif;
+  }
+}
+
+.top-container {
+  width: 100vw;
+  min-width: calc(100vh * 1.55);
+  position: absolute;
+  top: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bottom-container {
+  width: 100vw;
+  min-width: calc(100vh * 1.55);
+  position: absolute;
+  bottom: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .text {
+    text-align: center;
+  }
+
+  .text-item {
+    margin: 20px;
+  }
+}
+
+.triangle-container {
+  width: 57.143vh;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-grow: 0;
+
+  .bg {
+    position: absolute;
+    top: 0;
+  }
+
+  .line {
+    stroke-width: 8px;
+  }
+
+  .triangle {
+    fill: transparent;
+    stroke-width: 8px;
+  }
+
+  .key-indicators {
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 70%;
+  }
+
+  .key-highlight-value {
+    line-height: 1;
+    font-weight: bold;
+    font-size: 200%;
+    font-family: 'Trebuchet MS', sans-serif;
+  }
+}
+
+.triangle-humans {
+  .line {
+    stroke: rgb(33, 29, 104);
+  }
+
+  .triangle {
+    stroke: rgb(33, 29, 104);
+    fill: rgb(33, 29, 104);
+  }
+
+  .key-indicators {
+    margin-left: 20%;
+  }
+}
+
+.triangle-thargoids {
+  justify-content: flex-end;
+
+  .line {
+    stroke: #846a24;
+  }
+
+  .triangle {
+    stroke: #846a24;
+    fill: #846a24;
+  }
+
+  .key-indicators {
+    margin-right: 20%;
+    text-align: right;
+  }
+}

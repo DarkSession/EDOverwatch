@@ -1,0 +1,57 @@
+{
+  "name": "edoverwatch_web",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "prestart": "node aspnetcore-https",
+    "start": "run-script-os",
+    "start:windows": "ng serve --port 44440 --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\"",
+    "start:default": "ng serve --port 44440 --ssl --ssl-cert \"$HOME/.aspnet/https/${npm_package_name}.pem\" --ssl-key \"$HOME/.aspnet/https/${npm_package_name}.key\"",
+    "build": "ng build",
+    "build:ssr": "ng run EDOverwatch_Web:server:dev",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^15.0.2",
+    "@angular/cdk": "^15.0.1",
+    "@angular/common": "^15.0.2",
+    "@angular/compiler": "^15.0.2",
+    "@angular/core": "^15.0.2",
+    "@angular/forms": "^15.0.2",
+    "@angular/material": "^15.0.1",
+    "@angular/platform-browser": "^15.0.2",
+    "@angular/platform-browser-dynamic": "^15.0.2",
+    "@angular/platform-server": "^15.0.2",
+    "@angular/router": "^15.0.2",
+    "bootstrap": "^5.2.0",
+    "dayjs": "^1.11.6",
+    "jquery": "^3.6.0",
+    "material-icons": "^1.13.1",
+    "oidc-client": "^1.11.5",
+    "popper.js": "^1.16.0",
+    "run-script-os": "^1.1.6",
+    "rxjs": "~7.5.6",
+    "tslib": "^2.4.0",
+    "zone.js": "~0.11.8"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^15.0.2",
+    "@angular/cli": "^15.0.2",
+    "@angular/compiler-cli": "^15.0.2",
+    "@types/jasmine": "~4.3.0",
+    "@types/jasminewd2": "~2.0.10",
+    "@types/node": "^18.7.11",
+    "jasmine-core": "~4.3.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.1.1",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "^2.0.0",
+    "typescript": "~4.8.4"
+  },
+  "overrides": {
+    "autoprefixer": "10.4.5"
+  }
+}

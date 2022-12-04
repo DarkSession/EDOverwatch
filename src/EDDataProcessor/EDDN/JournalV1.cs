@@ -47,8 +47,10 @@ namespace EDDataProcessor.EDDN
                                 (decimal)starPos[1],
                                 (decimal)starPos[2],
                                 Message.Population ?? 0,
+                                false,
                                 Message.Timestamp,
                                 Message.Timestamp);
+                            starSystem.WarRelevantSystem = starSystem.IsWarRelevantSystem;
                             dbContext.StarSystems.Add(starSystem);
                         }
                         if (starSystem.Updated < Message.Timestamp || isNew)

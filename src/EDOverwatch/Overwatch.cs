@@ -137,60 +137,66 @@ namespace EDOverwatch
                 .Include(s => s.Allegiance)
                 .Include(s => s.ThargoidLevel)
                 .SingleOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
-            if (starSystem != null &&
+            if (starSystem != null)
+            {
+                StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.None;
                 // We check if the system is within range of a Maelstrom
-                await dbContext.ThargoidMaelstroms.AnyAsync(t =>
+                if (await dbContext.ThargoidMaelstroms.AnyAsync(t =>
                             t.StarSystem!.LocationX >= starSystem.LocationX - MaelstromMaxDistanceLy && t.StarSystem!.LocationX <= starSystem.LocationX + MaelstromMaxDistanceLy &&
                             t.StarSystem!.LocationY >= starSystem.LocationY - MaelstromMaxDistanceLy && t.StarSystem!.LocationY <= starSystem.LocationY + MaelstromMaxDistanceLy &&
                             t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken))
-            {
-                StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.Unknown;
-                DateTimeOffset signalsMaxAge = starSystem.Updated.AddHours(-6);
-                IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
-                if (starSystem.Allegiance?.IsThargoid ?? false)
                 {
-                    if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.Maelstrom, cancellationToken))
+                    DateTimeOffset signalsMaxAge = starSystem.Updated.AddHours(-6);
+                    IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
+                    if (starSystem.Allegiance?.IsThargoid ?? false)
                     {
-                        thargoidLevel = StarSystemThargoidLevelState.Maelstrom;
-                    }
-                    else
-                    {
-                        thargoidLevel = StarSystemThargoidLevelState.Controlled;
-                    }
-                }
-                else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.AXCZ, cancellationToken))
-                {
-                    thargoidLevel = StarSystemThargoidLevelState.Invasion;
-                }
-                else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.ThargoidActivity, cancellationToken))
-                {
-                    thargoidLevel = StarSystemThargoidLevelState.Alert;
-                }
-
-                // If the system is brand new, we might not have all the data yet, so we skip it for now.
-                if (thargoidLevel == StarSystemThargoidLevelState.Unknown && starSystem.Created > DateTimeOffset.UtcNow.AddHours(-6))
-                {
-                    return;
-                }
-
-                if (starSystem.ThargoidLevel?.State != thargoidLevel)
-                {
-                    ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
-                    if (starSystem.ThargoidLevel != null)
-                    {
-                        if (starSystem.ThargoidLevel.CycleStart?.Id == currentThargoidCycle.Id)
+                        if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.Maelstrom, cancellationToken))
                         {
-                            Log.LogWarning("Star System {systemAddress}: New thargoid level in the same cycle!", starSystem.SystemAddress);
+                            thargoidLevel = StarSystemThargoidLevelState.Maelstrom;
                         }
-                        starSystem.ThargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken, -1);
+                        else
+                        {
+                            thargoidLevel = StarSystemThargoidLevelState.Controlled;
+                        }
                     }
-                    starSystem.ThargoidLevel = new(0, thargoidLevel)
+                    else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.AXCZ, cancellationToken))
                     {
-                        StarSystem = starSystem,
-                        CycleStart = currentThargoidCycle,
-                    };
+                        thargoidLevel = StarSystemThargoidLevelState.Invasion;
+                    }
+                    else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.ThargoidActivity, cancellationToken))
+                    {
+                        thargoidLevel = StarSystemThargoidLevelState.Alert;
+                    }
+
+                    // If the system is brand new, we might not have all the data yet, so we skip it for now.
+                    if (thargoidLevel == StarSystemThargoidLevelState.None && starSystem.Created > DateTimeOffset.UtcNow.AddHours(-6))
+                    {
+                        return;
+                    }
+                    if (starSystem.ThargoidLevel?.State != thargoidLevel)
+                    {
+                        ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
+                        if (starSystem.ThargoidLevel != null)
+                        {
+                            if (starSystem.ThargoidLevel.CycleStart?.Id == currentThargoidCycle.Id)
+                            {
+                                Log.LogWarning("Star System {systemAddress}: New thargoid level in the same cycle!", starSystem.SystemAddress);
+                            }
+                            starSystem.ThargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken, -1);
+                        }
+                        starSystem.ThargoidLevel = new(0, thargoidLevel)
+                        {
+                            StarSystem = starSystem,
+                            CycleStart = currentThargoidCycle,
+                        };
+                        await dbContext.SaveChangesAsync(cancellationToken);
+                        // await starSystemThargoidLevelChangedProducer.SendAsync(new(JsonConvert.SerializeObject(new StarSystemThargoidLevelChanged(starSystem.SystemAddress))), transaction, cancellationToken);
+                    }
+                }
+                if (!starSystem.WarRelevantSystem && (starSystem.IsWarRelevantSystem || thargoidLevel != StarSystemThargoidLevelState.None))
+                {
+                    starSystem.WarRelevantSystem = true;
                     await dbContext.SaveChangesAsync(cancellationToken);
-                    // await starSystemThargoidLevelChangedProducer.SendAsync(new(JsonConvert.SerializeObject(new StarSystemThargoidLevelChanged(starSystem.SystemAddress))), transaction, cancellationToken);
                 }
             }
         }
