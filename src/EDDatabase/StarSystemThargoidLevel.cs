@@ -18,6 +18,9 @@
         [ForeignKey("CycleEndId")]
         public ThargoidCycle? CycleEnd { get; set; }
 
+        [ForeignKey("MaelstromId")]
+        public ThargoidMaelstrom? Maelstrom { get; set; }
+
         public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state)
         {
             Id = id;

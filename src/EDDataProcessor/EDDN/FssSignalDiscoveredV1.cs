@@ -99,7 +99,7 @@ namespace EDDataProcessor.EDDN
                             .FirstOrDefaultAsync(t => t.Name == maelStromName, cancellationToken);
                         if (thargoidMaelstrom == null)
                         {
-                            thargoidMaelstrom = new(0, maelStromName, Message.Timestamp);
+                            thargoidMaelstrom = new(0, maelStromName, 20m, Message.Timestamp);
                             thargoidMaelstrom.StarSystem = starSystem;
                             await dbContext.SaveChangesAsync(cancellationToken);
                             starSystem.Maelstrom = thargoidMaelstrom;

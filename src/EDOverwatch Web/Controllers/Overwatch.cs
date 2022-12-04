@@ -8,10 +8,10 @@ namespace EDOverwatch_Web.Controllers
     [Route("api/[controller]/[action]")]
     public class Overwatch : ControllerBase
     {
-        private EdDbContext EdDbContext { get; }
+        private EdDbContext DbContext { get; }
         public Overwatch(EdDbContext dbContext)
         {
-            EdDbContext = dbContext;
+            DbContext = dbContext;
         }
 
         [HttpGet]
@@ -24,7 +24,7 @@ namespace EDOverwatch_Web.Controllers
         public async Task<OverwatchOverview> Overview(CancellationToken cancellationToken)
         {
             OverwatchOverview result = new();
-            int relevantSystemCount = await EdDbContext.StarSystems
+            int relevantSystemCount = await DbContext.StarSystems
                 .Where(s => s.WarRelevantSystem)
                 .CountAsync(cancellationToken);
             if (relevantSystemCount == 0)
@@ -33,17 +33,17 @@ namespace EDOverwatch_Web.Controllers
             }
 
             {
-                int thargoidsSystemsControlling = await EdDbContext.StarSystems
+                int thargoidsSystemsControlling = await DbContext.StarSystems
                     .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
                     .CountAsync(cancellationToken);
                 result.Thargoids = new(
                     Math.Round((double)thargoidsSystemsControlling / (double)relevantSystemCount, 4),
-                    await EdDbContext.ThargoidMaelstroms.CountAsync(cancellationToken),
+                    await DbContext.ThargoidMaelstroms.CountAsync(cancellationToken),
                     thargoidsSystemsControlling
                 );
             }
             {
-                int humansSystemsControlling = await EdDbContext.StarSystems
+                int humansSystemsControlling = await DbContext.StarSystems
                     .Where(s => s.WarRelevantSystem && (s.ThargoidLevel == null || s.ThargoidLevel!.State == StarSystemThargoidLevelState.None) && s.Population > 0)
                     .CountAsync(cancellationToken);
                 result.Humans = new(
@@ -52,11 +52,23 @@ namespace EDOverwatch_Web.Controllers
                     0);
             }
             result.Contested = new(
-                await EdDbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion).CountAsync(cancellationToken),
-                await EdDbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Alert).CountAsync(cancellationToken),
-                await EdDbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recapture).CountAsync(cancellationToken)
+                await DbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion).CountAsync(cancellationToken),
+                await DbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Alert).CountAsync(cancellationToken),
+                await DbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recapture).CountAsync(cancellationToken)
             );
             return result;
         }
+
+        /*
+        [HttpGet]
+        public async Task<OverwatchSystems> Systems(CancellationToken cancellationToken)
+        {
+            List<StarSystem> starSystems = await DbContext.StarSystems
+                .AsNoTracking()
+                .Include(s => s.ThargoidLevel)
+                .Where(s => s.ThargoidLevel != null && s.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert)
+                .ToListAsync(cancellationToken);
+        }
+        */
     }
 }

@@ -12,6 +12,7 @@ namespace EDOverwatch
         private SemaphoreSlim SemaphoreSlimLock { get; } = new SemaphoreSlim(1, 1);
         private ILogger Log { get; }
         private IServiceProvider ServiceProvider { get; }
+        private decimal MaelstromMaxDistanceLy { get; set; } = 40m;
 
         public Overwatch(IConfiguration configuration, ILogger<Overwatch> log, IServiceProvider serviceProvider)
         {
@@ -33,6 +34,16 @@ namespace EDOverwatch
                     Configuration.GetValue<int>("ActiveMQ:Port"),
                     Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
                     Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
+
+                {
+                    await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
+                    EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+                    if (await dbContext.ThargoidMaelstroms.AnyAsync())
+                    {
+                        MaelstromMaxDistanceLy = (await dbContext.ThargoidMaelstroms.MaxAsync(t => t.InfluenceSphere)) + 10m;
+                        Log.LogInformation("MaelstromMaxDistanceLy: {MaelstromMaxDistanceLy}", MaelstromMaxDistanceLy);
+                    }
+                }
 
                 ConnectionFactory connectionFactory = new();
                 await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
@@ -126,25 +137,27 @@ namespace EDOverwatch
             }
         }
 
-        private const decimal MaelstromMaxDistanceLy = 40m;
-
         private async Task CheckStarSystem(long systemAddress, IProducer starSystemThargoidLevelChangedProducer, Transaction transaction, CancellationToken cancellationToken)
         {
-            using IServiceScope serviceScope = ServiceProvider.CreateScope();
+            await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
 
             StarSystem? starSystem = await dbContext.StarSystems
                 .Include(s => s.Allegiance)
                 .Include(s => s.ThargoidLevel)
+                .ThenInclude(t => t!.Maelstrom)
                 .SingleOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
             if (starSystem != null)
             {
                 StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.None;
                 // We check if the system is within range of a Maelstrom
-                if (await dbContext.ThargoidMaelstroms.AnyAsync(t =>
+                ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms
+                    .Include(t => t.StarSystem)
+                    .FirstOrDefaultAsync(t =>
                             t.StarSystem!.LocationX >= starSystem.LocationX - MaelstromMaxDistanceLy && t.StarSystem!.LocationX <= starSystem.LocationX + MaelstromMaxDistanceLy &&
                             t.StarSystem!.LocationY >= starSystem.LocationY - MaelstromMaxDistanceLy && t.StarSystem!.LocationY <= starSystem.LocationY + MaelstromMaxDistanceLy &&
-                            t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken))
+                            t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken);
+                if (maelstrom != null)
                 {
                     DateTimeOffset signalsMaxAge = starSystem.Updated.AddHours(-6);
                     IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
@@ -188,9 +201,31 @@ namespace EDOverwatch
                         {
                             StarSystem = starSystem,
                             CycleStart = currentThargoidCycle,
+                            Maelstrom = maelstrom,
                         };
                         await dbContext.SaveChangesAsync(cancellationToken);
                         // await starSystemThargoidLevelChangedProducer.SendAsync(new(JsonConvert.SerializeObject(new StarSystemThargoidLevelChanged(starSystem.SystemAddress))), transaction, cancellationToken);
+                    }
+                    else if (starSystem.ThargoidLevel != null && starSystem.ThargoidLevel.Maelstrom == null)
+                    {
+                        starSystem.ThargoidLevel.Maelstrom = maelstrom;
+                        await dbContext.SaveChangesAsync(cancellationToken);
+                    }
+                    if (maelstrom.StarSystem != null && thargoidLevel != StarSystemThargoidLevelState.None)
+                    {
+                        decimal distanceToMaelstrom = (decimal)starSystem.DistanceTo(maelstrom.StarSystem);
+                        if (maelstrom.InfluenceSphere < distanceToMaelstrom)
+                        {
+                            maelstrom.InfluenceSphere = distanceToMaelstrom;
+                            Log.LogInformation("Maelstrom {name}'s sphere of influence is to {distanceToMaelstrom}", maelstrom.Name, distanceToMaelstrom);
+                            await dbContext.SaveChangesAsync(cancellationToken);
+                        }
+                        distanceToMaelstrom += 10m;
+                        if (distanceToMaelstrom > MaelstromMaxDistanceLy)
+                        {
+                            MaelstromMaxDistanceLy = distanceToMaelstrom;
+                            Log.LogInformation("MaelstromMaxDistanceLy: {MaelstromMaxDistanceLy}", MaelstromMaxDistanceLy);
+                        }
                     }
                 }
                 if (!starSystem.WarRelevantSystem && (starSystem.IsWarRelevantSystem || thargoidLevel != StarSystemThargoidLevelState.None))

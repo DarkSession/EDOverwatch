@@ -60,7 +60,7 @@ namespace EDDataProcessor.EDDN
                             EDDNProcessors.TryGetValue(schema, out Type? schemaClass) &&
                             json.ToObject(schemaClass) is IEDDNEvent eddnEvent)
                         {
-                            using IServiceScope serviceScope = ServiceProvider.CreateScope();
+                            await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
                             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
                             if (!await dbContext.Database.CanConnectAsync(cancellationToken))
                             {

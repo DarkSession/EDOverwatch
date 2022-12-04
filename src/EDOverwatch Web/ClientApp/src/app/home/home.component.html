@@ -51,7 +51,7 @@
           </div>
           <div>
             <span class="key-highlight-description">Controlling</span>
-            <div class="key-highlight-value">{{ overview.humans.controllingPercentage | percent }}</div>
+            <div class="key-highlight-value">{{ overview.humans.controllingPercentage | percent:'0.2-2' }}</div>
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@
         <div class="key-indicators" *ngIf="overview && overview.thargoids">
           <div>
             <span class="key-highlight-description">Controlling</span>
-            <div class="key-highlight-value">{{ overview.thargoids.controllingPercentage | percent }}</div>
+            <div class="key-highlight-value">{{ overview.thargoids.controllingPercentage | percent:'0.2-2' }}</div>
           </div>
           <div class="text">
             <div>

@@ -1,4 +1,6 @@
-﻿namespace EDDatabase
+﻿using System.Numerics;
+
+namespace EDDatabase
 {
     [Table("StarSystem")]
     [Index(nameof(SystemAddress), IsUnique = true)]
@@ -77,6 +79,16 @@
         }
 
         [NotMapped]
-        public bool IsWarRelevantSystem => Population > 0 && EDDatabase.Util.Math.DistanceFromSol((float)LocationX, (float)LocationY, (float)LocationZ) <= 1000f;
+        public bool IsWarRelevantSystem => Population > 0 && DistanceTo(Vector3.Zero) <= 1000f;
+
+        public float DistanceTo(StarSystem system) => DistanceTo((float)system.LocationX, (float)system.LocationY, (float)system.LocationZ);
+
+        public float DistanceTo(float x, float y, float z) => DistanceTo(new Vector3(x, y, z));
+
+        public float DistanceTo(Vector3 location)
+        {
+            Vector3 system2 = new((float)LocationX, (float)LocationY, (float)LocationZ);
+            return Vector3.Distance(location, system2);
+        }
     }
 }
