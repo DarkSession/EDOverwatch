@@ -21,6 +21,16 @@ body {
   font-family: Tahoma, sans-serif;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-weight: bold;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+*:focus {
+  outline: 0;
 }

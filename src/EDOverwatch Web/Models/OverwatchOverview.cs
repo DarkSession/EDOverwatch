@@ -11,14 +11,16 @@
     {
         public double ControllingPercentage { get; set; }
         public int SystemsControlling { get; set; }
+        public int SystemsRecaptured { get; set; }
         public int? ThargoidKills { get; set; }
         public int? Rescues { get; set; }
         public int? RescueSupplies { get; set; }
 
-        public OverwatchOverviewHuman(double controllingPercentage, int systemsControlling, int? thargoidKills = null, int? rescues = null, int? rescueSupplies = null)
+        public OverwatchOverviewHuman(double controllingPercentage, int systemsControlling, int systemsRecaptured, int? thargoidKills = null, int? rescues = null, int? rescueSupplies = null)
         {
             ControllingPercentage = controllingPercentage;
             SystemsControlling = systemsControlling;
+            SystemsRecaptured = systemsRecaptured;
             ThargoidKills = thargoidKills;
             Rescues = rescues;
             RescueSupplies = rescueSupplies;

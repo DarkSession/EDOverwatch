@@ -12,46 +12,46 @@
           <line x1="0" y1="720" x2="400" y2="350" class="line" />
           <polygon points="0,0 380,350 0,700" class="triangle" />
         </svg>
-        <div class="key-indicators">
+        <div class="key-indicators" *ngIf="overview && overview.humans">
           <div class="text">
             <div class="text-item">
               Controlling
               <div class="highlight">
-                13.337
+                {{ overview.humans.systemsControlling | number }}
               </div>
               systems of the human 'bubble'
             </div>
             <div class="text-item">
               <div class="highlight">
-                12
+                {{ overview.humans.systemsRecaptured | number }}
               </div>
               systems recaptured
             </div>
-            <div class="text-item">
+            <div class="text-item" *ngIf="overview.humans.thargoidKills">
               Over
               <div class="highlight">
-                1.337+
+                {{ overview.humans.thargoidKills | number }}+
               </div>
               confirmed Thargoid kills
             </div>
-            <div class="text-item">
+            <div class="text-item" *ngIf="overview.humans.rescues">
               Over
               <div class="highlight">
-                123.456+
+                {{ overview.humans.rescues | number }}+
               </div>
               confirmed rescues
             </div>
-            <div class="text-item">
+            <div class="text-item" *ngIf="overview.humans.rescueSupplies">
               Over
               <div class="highlight">
-                234.567+ t
+                {{ overview.humans.rescueSupplies | number }}+ t
               </div>
               confirmed rescue supplies
             </div>
           </div>
           <div>
             <span class="key-highlight-description">Controlling</span>
-            <div class="key-highlight-value">89.01%</div>
+            <div class="key-highlight-value">{{ overview.humans.controllingPercentage | percent }}</div>
           </div>
         </div>
       </div>
@@ -63,30 +63,30 @@
           <line x1="400" y1="720" x2="0" y2="350" class="line" />
           <polygon points="400,0 20,350 400,700" class="triangle" />
         </svg>
-        <div class="key-indicators">
+        <div class="key-indicators" *ngIf="overview && overview.thargoids">
           <div>
             <span class="key-highlight-description">Controlling</span>
-            <div class="key-highlight-value">12.34%</div>
+            <div class="key-highlight-value">{{ overview.thargoids.controllingPercentage | percent }}</div>
           </div>
           <div class="text">
             <div>
               <div class="text-item">
-                <div class="highlight">
-                  8
-                </div>
-                active Maelstroms
-              </div>
-              <div class="text-item">
                 Controlling
                 <div class="highlight">
-                  123
+                  {{ overview.thargoids.systemsControlling | number }}
                 </div>
                 systems of the human 'bubble'
               </div>
               <div class="text-item">
+                <div class="highlight">
+                  {{ overview.thargoids.activeMaelstroms | number }}
+                </div>
+                active Maelstroms
+              </div>
+              <div class="text-item" *ngIf="overview.thargoids.commanderKills">
                 Over
                 <div class="highlight">
-                  1.337+
+                  {{ overview.thargoids.commanderKills | number }}+
                 </div>
                 confirmed Commander kills
               </div>
@@ -106,22 +106,22 @@
     <h1>{{ timeSince }}</h1>
   </div>
   <div class="bottom-container">
-    <div class="text">
+    <div class="text" *ngIf="overview && overview.contested">
       <div class="text-item">
         <div class="highlight">
-          11
+          {{ overview.contested.systemsInInvasion | number }}
         </div>
         systems under Thargoid invasion
       </div>
       <div class="text-item">
         <div class="highlight">
-          12
+          {{ overview.contested.systemsWithAlerts | number }}
         </div>
         systems reporting Thargoid alerts
       </div>
       <div class="text-item">
         <div class="highlight">
-          13
+          {{ overview.contested.systemsBeingRecaptured | number }}
         </div>
         systems being recaptured
       </div>

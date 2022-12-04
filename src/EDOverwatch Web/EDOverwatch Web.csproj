@@ -9,6 +9,7 @@
     <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
     <RootNamespace>EDOverwatch_Web</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>f424965b-73ec-4ecc-9260-e9edd839b918</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

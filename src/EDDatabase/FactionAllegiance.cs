@@ -30,5 +30,8 @@
 
         [NotMapped]
         public bool IsThargoid => Name == "Thargoid";
+
+        [NotMapped]
+        public static string FactionAllegianceThargoidName => "Thargoid";
     }
 }
