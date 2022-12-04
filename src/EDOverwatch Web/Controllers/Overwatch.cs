@@ -59,16 +59,27 @@ namespace EDOverwatch_Web.Controllers
             return result;
         }
 
-        /*
         [HttpGet]
         public async Task<OverwatchSystems> Systems(CancellationToken cancellationToken)
         {
             List<StarSystem> starSystems = await DbContext.StarSystems
                 .AsNoTracking()
                 .Include(s => s.ThargoidLevel)
-                .Where(s => s.ThargoidLevel != null && s.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert)
+                .ThenInclude(t => t!.Maelstrom)
+                .ThenInclude(m => m!.StarSystem)
+                .Where(s => 
+                            s.ThargoidLevel != null && 
+                            s.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert && 
+                            s.ThargoidLevel.Maelstrom != null && 
+                            s.ThargoidLevel.Maelstrom.StarSystem != null)
                 .ToListAsync(cancellationToken);
+
+            List<ThargoidMaelstrom> maelstroms = await DbContext.ThargoidMaelstroms
+                .AsNoTracking()
+                .Include(t => t.StarSystem)
+                .ToListAsync(cancellationToken: cancellationToken);
+
+            return new OverwatchSystems(maelstroms, starSystems);
         }
-        */
     }
 }

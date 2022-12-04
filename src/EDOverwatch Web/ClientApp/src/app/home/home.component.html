@@ -107,19 +107,19 @@
   </div>
   <div class="bottom-container">
     <div class="text" *ngIf="overview && overview.contested">
-      <div class="text-item">
+      <div class="text-item clickable" [routerLink]="['/systems']">
         <div class="highlight">
           {{ overview.contested.systemsInInvasion | number }}
         </div>
         systems under Thargoid invasion
       </div>
-      <div class="text-item">
+      <div class="text-item clickable" [routerLink]="['/systems']">
         <div class="highlight">
           {{ overview.contested.systemsWithAlerts | number }}
         </div>
         systems reporting Thargoid alerts
       </div>
-      <div class="text-item">
+      <div class="text-item clickable" [routerLink]="['/systems']">
         <div class="highlight">
           {{ overview.contested.systemsBeingRecaptured | number }}
         </div>

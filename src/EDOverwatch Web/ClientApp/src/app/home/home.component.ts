@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.updateInterval = setInterval(() => {
       this.updateTimeSince();
-    }, 1000);
+    }, 60000);
     this.updateTimeSince();
     this.loadOverview();
   }

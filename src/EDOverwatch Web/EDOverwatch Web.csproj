@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EDDatabase\EDDatabase.csproj" />
+    <ProjectReference Include="..\EDUtils\EDUtils.csproj" />
     <ProjectReference Include="..\Messages\Messages.csproj" />
   </ItemGroup>
 

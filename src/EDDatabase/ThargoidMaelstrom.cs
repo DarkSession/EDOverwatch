@@ -9,7 +9,6 @@
         [Column(TypeName = "varchar(256)")]
         public string Name { get; set; }
 
-
         [Column(TypeName = "decimal(14,6)")]
         public decimal InfluenceSphere { get; set; }
 

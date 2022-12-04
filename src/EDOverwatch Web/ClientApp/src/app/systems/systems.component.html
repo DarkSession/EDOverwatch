@@ -1,0 +1,26 @@
+<div style="height: 100px;">
+
+</div>
+<div class="systems-container mat-elevation-z8">
+    <div class="systems-table-container">
+        <table mat-table [dataSource]="dataSource">
+            <ng-container matColumnDef="systemName">
+                <th mat-header-cell *matHeaderCellDef>System Name</th>
+                <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="thargoidLevel">
+                <th mat-header-cell *matHeaderCellDef>Thargoid Level</th>
+                <td mat-cell *matCellDef="let row">{{ row.thargoidLevel.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="maelstrom">
+                <th mat-header-cell *matHeaderCellDef>Maelstrom</th>
+                <td mat-cell *matCellDef="let row">{{ row.maelstrom.name }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </div>
+</div>

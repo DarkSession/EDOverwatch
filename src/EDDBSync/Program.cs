@@ -46,18 +46,25 @@ namespace EDDBSync
                 log.LogInformation("Downloaded {systemCount} systems", systems.Count);
                 foreach (Models.System eddbStarSystem in systems)
                 {
-                    await using AsyncServiceScope serviceScope = Services.CreateAsyncScope();
-                    EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                    if (!await dbContext.StarSystems.AnyAsync(s => s.SystemAddress == eddbStarSystem.SystemAddress))
+                    try
                     {
-                        StarSystem starSystem = new(0, eddbStarSystem.SystemAddress, eddbStarSystem.Name, eddbStarSystem.X, eddbStarSystem.Y, eddbStarSystem.Z, eddbStarSystem.Population ?? 0, false, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
-                        starSystem.WarRelevantSystem = starSystem.IsWarRelevantSystem;
-                        if (!string.IsNullOrEmpty(eddbStarSystem.Allegiance))
+                        await using AsyncServiceScope serviceScope = Services.CreateAsyncScope();
+                        EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+                        if (!await dbContext.StarSystems.AnyAsync(s => s.SystemAddress == eddbStarSystem.SystemAddress))
                         {
-                            starSystem.Allegiance = await FactionAllegiance.GetByName(eddbStarSystem.Allegiance, dbContext);
+                            StarSystem starSystem = new(0, eddbStarSystem.SystemAddress, eddbStarSystem.Name, eddbStarSystem.X, eddbStarSystem.Y, eddbStarSystem.Z, eddbStarSystem.Population ?? 0, false, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+                            starSystem.WarRelevantSystem = starSystem.IsWarRelevantSystem;
+                            if (!string.IsNullOrEmpty(eddbStarSystem.Allegiance))
+                            {
+                                starSystem.Allegiance = await FactionAllegiance.GetByName(eddbStarSystem.Allegiance, dbContext);
+                            }
+                            dbContext.StarSystems.Add(starSystem);
+                            await dbContext.SaveChangesAsync();
                         }
-                        dbContext.StarSystems.Add(starSystem);
-                        await dbContext.SaveChangesAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        log.LogError(e, "Process system exception: {systemId}", eddbStarSystem.SystemAddress);
                     }
                 }
                 log.LogInformation("Processed {systemCount} systems", systems.Count);

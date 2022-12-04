@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 
 namespace EDDataProcessor.EDDN
 {
@@ -105,10 +106,24 @@ namespace EDDataProcessor.EDDN
                         {
                             break;
                         }
+
+                        Regex r = new("^([A-Z]{3})-([A-Z]{3})$", RegexOptions.IgnoreCase);
+                        bool isFleetCarrier = r.Match(Message.StationName).Success;
+
                         bool isNew = false;
-                        Station? station = await dbContext.Stations
-                            .Include(s => s.Government)
-                            .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
+                        Station? station;
+                        if (isFleetCarrier)
+                        {
+                            station = await dbContext.Stations
+                                .Include(s => s.Government)
+                                .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID || (s.MarketId == 0 && s.Name == Message.StationName), cancellationToken);
+                        }
+                        else
+                        {
+                            station = await dbContext.Stations
+                                .Include(s => s.Government)
+                                .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
+                        }
                         if (station == null)
                         {
                             isNew = true;
@@ -127,9 +142,14 @@ namespace EDDataProcessor.EDDN
                                 station.StarSystem = starSystem;
                                 changed = true;
                             }
-                            if (station.DistanceFromStarLS != Message.DistFromStarLS)
+                            if (Message.DistFromStarLS != 0m && station.DistanceFromStarLS != Message.DistFromStarLS)
                             {
                                 station.DistanceFromStarLS = Message.DistFromStarLS;
+                                changed = true;
+                            }
+                            if (isFleetCarrier && station.MarketId == Message.MarketID)
+                            {
+                                station.MarketId = Message.MarketID;
                                 changed = true;
                             }
                             if (!string.IsNullOrEmpty(Message.StationEconomy))
