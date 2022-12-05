@@ -1,7 +1,8 @@
 <div class="main-container">
   <div class="sides">
     <div class="side side-human">
-      <div class="side-content-container side-content-container-human">
+      <div class="side-content-container side-content-container-human"
+        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight }">
         <div class="side-content">
           <h2>Humans</h2>
         </div>
@@ -58,7 +59,7 @@
     </div>
     <div class="side side-human">
       <div class="triangle-container triangle-thargoids">
-        <svg class="bg" viewBox="0 0 400 700">
+        <svg class="bg" viewBox="0 0 400 700" #triangleLeft>
           <line x1="400" y1="-20" x2="0" y2="350" class="line" />
           <line x1="400" y1="720" x2="0" y2="350" class="line" />
           <polygon points="400,0 20,350 400,700" class="triangle" />
@@ -94,7 +95,8 @@
           </div>
         </div>
       </div>
-      <div class="side-content-container side-content-container-thargoid">
+      <div class="side-content-container side-content-container-thargoid"
+        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight }">
         <div class="side-content side-content-thargoid">
           <h2>Thargoids</h2>
         </div>

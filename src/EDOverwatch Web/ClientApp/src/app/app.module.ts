@@ -9,6 +9,7 @@ import { HomeComponent } from './home/home.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SystemsComponent } from './systems/systems.component';
 import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { MatTableModule } from '@angular/material/table';
     ]),
     BrowserAnimationsModule,
     MatTableModule,
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

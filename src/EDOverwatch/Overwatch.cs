@@ -159,7 +159,7 @@ namespace EDOverwatch
                             t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken);
                 if (maelstrom != null)
                 {
-                    DateTimeOffset signalsMaxAge = starSystem.Updated.AddHours(-6);
+                    DateTimeOffset signalsMaxAge = starSystem.Updated.AddHours(-24);
                     IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
                     if (starSystem.Allegiance?.IsThargoid ?? false)
                     {

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as dayjs from 'dayjs';
 import * as duration from 'dayjs/plugin/duration';
 import { firstValueFrom } from 'rxjs';
@@ -11,11 +11,18 @@ dayjs.extend(duration)
   templateUrl: './home.component.html',
   styleUrls: ['home.component.scss'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   public start: dayjs.Dayjs = dayjs("2022-11-29T18:30:00.000+00:00");
   public timeSince: string = "";
   private updateInterval: any = null;
   public overview: OverwatchOverview | null = null;
+  @ViewChild("triangleLeft") triangleLeft: ElementRef | undefined;
+  public sideSontentContainerMaxHeight = 2000;
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.updateTriangleLeft();
+  }
 
   public constructor(
     private readonly httpClient: HttpClient,
@@ -28,6 +35,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     }, 60000);
     this.updateTimeSince();
     this.loadOverview();
+  }
+
+  public ngAfterViewInit(): void {
+    this.updateTriangleLeft();
+  }
+
+  private updateTriangleLeft(): void {
+    if (this.triangleLeft) {
+      console.log(this.triangleLeft.nativeElement.getBoundingClientRect());
+      this.sideSontentContainerMaxHeight = this.triangleLeft.nativeElement.getBoundingClientRect().height;
+    }
   }
 
   private async loadOverview(): Promise<void> {

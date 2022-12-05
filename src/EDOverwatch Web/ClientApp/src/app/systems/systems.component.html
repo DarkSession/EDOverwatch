@@ -1,12 +1,14 @@
 <div style="height: 100px;">
-
 </div>
 <div class="systems-container mat-elevation-z8">
     <div class="systems-table-container">
         <table mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="systemName">
                 <th mat-header-cell *matHeaderCellDef>System Name</th>
-                <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.name }}
+                    <mat-icon fontIcon="content_copy"></mat-icon>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="thargoidLevel">
