@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace EDDataProcessor.EDDN
 {
     [EDDNSchema("https://eddn.edcd.io/schemas/journal/1")]
-    internal class JournalV1 : IEDDNEvent
+    internal partial class JournalV1 : IEDDNEvent
     {
         [JsonProperty("$schemaRef", Required = Required.Always)]
         public string SchemaRef { get; set; } = string.Empty;
@@ -96,7 +96,7 @@ namespace EDDataProcessor.EDDN
                 case MessageEvent.CarrierJump:
                 case MessageEvent.Location:
                     {
-                        if (Message.MarketID == 0 || (Message.Event == MessageEvent.Location && !Message.Docked))
+                        if (Message.MarketID == 0 || Message.Event == MessageEvent.Location && !Message.Docked)
                         {
                             break;
                         }
@@ -107,7 +107,7 @@ namespace EDDataProcessor.EDDN
                             break;
                         }
 
-                        Regex r = new("^([A-Z]{3})-([A-Z]{3})$", RegexOptions.IgnoreCase);
+                        Regex r = FleetCarrierIdRegex();
                         bool isFleetCarrier = r.Match(Message.StationName).Success;
 
                         bool isNew = false;
@@ -116,7 +116,7 @@ namespace EDDataProcessor.EDDN
                         {
                             station = await dbContext.Stations
                                 .Include(s => s.Government)
-                                .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID || (s.MarketId == 0 && s.Name == Message.StationName), cancellationToken);
+                                .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID || s.MarketId == 0 && s.Name == Message.StationName, cancellationToken);
                         }
                         else
                         {
@@ -196,6 +196,9 @@ namespace EDDataProcessor.EDDN
                     }
             }
         }
+
+        [GeneratedRegex("^([A-Z]{3})-([A-Z]{3})$", RegexOptions.IgnoreCase, "en-CH")]
+        private static partial Regex FleetCarrierIdRegex();
     }
 
     public class JournalV1Message
