@@ -43,7 +43,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private updateTriangleLeft(): void {
     if (this.triangleLeft) {
-      console.log(this.triangleLeft.nativeElement.getBoundingClientRect());
       this.sideSontentContainerMaxHeight = this.triangleLeft.nativeElement.getBoundingClientRect().height;
     }
   }

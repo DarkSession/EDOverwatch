@@ -28,7 +28,8 @@ namespace EDOverwatch_Web
 
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; trusted-types angular angular#bundler; require-trusted-types-for 'script';");
+                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline';");
+                // trusted-types angular angular#bundler; require-trusted-types-for 'script';
                 context.Response.Headers.Add("X-Frame-Options", "deny");
                 context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
                 context.Response.Headers.Add("Referrer-Policy", "strict-origin");
