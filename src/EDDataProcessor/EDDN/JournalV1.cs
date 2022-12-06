@@ -122,7 +122,7 @@ namespace EDDataProcessor.EDDN
                         {
                             station = await dbContext.Stations
                                 .Include(s => s.Government)
-                                .SingleOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
+                                .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
                         }
                         if (station == null)
                         {
