@@ -25,7 +25,11 @@ namespace EDOverwatch_Web.Controllers
         {
             OverwatchOverview result = new();
             int relevantSystemCount = await DbContext.StarSystems
-                .Where(s => s.WarRelevantSystem)
+                .Where(s => 
+                    s.WarRelevantSystem && 
+                    (s.Population > 0 || 
+                        (s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled || 
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)))
                 .CountAsync(cancellationToken);
             if (relevantSystemCount == 0)
             {
@@ -34,7 +38,10 @@ namespace EDOverwatch_Web.Controllers
 
             {
                 int thargoidsSystemsControlling = await DbContext.StarSystems
-                    .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
+                    .Where(s =>
+                        s.WarRelevantSystem &&
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled || 
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)
                     .CountAsync(cancellationToken);
                 result.Thargoids = new(
                     Math.Round((double)thargoidsSystemsControlling / (double)relevantSystemCount, 4),
@@ -44,7 +51,11 @@ namespace EDOverwatch_Web.Controllers
             }
             {
                 int humansSystemsControlling = await DbContext.StarSystems
-                    .Where(s => s.WarRelevantSystem && (s.ThargoidLevel == null || s.ThargoidLevel!.State == StarSystemThargoidLevelState.None) && s.Population > 0)
+                    .Where(s => 
+                        s.WarRelevantSystem &&
+                        s.ThargoidLevel!.State != StarSystemThargoidLevelState.Controlled &&
+                        s.ThargoidLevel!.State != StarSystemThargoidLevelState.Maelstrom &&
+                        s.Population > 0)
                     .CountAsync(cancellationToken);
                 result.Humans = new(
                     Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),

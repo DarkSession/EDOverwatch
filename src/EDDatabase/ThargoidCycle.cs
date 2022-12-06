@@ -18,5 +18,8 @@
             Start = start;
             End = end;
         }
+
+        [NotMapped]
+        public bool IsCurrent => Start <= DateTimeOffset.UtcNow&& End >= DateTimeOffset.UtcNow;
     }
 }

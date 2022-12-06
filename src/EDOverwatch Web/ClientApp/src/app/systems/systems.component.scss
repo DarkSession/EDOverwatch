@@ -1,0 +1,22 @@
+.systems-container {
+    position: relative;
+}
+  
+.systems-table-container {
+    position: relative;
+    min-height: 200px;
+    max-height: 80vh;
+    overflow: auto;
+}
+
+.systems-filter {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    mat-form-field {
+        width: 300px;
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+}

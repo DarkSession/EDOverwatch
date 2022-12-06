@@ -1,13 +1,32 @@
 <div style="height: 100px;">
 </div>
-<div class="systems-container mat-elevation-z8">
+<div class="systems-container">
+    <div class="systems-filter">
+        <mat-form-field appearance="outline">
+            <mat-label>Maelstroms</mat-label>
+            <mat-select [(ngModel)]="maelstromsSelected" (ngModelChange)="updateDataSource()" multiple>
+                <mat-option *ngFor="let maelstrom of maelstroms" [value]="maelstrom">
+                    {{ maelstrom.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Thargoid Level</mat-label>
+            <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="updateDataSource()" multiple>
+                <mat-option *ngFor="let thargoidLevel of thargoidLevels" [value]="thargoidLevel">
+                    {{ thargoidLevel.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
     <div class="systems-table-container">
         <table mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="systemName">
                 <th mat-header-cell *matHeaderCellDef>System Name</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="cell-system-name">
                     {{ row.name }}
-                    <mat-icon fontIcon="content_copy"></mat-icon>
+                    <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                        (click)="copySystemName(row)"></fa-icon>
                 </td>
             </ng-container>
 

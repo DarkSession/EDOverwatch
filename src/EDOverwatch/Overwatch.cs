@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace EDOverwatch
 {
@@ -38,9 +39,9 @@ namespace EDOverwatch
                 {
                     await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
                     EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                    if (await dbContext.ThargoidMaelstroms.AnyAsync())
+                    if (await dbContext.ThargoidMaelstroms.AnyAsync(cancellationToken))
                     {
-                        MaelstromMaxDistanceLy = (await dbContext.ThargoidMaelstroms.MaxAsync(t => t.InfluenceSphere)) + 10m;
+                        MaelstromMaxDistanceLy = (await dbContext.ThargoidMaelstroms.MaxAsync(t => t.InfluenceSphere, cancellationToken)) + 10m;
                         Log.LogInformation("MaelstromMaxDistanceLy: {MaelstromMaxDistanceLy}", MaelstromMaxDistanceLy);
                     }
                 }
@@ -146,45 +147,22 @@ namespace EDOverwatch
                 .Include(s => s.Allegiance)
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
+                .Include(s => s.ThargoidLevel!.CycleStart)
                 .SingleOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
             if (starSystem != null)
             {
-                StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.None;
-                // We check if the system is within range of a Maelstrom
-                ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms
-                    .Include(t => t.StarSystem)
-                    .FirstOrDefaultAsync(t =>
-                            t.StarSystem!.LocationX >= starSystem.LocationX - MaelstromMaxDistanceLy && t.StarSystem!.LocationX <= starSystem.LocationX + MaelstromMaxDistanceLy &&
-                            t.StarSystem!.LocationY >= starSystem.LocationY - MaelstromMaxDistanceLy && t.StarSystem!.LocationY <= starSystem.LocationY + MaelstromMaxDistanceLy &&
-                            t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken);
+                (StarSystemThargoidLevelState thargoidLevel, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, TimeSpan.FromDays(1), dbContext, cancellationToken);
+                // If the system is brand new, we might not have all the data yet, so we skip it for now.
+                if (thargoidLevel == StarSystemThargoidLevelState.None && starSystem.Created > DateTimeOffset.UtcNow.AddHours(-6))
+                {
+                    return;
+                }
                 if (maelstrom != null)
                 {
-                    DateTimeOffset signalsMaxAge = starSystem.Updated.AddHours(-24);
-                    IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
-                    if (starSystem.Allegiance?.IsThargoid ?? false)
+                    // If the level decreased in the same cycle, we might have some old data, so we analyze again and allow to use older signal sources
+                    if ((starSystem.ThargoidLevel?.CycleStart?.IsCurrent ?? false) && starSystem.ThargoidLevel.State > thargoidLevel)
                     {
-                        if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.Maelstrom, cancellationToken))
-                        {
-                            thargoidLevel = StarSystemThargoidLevelState.Maelstrom;
-                        }
-                        else
-                        {
-                            thargoidLevel = StarSystemThargoidLevelState.Controlled;
-                        }
-                    }
-                    else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.AXCZ, cancellationToken))
-                    {
-                        thargoidLevel = StarSystemThargoidLevelState.Invasion;
-                    }
-                    else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.ThargoidActivity, cancellationToken))
-                    {
-                        thargoidLevel = StarSystemThargoidLevelState.Alert;
-                    }
-
-                    // If the system is brand new, we might not have all the data yet, so we skip it for now.
-                    if (thargoidLevel == StarSystemThargoidLevelState.None && starSystem.Created > DateTimeOffset.UtcNow.AddHours(-6))
-                    {
-                        return;
+                        (thargoidLevel, _) = await AnalyzeThargoidLevelForSystem(starSystem, TimeSpan.FromDays(4), dbContext, cancellationToken);
                     }
                     if (starSystem.ThargoidLevel?.State != thargoidLevel)
                     {
@@ -197,7 +175,7 @@ namespace EDOverwatch
                             }
                             starSystem.ThargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken, -1);
                         }
-                        starSystem.ThargoidLevel = new(0, thargoidLevel)
+                        starSystem.ThargoidLevel = new(0, thargoidLevel, DateTimeOffset.UtcNow)
                         {
                             StarSystem = starSystem,
                             CycleStart = currentThargoidCycle,
@@ -234,6 +212,43 @@ namespace EDOverwatch
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
             }
+        }
+
+        private async Task<(StarSystemThargoidLevelState level, ThargoidMaelstrom? maelstrom)> AnalyzeThargoidLevelForSystem(StarSystem starSystem, TimeSpan maxAge, EdDbContext dbContext, CancellationToken cancellationToken)
+        {
+            StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.None;
+            // We check if the system is within range of a Maelstrom
+            ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms
+                .Include(t => t.StarSystem)
+                .FirstOrDefaultAsync(t =>
+                        t.StarSystem!.LocationX >= starSystem.LocationX - MaelstromMaxDistanceLy && t.StarSystem!.LocationX <= starSystem.LocationX + MaelstromMaxDistanceLy &&
+                        t.StarSystem!.LocationY >= starSystem.LocationY - MaelstromMaxDistanceLy && t.StarSystem!.LocationY <= starSystem.LocationY + MaelstromMaxDistanceLy &&
+                        t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken);
+            if (maelstrom != null)
+            {
+                DateTimeOffset signalsMaxAge = starSystem.Updated.Subtract(maxAge);
+                IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
+                if (starSystem.Allegiance?.IsThargoid ?? false)
+                {
+                    if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.Maelstrom, cancellationToken))
+                    {
+                        thargoidLevel = StarSystemThargoidLevelState.Maelstrom;
+                    }
+                    else
+                    {
+                        thargoidLevel = StarSystemThargoidLevelState.Controlled;
+                    }
+                }
+                else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.AXCZ, cancellationToken))
+                {
+                    thargoidLevel = StarSystemThargoidLevelState.Invasion;
+                }
+                else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.ThargoidActivity, cancellationToken))
+                {
+                    thargoidLevel = StarSystemThargoidLevelState.Alert;
+                }
+            }
+            return (thargoidLevel, maelstrom);
         }
     }
 }

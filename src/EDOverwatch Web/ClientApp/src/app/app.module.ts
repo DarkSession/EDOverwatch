@@ -9,7 +9,11 @@ import { HomeComponent } from './home/home.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SystemsComponent } from './systems/systems.component';
 import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 
 @NgModule({
   declarations: [
@@ -21,13 +25,17 @@ import { MatIconModule } from '@angular/material/icon';
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
+    BrowserAnimationsModule,
+    MatTableModule,
+    MatSelectModule,
+    MatTooltipModule,
+    MatSnackBarModule,
+    FontAwesomeModule,
+
     RouterModule.forRoot([
       { path: 'systems', component: SystemsComponent },
       { path: '**', component: HomeComponent },
     ]),
-    BrowserAnimationsModule,
-    MatTableModule,
-    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

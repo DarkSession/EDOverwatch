@@ -21,10 +21,14 @@
         [ForeignKey("MaelstromId")]
         public ThargoidMaelstrom? Maelstrom { get; set; }
 
-        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state)
+        [Column]
+        public DateTimeOffset Created { get; set; }
+
+        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, DateTimeOffset created)
         {
             Id = id;
             State = state;
+            Created = created;
         }
     }
 

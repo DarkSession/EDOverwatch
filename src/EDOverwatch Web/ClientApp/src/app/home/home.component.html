@@ -7,7 +7,8 @@
           <h2>Humans</h2>
         </div>
       </div>
-      <div class="triangle-container triangle-humans">
+      <div class="triangle-container triangle-humans"
+        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
         <svg class="bg" viewBox="0 0 400 700">
           <line x1="0" y1="-20" x2="400" y2="350" class="line" />
           <line x1="0" y1="720" x2="400" y2="350" class="line" />
@@ -58,7 +59,8 @@
       </div>
     </div>
     <div class="side side-human">
-      <div class="triangle-container triangle-thargoids">
+      <div class="triangle-container triangle-thargoids"
+        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
         <svg class="bg" viewBox="0 0 400 700" #triangleLeft>
           <line x1="400" y1="-20" x2="0" y2="350" class="line" />
           <line x1="400" y1="720" x2="0" y2="350" class="line" />
