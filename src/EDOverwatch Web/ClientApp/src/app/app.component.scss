@@ -1,19 +1,58 @@
+.top-toolbar {
+    height: 80px;
+}
+
 .header {
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    font-size: 300%;
-    font-weight: bold;
     display: flex;
-    align-items: center;
-    transform: translateX(-50%);
-    z-index: 5;
+    justify-content: center;
+    width: 100vw;
+    position: relative;
+    flex-direction: row;
+
+    .header-text {
+        font-size: 24pt;
+    }
+
+    .header-main {
+        display: flex;
+    }
+
+    .small {
+        font-size: 8pt;
+    }
 }
 
 .footer {
-    font-size: 60%;
-    position: absolute;
+    font-size: 8pt;
     bottom: 0px;
     text-align: center;
-    width: 100%;
+    margin-top: 12px;
+}
+
+.version-container {
+    position: relative;
+}
+
+.version-bg {
+    transform: rotate(45deg);
+    margin: 8px;
+    position: absolute;
+    left: -25px;
+    top: -14px;
+    font-size: 8pt;
+    opacity: 0.8;
+}
+
+.version {
+    padding: 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    background-color: #920000;
+    color: #cccccc;
+    font-size: 8pt;
+}
+
+.side-nav {
+    width: 200px;
+    padding: 12px;
 }

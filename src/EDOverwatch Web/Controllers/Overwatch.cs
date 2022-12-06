@@ -43,10 +43,21 @@ namespace EDOverwatch_Web.Controllers
                         s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled || 
                         s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)
                     .CountAsync(cancellationToken);
+                var warEfforts = await DbContext.WarEfforts
+                    .AsNoTracking()
+                    .Where(w => w.Side == WarEffortSide.Thargoids)
+                    .GroupBy(w => w.Type)
+                    .Select(w => new
+                    {
+                        type = w.Key,
+                        amount = w.Sum(s => s.Amount)
+                    })
+                    .ToListAsync(cancellationToken);
                 result.Thargoids = new(
                     Math.Round((double)thargoidsSystemsControlling / (double)relevantSystemCount, 4),
                     await DbContext.ThargoidMaelstroms.CountAsync(cancellationToken),
-                    thargoidsSystemsControlling
+                    thargoidsSystemsControlling,
+                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.Kill)?.amount
                 );
             }
             {
@@ -57,10 +68,25 @@ namespace EDOverwatch_Web.Controllers
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Maelstrom &&
                         s.Population > 0)
                     .CountAsync(cancellationToken);
+
+                var warEfforts = await DbContext.WarEfforts
+                    .AsNoTracking()
+                    .Where(w => w.Side == WarEffortSide.Humans)
+                    .GroupBy(w => w.Type)
+                    .Select(w => new
+                    {
+                        type = w.Key,
+                        amount = w.Sum(s => s.Amount)
+                    })
+                    .ToListAsync(cancellationToken);
+
                 result.Humans = new(
                     Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),
                     humansSystemsControlling,
-                    0);
+                    0,
+                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.Kill)?.amount,
+                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.Rescue)?.amount,
+                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.SupplyDelivery)?.amount);
             }
             result.Contested = new(
                 await DbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion).CountAsync(cancellationToken),

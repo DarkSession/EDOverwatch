@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as dayjs from 'dayjs';
 import * as duration from 'dayjs/plugin/duration';
 import { firstValueFrom } from 'rxjs';
@@ -26,7 +26,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public constructor(
     private readonly httpClient: HttpClient,
-    @Inject('BASE_URL') private readonly baseUrl: string) {
+    @Inject('BASE_URL') private readonly baseUrl: string,
+    private readonly changeDetectorRef: ChangeDetectorRef
+    ) {
   }
 
   public ngOnInit(): void {
@@ -44,6 +46,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateTriangleLeft(): void {
     if (this.triangleLeft) {
       this.sideSontentContainerMaxHeight = this.triangleLeft.nativeElement.getBoundingClientRect().height;
+      this.changeDetectorRef.detectChanges();
     }
   }
 
@@ -51,6 +54,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const response = await firstValueFrom(this.httpClient.get<any>(this.baseUrl + 'api/overwatch/overview'));
     if (response) {
       this.overview = response;
+      this.changeDetectorRef.detectChanges();
     }
   }
 
@@ -96,6 +100,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.timeSince = results.join(", ");
+    this.changeDetectorRef.detectChanges(); 
   }
 }
 

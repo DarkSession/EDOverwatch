@@ -12,11 +12,11 @@
         public double ControllingPercentage { get; set; }
         public int SystemsControlling { get; set; }
         public int SystemsRecaptured { get; set; }
-        public int? ThargoidKills { get; set; }
-        public int? Rescues { get; set; }
-        public int? RescueSupplies { get; set; }
+        public long? ThargoidKills { get; set; }
+        public long? Rescues { get; set; }
+        public long? RescueSupplies { get; set; }
 
-        public OverwatchOverviewHuman(double controllingPercentage, int systemsControlling, int systemsRecaptured, int? thargoidKills = null, int? rescues = null, int? rescueSupplies = null)
+        public OverwatchOverviewHuman(double controllingPercentage, int systemsControlling, int systemsRecaptured, long? thargoidKills = null, long? rescues = null, long? rescueSupplies = null)
         {
             ControllingPercentage = controllingPercentage;
             SystemsControlling = systemsControlling;
@@ -32,9 +32,9 @@
         public double ControllingPercentage { get; set; }
         public int ActiveMaelstroms { get; set; }
         public int SystemsControlling { get;set; }
-        public int? CommanderKills { get; set; }
+        public long? CommanderKills { get; set; }
 
-        public OverwatchOverviewThargoids(double controllingPercentage, int activeMaelstroms, int systemsControlling, int? commanderKills = null)
+        public OverwatchOverviewThargoids(double controllingPercentage, int activeMaelstroms, int systemsControlling, long? commanderKills = null)
         {
             ControllingPercentage = controllingPercentage;
             ActiveMaelstroms = activeMaelstroms;

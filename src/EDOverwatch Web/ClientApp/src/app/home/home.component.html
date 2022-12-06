@@ -2,20 +2,10 @@
   <div class="sides">
     <div class="side side-human">
       <div class="side-content-container side-content-container-human"
-        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight }">
+        [ngStyle]="{ 'height.px': sideSontentContainerMaxHeight }">
         <div class="side-content">
           <h2>Humans</h2>
-        </div>
-      </div>
-      <div class="triangle-container triangle-humans"
-        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
-        <svg class="bg" viewBox="0 0 400 700">
-          <line x1="0" y1="-20" x2="400" y2="350" class="line" />
-          <line x1="0" y1="720" x2="400" y2="350" class="line" />
-          <polygon points="0,0 380,350 0,700" class="triangle" />
-        </svg>
-        <div class="key-indicators" *ngIf="overview && overview.humans">
-          <div class="text">
+          <div class="text" *ngIf="overview">
             <div class="text-item">
               Controlling
               <div class="highlight">
@@ -29,28 +19,53 @@
               </div>
               systems recaptured
             </div>
-            <div class="text-item" *ngIf="overview.humans.thargoidKills">
+            <div class="text-item">
               Over
               <div class="highlight">
-                {{ overview.humans.thargoidKills | number }}+
+                <span *ngIf="overview.humans.thargoidKills">
+                  {{ overview.humans.thargoidKills | number }}+
+                </span>
+                <span *ngIf="!overview.humans.thargoidKills">
+                  ???
+                </span>
               </div>
               confirmed Thargoid kills
             </div>
-            <div class="text-item" *ngIf="overview.humans.rescues">
+            <div class="text-item">
               Over
               <div class="highlight">
-                {{ overview.humans.rescues | number }}+
+                <span *ngIf="overview.humans.rescues">
+                  {{ overview.humans.rescues | number }}+
+                </span>
+                <span *ngIf="!overview.humans.rescues">
+                  ???
+                </span>
               </div>
               confirmed rescues
             </div>
-            <div class="text-item" *ngIf="overview.humans.rescueSupplies">
+            <div class="text-item">
               Over
               <div class="highlight">
-                {{ overview.humans.rescueSupplies | number }}+ t
+                <span *ngIf="overview.humans.rescueSupplies">
+                  {{ overview.humans.rescueSupplies | number }}+ t
+                </span>
+                <span *ngIf="!overview.humans.rescueSupplies">
+                  ???
+                </span>
               </div>
               confirmed rescue supplies
             </div>
           </div>
+        </div>
+      </div>
+      <div class="triangle-container triangle-humans"
+        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
+        <svg class="bg" viewBox="0 0 200 600">
+          <line x1="0" y1="-33" x2="200" y2="300" class="line" />
+          <line x1="0" y1="633" x2="200" y2="300" class="line" />
+          <polygon points="0,0 180,300 0,600" class="triangle" />
+        </svg>
+        <div class="key-indicators" *ngIf="overview && overview.humans">
           <div>
             <span class="key-highlight-description">Controlling</span>
             <div class="key-highlight-value">{{ overview.humans.controllingPercentage | percent:'0.2-2' }}</div>
@@ -61,19 +76,25 @@
     <div class="side side-human">
       <div class="triangle-container triangle-thargoids"
         [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
-        <svg class="bg" viewBox="0 0 400 700" #triangleLeft>
-          <line x1="400" y1="-20" x2="0" y2="350" class="line" />
-          <line x1="400" y1="720" x2="0" y2="350" class="line" />
-          <polygon points="400,0 20,350 400,700" class="triangle" />
+        <svg class="bg" viewBox="0 0 200 600" #triangleLeft>
+          <line x1="200" y1="-33" x2="0" y2="300" class="line" />
+          <line x1="200" y1="633" x2="0" y2="300" class="line" />
+          <polygon points="200,0 20,300 200,600" class="triangle" />
         </svg>
         <div class="key-indicators" *ngIf="overview && overview.thargoids">
           <div>
             <span class="key-highlight-description">Controlling</span>
             <div class="key-highlight-value">{{ overview.thargoids.controllingPercentage | percent:'0.2-2' }}</div>
           </div>
-          <div class="text">
+        </div>
+      </div>
+      <div class="side-content-container side-content-container-thargoid"
+        [ngStyle]="{ 'height.px': sideSontentContainerMaxHeight }">
+        <div class="side-content side-content-thargoid">
+          <h2>Thargoids</h2>
+          <div class="text" *ngIf="overview">
             <div>
-              <div class="text-item">
+              <div class="text-item clickable" routerLink="systems">
                 Controlling
                 <div class="highlight">
                   {{ overview.thargoids.systemsControlling | number }}
@@ -86,10 +107,15 @@
                 </div>
                 active Maelstroms
               </div>
-              <div class="text-item" *ngIf="overview.thargoids.commanderKills">
+              <div class="text-item">
                 Over
                 <div class="highlight">
-                  {{ overview.thargoids.commanderKills | number }}+
+                  <span *ngIf="overview.thargoids.commanderKills">
+                    {{ overview.thargoids.commanderKills | number }}+
+                  </span>
+                  <span *ngIf="!overview.thargoids.commanderKills">
+                    ???
+                  </span>
                 </div>
                 confirmed Commander kills
               </div>
@@ -97,37 +123,42 @@
           </div>
         </div>
       </div>
-      <div class="side-content-container side-content-container-thargoid"
-        [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight }">
-        <div class="side-content side-content-thargoid">
-          <h2>Thargoids</h2>
-        </div>
-      </div>
     </div>
   </div>
-  <div class="top-container">
-    <p>Humanity is in the Aftermath War with the Thargoids for</p>
-    <h1>{{ timeSince }}</h1>
-  </div>
-  <div class="bottom-container">
-    <div class="text" *ngIf="overview && overview.contested">
-      <div class="text-item clickable" [routerLink]="['/systems']">
-        <div class="highlight">
-          {{ overview.contested.systemsInInvasion | number }}
-        </div>
-        systems under Thargoid invasion
+  <div class="middle-container-wrapper">
+    <div class="middle-container" [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
+      <div class="top-container">
+        <span>Humanity is in the Aftermath War</span>
+        <span>with the Thargoids for</span>
+        <h1>{{ timeSince }}</h1>
       </div>
-      <div class="text-item clickable" [routerLink]="['/systems']">
-        <div class="highlight">
-          {{ overview.contested.systemsWithAlerts | number }}
+      <div class="bottom-container">
+        <div class="text" *ngIf="overview && overview.contested">
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.contested.systemsInInvasion | number }}
+            </div>
+            systems under Thargoid invasion
+          </div>
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.contested.systemsWithAlerts | number }}
+            </div>
+            systems reporting Thargoid alerts
+          </div>
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.contested.systemsBeingRecaptured | number }}
+            </div>
+            systems being recaptured
+          </div>
         </div>
-        systems reporting Thargoid alerts
-      </div>
-      <div class="text-item clickable" [routerLink]="['/systems']">
-        <div class="highlight">
-          {{ overview.contested.systemsBeingRecaptured | number }}
-        </div>
-        systems being recaptured
+        <br>
+        <br>
+        <br>
+        <button mat-raised-button color="warn" routerLink="get-involved">
+          <b>Get involved</b>
+        </button>
       </div>
     </div>
   </div>

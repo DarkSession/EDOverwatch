@@ -29,6 +29,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-regular-svg-icons": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
+    "@ngneat/until-destroy": "^9.2.2",
     "bootstrap": "^5.2.0",
     "dayjs": "^1.11.6",
     "jquery": "^3.6.0",

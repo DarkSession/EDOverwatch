@@ -1,14 +1,49 @@
-<main style="margin: auto; width: 100%;">
-  <div class="header clickable" [routerLink]="['/']">
-    <img src="assets/logo-elite-dangerous-icon.svg" style="width: 75px; padding-right: 10px;" >
-    ED: Overwatch
-  </div>
-  <router-outlet></router-outlet>
-  <div class="footer">
-    <!-- https://forums.frontier.co.uk/threads/elite-dangerous-media-usage-rules.510879/ -->
-    ED: Overwatch was created using assets and imagery from Elite Dangerous, with the permission of Frontier
-    Developments plc, for non-commercial purposes.<br>
-    It is not endorsed by nor reflects the views or opinions of Frontier
-    Developments and no employee of Frontier Developments was involved in the making of it.
-  </div>
-</main>
+<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100" *ngIf="loading">
+  <img src="assets/EDLoader1.svg" style="width: 100px; height: 100px;" />
+</div>
+<div style="min-height: 100vh">
+  <mat-toolbar class="top-toolbar">
+    <button mat-icon-button aria-label="Menu" (click)="toggleMenu()">
+      <mat-icon [ngClass]="{'menu-open': isMenuOpen, 'menu-closed': !isMenuOpen}">menu</mat-icon>
+    </button>
+    <div class="header clickable" [routerLink]="['/']">
+      <img src="assets/logo-elite-dangerous-icon.svg" style="width: 75px; padding-right: 10px;">
+      <div>
+        <div class="header-main">
+          <div class="header-text">
+            ED: Overwatch
+          </div>
+          <div class="version-container">
+            <div class="version-bg">
+              <span class="version">Alpha</span>
+            </div>
+          </div>
+        </div>
+        <div class="small">Automated Thargoid conflict tracking, analysis and coordination</div>
+      </div>
+    </div>
+  </mat-toolbar>
+  <mat-sidenav-container style="min-height: calc(100vh - 80px)">
+    <mat-sidenav #sidenav mode="side" [opened]="isMenuOpen" class="side-nav">
+      <div>
+        <div routerLink="/" class="clickable">Overview</div>
+      </div>
+      <div>
+        <div routerLink="systems" class="clickable">Systems</div>
+      </div>
+      <div>
+        <div routerLink="about" class="clickable">About</div>
+      </div>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <router-outlet></router-outlet>
+      <div class="footer">
+        <!-- https://forums.frontier.co.uk/threads/elite-dangerous-media-usage-rules.510879/ -->
+        ED: Overwatch was created using assets and imagery from Elite Dangerous, with the permission of Frontier
+        Developments plc, for non-commercial purposes.<br>
+        It is not endorsed by nor reflects the views or opinions of Frontier
+        Developments and no employee of Frontier Developments was involved in the making of it.
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

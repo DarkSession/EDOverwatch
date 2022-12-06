@@ -17,12 +17,12 @@ namespace EDDatabase
         public DbSet<StarSystemSecurity> StarSystemSecurities { get; set; }
 
         public DbSet<Station> Stations { get; set; }
-        public DbSet<StationType> StationTypes
-        {
-            get; set;
-        }
+        public DbSet<StationType> StationTypes { get; set; }
+
         public DbSet<ThargoidCycle> ThargoidCycles { get; set; }
         public DbSet<ThargoidMaelstrom> ThargoidMaelstroms { get; set; }
+
+        public DbSet<WarEffort> WarEfforts { get; set; }
 
         private string ConnectionString { get; }
 

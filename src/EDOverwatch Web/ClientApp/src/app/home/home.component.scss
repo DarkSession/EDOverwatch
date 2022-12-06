@@ -1,15 +1,11 @@
-.main-container {
-  position: relative;
-}
 
 .sides {
   display: flex;
 }
 
 .side {
-  width: 50vw;
+  width: 50%;
   display: flex;
-  position: relative;
 }
 
 .side-human {
@@ -36,17 +32,18 @@
   display: flex;
   flex-direction: column;
   width: 200px;
-  margin-top: 10%;
+  justify-content: center;
 }
 
 .side-content-thargoid {
   align-items: flex-end;
+  text-align: right;
 }
 
 .key-highlight,
 .text,
 .key-highlight-description {
-  font-size: 80%;
+  font-size: 10pt;
   line-height: 1;
 }
 
@@ -59,24 +56,32 @@
 
   .highlight {
     font-weight: bold;
-    font-size: 160%;
+    font-size: 16pt;
     font-family: 'Trebuchet MS', sans-serif;
   }
 }
 
-.top-container {
-  width: 100vw;
+.middle-container-wrapper {
   position: absolute;
-  top: 10%;
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.middle-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 90vh;
+}
+
+.top-container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .bottom-container {
-  width: 100vw;
-  position: absolute;
-  bottom: 20vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -91,8 +96,8 @@
 }
 
 .triangle-container {
-  width: 57.143vh;
-  height: 100vh;
+  width: 30vh;
+  height: 90vh;
   position: relative;
   display: flex;
   align-items: center;
@@ -115,20 +120,20 @@
   .key-indicators {
     z-index: 1;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 70%;
+    padding: 36px;
   }
 
   .key-highlight-value {
     line-height: 1;
     font-weight: bold;
-    font-size: 200%;
+    font-size: 20pt;
     font-family: 'Trebuchet MS', sans-serif;
   }
 }
 
 .triangle-humans {
+  justify-content: flex-end;
+
   .line {
     stroke: rgb(33, 29, 104);
   }
@@ -137,14 +142,9 @@
     stroke: rgb(33, 29, 104);
     fill: rgb(33, 29, 104);
   }
-
-  .key-indicators {
-    margin-left: 20%;
-  }
 }
 
 .triangle-thargoids {
-  justify-content: flex-end;
 
   .line {
     stroke: #846a24;
@@ -156,7 +156,6 @@
   }
 
   .key-indicators {
-    margin-right: 20%;
     text-align: right;
   }
 }
