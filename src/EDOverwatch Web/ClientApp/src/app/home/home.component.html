@@ -1,6 +1,6 @@
 <div class="main-container">
   <div class="sides">
-    <div class="side side-human">
+    <div class="side">
       <div class="side-content-container side-content-container-human"
         [ngStyle]="{ 'height.px': sideSontentContainerMaxHeight }">
         <div class="side-content">
@@ -20,7 +20,6 @@
               systems recaptured
             </div>
             <div class="text-item">
-              Over
               <div class="highlight">
                 <span *ngIf="overview.humans.thargoidKills">
                   {{ overview.humans.thargoidKills | number }}+
@@ -32,7 +31,6 @@
               confirmed Thargoid kills
             </div>
             <div class="text-item">
-              Over
               <div class="highlight">
                 <span *ngIf="overview.humans.rescues">
                   {{ overview.humans.rescues | number }}+
@@ -44,7 +42,6 @@
               confirmed rescues
             </div>
             <div class="text-item">
-              Over
               <div class="highlight">
                 <span *ngIf="overview.humans.rescueSupplies">
                   {{ overview.humans.rescueSupplies | number }}+ t
@@ -73,7 +70,7 @@
         </div>
       </div>
     </div>
-    <div class="side side-human">
+    <div class="side">
       <div class="triangle-container triangle-thargoids"
         [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
         <svg class="bg" viewBox="0 0 200 600" #triangleLeft>
@@ -101,14 +98,13 @@
                 </div>
                 systems of the human 'bubble'
               </div>
-              <div class="text-item">
+              <div class="text-item clickable" routerLink="systems">
                 <div class="highlight">
                   {{ overview.thargoids.activeMaelstroms | number }}
                 </div>
                 active Maelstroms
               </div>
               <div class="text-item">
-                Over
                 <div class="highlight">
                   <span *ngIf="overview.thargoids.commanderKills">
                     {{ overview.thargoids.commanderKills | number }}+
@@ -127,12 +123,12 @@
   </div>
   <div class="middle-container-wrapper">
     <div class="middle-container" [ngStyle]="{ 'max-height.px': sideSontentContainerMaxHeight + 4 }">
-      <div class="top-container">
+      <div class="middle-container-item">
         <span>Humanity is in the Aftermath War</span>
         <span>with the Thargoids for</span>
         <h1>{{ timeSince }}</h1>
       </div>
-      <div class="bottom-container">
+      <div class="middle-container-item bottom-container">
         <div class="text" *ngIf="overview && overview.contested">
           <div class="text-item clickable" routerLink="systems">
             <div class="highlight">
@@ -153,8 +149,6 @@
             systems being recaptured
           </div>
         </div>
-        <br>
-        <br>
         <br>
         <button mat-raised-button color="warn" routerLink="get-involved">
           <b>Get involved</b>

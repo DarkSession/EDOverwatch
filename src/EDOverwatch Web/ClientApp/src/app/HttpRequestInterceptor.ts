@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators'
-import { LoadingService } from './loading.service';
+import { AppService } from './app.service';
 
 /**
  * This class is for intercepting http requests. When a request starts, we set the loadingSub property
@@ -19,19 +19,19 @@ import { LoadingService } from './loading.service';
 export class HttpRequestInterceptor implements HttpInterceptor {
 
     public constructor(
-        private loadingService: LoadingService
+        private readonly appService: AppService
     ) { }
 
     public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        this.loadingService.setLoading(true, request.url);
+        this.appService.setLoading(true, request.url);
         return next.handle(request)
             .pipe(catchError((err) => {
-                this.loadingService.setLoading(false, request.url);
+                this.appService.setLoading(false, request.url);
                 return err;
             }))
             .pipe(map<unknown, any>((evt: unknown) => {
                 if (evt instanceof HttpResponse) {
-                    this.loadingService.setLoading(false, request.url);
+                    this.appService.setLoading(false, request.url);
                 }
                 return evt;
             }));

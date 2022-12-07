@@ -71,21 +71,20 @@
 .middle-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
   height: 90vh;
-}
 
-.top-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  .middle-container-item {
+    flex-grow: 1;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .bottom-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
   .text {
     text-align: center;
   }

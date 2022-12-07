@@ -6,12 +6,11 @@ namespace EDOverwatch_Web.Models
     {
         public List<OverwatchMaelstrom> Maelstroms { get; }
         public List<OverwatchThargoidLevel> Levels => Enum.GetValues<StarSystemThargoidLevelState>().Select(s => new OverwatchThargoidLevel(s)).ToList();
-        public List<OverwatchStarSystem> Systems { get; }
+        public List<OverwatchStarSystem> Systems { get; } = new();
 
-        public OverwatchSystems(List<ThargoidMaelstrom> thargoidMaelstroms, List<StarSystem> starSystems)
+        public OverwatchSystems(List<ThargoidMaelstrom> thargoidMaelstroms)
         {
             Maelstroms = thargoidMaelstroms.Select(t => new OverwatchMaelstrom(t)).ToList();
-            Systems = starSystems.Select(s => new OverwatchStarSystem(s)).ToList();
         }
     }
 
@@ -44,12 +43,16 @@ namespace EDOverwatch_Web.Models
         public string Name { get; }
         public OverwatchMaelstrom Maelstrom { get; }
         public OverwatchThargoidLevel ThargoidLevel { get; }
+        public short? Progress { get; }
+        public decimal EffortFocus { get; }
 
-        public OverwatchStarSystem(StarSystem starSystem)
+        public OverwatchStarSystem(StarSystem starSystem, decimal effortFocus)
         {
             Name = starSystem.Name;
             Maelstrom = new(starSystem.ThargoidLevel?.Maelstrom ?? throw new Exception("Thargoid level must have a maelstrom property"));
             ThargoidLevel = new(starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
+            Progress = starSystem.ThargoidLevel?.Progress;
+            EffortFocus = effortFocus;
         }
     }
 }

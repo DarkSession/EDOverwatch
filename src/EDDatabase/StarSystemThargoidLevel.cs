@@ -22,12 +22,16 @@
         public ThargoidMaelstrom? Maelstrom { get; set; }
 
         [Column]
+        public short? Progress { get; set; }
+
+        [Column]
         public DateTimeOffset Created { get; set; }
 
-        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, DateTimeOffset created)
+        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progress, DateTimeOffset created)
         {
             Id = id;
             State = state;
+            Progress = progress;
             Created = created;
         }
     }

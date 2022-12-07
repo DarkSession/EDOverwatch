@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-// https://medium.com/swlh/angular-loading-spinner-using-http-interceptor-63c1bb76517b
 @Injectable({
   providedIn: 'root'
 })
-export class LoadingService {
+export class AppService {
+
+  constructor() { }
+
+  // https://medium.com/swlh/angular-loading-spinner-using-http-interceptor-63c1bb76517b
   public loadingSub: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   /**
    * Contains in-progress loading requests
    */
   public loadingMap: Map<string, boolean> = new Map<string, boolean>();
-
-  public constructor() { }
 
   /**
    * Sets the loadingSub property value based on the following:

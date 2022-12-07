@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { LoadingService } from './loading.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { delay } from 'rxjs';
+import { AppService } from './app.service';
 
 @UntilDestroy()
 @Component({
@@ -15,16 +15,16 @@ export class AppComponent implements OnInit {
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly loadingService: LoadingService) {
+    private readonly appService: AppService) {
   }
 
   public ngOnInit(): void {
-    this.loadingService.loadingSub
-    .pipe(delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
-    .pipe(untilDestroyed(this))
-    .subscribe((loading) => {
-      this.loading = loading;
-    });
+    this.appService.loadingSub
+      .pipe(delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
+      .pipe(untilDestroyed(this))
+      .subscribe((loading) => {
+        this.loading = loading;
+      });
   }
 
   public toggleMenu(): void {

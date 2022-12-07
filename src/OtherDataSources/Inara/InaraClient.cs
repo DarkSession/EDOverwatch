@@ -73,7 +73,7 @@ namespace OtherDataSources.Inara
         {
             ConflictDetails result = new();
             using IDocument? document = await Get($"thargoidwar-conflict/{systemId}/");
-            if (document?.GetElementsByTagName("div")?.FirstOrDefault(e => e is IHtmlDivElement i && i.TextContent == "Ships lost") is IHtmlDivElement shipsLostCell &&
+            if (document?.GetElementsByTagName("div")?.Where(e => e is IHtmlDivElement i && i.TextContent == "Ships lost").Skip(1).FirstOrDefault() is IHtmlDivElement shipsLostCell &&
                 shipsLostCell.NextSibling is IHtmlDivElement shipsLostValueCell &&
                 int.TryParse(shipsLostValueCell.TextContent.Replace(",", string.Empty), out int shipsLost))
             {

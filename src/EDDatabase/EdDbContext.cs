@@ -6,10 +6,15 @@ namespace EDDatabase
 {
     public class EdDbContext : DbContext
     {
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Commander> Commanders { get; set; }
+
         public DbSet<Economy> Economies { get; set; }
 
         public DbSet<FactionAllegiance> FactionAllegiances { get; set; }
         public DbSet<FactionGovernment> FactionGovernments { get; set; }
+
+        public DbSet<OAuthCode> OAuthCodes { get; set; }
 
         public DbSet<StarSystem> StarSystems { get; set; }
         public DbSet<StarSystemFssSignal> StarSystemFssSignals { get; set; }

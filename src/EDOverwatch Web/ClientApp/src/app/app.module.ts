@@ -17,12 +17,16 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSortModule } from '@angular/material/sort';
 import { AboutComponent } from './about/about.component';
+import { GetInvolvedComponent } from './get-involved/get-involved.component';
+import { ConsumerApiComponent } from './consumer-api/consumer-api.component';
 
 /* "Barrel" of Http Interceptors */
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpRequestInterceptor } from './HttpRequestInterceptor';
-import { GetInvolvedComponent } from './get-involved/get-involved.component';
+
 
 /** Http interceptor providers in outside-in order */
 export const httpInterceptorProviders = [
@@ -36,6 +40,7 @@ export const httpInterceptorProviders = [
     SystemsComponent,
     AboutComponent,
     GetInvolvedComponent,
+    ConsumerApiComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -43,6 +48,7 @@ export const httpInterceptorProviders = [
     FormsModule,
     BrowserAnimationsModule,
     MatTableModule,
+    MatSortModule,
     MatSelectModule,
     MatTooltipModule,
     MatSnackBarModule,
@@ -51,12 +57,29 @@ export const httpInterceptorProviders = [
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+    MatProgressBarModule,
 
     RouterModule.forRoot([
-      { path: 'systems', component: SystemsComponent },
-      { path: 'about', component: AboutComponent },
-      { path: 'get-involved', component: GetInvolvedComponent },
-      { path: '**', component: HomeComponent },
+      {
+        path: 'systems',
+        component: SystemsComponent
+      },
+      {
+        path: 'about',
+        component: AboutComponent
+      },
+      {
+        path: 'get-involved',
+        component: GetInvolvedComponent
+      },
+      {
+        path: 'consumer-api',
+        component: ConsumerApiComponent,
+      },
+      {
+        path: '**',
+        component: HomeComponent
+      },
     ]),
   ],
   providers: [httpInterceptorProviders],

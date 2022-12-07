@@ -1,5 +1,7 @@
 global using EDDatabase;
-using Microsoft.AspNetCore.Builder;
+global using Microsoft.EntityFrameworkCore;
+using EDOverwatch_Web.CAPI;
+using Microsoft.AspNetCore.Identity;
 
 namespace EDOverwatch_Web
 {
@@ -13,10 +15,35 @@ namespace EDOverwatch_Web
 #endif
             builder.Configuration.AddEnvironmentVariables();
 
-            // Add services to the container.
+            /*
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+                {
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequiredLength = 8;
+                    options.User.AllowedUserNameCharacters += " ";
+                })
+                .AddEntityFrameworkStores<EdDbContext>();
+            */
+            builder.Services.AddAuthentication();
 
-            builder.Services.AddControllers();
+            // Add services to the container.
+            builder.Services.AddControllers()
+                    .AddNewtonsoftJson();
             builder.Services.AddDbContext<EdDbContext>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    corsBuilder =>
+                    {
+                        corsBuilder.WithOrigins(builder.Configuration.GetValue<string>("AllowedHosts") ?? string.Empty)
+                                .AllowCredentials()
+                                .WithMethods(HttpMethods.Post, HttpMethods.Get, HttpMethods.Options)
+                                .WithHeaders("content-type", "content-length");
+                    });
+            });
+            builder.Services.AddScoped<FDevOAuth>();
+
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -41,6 +68,9 @@ namespace EDOverwatch_Web
             app.UseStaticFiles();
             app.UseRouting();
             app.MapControllers();
+            app.UseCors();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapFallbackToFile("index.html");
 

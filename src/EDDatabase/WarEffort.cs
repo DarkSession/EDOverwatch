@@ -13,6 +13,9 @@
         [ForeignKey("StarSystemId")]
         public StarSystem? StarSystem { get; set; }
 
+        [ForeignKey("StarSystemId")]
+        public long? StarSystemId { get; set; }
+
         [Column]
         public DateOnly Date { get; set; }
 

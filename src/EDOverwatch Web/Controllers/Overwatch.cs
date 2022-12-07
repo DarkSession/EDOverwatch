@@ -1,12 +1,13 @@
 ﻿using EDOverwatch_Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace EDOverwatch_Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class Overwatch : ControllerBase
+    [AllowAnonymous]
+    internal class Overwatch : ControllerBase
     {
         private EdDbContext DbContext { get; }
         public Overwatch(EdDbContext dbContext)
@@ -116,7 +117,57 @@ namespace EDOverwatch_Web.Controllers
                 .Include(t => t.StarSystem)
                 .ToListAsync(cancellationToken: cancellationToken);
 
-            return new OverwatchSystems(maelstroms, starSystems);
+            var efforts = await DbContext.WarEfforts
+                .AsNoTracking()
+                .Where(w => w.Date >= DateOnly.FromDateTime(DateTime.Today))
+                .GroupBy(w => new
+                {
+                    w.StarSystemId,
+                    w.Type,
+                })
+                .Select(w => new
+                {
+                    w.Key.StarSystemId,
+                    w.Key.Type,
+                    Amount = w.Sum(g => g.Amount),
+                })
+                .ToListAsync(cancellationToken);
+
+            Dictionary<WarEffortType, long> effortSums = new();
+            foreach (var total in efforts.GroupBy(e => e.Type).Select(e => new
+            {
+                e.Key,
+                Amount = e.Sum(g => g.Amount),
+            }))
+            {
+                effortSums[total.Key] = total.Amount;
+            }
+
+            OverwatchSystems result = new(maelstroms);
+            foreach (StarSystem starSystem in starSystems)
+            {
+                decimal effortFocus = 0;
+                if (effortSums.Any())
+                {
+                    foreach (var effort in efforts
+                        .Where(e => e.StarSystemId == starSystem.Id)
+                        .GroupBy(e => e.Type)
+                        .Select(e => new
+                        {
+                            e.Key,
+                            Amount = e.Sum(g => g.Amount),
+                        }))
+                    {
+                        if (effortSums.TryGetValue(effort.Key, out long totalAmount) && totalAmount != 0)
+                        {
+                            effortFocus += ((decimal)effort.Amount / (decimal)totalAmount);
+                        }
+                    }
+                    effortFocus = Math.Round(effortFocus / (decimal)effortSums.Count, 2);
+                }
+                result.Systems.Add(new OverwatchStarSystem(starSystem, effortFocus));
+            }
+            return result;
         }
     }
 }
