@@ -1,7 +1,6 @@
 global using EDDatabase;
 global using Microsoft.EntityFrameworkCore;
 using EDOverwatch_Web.CAPI;
-using Microsoft.AspNetCore.Identity;
 
 namespace EDOverwatch_Web
 {
@@ -15,7 +14,6 @@ namespace EDOverwatch_Web
 #endif
             builder.Configuration.AddEnvironmentVariables();
 
-            /*
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
                 {
                     options.Password.RequireNonAlphanumeric = false;
@@ -24,7 +22,6 @@ namespace EDOverwatch_Web
                     options.User.AllowedUserNameCharacters += " ";
                 })
                 .AddEntityFrameworkStores<EdDbContext>();
-            */
             builder.Services.AddAuthentication();
 
             // Add services to the container.
@@ -36,7 +33,7 @@ namespace EDOverwatch_Web
                 options.AddDefaultPolicy(
                     corsBuilder =>
                     {
-                        corsBuilder.WithOrigins(builder.Configuration.GetValue<string>("AllowedHosts") ?? string.Empty)
+                        corsBuilder.WithOrigins(builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty)
                                 .AllowCredentials()
                                 .WithMethods(HttpMethods.Post, HttpMethods.Get, HttpMethods.Options)
                                 .WithHeaders("content-type", "content-length");

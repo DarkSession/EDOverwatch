@@ -269,3 +269,15 @@ $altTheme: (
     font-family: 'Roboto';
   }
 }
+
+.content {
+  display: flex;
+  justify-content: center;
+  margin: 24px;
+}
+
+.content-box {
+  background-color: var(--accent-darker-color);
+  width: 500px;
+  padding: 12px;
+}

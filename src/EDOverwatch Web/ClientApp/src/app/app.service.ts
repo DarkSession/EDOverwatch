@@ -1,12 +1,16 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
 
-  constructor() { }
+  constructor(
+    private readonly httpClient: HttpClient,
+    @Inject('BASE_URL') private readonly baseUrl: string) {
+  }
 
   // https://medium.com/swlh/angular-loading-spinner-using-http-interceptor-63c1bb76517b
   public loadingSub: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -14,6 +18,17 @@ export class AppService {
    * Contains in-progress loading requests
    */
   public loadingMap: Map<string, boolean> = new Map<string, boolean>();
+
+  public async getUser(): Promise<User | null> {
+    try {
+      const response = await firstValueFrom(this.httpClient.get<MeResponse>(this.baseUrl + 'api/user/me'));
+      return response.User;
+    }
+    catch (e) {
+      console.error(e);
+    }
+    return null;
+  }
 
   /**
    * Sets the loadingSub property value based on the following:
@@ -38,4 +53,13 @@ export class AppService {
       this.loadingSub.next(false);
     }
   }
+}
+
+interface MeResponse {
+  LoggedIn: boolean;
+  User: User | null;
+}
+
+export interface User {
+  UserName: string | null;
 }

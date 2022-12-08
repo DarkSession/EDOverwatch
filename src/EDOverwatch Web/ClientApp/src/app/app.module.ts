@@ -26,6 +26,8 @@ import { ConsumerApiComponent } from './consumer-api/consumer-api.component';
 /* "Barrel" of Http Interceptors */
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpRequestInterceptor } from './HttpRequestInterceptor';
+import { LoginComponent } from './login/login.component';
+import { AuthComponent } from './auth/auth.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -41,6 +43,8 @@ export const httpInterceptorProviders = [
     AboutComponent,
     GetInvolvedComponent,
     ConsumerApiComponent,
+    LoginComponent,
+    AuthComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -75,6 +79,14 @@ export const httpInterceptorProviders = [
       {
         path: 'consumer-api',
         component: ConsumerApiComponent,
+      },
+      {
+        path: 'login',
+        component: LoginComponent,
+      },
+      {
+        path: 'auth',
+        component: AuthComponent,
       },
       {
         path: '**',

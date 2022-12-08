@@ -6,7 +6,7 @@
     <button mat-icon-button aria-label="Menu" (click)="toggleMenu()">
       <mat-icon [ngClass]="{'menu-open': isMenuOpen, 'menu-closed': !isMenuOpen}">menu</mat-icon>
     </button>
-    <div class="header clickable" [routerLink]="['/']">
+    <div class="header clickable" routerLink="/">
       <img src="assets/logo-elite-dangerous-icon.svg" style="width: 75px; padding-right: 10px;">
       <div>
         <div class="header-main">
@@ -21,6 +21,14 @@
         </div>
         <div class="small">Automated Thargoid conflict tracking, analysis and coordination</div>
       </div>
+    </div>
+    <div>
+      <span *ngIf="user">
+        {{ user.UserName }}
+      </span>
+      <span *ngIf="!user">
+        <button mat-raised-button color="primary" routerLink="login">Login</button>
+      </span>
     </div>
   </mat-toolbar>
   <mat-sidenav-container style="min-height: calc(100vh - 80px)">

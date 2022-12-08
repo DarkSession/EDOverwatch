@@ -38,7 +38,7 @@ export class SystemsComponent implements OnInit {
   }
 
   private async loadSystems(): Promise<void> {
-    const response = await firstValueFrom(this.httpClient.get<any>(this.baseUrl + 'api/overwatch/systems')) as OverwatchSystems;
+    const response = await firstValueFrom(this.httpClient.get<OverwatchSystems>(this.baseUrl + 'api/overwatch/systems'));
     if (response) {
       this.dataRaw = response.systems;
       this.maelstroms = response.maelstroms;

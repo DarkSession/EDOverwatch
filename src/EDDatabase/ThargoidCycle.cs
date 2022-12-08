@@ -20,6 +20,6 @@
         }
 
         [NotMapped]
-        public bool IsCurrent => Start <= DateTimeOffset.UtcNow&& End >= DateTimeOffset.UtcNow;
+        public bool IsCurrent => Start <= DateTimeOffset.UtcNow && End >= DateTimeOffset.UtcNow;
     }
 }
