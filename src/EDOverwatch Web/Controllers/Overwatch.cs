@@ -7,7 +7,7 @@ namespace EDOverwatch_Web.Controllers
     [ApiController]
     [Route("api/[controller]/[action]")]
     [AllowAnonymous]
-    internal class Overwatch : ControllerBase
+    public class Overwatch : ControllerBase
     {
         private EdDbContext DbContext { get; }
         public Overwatch(EdDbContext dbContext)
@@ -26,10 +26,10 @@ namespace EDOverwatch_Web.Controllers
         {
             OverwatchOverview result = new();
             int relevantSystemCount = await DbContext.StarSystems
-                .Where(s => 
-                    s.WarRelevantSystem && 
-                    (s.Population > 0 || 
-                        (s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled || 
+                .Where(s =>
+                    s.WarRelevantSystem &&
+                    (s.Population > 0 ||
+                        (s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled ||
                         s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)))
                 .CountAsync(cancellationToken);
             if (relevantSystemCount == 0)
@@ -41,7 +41,7 @@ namespace EDOverwatch_Web.Controllers
                 int thargoidsSystemsControlling = await DbContext.StarSystems
                     .Where(s =>
                         s.WarRelevantSystem &&
-                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled || 
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled ||
                         s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)
                     .CountAsync(cancellationToken);
                 var warEfforts = await DbContext.WarEfforts
@@ -63,7 +63,7 @@ namespace EDOverwatch_Web.Controllers
             }
             {
                 int humansSystemsControlling = await DbContext.StarSystems
-                    .Where(s => 
+                    .Where(s =>
                         s.WarRelevantSystem &&
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Controlled &&
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Maelstrom &&
@@ -105,10 +105,10 @@ namespace EDOverwatch_Web.Controllers
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)
-                .Where(s => 
-                            s.ThargoidLevel != null && 
-                            s.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert && 
-                            s.ThargoidLevel.Maelstrom != null && 
+                .Where(s =>
+                            s.ThargoidLevel != null &&
+                            s.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert &&
+                            s.ThargoidLevel.Maelstrom != null &&
                             s.ThargoidLevel.Maelstrom.StarSystem != null)
                 .ToListAsync(cancellationToken);
 

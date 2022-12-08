@@ -2,13 +2,13 @@
 
 namespace EDOverwatch_Web.CAPI
 {
-    internal class Profile
+    public class Profile
     {
         [JsonProperty("commander")]
         public ProfileCommander? Commander { get; set; }
     }
 
-    internal class ProfileCommander
+    public class ProfileCommander
     {
         [JsonProperty("name")]
         public string Name { get; set; }

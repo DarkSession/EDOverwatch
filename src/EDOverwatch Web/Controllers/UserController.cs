@@ -10,7 +10,7 @@ namespace EDOverwatch_Web.Controllers
     [ApiController]
     [Route("api/[controller]/[action]")]
     [AllowAnonymous]
-    internal partial class UserController : ControllerBase
+    public partial class UserController : ControllerBase
     {
         private UserManager<ApplicationUser> UserManager { get; }
         private SignInManager<ApplicationUser> SignInManager { get; }
@@ -49,7 +49,7 @@ namespace EDOverwatch_Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResponse>> Register(RegistrationRequest registrationRequest)
+        public async Task<ActionResult<OAuthResponse>> Register(RegistrationRequest registrationRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -63,13 +63,13 @@ namespace EDOverwatch_Web.Controllers
             if (result.Succeeded)
             {
                 await SignInManager.SignInAsync(user, true);
-                return new RegistrationResponse(true);
+                return new OAuthResponse(true);
             }
-            return new RegistrationResponse(result.Errors.Select(e => e.Description).ToList());
+            return new OAuthResponse(result.Errors.Select(e => e.Description).ToList());
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResponse>> OAuth(OAuthRequest requestData, CancellationToken cancellationToken)
+        public async Task<ActionResult<OAuthResponse>> OAuth(OAuthRequest requestData, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
@@ -79,6 +79,7 @@ namespace EDOverwatch_Web.Controllers
             if (oAuthCode != null)
             {
                 DbContext.OAuthCodes.Remove(oAuthCode);
+                await DbContext.SaveChangesAsync(cancellationToken);
                 OAuthenticationResult? oAuthenticationResult = await FDevOAuth.AuthenticateUser(requestData.Code, oAuthCode, cancellationToken);
                 if (oAuthenticationResult != null && oAuthenticationResult.CustomerId > 0)
                 {
@@ -90,7 +91,7 @@ namespace EDOverwatch_Web.Controllers
                         Profile? profile = await FDevOAuth.GetProfile(oAuthenticationResult.Credentials, cancellationToken);
                         if (string.IsNullOrEmpty(profile?.Commander?.Name))
                         {
-                            return new RegistrationResponse(new List<string>() { "Authentication failed! Your Frontier profile does not seem to have an Elite Dangerous profile." });
+                            return new OAuthResponse(new List<string>() { "Authentication failed! Your Frontier profile does not seem to have an Elite Dangerous profile." });
                         }
                         string userName = RegexRemoveCharacters().Replace(profile!.Commander!.Name, "_") + "-" + oAuthenticationResult.CustomerId;
 
@@ -99,49 +100,60 @@ namespace EDOverwatch_Web.Controllers
                             Email = $"{userName}@edct.dev",
                         };
                         IdentityResult result = await UserManager.CreateAsync(user);
-                        if (result.Succeeded)
+                        if (!result.Succeeded)
                         {
-                            await DbContext.SaveChangesAsync(cancellationToken);
-                            await SignInManager.SignInAsync(user, true);
-                            return new RegistrationResponse(true);
+                            return new OAuthResponse(new List<string>() { "Registration could not be completed." });
                         }
-                        return new RegistrationResponse(new List<string>() { "Registration could not be completed." });
+                        await DbContext.SaveChangesAsync(cancellationToken);
+                        commander = new(0, oAuthenticationResult.CustomerId, false, DateTimeOffset.UtcNow.AddYears(-1), 0, DateTimeOffset.Now, CommanderOAuthStatus.Active, oAuthenticationResult.Credentials.AccessToken, oAuthenticationResult.Credentials.RefreshToken, oAuthenticationResult.Credentials.TokenType)
+                        {
+                            User = user
+                        };
+                        user.Commander = commander;
+                        DbContext.Commanders.Add(commander);
                     }
-                    else if (commander.User != null)
+                    if (commander.User != null)
                     {
+                        commander.OAuthAccessToken = oAuthenticationResult.Credentials.AccessToken;
+                        commander.OAuthRefreshToken = oAuthenticationResult.Credentials.RefreshToken;
+                        commander.OAuthTokenType = oAuthenticationResult.Credentials.TokenType;
+                        commander.OAuthStatus = CommanderOAuthStatus.Active;
+                        await DbContext.SaveChangesAsync(cancellationToken);
                         await SignInManager.SignInAsync(commander.User, true);
-                        return new RegistrationResponse(true);
+                        return new OAuthResponse(true);
                     }
                 }
             }
-            return new RegistrationResponse(new List<string>() { "Authentication failed!" });
+            return new OAuthResponse(new List<string>() { "Authentication failed!" });
         }
 
         [HttpPost]
-        public async Task<ActionResult<FDevGetStateResponse>> OAuthGetUrl(CancellationToken cancellationToken)
+        public async Task<ActionResult<OAuthGetStateResponse>> OAuthGetUrl(CancellationToken cancellationToken)
         {
             string url = FDevOAuth.CreateAuthorizeUrl();
             await DbContext.SaveChangesAsync(cancellationToken);
-            return new FDevGetStateResponse(url);
+            return new OAuthGetStateResponse(url);
         }
 
-        [Authorize]
         [HttpGet]
-        public async Task<ActionResult> Me()
+        public async Task<MeResponse> Me()
         {
             ApplicationUser? user = await UserManager.GetUserAsync(User);
             if (user != null)
             {
-
+                await DbContext.Entry(user)
+                    .Reference(u => u.Commander)
+                    .LoadAsync();
+                return new MeResponse(true, user.UserName);
             }
-            return Ok();
+            return new MeResponse(false);
         }
 
         [GeneratedRegex("[^0-9a-z]", RegexOptions.IgnoreCase, "en-CH")]
         private static partial Regex RegexRemoveCharacters();
     }
 
-    internal class LoginRequest
+    public class LoginRequest
     {
         [Required]
         public string UserName { get; set; }
@@ -156,7 +168,7 @@ namespace EDOverwatch_Web.Controllers
         }
     }
 
-    internal class LoginResponse
+    public class LoginResponse
     {
         public bool Success { get; set; }
 
@@ -166,7 +178,7 @@ namespace EDOverwatch_Web.Controllers
         }
     }
 
-    internal class RegistrationRequest
+    public class RegistrationRequest
     {
         [Required]
         public string UserName { get; set; }
@@ -186,24 +198,24 @@ namespace EDOverwatch_Web.Controllers
         }
     }
 
-    internal class RegistrationResponse
+    public class OAuthResponse
     {
         public bool Success { get; }
 
         public List<string>? Error { get; }
 
-        public RegistrationResponse(bool success)
+        public OAuthResponse(bool success)
         {
             Success = success;
         }
 
-        public RegistrationResponse(List<string> errors) : this(false)
+        public OAuthResponse(List<string> errors) : this(false)
         {
             Error = errors;
         }
     }
 
-    internal class OAuthRequest
+    public class OAuthRequest
     {
         [Required]
         public string State { get; set; }
@@ -218,12 +230,36 @@ namespace EDOverwatch_Web.Controllers
         }
     }
 
-    internal class FDevGetStateResponse
+    public class OAuthGetStateResponse
     {
         public string Url { get; }
-        public FDevGetStateResponse(string url)
+        public OAuthGetStateResponse(string url)
         {
             Url = url;
+        }
+    }
+
+    public class MeResponse
+    {
+        public bool LoggedIn { get; set; }
+        public User? User { get; }
+
+        public MeResponse(bool loggedIn, string? userName = null)
+        {
+            LoggedIn = loggedIn;
+            if (loggedIn && userName != null)
+            {
+                User = new(userName);
+            }
+        }
+    }
+
+    public class User
+    {
+        public string UserName { get; set; }
+        public User(string userName)
+        {
+            UserName = userName;
         }
     }
 }

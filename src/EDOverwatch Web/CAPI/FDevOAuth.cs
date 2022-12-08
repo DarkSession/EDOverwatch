@@ -7,9 +7,9 @@ using System.Text;
 
 namespace EDOverwatch_Web.CAPI
 {
-    internal class FDevOAuth : IDisposable
+    public class FDevOAuth : IDisposable
     {
-        private HttpClient HttpClient { get; } = new();
+        private HttpClient HttpClient { get; } = new(/*new LoggingHandler(new HttpClientHandler())*/);
         private IConfiguration Configuration { get; }
         private EdDbContext DbContext { get; }
         private string ClientId { get; }
@@ -26,6 +26,7 @@ namespace EDOverwatch_Web.CAPI
         public void Dispose()
         {
             HttpClient.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public async Task<OAuthenticationResult?> AuthenticateUser(string userCode, OAuthCode oAuthCode, CancellationToken cancellationToken)
@@ -33,6 +34,7 @@ namespace EDOverwatch_Web.CAPI
             string authTokenUrl = Configuration.GetValue<string>("FDevOAuth:TokenUrl") ?? throw new Exception("FDevOAuth:TokenUrl is not configured");
             // If this request fails with an error 500, then we probably have a compatibility issue.
             // It was tested and worked with IdentityModel 5.2
+
             TokenResponse tokenResponse = await HttpClient.RequestAuthorizationCodeTokenAsync(new AuthorizationCodeTokenRequest
             {
                 Address = authTokenUrl,
@@ -41,8 +43,9 @@ namespace EDOverwatch_Web.CAPI
                 RedirectUri = RedirectUrl,
                 CodeVerifier = oAuthCode.Code,
                 GrantType = "authorization_code",
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
             }, cancellationToken);
-            if (!tokenResponse.IsError)
+            if (tokenResponse.IsError)
             {
                 return null;
             }
@@ -104,7 +107,7 @@ namespace EDOverwatch_Web.CAPI
         }
     }
 
-    internal class OAuthenticationResult
+    public class OAuthenticationResult
     {
         public TokenResponse TokenResponse { get; }
         public UserInfoResponse UserInfoResponse { get; }
@@ -119,7 +122,7 @@ namespace EDOverwatch_Web.CAPI
         }
     }
 
-    internal class OAuthCredentials
+    public class OAuthCredentials
     {
         public string TokenType { get; }
         public string AccessToken { get; }
@@ -132,4 +135,37 @@ namespace EDOverwatch_Web.CAPI
             RefreshToken = refreshToken;
         }
     }
+
+    /*
+    public class LoggingHandler : DelegatingHandler
+    {
+        public LoggingHandler(HttpMessageHandler innerHandler)
+            : base(innerHandler)
+        {
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Console.WriteLine("Request:");
+            Console.WriteLine(request.ToString());
+            if (request.Content != null)
+            {
+                Console.WriteLine(await request.Content.ReadAsStringAsync());
+            }
+            Console.WriteLine();
+
+            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+
+            Console.WriteLine("Response:");
+            Console.WriteLine(response.ToString());
+            if (response.Content != null)
+            {
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
+            }
+            Console.WriteLine();
+
+            return response;
+        }
+    }
+    */
 }
