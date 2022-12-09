@@ -1,5 +1,6 @@
 ﻿global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 
 namespace EDDatabase
@@ -8,11 +9,14 @@ namespace EDDatabase
     {
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Commander> Commanders { get; set; }
+        public DbSet<CommanderMission> CommanderMissions { get; set; }
 
         public DbSet<Economy> Economies { get; set; }
 
         public DbSet<FactionAllegiance> FactionAllegiances { get; set; }
         public DbSet<FactionGovernment> FactionGovernments { get; set; }
+
+        public DbSet<IdentityUserClaim<string>> IdentityUserClaims { get; set; }
 
         public DbSet<OAuthCode> OAuthCodes { get; set; }
 

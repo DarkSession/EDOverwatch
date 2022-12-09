@@ -1,3 +1,7 @@
+/* "Barrel" of Http Interceptors */
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpRequestInterceptor } from './HttpRequestInterceptor';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -19,15 +23,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
+import { TimeagoModule } from 'ngx-timeago';
+
 import { AboutComponent } from './about/about.component';
 import { GetInvolvedComponent } from './get-involved/get-involved.component';
 import { ConsumerApiComponent } from './consumer-api/consumer-api.component';
 
-/* "Barrel" of Http Interceptors */
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { HttpRequestInterceptor } from './HttpRequestInterceptor';
 import { LoginComponent } from './login/login.component';
 import { AuthComponent } from './auth/auth.component';
+import { MyEffortsComponent } from './my-efforts/my-efforts.component';
+import { AuthenticationGuard } from './authentication.guard';
 
 
 /** Http interceptor providers in outside-in order */
@@ -45,9 +50,11 @@ export const httpInterceptorProviders = [
     ConsumerApiComponent,
     LoginComponent,
     AuthComponent,
+    MyEffortsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    TimeagoModule.forRoot(),
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
@@ -87,6 +94,11 @@ export const httpInterceptorProviders = [
       {
         path: 'auth',
         component: AuthComponent,
+      },
+      {
+        path: 'my-efforts',
+        component: MyEffortsComponent,
+        canActivate: [AuthenticationGuard],
       },
       {
         path: '**',

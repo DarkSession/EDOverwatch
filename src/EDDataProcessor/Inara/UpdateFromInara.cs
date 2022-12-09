@@ -1,4 +1,4 @@
-﻿namespace OtherDataSources.Inara
+﻿namespace EDDataProcessor.Inara
 {
     internal class UpdateFromInara
     {
@@ -23,17 +23,17 @@
                         long currentTotalShipsLost = await DbContext.WarEfforts
                             .Where(w =>
                                     w.StarSystem == starSystem &&
-                                    w.Type == WarEffortType.Kill &&
+                                    w.Type == WarEffortType.KillGeneric &&
                                     w.Side == WarEffortSide.Thargoids &&
                                     w.Source == WarEffortSource.Inara)
                             .SumAsync(w => w.Amount);
                         if (currentTotalShipsLost != conflictDetails.ShipsLost)
                         {
-                            DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+                            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
                             WarEffort? shipKills = await DbContext.WarEfforts
                                 .FirstOrDefaultAsync(w =>
                                         w.StarSystem == starSystem &&
-                                        w.Type == WarEffortType.Kill &&
+                                        w.Type == WarEffortType.KillGeneric &&
                                         w.Side == WarEffortSide.Thargoids &&
                                         w.Source == WarEffortSource.Inara &&
                                         w.Date == today);
@@ -43,7 +43,7 @@
                             }
                             else
                             {
-                                shipKills = new(0, WarEffortType.Kill, today, (conflictDetails.ShipsLost - currentTotalShipsLost), WarEffortSide.Thargoids, WarEffortSource.Inara)
+                                shipKills = new(0, WarEffortType.KillGeneric, today, (conflictDetails.ShipsLost - currentTotalShipsLost), WarEffortSide.Thargoids, WarEffortSource.Inara)
                                 {
                                     StarSystem = starSystem,
                                 };
@@ -62,14 +62,14 @@
                         long kills = (scoutKills + interceptorKills);
                         if (kills > 0)
                         {
-                            WarEffort? warEffortKills = warEfforts.FirstOrDefault(w => w.Type == WarEffortType.Kill && w.Side == WarEffortSide.Humans);
+                            WarEffort? warEffortKills = warEfforts.FirstOrDefault(w => w.Type == WarEffortType.KillGeneric && w.Side == WarEffortSide.Humans);
                             if (warEffortKills != null)
                             {
                                 warEffortKills.Amount = kills;
                             }
                             else
                             {
-                                warEffortKills = new(0, WarEffortType.Kill, date, kills, WarEffortSide.Humans, WarEffortSource.Inara)
+                                warEffortKills = new(0, WarEffortType.KillGeneric, date, kills, WarEffortSide.Humans, WarEffortSource.Inara)
                                 {
                                     StarSystem = starSystem,
                                 };

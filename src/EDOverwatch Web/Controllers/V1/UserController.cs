@@ -1,14 +1,17 @@
-﻿using EDOverwatch_Web.CAPI;
+﻿using ActiveMQ.Artemis.Client;
+using EDCApi;
+using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace EDOverwatch_Web.Controllers
+namespace EDOverwatch_Web.Controllers.V1
 {
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("api/v1/[controller]/[action]")]
     [AllowAnonymous]
     public partial class UserController : ControllerBase
     {
@@ -16,18 +19,21 @@ namespace EDOverwatch_Web.Controllers
         private SignInManager<ApplicationUser> SignInManager { get; }
         private EdDbContext DbContext { get; }
         private FDevOAuth FDevOAuth { get; }
+        private ActiveMqMessageProducer Producer { get; }
 
         public UserController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             EdDbContext dbContext,
-            FDevOAuth fDevOAuth
+            FDevOAuth fDevOAuth,
+            ActiveMqMessageProducer producer
             )
         {
             UserManager = userManager;
             SignInManager = signInManager;
             DbContext = dbContext;
             FDevOAuth = fDevOAuth;
+            Producer = producer;
         }
 
         [HttpPost]
@@ -63,7 +69,10 @@ namespace EDOverwatch_Web.Controllers
             if (result.Succeeded)
             {
                 await SignInManager.SignInAsync(user, true);
-                return new OAuthResponse(true);
+                await DbContext.Entry(user)
+                    .Reference(u => u.Commander)
+                    .LoadAsync();
+                return new OAuthResponse(new MeResponse(user));
             }
             return new OAuthResponse(result.Errors.Select(e => e.Description).ToList());
         }
@@ -80,14 +89,16 @@ namespace EDOverwatch_Web.Controllers
             {
                 DbContext.OAuthCodes.Remove(oAuthCode);
                 await DbContext.SaveChangesAsync(cancellationToken);
-                OAuthenticationResult? oAuthenticationResult = await FDevOAuth.AuthenticateUser(requestData.Code, oAuthCode, cancellationToken);
+                OAuthenticationResult? oAuthenticationResult = await FDevOAuth.AuthenticateUser(requestData.Code, oAuthCode.Code, cancellationToken);
                 if (oAuthenticationResult != null && oAuthenticationResult.CustomerId > 0)
                 {
                     Commander? commander = await DbContext.Commanders
                         .Include(c => c.User)
                         .FirstOrDefaultAsync(u => u.FDevCustomerId == oAuthenticationResult.CustomerId, cancellationToken);
+                    bool isCommanderNew = false;
                     if (commander == null)
                     {
+                        isCommanderNew = true;
                         Profile? profile = await FDevOAuth.GetProfile(oAuthenticationResult.Credentials, cancellationToken);
                         if (string.IsNullOrEmpty(profile?.Commander?.Name))
                         {
@@ -105,7 +116,20 @@ namespace EDOverwatch_Web.Controllers
                             return new OAuthResponse(new List<string>() { "Registration could not be completed." });
                         }
                         await DbContext.SaveChangesAsync(cancellationToken);
-                        commander = new(0, oAuthenticationResult.CustomerId, false, DateTimeOffset.UtcNow.AddYears(-1), 0, DateTimeOffset.Now, CommanderOAuthStatus.Active, oAuthenticationResult.Credentials.AccessToken, oAuthenticationResult.Credentials.RefreshToken, oAuthenticationResult.Credentials.TokenType)
+                        commander = new(
+                            id: 0,
+                            name: profile!.Commander!.Name,
+                            oAuthenticationResult.CustomerId,
+                            false,
+                            DateTimeOffset.UtcNow.AddYears(-1),
+                            DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).Date),
+                            0,
+                            DateTimeOffset.UtcNow.AddDays(-14).Date,
+                            DateTimeOffset.Now,
+                            CommanderOAuthStatus.Active,
+                            oAuthenticationResult.Credentials.AccessToken,
+                            oAuthenticationResult.Credentials.RefreshToken,
+                            oAuthenticationResult.Credentials.TokenType)
                         {
                             User = user
                         };
@@ -120,7 +144,11 @@ namespace EDOverwatch_Web.Controllers
                         commander.OAuthStatus = CommanderOAuthStatus.Active;
                         await DbContext.SaveChangesAsync(cancellationToken);
                         await SignInManager.SignInAsync(commander.User, true);
-                        return new OAuthResponse(true);
+                        if (isCommanderNew)
+                        {
+                            await Producer.SendAsync("Commander.CApi", RoutingType.Anycast, JsonConvert.SerializeObject(new CommanderCApi(oAuthenticationResult.CustomerId)), cancellationToken);
+                        }
+                        return new OAuthResponse(new MeResponse(commander.User));
                     }
                 }
             }
@@ -130,9 +158,10 @@ namespace EDOverwatch_Web.Controllers
         [HttpPost]
         public async Task<ActionResult<OAuthGetStateResponse>> OAuthGetUrl(CancellationToken cancellationToken)
         {
-            string url = FDevOAuth.CreateAuthorizeUrl();
+            OAuthAuthorizeUrl oAuthAuthorizeUrl = FDevOAuth.CreateAuthorizeUrl();
+            DbContext.OAuthCodes.Add(new(oAuthAuthorizeUrl.State, oAuthAuthorizeUrl.CodeVerifier, DateTimeOffset.Now));
             await DbContext.SaveChangesAsync(cancellationToken);
-            return new OAuthGetStateResponse(url);
+            return new OAuthGetStateResponse(oAuthAuthorizeUrl.Url);
         }
 
         [HttpGet]
@@ -144,9 +173,9 @@ namespace EDOverwatch_Web.Controllers
                 await DbContext.Entry(user)
                     .Reference(u => u.Commander)
                     .LoadAsync();
-                return new MeResponse(true, user.UserName);
+                return new MeResponse(user);
             }
-            return new MeResponse(false);
+            return new MeResponse(null);
         }
 
         [GeneratedRegex("[^0-9a-z]", RegexOptions.IgnoreCase, "en-CH")]
@@ -201,16 +230,18 @@ namespace EDOverwatch_Web.Controllers
     public class OAuthResponse
     {
         public bool Success { get; }
-
+        public MeResponse? Me { get; }
         public List<string>? Error { get; }
 
-        public OAuthResponse(bool success)
+        public OAuthResponse(MeResponse me)
         {
-            Success = success;
+            Success = true;
+            Me = me;
         }
 
-        public OAuthResponse(List<string> errors) : this(false)
+        public OAuthResponse(List<string> errors)
         {
+            Success = false;
             Error = errors;
         }
     }
@@ -244,22 +275,24 @@ namespace EDOverwatch_Web.Controllers
         public bool LoggedIn { get; set; }
         public User? User { get; }
 
-        public MeResponse(bool loggedIn, string? userName = null)
+        public MeResponse(ApplicationUser? applicationUser)
         {
-            LoggedIn = loggedIn;
-            if (loggedIn && userName != null)
+            LoggedIn = applicationUser != null;
+            if (applicationUser != null)
             {
-                User = new(userName);
+                User = new(applicationUser.Commander?.Name ?? applicationUser.UserName, applicationUser.Commander?.JournalLastActivity);
             }
         }
     }
 
     public class User
     {
-        public string UserName { get; set; }
-        public User(string userName)
+        public string Commander { get; set; }
+        public DateTimeOffset? JournalLastImport { get; set; }
+        public User(string commander, DateTimeOffset? journalLastImport)
         {
-            UserName = userName;
+            Commander = commander;
+            JournalLastImport = journalLastImport;
         }
     }
 }

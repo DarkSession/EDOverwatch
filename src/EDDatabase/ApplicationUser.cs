@@ -8,6 +8,9 @@ namespace EDDatabase
         [ForeignKey("CommanderId")]
         public Commander? Commander { get; set; }
 
+        [ForeignKey("CommanderId")]
+        public int? CommanderId { get; set; }
+
         public ApplicationUser(string userName) : base(userName) { }
     }
 }

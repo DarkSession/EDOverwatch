@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EDOverwatch_Web.Controllers
+namespace EDOverwatch_Web.Controllers.V1
 {
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("api/v1/[controller]/[action]")]
     [AllowAnonymous]
     public class Overwatch : ControllerBase
     {
@@ -58,7 +58,7 @@ namespace EDOverwatch_Web.Controllers
                     Math.Round((double)thargoidsSystemsControlling / (double)relevantSystemCount, 4),
                     await DbContext.ThargoidMaelstroms.CountAsync(cancellationToken),
                     thargoidsSystemsControlling,
-                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.Kill)?.amount
+                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.KillGeneric)?.amount
                 );
             }
             {
@@ -81,11 +81,22 @@ namespace EDOverwatch_Web.Controllers
                     })
                     .ToListAsync(cancellationToken);
 
+                List<WarEffortType> warEffortTypeKills = new()
+                {
+                    WarEffortType.KillGeneric,
+                    WarEffortType.KillThargoidScout,
+                    WarEffortType.KillThargoidCyclops,
+                    WarEffortType.KillThargoidBasilisk,
+                    WarEffortType.KillThargoidMedusa,
+                    WarEffortType.KillThargoidHydra,
+                    WarEffortType.KillThargoidOrthrus,
+                };
+
                 result.Humans = new(
                     Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),
                     humansSystemsControlling,
                     0,
-                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.Kill)?.amount,
+                    warEfforts.FirstOrDefault(w => warEffortTypeKills.Contains(w.type))?.amount,
                     warEfforts.FirstOrDefault(w => w.type == WarEffortType.Rescue)?.amount,
                     warEfforts.FirstOrDefault(w => w.type == WarEffortType.SupplyDelivery)?.amount);
             }
@@ -119,7 +130,7 @@ namespace EDOverwatch_Web.Controllers
 
             var efforts = await DbContext.WarEfforts
                 .AsNoTracking()
-                .Where(w => w.Date >= DateOnly.FromDateTime(DateTime.Today))
+                .Where(w => w.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
                 .GroupBy(w => new
                 {
                     w.StarSystemId,

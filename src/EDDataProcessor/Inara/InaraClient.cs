@@ -3,7 +3,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using System.Text.RegularExpressions;
 
-namespace OtherDataSources.Inara
+namespace EDDataProcessor.Inara
 {
     internal class InaraClient : IDisposable
     {

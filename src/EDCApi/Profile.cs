@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace EDOverwatch_Web.CAPI
+namespace EDCApi
 {
     public class Profile
     {

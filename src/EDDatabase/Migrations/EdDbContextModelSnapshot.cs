@@ -88,22 +88,35 @@ namespace EDDatabase.Migrations
                     b.Property<bool>("IsInLiveVersion")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<DateTimeOffset>("LogLastDateProcessed")
+                    b.Property<DateOnly>("JournalDay")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("JournalLastActivity")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("LogLastLine")
+                    b.Property<int>("JournalLastLine")
                         .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("JournalLastProcessed")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("OAuthAccessToken")
                         .IsRequired()
                         .HasColumnType("varchar(4096)");
 
-                    b.Property<DateTime>("OAuthCreated")
+                    b.Property<DateTimeOffset>("OAuthCreated")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("OAuthRefreshToken")
                         .IsRequired()
                         .HasColumnType("varchar(256)");
+
+                    b.Property<byte>("OAuthStatus")
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<string>("OAuthTokenType")
                         .IsRequired()
@@ -131,6 +144,39 @@ namespace EDDatabase.Migrations
                         .IsUnique();
 
                     b.ToTable("Commander");
+                });
+
+            modelBuilder.Entity("EDDatabase.CommanderMission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CommanderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("MissionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("SystemId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommanderId");
+
+                    b.HasIndex("MissionId")
+                        .IsUnique();
+
+                    b.HasIndex("SystemId");
+
+                    b.ToTable("CommanderMission");
                 });
 
             modelBuilder.Entity("EDDatabase.Economy", b =>
@@ -494,6 +540,9 @@ namespace EDDatabase.Migrations
                     b.Property<long>("Amount")
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("CommanderId")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
@@ -511,11 +560,33 @@ namespace EDDatabase.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CommanderId");
+
                     b.HasIndex("Side");
 
                     b.HasIndex("StarSystemId");
 
                     b.ToTable("WarEffort");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IdentityUserClaims");
                 });
 
             modelBuilder.Entity("EDDatabase.ApplicationUser", b =>
@@ -546,6 +617,21 @@ namespace EDDatabase.Migrations
                     b.Navigation("System");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EDDatabase.CommanderMission", b =>
+                {
+                    b.HasOne("EDDatabase.Commander", "Commander")
+                        .WithMany()
+                        .HasForeignKey("CommanderId");
+
+                    b.HasOne("EDDatabase.StarSystem", "System")
+                        .WithMany()
+                        .HasForeignKey("SystemId");
+
+                    b.Navigation("Commander");
+
+                    b.Navigation("System");
                 });
 
             modelBuilder.Entity("EDDatabase.StarSystem", b =>
@@ -655,9 +741,15 @@ namespace EDDatabase.Migrations
 
             modelBuilder.Entity("EDDatabase.WarEffort", b =>
                 {
+                    b.HasOne("EDDatabase.Commander", "Commander")
+                        .WithMany()
+                        .HasForeignKey("CommanderId");
+
                     b.HasOne("EDDatabase.StarSystem", "StarSystem")
                         .WithMany()
                         .HasForeignKey("StarSystemId");
+
+                    b.Navigation("Commander");
 
                     b.Navigation("StarSystem");
                 });

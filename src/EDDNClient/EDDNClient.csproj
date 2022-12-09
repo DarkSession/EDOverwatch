@@ -9,6 +9,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Include="..\EDCApi\edcapi.json" Link="edcapi.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="ArtemisNetClient" Version="2.11.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />

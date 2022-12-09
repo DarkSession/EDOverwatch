@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public constructor(
     private readonly httpClient: HttpClient,
-    @Inject('BASE_URL') private readonly baseUrl: string,
+    @Inject('API_URL') private readonly apiUrl: string,
     private readonly changeDetectorRef: ChangeDetectorRef
     ) {
   }
@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async loadOverview(): Promise<void> {
-    const response = await firstValueFrom(this.httpClient.get<any>(this.baseUrl + 'api/overwatch/overview'));
+    const response = await firstValueFrom(this.httpClient.get<any>(this.apiUrl + 'overwatch/overview'));
     if (response) {
       this.overview = response;
       this.changeDetectorRef.detectChanges();

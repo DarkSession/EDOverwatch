@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { delay } from 'rxjs';
-import { AppService, User } from './app.service';
+import { AppService } from './app.service';
+import { HttpInterceptorService } from './http-interceptor.service';
 
 @UntilDestroy()
 @Component({
@@ -12,27 +13,27 @@ import { AppService, User } from './app.service';
 export class AppComponent implements OnInit {
   public isMenuOpen = false;
   public loading = false;
-  public user: User | null = null;
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly appService: AppService
+    public readonly appService: AppService,
+    private readonly httpInterceptorService: HttpInterceptorService
   ) {
   }
 
   public ngOnInit(): void {
-    this.appService.loadingSub
+    this.httpInterceptorService.loadingSub
       .pipe(delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
       .pipe(untilDestroyed(this))
       .subscribe((loading) => {
         this.loading = loading;
       });
-    this.getUser();
-  }
+    this.appService.onUserChanged
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this.changeDetectorRef.detectChanges();
+      });
 
-  private async getUser(): Promise<void> {
-    this.user = await this.appService.getUser();
-    this.changeDetectorRef.detectChanges();
   }
 
   public toggleMenu(): void {

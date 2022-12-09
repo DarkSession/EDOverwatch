@@ -9,7 +9,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="appsettings.dev.json" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Content Include="appsettings.dev.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AngleSharp" Version="0.17.1" />
 		<PackageReference Include="ArtemisNetClient" Version="2.11.0" />
+		<PackageReference Include="Google.Apis.Sheets.v4" Version="1.58.0.2826" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,6 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\EDCApi\EDCApi.csproj" />
 	  <ProjectReference Include="..\EDDatabase\EDDatabase.csproj" />
 	  <ProjectReference Include="..\Messages\Messages.csproj" />
 	</ItemGroup>

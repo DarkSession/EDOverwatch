@@ -12,7 +12,7 @@ export class LoginComponent {
 
   public constructor(
     private readonly httpClient: HttpClient,
-    @Inject('BASE_URL') private readonly baseUrl: string) {
+    @Inject('API_URL') private readonly apiUrl: string) {
   }
 
   public async oAuth(): Promise<void> {
@@ -21,11 +21,10 @@ export class LoginComponent {
     }
     this.loginDisabled = true;
     try {
-      const response = await firstValueFrom(this.httpClient.post<OAuthGetStateResponse>(this.baseUrl + 'api/user/OAuthGetUrl', {}, {
+      const response = await firstValueFrom(this.httpClient.post<OAuthGetStateResponse>(this.apiUrl + 'user/OAuthGetUrl', {}, {
         withCredentials: true,
       }));
       if (response) {
-        console.log(response);
         window.location.href = response.url;
       }
     }

@@ -112,7 +112,7 @@ namespace EDDataProcessor.EDDN
                             {
                                 thargoidMaelstrom.StarSystem = starSystem;
                             }
-                            await dbContext.SaveChangesAsync();
+                            await dbContext.SaveChangesAsync(cancellationToken);
                         }
                     }
                     else if (signalName.StartsWith("$Warzone_TG_"))

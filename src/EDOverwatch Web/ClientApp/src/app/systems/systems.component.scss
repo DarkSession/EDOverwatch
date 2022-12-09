@@ -1,9 +1,9 @@
 .systems-container {
-    position: relative;
+    display: flex;
+    flex-direction: column;
 }
-  
+
 .systems-table-container {
-    position: relative;
     min-height: 200px;
     max-height: 75vh;
     overflow: auto;

@@ -4,7 +4,7 @@ using Google.Apis.Sheets.v4.Data;
 using System.Text.RegularExpressions;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource;
 
-namespace OtherDataSources.IDA
+namespace EDDataProcessor.IDA
 {
     internal partial class IdaClient
     {
@@ -53,7 +53,7 @@ namespace OtherDataSources.IDA
                                 .SumAsync(w => w.Amount);
                             if (currentTotalHauled != newTotalHauled)
                             {
-                                DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+                                DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
                                 WarEffort? supplyDeliveries = await DbContext.WarEfforts
                                     .FirstOrDefaultAsync(w =>
                                             w.StarSystem == starSystem &&

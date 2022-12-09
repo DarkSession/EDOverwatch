@@ -28,7 +28,7 @@ export class SystemsComponent implements OnInit {
 
   public constructor(
     private readonly httpClient: HttpClient,
-    @Inject('BASE_URL') private readonly baseUrl: string,
+    @Inject('API_URL') private readonly apiUrl: string,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly matSnackBar: MatSnackBar) {
   }
@@ -38,7 +38,7 @@ export class SystemsComponent implements OnInit {
   }
 
   private async loadSystems(): Promise<void> {
-    const response = await firstValueFrom(this.httpClient.get<OverwatchSystems>(this.baseUrl + 'api/overwatch/systems'));
+    const response = await firstValueFrom(this.httpClient.get<OverwatchSystems>(this.apiUrl + 'overwatch/systems'));
     if (response) {
       this.dataRaw = response.systems;
       this.maelstroms = response.maelstroms;

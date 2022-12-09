@@ -1,6 +1,9 @@
 global using EDDatabase;
 global using Microsoft.EntityFrameworkCore;
-using EDOverwatch_Web.CAPI;
+using ActiveMQ.Artemis.Client.Extensions.DependencyInjection;
+using ActiveMQ.Artemis.Client.Extensions.Hosting;
+using EDCApi;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace EDOverwatch_Web
 {
@@ -9,7 +12,13 @@ namespace EDOverwatch_Web
         public static async Task Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            builder.Configuration.AddJsonFile("edcapi.json");
 #if DEBUG
+            JsonConfigurationSource? secrets = builder.Configuration.Sources.FirstOrDefault(c => c is JsonConfigurationSource j && j.Path == "secrets.json") as JsonConfigurationSource;
+            if (secrets != null)
+            {
+                builder.Configuration.Sources.Remove(secrets);
+            }
             builder.Configuration.AddUserSecrets<Program>();
 #endif
             builder.Configuration.AddEnvironmentVariables();
@@ -27,6 +36,16 @@ namespace EDOverwatch_Web
             // Add services to the container.
             builder.Services.AddControllers()
                     .AddNewtonsoftJson();
+
+            ActiveMQ.Artemis.Client.Endpoint activeMqEndpont = ActiveMQ.Artemis.Client.Endpoint.Create(
+                builder.Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
+                builder.Configuration.GetValue<int>("ActiveMQ:Port"),
+                builder.Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
+                builder.Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
+
+            builder.Services.AddActiveMq("DN", new[] { activeMqEndpont })
+                .AddAnonymousProducer<ActiveMqMessageProducer>();
+            builder.Services.AddActiveMqHostedService();
             builder.Services.AddDbContext<EdDbContext>();
             builder.Services.AddCors(options =>
             {

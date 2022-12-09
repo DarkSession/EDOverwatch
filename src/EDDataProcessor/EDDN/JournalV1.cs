@@ -208,14 +208,6 @@ namespace EDDataProcessor.EDDN
         [JsonProperty("event", Required = Required.Always)]
         public MessageEvent Event { get; set; }
 
-        /// <summary>Whether the sending Cmdr has a Horizons pass.</summary>
-        [JsonProperty("horizons", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public bool Horizons { get; set; }
-
-        /// <summary>Whether the sending Cmdr has an Odyssey expansion.</summary>
-        [JsonProperty("odyssey", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public bool Odyssey { get; set; }
-
         /// <summary>Must be added by the sender if not present in the journal event</summary>
         [JsonProperty("StarSystem", Required = Required.Always)]
         public string StarSystem { get; set; } = string.Empty;
@@ -228,23 +220,14 @@ namespace EDDataProcessor.EDDN
         [JsonProperty("SystemAddress", Required = Required.Always)]
         public long SystemAddress { get; set; }
 
-        [JsonProperty("Name")]
-        public string Name { get; set; } = string.Empty;
-
         [JsonProperty("Population")]
         public long? Population { get; set; }
-
-        [JsonProperty("SystemGovernment")]
-        public string SystemGovernment { get; set; } = string.Empty;
 
         [JsonProperty("SystemAllegiance")]
         public string SystemAllegiance { get; set; } = string.Empty;
 
         [JsonProperty("SystemSecurity")]
         public string SystemSecurity { get; set; } = string.Empty;
-
-        [JsonProperty("SystemEconomy")]
-        public string SystemEconomy { get; set; } = string.Empty;
 
         [JsonProperty("MarketID")]
         public long MarketID { get; set; }

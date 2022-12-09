@@ -22,11 +22,15 @@
         <div class="small">Automated Thargoid conflict tracking, analysis and coordination</div>
       </div>
     </div>
-    <div>
-      <span *ngIf="user">
-        {{ user.UserName }}
+    <div class="user">
+      <span *ngIf="appService.user">
+        CMDR {{ appService.user.commander }}<br>
+        <div *ngIf="appService.user.journalLastImport">
+          Last journal event:
+          {{ appService.user.journalLastImport | timeago:true}}
+        </div>
       </span>
-      <span *ngIf="!user">
+      <span *ngIf="!appService.user">
         <button mat-raised-button color="primary" routerLink="login">Login</button>
       </span>
     </div>
@@ -39,6 +43,10 @@
       <div>
         <div routerLink="systems" class="clickable">Systems</div>
       </div>
+      <div *ngIf="appService.user">
+        <div routerLink="my-efforts" class="clickable">My contributions</div>
+      </div>
+      <hr>
       <div>
         <div routerLink="about" class="clickable">About</div>
       </div>

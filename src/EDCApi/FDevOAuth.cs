@@ -1,26 +1,26 @@
 ﻿using IdentityModel;
 using IdentityModel.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace EDOverwatch_Web.CAPI
+namespace EDCApi
 {
     public class FDevOAuth : IDisposable
     {
         private HttpClient HttpClient { get; } = new(/*new LoggingHandler(new HttpClientHandler())*/);
         private IConfiguration Configuration { get; }
-        private EdDbContext DbContext { get; }
         private string ClientId { get; }
-        private string RedirectUrl { get; }
+        private ILogger Log { get; }
 
-        public FDevOAuth(IConfiguration configuration, EdDbContext dbContext)
+        public FDevOAuth(IConfiguration configuration, ILogger<FDevOAuth> log)
         {
             Configuration = configuration;
-            DbContext = dbContext;
             ClientId = Configuration.GetValue<string>("FDevOAuth:ClientId") ?? throw new Exception("FDevOAuth:ClientId is not configured");
-            RedirectUrl = Configuration.GetValue<string>("FDevOAuth:ReturnUrl") ?? throw new Exception("FDevOAuth:ReturnUrl is not configured");
+            Log = log;
         }
 
         public void Dispose()
@@ -29,24 +29,23 @@ namespace EDOverwatch_Web.CAPI
             GC.SuppressFinalize(this);
         }
 
-        public async Task<OAuthenticationResult?> AuthenticateUser(string userCode, OAuthCode oAuthCode, CancellationToken cancellationToken)
+        public async Task<OAuthenticationResult?> AuthenticateUser(string userCode, string codeVerifier, CancellationToken cancellationToken)
         {
             string authTokenUrl = Configuration.GetValue<string>("FDevOAuth:TokenUrl") ?? throw new Exception("FDevOAuth:TokenUrl is not configured");
-            // If this request fails with an error 500, then we probably have a compatibility issue.
-            // It was tested and worked with IdentityModel 5.2
-
+            string redirectUrl = Configuration.GetValue<string>("FDevOAuth:RedirectUrl") ?? throw new Exception("FDevOAuth:RedirectUrl is not configured");
             TokenResponse tokenResponse = await HttpClient.RequestAuthorizationCodeTokenAsync(new AuthorizationCodeTokenRequest
             {
                 Address = authTokenUrl,
                 ClientId = ClientId,
                 Code = userCode,
-                RedirectUri = RedirectUrl,
-                CodeVerifier = oAuthCode.Code,
+                RedirectUri = redirectUrl,
+                CodeVerifier = codeVerifier,
                 GrantType = "authorization_code",
                 ClientCredentialStyle = ClientCredentialStyle.PostBody,
             }, cancellationToken);
             if (tokenResponse.IsError)
             {
+                Log.LogWarning("Request authorisation code token failed: {error} ({errorDescription})", tokenResponse.Error, tokenResponse.ErrorDescription);
                 return null;
             }
             string userInfoUrl = Configuration.GetValue<string>("FDevOAuth:UserInfoUrl") ?? throw new Exception("FDevOAuth:UserInfoUrl is not configured");
@@ -63,27 +62,30 @@ namespace EDOverwatch_Web.CAPI
                     return new OAuthenticationResult(tokenResponse, userInfoResponse, customerId);
                 }
             }
+            Log.LogWarning("User information request failed: {error}", userInfoResponse.Error);
             return null;
         }
 
-        public string CreateAuthorizeUrl()
+        public OAuthAuthorizeUrl CreateAuthorizeUrl()
         {
             string authUrl = Configuration.GetValue<string>("FDevOAuth:AuthUrl") ?? throw new Exception("FDevOAuth:AuthUrl is not configured");
+            string redirectUrl = Configuration.GetValue<string>("FDevOAuth:RedirectUrl") ?? throw new Exception("FDevOAuth:RedirectUrl is not configured");
+            string scope = Configuration.GetValue<string>("FDevOAuth:Scope") ?? throw new Exception("FDevOAuth:Scope is not configured");
             string state = CryptoRandom.CreateUniqueId(32);
             string codeVerifier = CryptoRandom.CreateUniqueId(32);
             byte[] challengeBytes = SHA256.HashData(Encoding.UTF8.GetBytes(codeVerifier));
             string codeChallenge = Base64Url.Encode(challengeBytes);
             RequestUrl requestUrl = new(authUrl);
-            DbContext.OAuthCodes.Add(new OAuthCode(state, codeVerifier, DateTimeOffset.Now));
-            return requestUrl.CreateAuthorizeUrl(
+            string url = requestUrl.CreateAuthorizeUrl(
                 clientId: ClientId,
                 responseType: "code",
-                redirectUri: RedirectUrl,
+                redirectUri: redirectUrl,
                 state: state,
-                scope: "auth",
+                scope: scope,
                 codeChallenge: codeChallenge,
                 codeChallengeMethod: "S256"
             );
+            return new OAuthAuthorizeUrl(url, state, codeVerifier);
         }
 
         public Task<Profile?> GetProfile(OAuthCredentials apiCredentials, CancellationToken cancellationToken)
@@ -105,6 +107,26 @@ namespace EDOverwatch_Web.CAPI
             }
             return default;
         }
+
+        public async Task<bool> TokenRefresh(OAuthCredentials oAuthCredentials, CancellationToken cancellationToken)
+        {
+            string authTokenUrl = Configuration.GetValue<string>("FDevOAuth:TokenUrl") ?? throw new Exception("FDevOAuth:TokenUrl is not configured");
+            TokenResponse response = await HttpClient.RequestRefreshTokenAsync(new RefreshTokenRequest
+            {
+                Address = authTokenUrl,
+                ClientId = ClientId,
+                RefreshToken = oAuthCredentials.RefreshToken,
+                GrantType = "refresh_token",
+            }, cancellationToken);
+            if (!response.IsError)
+            {
+                oAuthCredentials.TokenUpdated(response.AccessToken, response.RefreshToken);
+                return true;
+            }
+            oAuthCredentials.TokenUpdateFailed();
+            Log.LogWarning("TokenRefresh error: {responseError} {responseErrorDescription} (ErrorType: {responseErrorType}) (HttpStatusCode: {responseHttpStatusCode})", response.Error, response.ErrorDescription, response.ErrorType, response.HttpStatusCode);
+            return false;
+        }
     }
 
     public class OAuthenticationResult
@@ -125,14 +147,51 @@ namespace EDOverwatch_Web.CAPI
     public class OAuthCredentials
     {
         public string TokenType { get; }
-        public string AccessToken { get; }
-        public string RefreshToken { get; }
+        public string AccessToken { get; private set; }
+        public string RefreshToken { get; private set; }
+        public OAuthCredentialsStatus Status { get; private set; }
 
         public OAuthCredentials(string tokenType, string accessToken, string refreshToken)
         {
             TokenType = tokenType;
             AccessToken = accessToken;
             RefreshToken = refreshToken;
+        }
+
+        public void TokenUpdated(string accessToken, string refreshToken)
+        {
+            AccessToken = accessToken;
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                RefreshToken = refreshToken;
+            }
+            Status = OAuthCredentialsStatus.Refreshed;
+        }
+
+        public void TokenUpdateFailed()
+        {
+            Status = OAuthCredentialsStatus.Refreshed;
+        }
+    }
+
+    public enum OAuthCredentialsStatus
+    {
+        Valid,
+        Refreshed,
+        Invalid,
+    }
+
+    public class OAuthAuthorizeUrl
+    {
+        public string Url { get; }
+        public string State { get; }
+        public string CodeVerifier { get; }
+
+        public OAuthAuthorizeUrl(string url, string state, string codeVerifier)
+        {
+            Url = url;
+            State = state;
+            CodeVerifier = codeVerifier;
         }
     }
 

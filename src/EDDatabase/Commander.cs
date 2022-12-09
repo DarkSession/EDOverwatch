@@ -7,6 +7,9 @@
         [Column]
         public int Id { get; set; }
 
+        [Column(TypeName = "varchar(256)")]
+        public string Name { get; set; }
+
         [Column]
         public long FDevCustomerId { get; set; }
 
@@ -23,10 +26,16 @@
         public bool IsInLiveVersion { get; set; }
 
         [Column]
-        public DateTimeOffset LogLastDateProcessed { get; set; }
+        public DateTimeOffset JournalLastProcessed { get; set; }
 
         [Column]
-        public int LogLastLine { get; set; }
+        public DateOnly JournalDay { get; set; }
+
+        [Column]
+        public int JournalLastLine { get; set; }
+
+        [Column]
+        public DateTimeOffset JournalLastActivity { get; set; }
 
         [Column]
         public DateTimeOffset OAuthCreated { get; set; }
@@ -43,13 +52,19 @@
         [Column(TypeName = "varchar(256)")]
         public string OAuthTokenType { get; set; }
 
-        public Commander(int id, long fDevCustomerId, bool isInLiveVersion, DateTimeOffset logLastDateProcessed, int logLastLine, DateTimeOffset oAuthCreated, CommanderOAuthStatus oAuthStatus, string oAuthAccessToken, string oAuthRefreshToken, string oAuthTokenType)
+        [NotMapped]
+        public bool CanProcessCApiJournal => OAuthStatus == CommanderOAuthStatus.Active && JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-5);
+
+        public Commander(int id, string name, long fDevCustomerId, bool isInLiveVersion, DateTimeOffset journalLastProcessed, DateOnly journalDay, int journalLastLine, DateTimeOffset journalLastActivity, DateTimeOffset oAuthCreated, CommanderOAuthStatus oAuthStatus, string oAuthAccessToken, string oAuthRefreshToken, string oAuthTokenType)
         {
             Id = id;
+            Name = name;
             FDevCustomerId = fDevCustomerId;
             IsInLiveVersion = isInLiveVersion;
-            LogLastDateProcessed = logLastDateProcessed;
-            LogLastLine = logLastLine;
+            JournalLastProcessed = journalLastProcessed;
+            JournalDay = journalDay;
+            JournalLastLine = journalLastLine;
+            JournalLastActivity = journalLastActivity;
             OAuthCreated = oAuthCreated;
             OAuthStatus = oAuthStatus;
             OAuthAccessToken = oAuthAccessToken;
