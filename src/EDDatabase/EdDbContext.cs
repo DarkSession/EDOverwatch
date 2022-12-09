@@ -9,6 +9,7 @@ namespace EDDatabase
     {
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Commander> Commanders { get; set; }
+        public DbSet<CommanderDeferredJournalEvent> CommanderDeferredJournalEvents { get; set; }
         public DbSet<CommanderMission> CommanderMissions { get; set; }
 
         public DbSet<Economy> Economies { get; set; }

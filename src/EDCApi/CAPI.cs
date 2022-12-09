@@ -33,10 +33,18 @@ namespace EDCApi
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Method = HttpMethod.Get;
             using HttpResponseMessage response = await HttpClient.SendAsync(request, cancellationToken);
-            if (response.StatusCode == HttpStatusCode.Unauthorized && await FDevOAuth.TokenRefresh(oAuthCredentials, cancellationToken))
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                using HttpResponseMessage newResponse = await HttpClient.SendAsync(request, cancellationToken);
-                return await GetUrlProcessResponse(newResponse, cancellationToken);
+                if (await FDevOAuth.TokenRefresh(oAuthCredentials, cancellationToken))
+                {
+                    using HttpRequestMessage newRequest = new(HttpMethod.Get, url);
+                    newRequest.Headers.Authorization = new AuthenticationHeaderValue(oAuthCredentials.TokenType, oAuthCredentials.AccessToken);
+                    newRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    newRequest.Method = HttpMethod.Get;
+                    using HttpResponseMessage newResponse = await HttpClient.SendAsync(newRequest, cancellationToken);
+                    return await GetUrlProcessResponse(newResponse, cancellationToken);
+                }
+                return (response.StatusCode, null);
             }
             return await GetUrlProcessResponse(response, cancellationToken);
         }

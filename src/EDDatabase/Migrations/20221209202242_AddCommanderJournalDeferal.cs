@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -6,33 +7,37 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EDDatabase.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCommanderMission : Migration
+    public partial class AddCommanderJournalDeferal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CommanderMission",
+                name: "CommanderDeferredJournalEvent",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    MissionId = table.Column<long>(type: "bigint", nullable: false),
                     CommanderId = table.Column<int>(type: "int", nullable: true),
-                    Date = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     SystemId = table.Column<long>(type: "bigint", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Timestamp = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    Event = table.Column<string>(type: "varchar(256)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Source = table.Column<byte>(type: "tinyint unsigned", nullable: false),
+                    Journal = table.Column<string>(type: "text", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<byte>(type: "tinyint unsigned", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommanderMission", x => x.Id);
+                    table.PrimaryKey("PK_CommanderDeferredJournalEvent", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CommanderMission_Commander_CommanderId",
+                        name: "FK_CommanderDeferredJournalEvent_Commander_CommanderId",
                         column: x => x.CommanderId,
                         principalTable: "Commander",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_CommanderMission_StarSystem_SystemId",
+                        name: "FK_CommanderDeferredJournalEvent_StarSystem_SystemId",
                         column: x => x.SystemId,
                         principalTable: "StarSystem",
                         principalColumn: "Id");
@@ -40,19 +45,18 @@ namespace EDDatabase.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommanderMission_CommanderId",
-                table: "CommanderMission",
+                name: "IX_CommanderDeferredJournalEvent_CommanderId",
+                table: "CommanderDeferredJournalEvent",
                 column: "CommanderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommanderMission_MissionId",
-                table: "CommanderMission",
-                column: "MissionId",
-                unique: true);
+                name: "IX_CommanderDeferredJournalEvent_Status",
+                table: "CommanderDeferredJournalEvent",
+                column: "Status");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommanderMission_SystemId",
-                table: "CommanderMission",
+                name: "IX_CommanderDeferredJournalEvent_SystemId",
+                table: "CommanderDeferredJournalEvent",
                 column: "SystemId");
         }
 
@@ -60,7 +64,7 @@ namespace EDDatabase.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CommanderMission");
+                name: "CommanderDeferredJournalEvent");
         }
     }
 }

@@ -128,7 +128,7 @@ namespace EDDataProcessor
                 {
                     await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
                     EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                    List<Commander> commanders =  await dbContext.Commanders
+                    List<Commander> commanders = await dbContext.Commanders
                         .AsNoTracking()
                         .Where(c => c.OAuthStatus == CommanderOAuthStatus.Active && c.JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-30))
                         .ToListAsync(cancellationToken);

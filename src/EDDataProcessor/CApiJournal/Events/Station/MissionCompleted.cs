@@ -9,23 +9,50 @@
         {
             Name = name;
         }
-        public override async ValueTask ProcessEvent(Commander commander, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
             if (Name.StartsWith("Mission_TW"))
             {
                 CommanderMission? commanderMission = await dbContext.CommanderMissions
                     .Include(c => c.System)
-                    .FirstOrDefaultAsync(c => c.MissionId == MissionID && c.Commander == commander && c.Status == CommanderMissionStatus.Accepted, cancellationToken);
-                    if (commanderMission != null)
+                    .FirstOrDefaultAsync(c => c.MissionId == MissionID && c.Commander == journalParameters.Commander && c.Status == CommanderMissionStatus.Accepted, cancellationToken);
+                if (commanderMission != null)
                 {
                     commanderMission.Status = CommanderMissionStatus.Completed;
-                    WarEffortType warEffortType = Name switch
+                    WarEffortType warEffortType;
+                    if (Name.StartsWith("Mission_TW_Collect"))
                     {
-                        "Mission_TW_Collect_Alert_name" => WarEffortType.MissionCompletionDelivery,
-                        "Mission_TW_Rescue_Alert_name" => WarEffortType.MissionCompletionDelivery,
-                        _ => WarEffortType.MissionCompletionGeneric,
-                    };
-                    await AddOrUpdateWarEffort(commander, commanderMission.System, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
+                        warEffortType = WarEffortType.MissionCompletionDelivery;
+                    }
+                    else if (Name.StartsWith("Mission_TW_Rescue"))
+                    {
+                        warEffortType = WarEffortType.MissionCompletionRescue;
+                    }
+                    else if (Name.StartsWith("Mission_TW_PassengerEvacuation"))
+                    {
+                        warEffortType = WarEffortType.MissionCompletionPassengerEvacuation;
+                    }
+                    else if(Name.StartsWith("Mission_TW_Massacre"))
+                    {
+                        // Mission_TW_Massacre_Scout_Plural
+                        // Mission_TW_Massacre_Cyclops_Plural
+                        // Mission_TW_Massacre_Basilisk_Plural
+                        // Mission_TW_Massacre_Medusa_Plural
+                        // Mission_TW_Massacre_Hydra_Plural
+                        warEffortType = WarEffortType.MissionCompletionThargoidKill;
+                    }
+                    else
+                    {
+                        warEffortType = WarEffortType.MissionCompletionGeneric;
+                    }
+                    if (warEffortType == WarEffortType.MissionCompletionGeneric)
+                    {
+                        await DeferEvent(journalParameters, dbContext, cancellationToken);
+                    }
+                    else
+                    {
+                        await AddOrUpdateWarEffort(journalParameters.Commander, commanderMission.System, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
+                    }
                 }
             }
         }

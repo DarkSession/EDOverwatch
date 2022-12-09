@@ -12,7 +12,6 @@ namespace EDOverwatch_Web
         public static async Task Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-            builder.Configuration.AddJsonFile("edcapi.json");
 #if DEBUG
             JsonConfigurationSource? secrets = builder.Configuration.Sources.FirstOrDefault(c => c is JsonConfigurationSource j && j.Path == "secrets.json") as JsonConfigurationSource;
             if (secrets != null)

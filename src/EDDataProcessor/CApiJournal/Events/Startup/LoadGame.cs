@@ -8,9 +8,9 @@
         [JsonIgnore]
         public override bool BypassLiveStatusCheck => true;
 
-        public override ValueTask ProcessEvent(Commander commander, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
-            commander.IsInLiveVersion = !string.IsNullOrEmpty(GameVersion) && Version.TryParse(GameVersion, out Version? gameVersion) && gameVersion.Major >= 4;
+            journalParameters.Commander.IsInLiveVersion = !string.IsNullOrEmpty(GameVersion) && Version.TryParse(GameVersion, out Version? gameVersion) && gameVersion.Major >= 4;
             return ValueTask.CompletedTask;
         }
     }

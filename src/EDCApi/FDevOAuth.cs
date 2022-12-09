@@ -170,7 +170,7 @@ namespace EDCApi
 
         public void TokenUpdateFailed()
         {
-            Status = OAuthCredentialsStatus.Refreshed;
+            Status = OAuthCredentialsStatus.Expired;
         }
     }
 
@@ -178,7 +178,7 @@ namespace EDCApi
     {
         Valid,
         Refreshed,
-        Invalid,
+        Expired,
     }
 
     public class OAuthAuthorizeUrl

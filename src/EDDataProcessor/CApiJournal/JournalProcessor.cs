@@ -79,7 +79,28 @@ namespace EDDataProcessor.CApiJournal
                 .Include(c => c.Station)
                 .Include(c => c.System)
                 .SingleOrDefaultAsync(c => c.FDevCustomerId == commanderCApi.FDevCustomerId, cancellationToken);
-            if (commander == null || !commander.CanProcessCApiJournal)
+            if (commander == null)
+            {
+                return;
+            }
+            {
+                List<CommanderDeferredJournalEvent> commanderDeferredJournalEvents = await dbContext.CommanderDeferredJournalEvents
+                     .Where(c => c.Commander == commander && c.Status == CommanderDeferredJournalEventStatus.Pending)
+                     .Include(c => c.System)
+                     .Take(10)
+                     .ToListAsync(cancellationToken);
+                foreach (CommanderDeferredJournalEvent commanderDeferredJournalEvent in commanderDeferredJournalEvents)
+                {
+                    JournalParameters journalParameters = new(true, WarEffortSource.OverwatchCAPI, commander, commanderDeferredJournalEvent.System);
+                    await ProcessCommanderCApiMessageEvent(journalParameters, commanderDeferredJournalEvent.Journal, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                    if (!journalParameters.DeferRequested)
+                    {
+                        commanderDeferredJournalEvent.Status = CommanderDeferredJournalEventStatus.Processed;
+                    }
+                }
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            if (!commander.CanProcessCApiJournal)
             {
                 return;
             }
@@ -93,82 +114,96 @@ namespace EDDataProcessor.CApiJournal
             }
             OAuthCredentials oAuthCredentials = new(commander.OAuthTokenType, commander.OAuthAccessToken, commander.OAuthRefreshToken);
             Profile? profile = await capi.GetProfile(oAuthCredentials, cancellationToken);
-            if (profile?.Commander == null)
+            if (profile?.Commander != null)
             {
-                return;
-            }
-            commander.Name = profile.Commander.Name;
-            DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
-
-            do
-            {
-                (bool success, string? journal) = await capi.GetJournal(oAuthCredentials, day, cancellationToken);
-                if (!success)
+                commander.Name = profile.Commander.Name;
+                DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
+                do
                 {
-                    Log.LogWarning("Unable to get log for {commanderName} for {date}", commander.Name, day);
-                    break;
-                }
-                commander.JournalDay = day;
-
-                if (!string.IsNullOrEmpty(journal))
-                {
-                    int line = 0;
-                    try
+                    (bool success, string? journal) = await capi.GetJournal(oAuthCredentials, day, cancellationToken);
+                    if (!success)
                     {
-                        using StringReader strReader = new(journal);
-                        string? journalLine;
-                        do
+                        Log.LogWarning("Unable to get log for {commanderName} for {date}", commander.Name, day);
+                        break;
+                    }
+                    commander.JournalDay = day;
+
+                    if (!string.IsNullOrEmpty(journal))
+                    {
+                        int line = 0;
+                        try
                         {
-                            journalLine = await strReader.ReadLineAsync(cancellationToken);
-                            line++;
-                            if (line < lineStart || string.IsNullOrEmpty(journalLine))
+                            using StringReader strReader = new(journal);
+                            string? journalLine;
+                            do
                             {
-                                continue;
-                            }
-                            JObject journalObject = JObject.Parse(journalLine);
-                            if (journalObject.TryGetValue("event", out JToken? eventJToken) &&
-                                eventJToken.Value<string>() is string eventName &&
-                                !string.IsNullOrEmpty(eventName) &&
-                                JournalEvents.TryGetValue(eventName, out Type? eventClass) &&
-                                journalObject.ToObject(eventClass) is JournalEvent journalEvent)
-                            {
-                                if (journalEvent.BypassLiveStatusCheck || commander.IsInLiveVersion)
+                                journalLine = await strReader.ReadLineAsync(cancellationToken);
+                                line++;
+                                if (line < lineStart || string.IsNullOrEmpty(journalLine))
                                 {
-                                    await journalEvent.ProcessEvent(commander, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                                    continue;
+                                }
+                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System);
+                                DateTimeOffset? timestamp = await ProcessCommanderCApiMessageEvent(journalParameters, journalLine, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                                if (timestamp is DateTimeOffset t)
+                                {
+                                    commander.JournalLastActivity = t;
                                 }
                             }
-                            if (journalObject.TryGetValue("timestamp", out JToken? timestampToken) &&
-                                timestampToken.Value<DateTime>() is DateTime timestamp)
-                            {
-                                commander.JournalLastActivity = timestamp;
-                            }
+                            while (!string.IsNullOrEmpty(journalLine));
                         }
-                        while (!string.IsNullOrEmpty(journalLine));
+                        catch (Exception e)
+                        {
+                            throw new Exception("Error processing journal", e);
+                        }
+                        commander.JournalLastLine = line;
+                        commander.JournalDay = day;
                     }
-                    catch (Exception e)
+                    else if (today != day || (DateTimeOffset.UtcNow - commander.JournalLastActivity).TotalMinutes > 120)
                     {
-                        throw new Exception("Error processing journal", e);
+                        commander.JournalLastLine = 0;
+                        commander.JournalDay = day;
                     }
-                    commander.JournalLastLine = line;
-                    commander.JournalDay = day;
+                    day = day.AddDays(1);
+                    await Task.WhenAll(Task.Delay(TimeSpan.FromMilliseconds(500), cancellationToken), dbContext.SaveChangesAsync(cancellationToken));
                 }
-                else if (today != day || (DateTimeOffset.UtcNow - commander.JournalLastActivity).TotalMinutes > 120)
-                {
-                    commander.JournalLastLine = 0;
-                    commander.JournalDay = day;
-                }
-                day = day.AddDays(1);
-                await Task.WhenAll(Task.Delay(TimeSpan.FromMilliseconds(500), cancellationToken), dbContext.SaveChangesAsync(cancellationToken));
-            }
-            while (day <= today);
+                while (day <= today);
 
-            commander.JournalLastProcessed = DateTimeOffset.Now;
-            if (oAuthCredentials.Status == OAuthCredentialsStatus.Refreshed)
+                commander.JournalLastProcessed = DateTimeOffset.Now;
+            }
+            if (oAuthCredentials.Status == OAuthCredentialsStatus.Expired)
             {
+                commander.OAuthStatus = CommanderOAuthStatus.Expires;
+            }
+            else if (oAuthCredentials.Status == OAuthCredentialsStatus.Refreshed)
+            {
+                commander.OAuthStatus = CommanderOAuthStatus.Active;
                 commander.OAuthAccessToken = oAuthCredentials.AccessToken;
                 commander.OAuthRefreshToken = oAuthCredentials.RefreshToken;
             }
             await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task<DateTimeOffset?> ProcessCommanderCApiMessageEvent(JournalParameters journalParameters, string journalLine, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        {
+            JObject journalObject = JObject.Parse(journalLine);
+            if (journalObject.TryGetValue("event", out JToken? eventJToken) &&
+                eventJToken.Value<string>() is string eventName &&
+                !string.IsNullOrEmpty(eventName) &&
+                JournalEvents.TryGetValue(eventName, out Type? eventClass) &&
+                journalObject.ToObject(eventClass) is JournalEvent journalEvent)
+            {
+                if (journalParameters.IsDeferred || journalEvent.BypassLiveStatusCheck || journalParameters.Commander.IsInLiveVersion)
+                {
+                    await journalEvent.ProcessEvent(journalParameters, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                }
+            }
+            if (journalObject.TryGetValue("timestamp", out JToken? timestampToken) &&
+                timestampToken.Value<DateTime>() is DateTime timestamp)
+            {
+                return timestamp;
+            }
+            return null;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace EDDatabase
 {
@@ -85,6 +84,15 @@ namespace EDDatabase
 
         [EnumMember(Value = "Rescue mission completed")]
         MissionCompletionRescue,
+
+        [EnumMember(Value = "Thargoid kill mission completed")]
+        MissionCompletionThargoidKill,
+
+        [EnumMember(Value = "Passenger evacuation mission completed")]
+        MissionCompletionPassengerEvacuation,
+
+        [EnumMember(Value = "Thargoid probe collected")]
+        ThargoidProbeCollection,
     }
 
     public enum WarEffortSide : byte

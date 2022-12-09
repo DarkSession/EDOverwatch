@@ -15,7 +15,7 @@
             VictimFaction = victimFaction;
         }
 
-        public override async ValueTask ProcessEvent(Commander commander, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
             if (AwardingFaction == "$faction_PilotsFederation;" && VictimFaction == "$faction_Thargoid;")
             {
@@ -29,7 +29,14 @@
                     5000000 or 300000 => WarEffortType.KillThargoidOrthrus, // Orthrus
                     _ => WarEffortType.KillGeneric,
                 };
-                await AddOrUpdateWarEffort(commander, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
+                if (warEffortType == WarEffortType.KillGeneric)
+                {
+                    await DeferEvent(journalParameters, dbContext, cancellationToken);
+                }
+                else
+                {
+                    await AddOrUpdateWarEffort(journalParameters, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
+                }
             }
         }
     }

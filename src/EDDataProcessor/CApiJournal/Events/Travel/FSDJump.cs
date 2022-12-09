@@ -23,7 +23,7 @@
             SystemSecurity = systemSecurity;
         }
 
-        public override async ValueTask ProcessEvent(Commander commander, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
             bool isNew = false;
             StarSystem? starSystem = await dbContext.StarSystems
@@ -79,7 +79,7 @@
                     await activeMqProducer.SendAsync("StarSystem.Updated", RoutingType.Anycast, new(JsonConvert.SerializeObject(new StarSystemUpdated(SystemAddress))), activeMqTransaction, cancellationToken);
                 }
             }
-            commander.System = starSystem;
+            journalParameters.Commander.System = starSystem;
         }
     }
 }

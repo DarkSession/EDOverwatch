@@ -41,39 +41,78 @@ namespace EDDataProcessor.IDA
                     {
                         ValuesResource.GetRequest requestCells = sheetsService.Spreadsheets.Values.Get(speadsheetId, $"{sheet.Properties.Title}!A1:C2");
                         ValueRange valueRange = await requestCells.ExecuteAsync();
-                        string? result = valueRange.Values.ElementAt(1).ElementAt(2) as string;
-                        if (!string.IsNullOrEmpty(result) && long.TryParse(result.Replace(",", string.Empty), out long newTotalHauled))
                         {
-                            long currentTotalHauled = await DbContext.WarEfforts
-                                .Where(w =>
-                                        w.StarSystem == starSystem &&
-                                        w.Type == WarEffortType.SupplyDelivery &&
-                                        w.Side == WarEffortSide.Humans &&
-                                        w.Source == WarEffortSource.IDA)
-                                .SumAsync(w => w.Amount);
-                            if (currentTotalHauled != newTotalHauled)
+                            string? result = valueRange.Values.ElementAt(1).ElementAt(2) as string;
+                            if (!string.IsNullOrEmpty(result) && long.TryParse(result.Replace(",", string.Empty), out long newTotalHauled))
                             {
-                                DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-                                WarEffort? supplyDeliveries = await DbContext.WarEfforts
-                                    .FirstOrDefaultAsync(w =>
+                                long currentTotalHauled = await DbContext.WarEfforts
+                                    .Where(w =>
                                             w.StarSystem == starSystem &&
                                             w.Type == WarEffortType.SupplyDelivery &&
                                             w.Side == WarEffortSide.Humans &&
-                                            w.Source == WarEffortSource.IDA &&
-                                            w.Date == today);
-                                if (supplyDeliveries != null)
+                                            w.Source == WarEffortSource.IDA)
+                                    .SumAsync(w => w.Amount);
+                                if (currentTotalHauled != newTotalHauled)
                                 {
-                                    supplyDeliveries.Amount += (newTotalHauled - currentTotalHauled);
-                                }
-                                else
-                                {
-                                    supplyDeliveries = new(0, WarEffortType.SupplyDelivery, today, (newTotalHauled - currentTotalHauled), WarEffortSide.Humans, WarEffortSource.IDA)
+                                    DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+                                    WarEffort? supplyDeliveries = await DbContext.WarEfforts
+                                        .FirstOrDefaultAsync(w =>
+                                                w.StarSystem == starSystem &&
+                                                w.Type == WarEffortType.SupplyDelivery &&
+                                                w.Side == WarEffortSide.Humans &&
+                                                w.Source == WarEffortSource.IDA &&
+                                                w.Date == today);
+                                    if (supplyDeliveries != null)
                                     {
-                                        StarSystem = starSystem,
-                                    };
-                                    DbContext.WarEfforts.Add(supplyDeliveries);
+                                        supplyDeliveries.Amount += (newTotalHauled - currentTotalHauled);
+                                    }
+                                    else
+                                    {
+                                        supplyDeliveries = new(0, WarEffortType.SupplyDelivery, today, (newTotalHauled - currentTotalHauled), WarEffortSide.Humans, WarEffortSource.IDA)
+                                        {
+                                            StarSystem = starSystem,
+                                        };
+                                        DbContext.WarEfforts.Add(supplyDeliveries);
+                                    }
+                                    await DbContext.SaveChangesAsync();
                                 }
-                                await DbContext.SaveChangesAsync();
+                            }
+                        }
+                        {
+                            string? result = valueRange.Values.ElementAt(1).ElementAt(1) as string;
+                            if (!string.IsNullOrEmpty(result) && long.TryParse(result.Replace(",", string.Empty), out long newTotalMissions))
+                            {
+                                long currentTotalMissions = await DbContext.WarEfforts
+                                    .Where(w =>
+                                            w.StarSystem == starSystem &&
+                                            w.Type == WarEffortType.MissionCompletionDelivery &&
+                                            w.Side == WarEffortSide.Humans &&
+                                            w.Source == WarEffortSource.IDA)
+                                    .SumAsync(w => w.Amount);
+                                if (currentTotalMissions != newTotalMissions)
+                                {
+                                    DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+                                    WarEffort? supplyDeliveries = await DbContext.WarEfforts
+                                        .FirstOrDefaultAsync(w =>
+                                                w.StarSystem == starSystem &&
+                                                w.Type == WarEffortType.MissionCompletionDelivery &&
+                                                w.Side == WarEffortSide.Humans &&
+                                                w.Source == WarEffortSource.IDA &&
+                                                w.Date == today);
+                                    if (supplyDeliveries != null)
+                                    {
+                                        supplyDeliveries.Amount += (newTotalMissions - currentTotalMissions);
+                                    }
+                                    else
+                                    {
+                                        supplyDeliveries = new(0, WarEffortType.MissionCompletionDelivery, today, (newTotalMissions - currentTotalMissions), WarEffortSide.Humans, WarEffortSource.IDA)
+                                        {
+                                            StarSystem = starSystem,
+                                        };
+                                        DbContext.WarEfforts.Add(supplyDeliveries);
+                                    }
+                                    await DbContext.SaveChangesAsync();
+                                }
                             }
                         }
                     }
