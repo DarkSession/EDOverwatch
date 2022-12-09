@@ -280,7 +280,7 @@ namespace EDOverwatch_Web.Controllers.V1
             LoggedIn = applicationUser != null;
             if (applicationUser != null)
             {
-                User = new(applicationUser.Commander?.Name ?? applicationUser.UserName, applicationUser.Commander?.JournalLastActivity);
+                User = new(applicationUser.Commander?.Name ?? applicationUser.UserName ?? "Unknown", applicationUser.Commander?.JournalLastActivity);
             }
         }
     }
