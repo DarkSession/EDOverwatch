@@ -44,6 +44,8 @@ namespace EDDataProcessor
                 .AddScoped<CAPI>()
                 .AddScoped<FDevOAuth>()
                 .AddSingleton<JournalProcessor>()
+                .AddScoped<IdaClient>()
+                .AddSingleton<InaraClient>()
                 .BuildServiceProvider();
 
             CancellationToken cancellationToken = default;
