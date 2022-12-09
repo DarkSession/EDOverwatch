@@ -39,18 +39,18 @@
                   ???
                 </span>
               </div>
-              confirmed rescues
+              completed rescues
             </div>
             <div class="text-item">
               <div class="highlight">
-                <span *ngIf="overview.humans.rescueSupplies">
-                  {{ overview.humans.rescueSupplies | number }}+ t
+                <span *ngIf="overview.humans.missions">
+                  {{ overview.humans.missions | number }}+ t
                 </span>
-                <span *ngIf="!overview.humans.rescueSupplies">
+                <span *ngIf="!overview.humans.missions">
                   ???
                 </span>
               </div>
-              confirmed rescue supplies
+              missions completed
             </div>
           </div>
         </div>

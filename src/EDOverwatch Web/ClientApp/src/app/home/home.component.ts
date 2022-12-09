@@ -111,7 +111,7 @@ interface OverwatchOverview {
     systemsRecaptured: number;
     thargoidKills: number | null;
     rescues: number | null;
-    rescueSupplies: number | null;
+    missions: number | null;
   }
   thargoids: {
     controllingPercentage: number;

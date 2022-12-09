@@ -33,11 +33,14 @@ export class AppComponent implements OnInit {
       .subscribe(() => {
         this.changeDetectorRef.detectChanges();
       });
-
+    if (localStorage.getItem("menuOpen") === "1") {
+      this.isMenuOpen = true;
+    }
   }
 
   public toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
+    localStorage.setItem("menuOpen", this.isMenuOpen ? "1" : "0");
     this.changeDetectorRef.detectChanges();
   }
 }

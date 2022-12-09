@@ -92,13 +92,23 @@ namespace EDOverwatch_Web.Controllers.V1
                     WarEffortType.KillThargoidOrthrus,
                 };
 
+                List<WarEffortType> warEffortTypeMissions = new()
+                {
+                    WarEffortType.MissionCompletionGeneric,
+                    WarEffortType.MissionCompletionDelivery,
+                    WarEffortType.MissionCompletionRescue,
+                    WarEffortType.MissionCompletionThargoidKill,
+                    WarEffortType.MissionCompletionPassengerEvacuation,
+                };
+
                 result.Humans = new(
                     Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),
                     humansSystemsControlling,
                     0,
                     warEfforts.FirstOrDefault(w => warEffortTypeKills.Contains(w.type))?.amount,
                     warEfforts.FirstOrDefault(w => w.type == WarEffortType.Rescue)?.amount,
-                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.SupplyDelivery)?.amount);
+                    warEfforts.FirstOrDefault(w => w.type == WarEffortType.SupplyDelivery)?.amount,
+                    warEfforts.FirstOrDefault(w => warEffortTypeMissions.Contains(w.type))?.amount);
             }
             result.Contested = new(
                 await DbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion).CountAsync(cancellationToken),

@@ -15,8 +15,9 @@
         public long? ThargoidKills { get; set; }
         public long? Rescues { get; set; }
         public long? RescueSupplies { get; set; }
+        public long? Missions { get; set; }
 
-        public OverwatchOverviewHuman(double controllingPercentage, int systemsControlling, int systemsRecaptured, long? thargoidKills = null, long? rescues = null, long? rescueSupplies = null)
+        public OverwatchOverviewHuman(double controllingPercentage, int systemsControlling, int systemsRecaptured, long? thargoidKills = null, long? rescues = null, long? rescueSupplies = null, long? missions = null)
         {
             ControllingPercentage = controllingPercentage;
             SystemsControlling = systemsControlling;
@@ -24,6 +25,7 @@
             ThargoidKills = thargoidKills;
             Rescues = rescues;
             RescueSupplies = rescueSupplies;
+            Missions = missions;
         }
     }
 
