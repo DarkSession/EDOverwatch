@@ -3,7 +3,10 @@ global using Microsoft.EntityFrameworkCore;
 using ActiveMQ.Artemis.Client.Extensions.DependencyInjection;
 using ActiveMQ.Artemis.Client.Extensions.Hosting;
 using EDCApi;
+using EDOverwatch_Web.WebSockets;
 using Microsoft.Extensions.Configuration.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace EDOverwatch_Web
 {
@@ -13,8 +16,7 @@ namespace EDOverwatch_Web
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 #if DEBUG
-            JsonConfigurationSource? secrets = builder.Configuration.Sources.FirstOrDefault(c => c is JsonConfigurationSource j && j.Path == "secrets.json") as JsonConfigurationSource;
-            if (secrets != null)
+            if (builder.Configuration.Sources.FirstOrDefault(c => c is JsonConfigurationSource j && j.Path == "secrets.json") is JsonConfigurationSource secrets)
             {
                 builder.Configuration.Sources.Remove(secrets);
             }
@@ -46,6 +48,7 @@ namespace EDOverwatch_Web
                 .AddAnonymousProducer<ActiveMqMessageProducer>();
             builder.Services.AddActiveMqHostedService();
             builder.Services.AddDbContext<EdDbContext>();
+            builder.Services.AddSingleton<WebSocketServer>();
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
@@ -68,6 +71,21 @@ namespace EDOverwatch_Web
                 app.UseHsts();
             }
 
+            WebSocketOptions webSocketOptions = new()
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(120),
+            };
+            webSocketOptions.AllowedOrigins.Add(builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty);
+
+            app.UseWebSockets(webSocketOptions);
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.MapControllers();
+            app.UseCors();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.Use(async (context, next) =>
             {
                 context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline';");
@@ -78,14 +96,6 @@ namespace EDOverwatch_Web
                 context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
                 await next();
             });
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
-            app.MapControllers();
-            app.UseCors();
-            app.UseAuthentication();
-            app.UseAuthorization();
 
             app.MapFallbackToFile("index.html");
 

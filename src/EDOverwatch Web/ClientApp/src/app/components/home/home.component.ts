@@ -1,11 +1,12 @@
-import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as dayjs from 'dayjs';
 import * as duration from 'dayjs/plugin/duration';
-import { firstValueFrom } from 'rxjs';
+import { WebsocketService } from 'src/app/services/websocket.service';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 dayjs.extend(duration)
 
+@UntilDestroy()
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -25,16 +26,22 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public constructor(
-    private readonly httpClient: HttpClient,
-    @Inject('API_URL') private readonly apiUrl: string,
-    private readonly changeDetectorRef: ChangeDetectorRef
-    ) {
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly webSocketService: WebsocketService
+  ) {
   }
 
   public ngOnInit(): void {
     this.updateInterval = setInterval(() => {
       this.updateTimeSince();
     }, 60000);
+    this.webSocketService
+      .on<OverwatchOverview>("OverwatchHome")
+      .pipe(untilDestroyed(this))
+      .subscribe((message) => {
+        this.overview = message.Data;
+        this.changeDetectorRef.detectChanges();
+      });
     this.updateTimeSince();
     this.loadOverview();
   }
@@ -51,9 +58,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async loadOverview(): Promise<void> {
-    const response = await firstValueFrom(this.httpClient.get<any>(this.apiUrl + 'overwatch/overview'));
-    if (response) {
-      this.overview = response;
+    const response = await this.webSocketService.sendMessageAndWaitForResponse<OverwatchOverview>("OverwatchHome", {});
+    if (response && response.Success) {
+      this.overview = response.Data;
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -100,28 +107,28 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.timeSince = results.join(", ");
-    this.changeDetectorRef.detectChanges(); 
+    this.changeDetectorRef.detectChanges();
   }
 }
 
 interface OverwatchOverview {
-  humans: {
-    controllingPercentage: number;
-    systemsControlling: number;
-    systemsRecaptured: number;
-    thargoidKills: number | null;
-    rescues: number | null;
-    missions: number | null;
+  Humans: {
+    ControllingPercentage: number;
+    SystemsControlling: number;
+    SystemsRecaptured: number;
+    ThargoidKills: number | null;
+    Rescues: number | null;
+    Missions: number | null;
   }
-  thargoids: {
-    controllingPercentage: number;
-    activeMaelstroms: number;
-    systemsControlling: number;
-    commanderKills: number | null;
+  Thargoids: {
+    ControllingPercentage: number;
+    ActiveMaelstroms: number;
+    SystemsControlling: number;
+    CommanderKills: number | null;
   },
-  contested: {
-    systemsInInvasion: number;
-    systemsWithAlerts: number;
-    systemsBeingRecaptured: number;
+  Contested: {
+    SystemsInInvasion: number;
+    SystemsWithAlerts: number;
+    SystemsBeingRecaptured: number;
   }
 }

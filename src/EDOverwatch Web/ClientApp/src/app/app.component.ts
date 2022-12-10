@@ -1,8 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { delay } from 'rxjs';
-import { AppService } from './app.service';
-import { HttpInterceptorService } from './http-interceptor.service';
+import { AppService } from './services/app.service';
+import { HttpInterceptorService } from './services/http-interceptor.service';
+import { WebsocketService } from './services/websocket.service';
 
 @UntilDestroy()
 @Component({
@@ -17,7 +18,8 @@ export class AppComponent implements OnInit {
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
     public readonly appService: AppService,
-    private readonly httpInterceptorService: HttpInterceptorService
+    private readonly httpInterceptorService: HttpInterceptorService,
+    private readonly websocketService: WebsocketService
   ) {
   }
 

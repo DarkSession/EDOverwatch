@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AppService } from './app.service';
+import { ConnectionStatus, WebsocketService } from '../services/websocket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationGuard implements CanActivate, CanActivateChild {
   public constructor(
-    private readonly router: Router,
-    private readonly appService: AppService
+    private readonly websocketService: WebsocketService,
+    private readonly router: Router
   ) {
   }
 
@@ -17,8 +17,8 @@ export class AuthenticationGuard implements CanActivate, CanActivateChild {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot,
   ): Promise<boolean | UrlTree> {
-    await this.appService.authenticationResolved;
-    if (this.appService.isLoggedIn) {
+    const authenticationStatus = await this.websocketService.authenticationResolved;
+    if (authenticationStatus === ConnectionStatus.Authenticated) {
       return true;
     }
     this.router.navigate(["/login"]);

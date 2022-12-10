@@ -14,7 +14,16 @@ const PROXY_CONFIG = [
       Connection: 'Keep-Alive'
     },
     logLevel: 'debug',
-  }
+  },
+  {
+    context: [
+      "/ws",
+   ],
+    target: target,
+    secure: false,
+    ws: true,
+    logLevel: 'debug',
+  },
 ]
 
 module.exports = PROXY_CONFIG;

@@ -32,6 +32,7 @@
     "@ngneat/until-destroy": "^9.2.2",
     "bootstrap": "^5.2.0",
     "dayjs": "^1.11.6",
+    "guid-typescript": "^1.0.9",
     "jquery": "^3.6.0",
     "material-icons": "^1.13.1",
     "ngx-timeago": "^2.0.0",

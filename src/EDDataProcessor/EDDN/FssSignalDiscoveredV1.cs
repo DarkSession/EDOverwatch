@@ -93,6 +93,7 @@ namespace EDDataProcessor.EDDN
                     if (maelstromMatch.Success)
                     {
                         type = StarSystemFssSignalType.Maelstrom;
+                        bool createdUpdated = false;
                         string maelStromName = maelstromMatch.Groups[1].Value;
                         ThargoidMaelstrom? thargoidMaelstrom = await dbContext.ThargoidMaelstroms
                             .Include(t => t.StarSystem)
@@ -106,6 +107,7 @@ namespace EDDataProcessor.EDDN
                             await dbContext.SaveChangesAsync(cancellationToken);
                             starSystem.Maelstrom = thargoidMaelstrom;
                             await dbContext.SaveChangesAsync(cancellationToken);
+                            createdUpdated = true;
                         }
                         else if (thargoidMaelstrom.Updated < Message.Timestamp)
                         {
@@ -115,6 +117,11 @@ namespace EDDataProcessor.EDDN
                                 thargoidMaelstrom.StarSystem = starSystem;
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);
+                            createdUpdated = true;
+                        }
+                        if (createdUpdated && thargoidMaelstrom != null)
+                        {
+                            await activeMqProducer.SendAsync("ThargoidMaelstrom.CreatedUpdated", RoutingType.Anycast, new(JsonConvert.SerializeObject(new ThargoidMaelstromCreatedUpdated(thargoidMaelstrom.Id, thargoidMaelstrom.Name))), activeMqTransaction, cancellationToken);
                         }
                     }
                     else if (signalName.StartsWith("$Warzone_TG_"))

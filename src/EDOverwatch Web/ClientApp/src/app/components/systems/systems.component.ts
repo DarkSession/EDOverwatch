@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatSort, Sort } from '@angular/material/sort';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-systems',

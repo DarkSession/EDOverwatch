@@ -1,17 +1,13 @@
 /* "Barrel" of Http Interceptors */
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { HttpRequestInterceptor } from './HttpRequestInterceptor';
+import { HttpRequestInterceptor } from './services/HttpRequestInterceptor';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-
-import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SystemsComponent } from './systems/systems.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -25,14 +21,19 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { TimeagoModule } from 'ngx-timeago';
 
-import { AboutComponent } from './about/about.component';
-import { GetInvolvedComponent } from './get-involved/get-involved.component';
-import { ConsumerApiComponent } from './consumer-api/consumer-api.component';
+import { AuthenticationGuard } from './guards/authentication.guard';
 
-import { LoginComponent } from './login/login.component';
-import { AuthComponent } from './auth/auth.component';
-import { MyEffortsComponent } from './my-efforts/my-efforts.component';
-import { AuthenticationGuard } from './authentication.guard';
+import { AppComponent } from './app.component';
+import { HomeComponent } from './components/home/home.component';
+import { SystemsComponent } from './components/systems/systems.component';
+import { AboutComponent } from './components/about/about.component';
+import { GetInvolvedComponent } from './components/get-involved/get-involved.component';
+import { ConsumerApiComponent } from './components/consumer-api/consumer-api.component';
+import { LoginComponent } from './components/login/login.component';
+import { AuthComponent } from './components/auth/auth.component';
+import { MyEffortsComponent } from './components/my-efforts/my-efforts.component';
+import { SystemComponent } from './components/system/system.component';
+import { NotAuthenticatedGuard } from './guards/not-authenticated.guard';
 
 
 /** Http interceptor providers in outside-in order */
@@ -51,6 +52,7 @@ export const httpInterceptorProviders = [
     LoginComponent,
     AuthComponent,
     MyEffortsComponent,
+    SystemComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -90,10 +92,12 @@ export const httpInterceptorProviders = [
       {
         path: 'login',
         component: LoginComponent,
+        canActivate: [NotAuthenticatedGuard],
       },
       {
         path: 'auth',
         component: AuthComponent,
+        canActivate: [NotAuthenticatedGuard],
       },
       {
         path: 'my-efforts',

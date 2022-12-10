@@ -9,22 +9,22 @@
             <div class="text-item">
               Controlling
               <div class="highlight">
-                {{ overview.humans.systemsControlling | number }}
+                {{ overview.Humans.SystemsControlling | number }}
               </div>
               systems of the human 'bubble'
             </div>
             <div class="text-item">
               <div class="highlight">
-                {{ overview.humans.systemsRecaptured | number }}
+                {{ overview.Humans.SystemsRecaptured | number }}
               </div>
               systems recaptured
             </div>
             <div class="text-item">
               <div class="highlight">
-                <span *ngIf="overview.humans.thargoidKills">
-                  {{ overview.humans.thargoidKills | number }}+
+                <span *ngIf="overview.Humans.ThargoidKills">
+                  {{ overview.Humans.ThargoidKills | number }}+
                 </span>
-                <span *ngIf="!overview.humans.thargoidKills">
+                <span *ngIf="!overview.Humans.ThargoidKills">
                   ???
                 </span>
               </div>
@@ -32,10 +32,10 @@
             </div>
             <div class="text-item">
               <div class="highlight">
-                <span *ngIf="overview.humans.rescues">
-                  {{ overview.humans.rescues | number }}+
+                <span *ngIf="overview.Humans.Rescues">
+                  {{ overview.Humans.Rescues | number }}+
                 </span>
-                <span *ngIf="!overview.humans.rescues">
+                <span *ngIf="!overview.Humans.Rescues">
                   ???
                 </span>
               </div>
@@ -43,10 +43,10 @@
             </div>
             <div class="text-item">
               <div class="highlight">
-                <span *ngIf="overview.humans.missions">
-                  {{ overview.humans.missions | number }}+ t
+                <span *ngIf="overview.Humans.Missions">
+                  {{ overview.Humans.Missions | number }}+
                 </span>
-                <span *ngIf="!overview.humans.missions">
+                <span *ngIf="!overview.Humans.Missions">
                   ???
                 </span>
               </div>
@@ -62,10 +62,10 @@
           <line x1="0" y1="633" x2="200" y2="300" class="line" />
           <polygon points="0,0 180,300 0,600" class="triangle" />
         </svg>
-        <div class="key-indicators" *ngIf="overview && overview.humans">
+        <div class="key-indicators" *ngIf="overview && overview.Humans">
           <div>
             <span class="key-highlight-description">Controlling</span>
-            <div class="key-highlight-value">{{ overview.humans.controllingPercentage | percent:'0.2-2' }}</div>
+            <div class="key-highlight-value">{{ overview.Humans.ControllingPercentage | percent:'0.2-2' }}</div>
           </div>
         </div>
       </div>
@@ -78,10 +78,10 @@
           <line x1="200" y1="633" x2="0" y2="300" class="line" />
           <polygon points="200,0 20,300 200,600" class="triangle" />
         </svg>
-        <div class="key-indicators" *ngIf="overview && overview.thargoids">
+        <div class="key-indicators" *ngIf="overview && overview.Thargoids">
           <div>
             <span class="key-highlight-description">Controlling</span>
-            <div class="key-highlight-value">{{ overview.thargoids.controllingPercentage | percent:'0.2-2' }}</div>
+            <div class="key-highlight-value">{{ overview.Thargoids.ControllingPercentage | percent:'0.2-2' }}</div>
           </div>
         </div>
       </div>
@@ -94,22 +94,22 @@
               <div class="text-item clickable" routerLink="systems">
                 Controlling
                 <div class="highlight">
-                  {{ overview.thargoids.systemsControlling | number }}
+                  {{ overview.Thargoids.SystemsControlling | number }}
                 </div>
                 systems of the human 'bubble'
               </div>
               <div class="text-item clickable" routerLink="systems">
                 <div class="highlight">
-                  {{ overview.thargoids.activeMaelstroms | number }}
+                  {{ overview.Thargoids.ActiveMaelstroms | number }}
                 </div>
                 active Maelstroms
               </div>
               <div class="text-item">
                 <div class="highlight">
-                  <span *ngIf="overview.thargoids.commanderKills">
-                    {{ overview.thargoids.commanderKills | number }}+
+                  <span *ngIf="overview.Thargoids.CommanderKills">
+                    {{ overview.Thargoids.CommanderKills | number }}+
                   </span>
-                  <span *ngIf="!overview.thargoids.commanderKills">
+                  <span *ngIf="!overview.Thargoids.CommanderKills">
                     ???
                   </span>
                 </div>
@@ -129,22 +129,22 @@
         <h1>{{ timeSince }}</h1>
       </div>
       <div class="middle-container-item bottom-container">
-        <div class="text" *ngIf="overview && overview.contested">
+        <div class="text" *ngIf="overview && overview.Contested">
           <div class="text-item clickable" routerLink="systems">
             <div class="highlight">
-              {{ overview.contested.systemsInInvasion | number }}
+              {{ overview.Contested.SystemsInInvasion | number }}
             </div>
             systems under Thargoid invasion
           </div>
           <div class="text-item clickable" routerLink="systems">
             <div class="highlight">
-              {{ overview.contested.systemsWithAlerts | number }}
+              {{ overview.Contested.SystemsWithAlerts | number }}
             </div>
             systems reporting Thargoid alerts
           </div>
           <div class="text-item clickable" routerLink="systems">
             <div class="highlight">
-              {{ overview.contested.systemsBeingRecaptured | number }}
+              {{ overview.Contested.SystemsBeingRecaptured | number }}
             </div>
             systems being recaptured
           </div>
