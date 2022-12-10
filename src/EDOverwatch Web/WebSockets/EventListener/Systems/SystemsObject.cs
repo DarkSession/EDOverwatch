@@ -1,8 +1,8 @@
-﻿namespace EDOverwatch_Web.WebSockets.EventListener.Home
+﻿namespace EDOverwatch_Web.WebSockets.EventListener.Systems
 {
-    public class HomeObject : WebSocketSessionActiveObject
+    public class SystemsObject : WebSocketSessionActiveObject
     {
-        public HomeObject() : base("Home")
+        public SystemsObject() : base("Systems")
         {
         }
 

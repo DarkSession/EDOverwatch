@@ -39,7 +39,7 @@ namespace EDDataProcessor.CApiJournal
 
                 ConnectionFactory connectionFactory = new();
                 await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
-                await using IConsumer consumer = await connection.CreateConsumerAsync("Commander.CApi", RoutingType.Anycast, cancellationToken);
+                await using IConsumer consumer = await connection.CreateConsumerAsync(CommanderCApi.QueueName, CommanderCApi.Routing, cancellationToken);
                 await using IAnonymousProducer anonymousProducer = await connection.CreateAnonymousProducerAsync(cancellationToken);
 
                 Log.LogInformation("ProcessJournals: Waiting for messages...");
@@ -91,8 +91,8 @@ namespace EDDataProcessor.CApiJournal
                      .ToListAsync(cancellationToken);
                 foreach (CommanderDeferredJournalEvent commanderDeferredJournalEvent in commanderDeferredJournalEvents)
                 {
-                    JournalParameters journalParameters = new(true, WarEffortSource.OverwatchCAPI, commander, commanderDeferredJournalEvent.System);
-                    await ProcessCommanderCApiMessageEvent(journalParameters, commanderDeferredJournalEvent.Journal, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                    JournalParameters journalParameters = new(true, WarEffortSource.OverwatchCAPI, commander, commanderDeferredJournalEvent.System, activeMqProducer, activeMqTransaction);
+                    await ProcessCommanderCApiMessageEvent(journalParameters, commanderDeferredJournalEvent.Journal, dbContext, cancellationToken);
                     if (!journalParameters.DeferRequested)
                     {
                         commanderDeferredJournalEvent.Status = CommanderDeferredJournalEventStatus.Processed;
@@ -143,8 +143,8 @@ namespace EDDataProcessor.CApiJournal
                                 {
                                     continue;
                                 }
-                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System);
-                                DateTimeOffset? timestamp = await ProcessCommanderCApiMessageEvent(journalParameters, journalLine, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System, activeMqProducer, activeMqTransaction);
+                                DateTimeOffset? timestamp = await ProcessCommanderCApiMessageEvent(journalParameters, journalLine, dbContext, cancellationToken);
                                 if (timestamp is DateTimeOffset t)
                                 {
                                     commander.JournalLastActivity = t;
@@ -184,7 +184,7 @@ namespace EDDataProcessor.CApiJournal
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task<DateTimeOffset?> ProcessCommanderCApiMessageEvent(JournalParameters journalParameters, string journalLine, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        private async Task<DateTimeOffset?> ProcessCommanderCApiMessageEvent(JournalParameters journalParameters, string journalLine, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             JObject journalObject = JObject.Parse(journalLine);
             if (journalObject.TryGetValue("event", out JToken? eventJToken) &&
@@ -195,7 +195,7 @@ namespace EDDataProcessor.CApiJournal
             {
                 if (journalParameters.IsDeferred || journalEvent.BypassLiveStatusCheck || journalParameters.Commander.IsInLiveVersion)
                 {
-                    await journalEvent.ProcessEvent(journalParameters, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                    await journalEvent.ProcessEvent(journalParameters, dbContext, cancellationToken);
                 }
             }
             if (journalObject.TryGetValue("timestamp", out JToken? timestampToken) &&

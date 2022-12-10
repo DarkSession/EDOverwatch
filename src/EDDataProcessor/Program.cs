@@ -50,16 +50,25 @@ namespace EDDataProcessor
 
             CancellationToken cancellationToken = default;
 
+            Endpoint activeMqEndpont = Endpoint.Create(
+               Configuration!.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
+               Configuration!.GetValue<int?>("ActiveMQ:Port") ?? throw new Exception("No ActiveMQ port configured"),
+               Configuration!.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
+               Configuration!.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
+
+            ConnectionFactory connectionFactory = new();
+            await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
+
             Task eddnProcessorTask = Task.CompletedTask;
             if (Configuration.GetValue<bool>("EDDN:Enabled"))
             {
                 EDDNProcessor eddnProcessor = Services.GetRequiredService<EDDNProcessor>();
-                eddnProcessorTask = eddnProcessor.ProcessMessages(cancellationToken);
+                eddnProcessorTask = eddnProcessor.ProcessMessages(connection, cancellationToken);
             }
             Task scheduledUpdates = Task.CompletedTask;
             if (Configuration.GetValue<bool>("Inara:Enabled") || Configuration.GetValue<bool>("IDA:Enabled"))
             {
-                scheduledUpdates = ScheduledUpdates(cancellationToken);
+                scheduledUpdates = ScheduledUpdates(connection, cancellationToken);
             }
             Task journalProcessorTask = Task.CompletedTask;
             Task journalCommanderSelectionTask = Task.CompletedTask;
@@ -67,13 +76,15 @@ namespace EDDataProcessor
             {
                 JournalProcessor journalProcessor = Services.GetRequiredService<JournalProcessor>();
                 journalProcessorTask = journalProcessor.ProcessJournals(cancellationToken);
-                journalCommanderSelectionTask = CommanderJournalUpdateQueue(cancellationToken);
+                journalCommanderSelectionTask = CommanderJournalUpdateQueue(connection, cancellationToken);
             }
             await Task.WhenAll(eddnProcessorTask, scheduledUpdates, journalProcessorTask, journalCommanderSelectionTask);
         }
 
-        private static async Task ScheduledUpdates(CancellationToken cancellationToken)
+        private static async Task ScheduledUpdates(IConnection connection, CancellationToken cancellationToken)
         {
+            await using IProducer warEffortUpdatedProducer = await connection.CreateProducerAsync(WarEffortUpdated.QueueName, WarEffortUpdated.Routing, cancellationToken);
+
             ILogger log = Services!.GetRequiredService<ILogger<Program>>();
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -83,7 +94,15 @@ namespace EDDataProcessor
                     {
                         await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
                         IdaClient idaClient = serviceScope.ServiceProvider.GetRequiredService<IdaClient>();
-                        await idaClient.UpdateData();
+                        List<long> systemsUpdated = await idaClient.UpdateData().ToListAsync(cancellationToken);
+                        if (systemsUpdated.Any())
+                        {
+                            foreach (long systemAddress in systemsUpdated.Distinct())
+                            {
+                                WarEffortUpdated warEffortUpdated = new(systemAddress, null);
+                                await warEffortUpdatedProducer.SendAsync(warEffortUpdated.Message, cancellationToken);
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
@@ -97,7 +116,15 @@ namespace EDDataProcessor
                         await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
                         if (ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, typeof(UpdateFromInara)) is UpdateFromInara updateFromInara)
                         {
-                            await updateFromInara.Update();
+                            List<long> systemsUpdated = await updateFromInara.Update().ToListAsync(cancellationToken);
+                            if (systemsUpdated.Any())
+                            {
+                                foreach (long systemAddress in systemsUpdated.Distinct())
+                                {
+                                    WarEffortUpdated warEffortUpdated = new(systemAddress, null);
+                                    await warEffortUpdatedProducer.SendAsync(warEffortUpdated.Message, cancellationToken);
+                                }
+                            }
                         }
                     }
                     catch (Exception e)
@@ -109,18 +136,9 @@ namespace EDDataProcessor
             }
         }
 
-        private static async Task CommanderJournalUpdateQueue(CancellationToken cancellationToken)
+        private static async Task CommanderJournalUpdateQueue(IConnection connection, CancellationToken cancellationToken)
         {
-            Endpoint activeMqEndpont = Endpoint.Create(
-               Configuration!.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
-               Configuration!.GetValue<int?>("ActiveMQ:Port") ?? throw new Exception("No ActiveMQ port configured"),
-               Configuration!.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
-               Configuration!.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
-
-            ConnectionFactory connectionFactory = new();
-            await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
-            await using IProducer commanderCApiproducer = await connection.CreateProducerAsync("Commander.CApi", RoutingType.Anycast, cancellationToken);
-
+            await using IProducer commanderCApiproducer = await connection.CreateProducerAsync(CommanderCApi.QueueName, CommanderCApi.Routing, cancellationToken);
             ILogger log = Services!.GetRequiredService<ILogger<Program>>();
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -134,7 +152,8 @@ namespace EDDataProcessor
                         .ToListAsync(cancellationToken);
                     foreach (Commander commander in commanders)
                     {
-                        await commanderCApiproducer.SendAsync(new Message(JsonConvert.SerializeObject(new CommanderCApi(commander.FDevCustomerId))), cancellationToken);
+                        CommanderCApi commanderCApi = new(commander.FDevCustomerId);
+                        await commanderCApiproducer.SendAsync(commanderCApi.Message, cancellationToken);
                     }
                     await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
                 }

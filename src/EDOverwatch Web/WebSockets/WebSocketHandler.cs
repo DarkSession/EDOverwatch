@@ -1,5 +1,4 @@
-﻿using EDOverwatch_Web.WebSockets;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using NJsonSchema.Validation;
 
@@ -9,7 +8,9 @@ namespace EDOverwatch_Web.WebSockets
     {
         protected abstract Type? MessageDataType { get; }
 
-        public abstract ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser user, EdDbContext dbContext, CancellationToken cancellationToken);
+        public virtual bool AllowAnonymous => false;
+
+        public abstract ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken);
 
         public bool ValidateMessageData(JObject? data)
         {

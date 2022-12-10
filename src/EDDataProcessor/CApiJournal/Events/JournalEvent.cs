@@ -14,16 +14,16 @@
         [JsonIgnore]
         public virtual bool BypassLiveStatusCheck => false;
 
-        public abstract ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken);
+        public abstract ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken);
 
         protected Task AddOrUpdateWarEffort(JournalParameters journalParameters, WarEffortType type, long amount, WarEffortSide side, EdDbContext dbContext, CancellationToken cancellationToken)
-            => AddOrUpdateWarEffort(journalParameters.Commander, journalParameters.CommanderCurrentStarSystem, type, amount, side, dbContext, cancellationToken);
+            => AddOrUpdateWarEffort(journalParameters, journalParameters.CommanderCurrentStarSystem, type, amount, side, dbContext, cancellationToken);
 
-        protected async Task AddOrUpdateWarEffort(Commander commander, StarSystem? starSystem, WarEffortType type, long amount, WarEffortSide side, EdDbContext dbContext, CancellationToken cancellationToken)
+        protected async Task AddOrUpdateWarEffort(JournalParameters journalParameters, StarSystem? starSystem, WarEffortType type, long amount, WarEffortSide side, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             WarEffort? warEffort = await dbContext.WarEfforts
                 .FirstOrDefaultAsync(w =>
-                        w.Commander == commander &&
+                        w.Commander == journalParameters.Commander &&
                         w.Date == Day &&
                         w.Type == type &&
                         w.Side == side &&
@@ -32,7 +32,7 @@
             {
                 warEffort = new(0, type, Day, amount, side, WarEffortSource.OverwatchCAPI)
                 {
-                    Commander = (side == WarEffortSide.Humans) ? commander : null,
+                    Commander = (side == WarEffortSide.Humans) ? journalParameters.Commander : null,
                     StarSystem = starSystem,
                 };
                 dbContext.WarEfforts.Add(warEffort);
@@ -42,6 +42,8 @@
             {
                 warEffort.Amount += amount;
             }
+            WarEffortUpdated warEffortUpdated = new(starSystem?.SystemAddress ?? 0, journalParameters.Commander.FDevCustomerId);
+            await journalParameters.ActiveMqProducer.SendAsync(WarEffortUpdated.QueueName, WarEffortUpdated.Routing, warEffortUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
         }
 
         protected async Task DeferEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
@@ -63,18 +65,23 @@
 
     internal class JournalParameters
     {
-        public bool IsDeferred { get; set; }
-        public WarEffortSource Source { get; set; }
-        public Commander Commander { get; set; }
-        public StarSystem? CommanderCurrentStarSystem { get; set; }
+        public bool IsDeferred { get; }
+        public WarEffortSource Source { get; }
+        public Commander Commander { get; }
+        public StarSystem? CommanderCurrentStarSystem { get; }
         public bool DeferRequested { get; set; }
 
-        public JournalParameters(bool isDeferred, WarEffortSource source, Commander commander, StarSystem? commanderCurrentStarSystem)
+        public IAnonymousProducer ActiveMqProducer { get; }
+        public Transaction ActiveMqTransaction { get; }
+
+        public JournalParameters(bool isDeferred, WarEffortSource source, Commander commander, StarSystem? commanderCurrentStarSystem, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction)
         {
             IsDeferred = isDeferred;
             Source = source;
             Commander = commander;
             CommanderCurrentStarSystem = commanderCurrentStarSystem;
+            ActiveMqProducer = activeMqProducer;
+            ActiveMqTransaction = activeMqTransaction;
         }
     }
 }

@@ -5,8 +5,6 @@ using ActiveMQ.Artemis.Client.Extensions.Hosting;
 using EDCApi;
 using EDOverwatch_Web.WebSockets;
 using Microsoft.Extensions.Configuration.Json;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace EDOverwatch_Web
 {

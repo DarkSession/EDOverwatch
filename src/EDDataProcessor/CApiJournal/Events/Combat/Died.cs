@@ -7,7 +7,7 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
         [JsonProperty(Required = Required.Default)]
         public string? KillerShip { get; set; }
 
-        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrEmpty(KillerShip) && !Enum.TryParse<Ship>(KillerShip, true, out _))
             {

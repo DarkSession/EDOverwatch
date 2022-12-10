@@ -10,7 +10,7 @@
             InaraClient = inaraClient;
         }
 
-        public async Task Update()
+        public async IAsyncEnumerable<long> Update()
         {
             await foreach ((int systemId, string systemName) in InaraClient.GetThargoidConflictList())
             {
@@ -49,6 +49,7 @@
                                 };
                                 DbContext.WarEfforts.Add(shipKills);
                             }
+                            yield return starSystem.SystemAddress;
                         }
                     }
                     foreach ((DateOnly date, int scoutKills, int interceptorKills, int rescues) in conflictDetails.Details)
@@ -65,7 +66,11 @@
                             WarEffort? warEffortKills = warEfforts.FirstOrDefault(w => w.Type == WarEffortType.KillGeneric && w.Side == WarEffortSide.Humans);
                             if (warEffortKills != null)
                             {
-                                warEffortKills.Amount = kills;
+                                if (warEffortKills.Amount != kills)
+                                {
+                                    warEffortKills.Amount = kills;
+                                    yield return starSystem.SystemAddress;
+                                }
                             }
                             else
                             {
@@ -74,6 +79,7 @@
                                     StarSystem = starSystem,
                                 };
                                 DbContext.WarEfforts.Add(warEffortKills);
+                                yield return starSystem.SystemAddress;
                             }
                         }
                         if (rescues > 0)
@@ -81,7 +87,11 @@
                             WarEffort? warEffortRescues = warEfforts.FirstOrDefault(w => w.Type == WarEffortType.Rescue && w.Side == WarEffortSide.Humans);
                             if (warEffortRescues != null)
                             {
-                                warEffortRescues.Amount = rescues;
+                                if (warEffortRescues.Amount != rescues)
+                                {
+                                    warEffortRescues.Amount = rescues;
+                                    yield return starSystem.SystemAddress;
+                                }
                             }
                             else
                             {
@@ -90,6 +100,7 @@
                                     StarSystem = starSystem,
                                 };
                                 DbContext.WarEfforts.Add(warEffortRescues);
+                                yield return starSystem.SystemAddress;
                             }
                         }
                     }

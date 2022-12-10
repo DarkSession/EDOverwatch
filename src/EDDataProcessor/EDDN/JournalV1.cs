@@ -83,7 +83,8 @@ namespace EDDataProcessor.EDDN
                             await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
                             {
-                                await activeMqProducer.SendAsync("StarSystem.Updated", RoutingType.Anycast, new(JsonConvert.SerializeObject(new StarSystemUpdated(Message.SystemAddress))), activeMqTransaction, cancellationToken);
+                                StarSystemUpdated starSystemUpdated = new(Message.SystemAddress);
+                                await activeMqProducer.SendAsync(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, activeMqTransaction, cancellationToken);
                             }
                         }
                         break;

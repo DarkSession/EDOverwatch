@@ -9,7 +9,7 @@
         {
             Name = name;
         }
-        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             if (Name.StartsWith("Mission_TW"))
             {
@@ -32,7 +32,7 @@
                     {
                         warEffortType = WarEffortType.MissionCompletionPassengerEvacuation;
                     }
-                    else if(Name.StartsWith("Mission_TW_Massacre"))
+                    else if (Name.StartsWith("Mission_TW_Massacre"))
                     {
                         // Mission_TW_Massacre_Scout_Plural
                         // Mission_TW_Massacre_Cyclops_Plural
@@ -51,7 +51,7 @@
                     }
                     else
                     {
-                        await AddOrUpdateWarEffort(journalParameters.Commander, commanderMission.System, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
+                        await AddOrUpdateWarEffort(journalParameters, commanderMission.System, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
                     }
                 }
             }

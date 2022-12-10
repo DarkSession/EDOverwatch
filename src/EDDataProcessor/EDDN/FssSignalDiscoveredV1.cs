@@ -64,9 +64,11 @@ namespace EDDataProcessor.EDDN
                             if (station == null)
                             {
                                 isNew = true;
-                                station = new(0, carrierId, 0, 0, 4, 4, 8, signal.Timestamp, signal.Timestamp);
-                                station.StarSystem = starSystem;
-                                station.Type = await StationType.GetFleetCarrier(dbContext, cancellationToken);
+                                station = new(0, carrierId, 0, 0, 4, 4, 8, signal.Timestamp, signal.Timestamp)
+                                {
+                                    StarSystem = starSystem,
+                                    Type = await StationType.GetFleetCarrier(dbContext, cancellationToken)
+                                };
                                 dbContext.Stations.Add(station);
                             }
                             if (isNew || station.Updated < signal.Timestamp)
@@ -81,7 +83,8 @@ namespace EDDataProcessor.EDDN
                                 await dbContext.SaveChangesAsync(cancellationToken);
                                 if (changed)
                                 {
-                                    await activeMqProducer.SendAsync("StarSystem.Updated", new(JsonConvert.SerializeObject(new StationUpdated(station.MarketId, Message.SystemAddress))), activeMqTransaction, cancellationToken);
+                                    StationUpdated stationUpdated = new(station.MarketId, Message.SystemAddress);
+                                    await activeMqProducer.SendAsync(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, activeMqTransaction, cancellationToken);
                                 }
                             }
                         }
@@ -121,7 +124,8 @@ namespace EDDataProcessor.EDDN
                         }
                         if (createdUpdated && thargoidMaelstrom != null)
                         {
-                            await activeMqProducer.SendAsync("ThargoidMaelstrom.CreatedUpdated", RoutingType.Anycast, new(JsonConvert.SerializeObject(new ThargoidMaelstromCreatedUpdated(thargoidMaelstrom.Id, thargoidMaelstrom.Name))), activeMqTransaction, cancellationToken);
+                            ThargoidMaelstromCreatedUpdated thargoidMaelstromCreatedUpdated = new(thargoidMaelstrom.Id, thargoidMaelstrom.Name);
+                            await activeMqProducer.SendAsync(ThargoidMaelstromCreatedUpdated.QueueName, ThargoidMaelstromCreatedUpdated.Routing, thargoidMaelstromCreatedUpdated.Message, activeMqTransaction, cancellationToken);
                         }
                     }
                     else if (signalName.StartsWith("$Warzone_TG_"))
@@ -138,8 +142,10 @@ namespace EDDataProcessor.EDDN
                     .FirstOrDefaultAsync(s => s.StarSystem == starSystem && s.Type == type && s.Name == signalName, cancellationToken);
                 if (starSystemFssSignal == null)
                 {
-                    starSystemFssSignal = new(0, signalName, type, Message.Timestamp, Message.Timestamp);
-                    starSystemFssSignal.StarSystem = starSystem;
+                    starSystemFssSignal = new(0, signalName, type, Message.Timestamp, Message.Timestamp)
+                    {
+                        StarSystem = starSystem
+                    };
                     dbContext.StarSystemFssSignals.Add(starSystemFssSignal);
                     await dbContext.SaveChangesAsync(cancellationToken);
                     signalUpdated = true;
@@ -157,7 +163,8 @@ namespace EDDataProcessor.EDDN
             }
             if (starSystemSignalsUpdated.Any())
             {
-                await activeMqProducer.SendAsync("StarSystem.FssSignalsUpdated", RoutingType.Anycast, new(JsonConvert.SerializeObject(new StarSystemFssSignalsUpdated(Message.SystemAddress))), activeMqTransaction, cancellationToken);
+                StarSystemFssSignalsUpdated starSystemFssSignalsUpdated = new(Message.SystemAddress);
+                await activeMqProducer.SendAsync(StarSystemFssSignalsUpdated.QueueName, StarSystemFssSignalsUpdated.Routing, starSystemFssSignalsUpdated.Message, activeMqTransaction, cancellationToken);
             }
         }
     }

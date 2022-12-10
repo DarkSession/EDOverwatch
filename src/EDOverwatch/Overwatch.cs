@@ -47,7 +47,7 @@ namespace EDOverwatch
 
                 ConnectionFactory connectionFactory = new();
                 await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
-                await using IProducer starSystemThargoidLevelChangedProducer = await connection.CreateProducerAsync("StarSystem.ThargoidLevelChanged", RoutingType.Anycast, cancellationToken);
+                await using IProducer starSystemThargoidLevelChangedProducer = await connection.CreateProducerAsync(StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing, cancellationToken);
 
                 _ = StarSystemUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
                 _ = StarSystemFssSignalsUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
@@ -66,14 +66,14 @@ namespace EDOverwatch
         {
             try
             {
-                await using IConsumer consumer = await connection.CreateConsumerAsync("StarSystem.Updated", RoutingType.Anycast, cancellationToken);
+                await using IConsumer consumer = await connection.CreateConsumerAsync(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, cancellationToken);
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     try
                     {
                         Message message = await consumer.ReceiveAsync(cancellationToken);
 
-                        Log.LogDebug("StarSystem.Updated received");
+                        Log.LogDebug("{n} received", StarSystemUpdated.QueueName);
 
                         await using Transaction transaction = new();
                         await consumer.AcceptAsync(message, transaction, cancellationToken);
@@ -104,14 +104,12 @@ namespace EDOverwatch
         {
             try
             {
-                await using IConsumer consumer = await connection.CreateConsumerAsync("StarSystem.FssSignalsUpdated", RoutingType.Anycast, cancellationToken);
+                await using IConsumer consumer = await connection.CreateConsumerAsync(StarSystemFssSignalsUpdated.QueueName, StarSystemFssSignalsUpdated.Routing, cancellationToken);
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     try
                     {
                         Message message = await consumer.ReceiveAsync(cancellationToken);
-
-                        Log.LogDebug("StarSystem.FssSignalsUpdated");
 
                         await using Transaction transaction = new();
                         await consumer.AcceptAsync(message, transaction, cancellationToken);
@@ -181,7 +179,9 @@ namespace EDOverwatch
                             Maelstrom = maelstrom,
                         };
                         await dbContext.SaveChangesAsync(cancellationToken);
-                        // await starSystemThargoidLevelChangedProducer.SendAsync(new(JsonConvert.SerializeObject(new StarSystemThargoidLevelChanged(starSystem.SystemAddress))), transaction, cancellationToken);
+
+                        StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress);
+                        await starSystemThargoidLevelChangedProducer.SendAsync(starSystemThargoidLevelChanged.Message, transaction, cancellationToken);
                     }
                     else if (starSystem.ThargoidLevel != null && starSystem.ThargoidLevel.Maelstrom == null)
                     {

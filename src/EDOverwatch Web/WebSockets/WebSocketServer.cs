@@ -1,7 +1,6 @@
 ﻿using ActiveMQ.Artemis.Client;
 using ActiveMQ.Artemis.Client.Transactions;
-using EDOverwatch_Web.sWebSocket.EventListener;
-using Microsoft.Extensions.DependencyInjection;
+using EDOverwatch_Web.WebSockets.EventListener;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using NJsonSchema.Validation;
@@ -46,39 +45,61 @@ namespace EDOverwatch_Web.WebSockets
                     }
                 }
             }
+            _ = InitEventListener();
         }
 
         private async Task InitEventListener()
         {
-            ActiveMQ.Artemis.Client.Endpoint activeMqEndpont = ActiveMQ.Artemis.Client.Endpoint.Create(
-                Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
-                Configuration.GetValue<int>("ActiveMQ:Port"),
-                Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
-                Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
-            ConnectionFactory connectionFactory = new();
-            await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont);
-
-            List<Task> tasks = new();
-            foreach (Type type in GetType().Assembly.GetTypes()
-                .Where(t => !t.IsAbstract && t.IsClass && typeof(IEventListener).IsAssignableFrom(t)))
+            try
             {
-                IEventListener? eventListener = Activator.CreateInstance(type) as IEventListener;
-                if (eventListener == null)
+                ActiveMQ.Artemis.Client.Endpoint activeMqEndpont = ActiveMQ.Artemis.Client.Endpoint.Create(
+                    Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
+                    Configuration.GetValue<int>("ActiveMQ:Port"),
+                    Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
+                    Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
+                ConnectionFactory connectionFactory = new();
+                await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont);
+
+                List<(string queueName, RoutingType routingType)> queues = new();
+                List<IEventListener> eventListeners = new();
+                foreach (Type type in GetType().Assembly.GetTypes()
+                    .Where(t => !t.IsAbstract && t.IsClass && typeof(IEventListener).IsAssignableFrom(t)))
                 {
-                    continue;
+                    if (Activator.CreateInstance(type) is not IEventListener eventListener)
+                    {
+                        continue;
+                    }
+                    eventListeners.Add(eventListener);
+                    foreach ((string queueName, RoutingType routingType) in eventListener.Events)
+                    {
+                        if (!queues.Contains((queueName, routingType)))
+                        {
+                            queues.Add((queueName, routingType));
+                        }
+                    }
                 }
-                foreach (string eventName in eventListener.Events)
+
+                List<Task> tasks = new();
+                foreach ((string queueName, RoutingType routingType) in queues)
                 {
-                    Task task = InitEventListenerEvent(connection, eventListener, eventName);
+                    List<IEventListener> eventListener = eventListeners
+                        .Where(e => e.Events.Contains((queueName, routingType)))
+                        .ToList();
+                    Task task = InitEventListenerEvent(connection, eventListener, queueName, routingType);
                     tasks.Add(task);
                 }
+
+                await Task.WhenAll(tasks);
             }
-            await Task.WhenAll(tasks);
+            catch (Exception e)
+            {
+                Log.LogError(e, "Exception in event listener initialisation");
+            }
         }
 
-        private async Task InitEventListenerEvent(IConnection connection, IEventListener eventListener, string eventName)
+        private async Task InitEventListenerEvent(IConnection connection, List<IEventListener> eventListeners, string queueName, RoutingType routingType)
         {
-            await using IConsumer consumer = await connection.CreateConsumerAsync(eventName, RoutingType.Anycast);
+            await using IConsumer consumer = await connection.CreateConsumerAsync(queueName, routingType);
             while (true)
             {
                 try
@@ -91,7 +112,18 @@ namespace EDOverwatch_Web.WebSockets
                     EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
                     string jsonString = message.GetBody<string>();
                     JObject json = JObject.Parse(jsonString);
-                    await eventListener.ProcessEvent(json, this, dbContext);
+
+                    foreach (IEventListener eventListener in eventListeners)
+                    {
+                        try
+                        {
+                            await eventListener.ProcessEvent(queueName, json, this, dbContext, CancellationToken.None);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.LogError(e, "Exception while processing event in {eventListener}", eventListener);
+                        }
+                    }
                     await transaction.CommitAsync();
                 }
                 catch (Exception e)
@@ -131,11 +163,6 @@ namespace EDOverwatch_Web.WebSockets
             bool isAuthenticated = (applicationUser != null);
             WebSocketMessage authenticationMessage = new("Authentication", new AuthenticationStatus(isAuthenticated));
             await authenticationMessage.Send(ws, cancellationToken);
-            if (!isAuthenticated || applicationUser == null)
-            {
-                await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancellationToken);
-                return;
-            }
             WebSocketSession webSocketSession = new(ws, applicationUser);
             lock (WebSocketSessions)
             {
@@ -210,44 +237,50 @@ namespace EDOverwatch_Web.WebSockets
                 if (webSocketMessage?.Name != null && (WebSocketHandlers?.TryGetValue(webSocketMessage.Name, out Type? messageHandler) ?? false))
                 {
                     EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                    ApplicationUser? user = await dbContext.ApplicationUsers.FindAsync(webSocketSession.User.Id, cancellationToken);
-                    if (user != null)
+                    ApplicationUser? user = null;
+                    if (webSocketSession.UserId != null)
                     {
-                        try
+                        user = await dbContext.ApplicationUsers.SingleOrDefaultAsync(a => a.Id == webSocketSession.UserId, cancellationToken);
+                    }
+                    try
+                    {
+                        WebSocketHandler webSocketHandler = (WebSocketHandler)ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, messageHandler);
+                        if (!webSocketHandler.AllowAnonymous && user != null)
                         {
-                            WebSocketHandler webSocketHandler = (WebSocketHandler)ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, messageHandler);
-                            if (webSocketHandler.ValidateMessageData(webSocketMessage.Data))
+                            WebSocketErrorMessage webSocketErrorMessage = new(webSocketMessage.Name, new List<string>() { "Unauthorized request" });
+                            await webSocketErrorMessage.Send(webSocketSession.WebSocket, cancellationToken);
+                        }
+                        else if (webSocketHandler.ValidateMessageData(webSocketMessage.Data))
+                        {
+                            WebSocketHandlerResult result = await webSocketHandler.ProcessMessage(webSocketMessage, webSocketSession, user, dbContext, cancellationToken);
+                            if (webSocketMessage.MessageId != null)
                             {
-                                WebSocketHandlerResult result = await webSocketHandler.ProcessMessage(webSocketMessage, webSocketSession, user, dbContext, cancellationToken);
-                                if (webSocketMessage.MessageId != null)
+                                if (result is WebSocketHandlerResultSuccess webSocketHandlerResultSuccess)
                                 {
-                                    if (result is WebSocketHandlerResultSuccess webSocketHandlerResultSuccess)
+                                    WebSocketResponseMessage responseMessage = new(webSocketMessage.Name, true, webSocketHandlerResultSuccess.ResponseData, webSocketMessage.MessageId);
+                                    await responseMessage.Send(webSocketSession.WebSocket, cancellationToken);
+                                    if (webSocketHandlerResultSuccess.ActiveObject != null)
                                     {
-                                        WebSocketResponseMessage responseMessage = new(webSocketMessage.Name, true, webSocketHandlerResultSuccess.ResponseData, webSocketMessage.MessageId);
-                                        await responseMessage.Send(webSocketSession.WebSocket, cancellationToken);
-                                        if (webSocketHandlerResultSuccess.ActiveObject != null)
-                                        {
-                                            webSocketSession.ActiveObject = webSocketHandlerResultSuccess.ActiveObject;
-                                        }
-                                    }
-                                    else if (result is WebSocketHandlerResultError webSocketHandlerResultError)
-                                    {
-                                        WebSocketErrorMessage webSocketErrorMessage = new(webSocketMessage.Name, webSocketHandlerResultError.Errors, webSocketMessage.MessageId);
-                                        await webSocketErrorMessage.Send(webSocketSession.WebSocket, cancellationToken);
+                                        webSocketSession.ActiveObject = webSocketHandlerResultSuccess.ActiveObject;
                                     }
                                 }
-                                await dbContext.SaveChangesAsync(cancellationToken);
+                                else if (result is WebSocketHandlerResultError webSocketHandlerResultError)
+                                {
+                                    WebSocketErrorMessage webSocketErrorMessage = new(webSocketMessage.Name, webSocketHandlerResultError.Errors, webSocketMessage.MessageId);
+                                    await webSocketErrorMessage.Send(webSocketSession.WebSocket, cancellationToken);
+                                }
                             }
-                            else
-                            {
-                                WebSocketErrorMessage webSocketErrorMessage = new(webSocketMessage.Name, new List<string>() { "The message data received is not in the expected format." });
-                                await webSocketErrorMessage.Send(webSocketSession.WebSocket, cancellationToken);
-                            }
+                            await dbContext.SaveChangesAsync(cancellationToken);
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Log.LogError(ex, "Error processing WebSocket Message");
+                            WebSocketErrorMessage webSocketErrorMessage = new(webSocketMessage.Name, new List<string>() { "The message data received is not in the expected format." });
+                            await webSocketErrorMessage.Send(webSocketSession.WebSocket, cancellationToken);
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogError(ex, "Error processing WebSocket Message");
                     }
                 }
             }

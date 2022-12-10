@@ -14,7 +14,7 @@
             Type = type;
         }
 
-        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             if (journalParameters.CommanderCurrentStarSystem != null && !Stolen && MissionID == 0)
             {

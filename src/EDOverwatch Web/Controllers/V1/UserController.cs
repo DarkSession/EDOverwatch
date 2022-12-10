@@ -1,5 +1,4 @@
-﻿using ActiveMQ.Artemis.Client;
-using EDCApi;
+﻿using EDCApi;
 using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -55,7 +54,7 @@ namespace EDOverwatch_Web.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<ActionResult<OAuthResponse>> Register(RegistrationRequest registrationRequest)
+        public async Task<ActionResult<OAuthResponse>> Register(RegistrationRequest registrationRequest, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
@@ -69,9 +68,24 @@ namespace EDOverwatch_Web.Controllers.V1
             if (result.Succeeded)
             {
                 await SignInManager.SignInAsync(user, true);
-                await DbContext.Entry(user)
-                    .Reference(u => u.Commander)
-                    .LoadAsync();
+                user.Commander = new(
+                            id: 0,
+                            name: string.Empty,
+                            0,
+                            false,
+                            DateTimeOffset.UtcNow.AddYears(-1),
+                            DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).Date),
+                            0,
+                            DateTimeOffset.UtcNow.AddDays(-14).Date,
+                            DateTimeOffset.Now,
+                            CommanderOAuthStatus.Inactive,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty)
+                {
+                    User = user
+                };
+                await DbContext.SaveChangesAsync(cancellationToken);
                 return new OAuthResponse(new MeResponse(user));
             }
             return new OAuthResponse(result.Errors.Select(e => e.Description).ToList());
@@ -146,7 +160,8 @@ namespace EDOverwatch_Web.Controllers.V1
                         await SignInManager.SignInAsync(commander.User, true);
                         if (isCommanderNew)
                         {
-                            await Producer.SendAsync("Commander.CApi", RoutingType.Anycast, JsonConvert.SerializeObject(new CommanderCApi(oAuthenticationResult.CustomerId)), cancellationToken);
+                            CommanderCApi commanderCApi = new(oAuthenticationResult.CustomerId);
+                            await Producer.SendAsync(CommanderCApi.QueueName, CommanderCApi.Routing, commanderCApi.Message, cancellationToken);
                         }
                         return new OAuthResponse(new MeResponse(commander.User));
                     }

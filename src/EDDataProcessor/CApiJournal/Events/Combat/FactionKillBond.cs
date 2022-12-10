@@ -15,7 +15,7 @@
             VictimFaction = victimFaction;
         }
 
-        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
+        public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             if (AwardingFaction == "$faction_PilotsFederation;" && VictimFaction == "$faction_Thargoid;")
             {

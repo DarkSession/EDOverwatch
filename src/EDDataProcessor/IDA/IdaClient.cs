@@ -16,7 +16,7 @@ namespace EDDataProcessor.IDA
             DbContext = dbContext;
         }
 
-        public async Task UpdateData()
+        public async IAsyncEnumerable<long> UpdateData()
         {
             using SheetsService sheetsService = new(new BaseClientService.Initializer()
             {
@@ -75,6 +75,7 @@ namespace EDDataProcessor.IDA
                                         DbContext.WarEfforts.Add(supplyDeliveries);
                                     }
                                     await DbContext.SaveChangesAsync();
+                                    yield return starSystem.SystemAddress;
                                 }
                             }
                         }
@@ -112,6 +113,7 @@ namespace EDDataProcessor.IDA
                                         DbContext.WarEfforts.Add(supplyDeliveries);
                                     }
                                     await DbContext.SaveChangesAsync();
+                                    yield return starSystem.SystemAddress;
                                 }
                             }
                         }

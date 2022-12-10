@@ -25,20 +25,12 @@ namespace EDDataProcessor.EDDN
             }
         }
 
-        public async Task ProcessMessages(CancellationToken cancellationToken = default)
+        public async Task ProcessMessages(IConnection connection, CancellationToken cancellationToken = default)
         {
             Log.LogInformation("Starting EDDNProcessor");
 
             try
             {
-                Endpoint activeMqEndpont = Endpoint.Create(
-                    Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
-                    Configuration.GetValue<int>("ActiveMQ:Port"),
-                    Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
-                    Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
-
-                ConnectionFactory connectionFactory = new();
-                await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
                 await using IConsumer consumer = await connection.CreateConsumerAsync("EDDN", RoutingType.Anycast, cancellationToken);
                 await using IAnonymousProducer anonymousProducer = await connection.CreateAnonymousProducerAsync(cancellationToken);
 

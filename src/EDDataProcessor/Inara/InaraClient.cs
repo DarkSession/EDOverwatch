@@ -5,11 +5,11 @@ using System.Text.RegularExpressions;
 
 namespace EDDataProcessor.Inara
 {
-    internal class InaraClient : IDisposable
+    internal partial class InaraClient : IDisposable
     {
         private const string BaseUrl = "https://inara.cz/elite/";
         private IBrowsingContext IBrowsingContext { get; }
-        private Regex PathRegex { get; } = new("/([0-9]+)/$");
+        private Regex PathRegex { get; } = PathRegexGen();
         private DateTimeOffset LastRequest { get; set; } = DateTimeOffset.Now;
 
         public InaraClient()
@@ -26,10 +26,9 @@ namespace EDDataProcessor.Inara
         public async Task<int?> GetSystemId(string systemName)
         {
             using IDocument? document = await Get("starsystem/?search=" + Uri.EscapeDataString(systemName));
-            IHtmlAnchorElement? overviewLink = document?.GetElementsByClassName("quickmenu")
+            if (document?.GetElementsByClassName("quickmenu")
                  .Where(d => d is IHtmlAnchorElement h && h.TextContent == "Overview")
-                 .FirstOrDefault() as IHtmlAnchorElement;
-            if (overviewLink != null)
+                 .FirstOrDefault() is IHtmlAnchorElement overviewLink)
             {
                 return LinkExtractStarSystemId(overviewLink);
             }
@@ -50,14 +49,12 @@ namespace EDDataProcessor.Inara
         {
             using IDocument? document = await Get("thargoidwar-conflicts/");
             IHtmlTableElement? table = document?.GetElementsByTagName("table").FirstOrDefault() as IHtmlTableElement;
-            IHtmlTableSectionElement? tbody = table?.GetElementsByTagName("tbody").FirstOrDefault() as IHtmlTableSectionElement;
-            if (tbody != null)
+            if (table?.GetElementsByTagName("tbody").FirstOrDefault() is IHtmlTableSectionElement tbody)
             {
                 foreach (IHtmlTableRowElement row in tbody.Rows)
                 {
                     IHtmlTableDataCellElement? cell = row.Cells.FirstOrDefault() as IHtmlTableDataCellElement;
-                    IHtmlAnchorElement? link = cell?.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
-                    if (link != null)
+                    if (cell?.GetElementsByTagName("a").FirstOrDefault() is IHtmlAnchorElement link)
                     {
                         int? systemId = LinkExtractStarSystemId(link);
                         if (systemId is int s)
@@ -81,12 +78,11 @@ namespace EDDataProcessor.Inara
             }
 
             IHtmlTableElement? table = document?.GetElementsByTagName("table").FirstOrDefault() as IHtmlTableElement;
-            IHtmlTableSectionElement? tbody = table?.GetElementsByTagName("tbody").FirstOrDefault() as IHtmlTableSectionElement;
-            if (tbody != null)
+            if (table?.GetElementsByTagName("tbody").FirstOrDefault() is IHtmlTableSectionElement tbody)
             {
                 foreach (IHtmlTableRowElement row in tbody.Rows)
                 {
-                    if (row.Cells.Count() == 5)
+                    if (row.Cells.Length == 5)
                     {
 
                         if (// Date
@@ -129,6 +125,9 @@ namespace EDDataProcessor.Inara
             }
             return null;
         }
+
+        [GeneratedRegex("/([0-9]+)/$")]
+        private static partial Regex PathRegexGen();
     }
 
     internal class ConflictDetails
