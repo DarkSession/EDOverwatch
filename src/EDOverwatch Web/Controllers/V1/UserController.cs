@@ -1,4 +1,5 @@
 ﻿using EDCApi;
+using EDOverwatch_Web.Models;
 using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -179,19 +180,6 @@ namespace EDOverwatch_Web.Controllers.V1
             return new OAuthGetStateResponse(oAuthAuthorizeUrl.Url);
         }
 
-        [HttpGet]
-        public async Task<MeResponse> Me()
-        {
-            ApplicationUser? user = await UserManager.GetUserAsync(User);
-            if (user != null)
-            {
-                await DbContext.Entry(user)
-                    .Reference(u => u.Commander)
-                    .LoadAsync();
-                return new MeResponse(user);
-            }
-            return new MeResponse(null);
-        }
 
         [GeneratedRegex("[^0-9a-z]", RegexOptions.IgnoreCase, "en-CH")]
         private static partial Regex RegexRemoveCharacters();
@@ -297,17 +285,6 @@ namespace EDOverwatch_Web.Controllers.V1
             {
                 User = new(applicationUser.Commander?.Name ?? applicationUser.UserName ?? "Unknown", applicationUser.Commander?.JournalLastActivity);
             }
-        }
-    }
-
-    public class User
-    {
-        public string Commander { get; set; }
-        public DateTimeOffset? JournalLastImport { get; set; }
-        public User(string commander, DateTimeOffset? journalLastImport)
-        {
-            Commander = commander;
-            JournalLastImport = journalLastImport;
         }
     }
 }

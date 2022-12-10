@@ -24,10 +24,10 @@
     </div>
     <div class="user">
       <span *ngIf="appService.user">
-        CMDR {{ appService.user.commander }}<br>
-        <div *ngIf="appService.user.journalLastImport">
+        CMDR {{ appService.user.Commander }}<br>
+        <div *ngIf="appService.user.JournalLastImport">
           Last journal event:
-          {{ appService.user.journalLastImport | timeago:true}}
+          {{ appService.user.JournalLastImport | timeago:true}}
         </div>
       </span>
       <span *ngIf="!appService.user">

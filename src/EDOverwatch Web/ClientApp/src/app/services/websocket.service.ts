@@ -13,8 +13,8 @@ export class WebsocketService {
     private responseCallbacks: {
         [key: string]: (response: WebSocketResponseMessage | null) => void;
     } = {};
-    public authenticationResolved!: Promise<ConnectionStatus>;
-    private authenticationResolve!: ((connectionStatus: ConnectionStatus) => void);
+    public authenticationResolved!: Promise<void>;
+    private authenticationResolve!: ((connectionStatus: void) => void);
     public onConnectionStatusChanged: EventEmitter<ConnectionStatus> = new EventEmitter<ConnectionStatus>();
     private eventSubscribers: {
         [key: string]: EventEmitter<WebSocketMessage<any>>;
@@ -38,7 +38,7 @@ export class WebsocketService {
             this.authenticationResolved = new Promise((resolve) => {
                 this.authenticationResolve = resolve;
             });
-            this.authenticationResolve(ConnectionStatus.NotAuthenticated);
+            this.authenticationResolve();
             this.webSocket?.close();
             this.webSocket = null;
         }
@@ -117,7 +117,7 @@ export class WebsocketService {
                     this.setConnectionStatus(ConnectionStatus.NotAuthenticated);
                 }
                 if (this.authenticationResolve) {
-                    this.authenticationResolve(this.connectionStatus);
+                    this.authenticationResolve();
                 }
                 break;
             }

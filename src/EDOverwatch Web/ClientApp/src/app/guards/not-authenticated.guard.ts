@@ -16,8 +16,8 @@ export class NotAuthenticatedGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot,
   ): Promise<boolean | UrlTree> {
-    const authenticationStatus = await this.websocketService.authenticationResolved;
-    if (authenticationStatus === ConnectionStatus.NotAuthenticated) {
+    await this.websocketService.authenticationResolved;
+    if (this.websocketService.connectionStatus === ConnectionStatus.NotAuthenticated) {
       return true;
     }
     this.router.navigate(["/"]);

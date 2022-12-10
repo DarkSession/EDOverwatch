@@ -17,8 +17,8 @@ export class AuthenticationGuard implements CanActivate, CanActivateChild {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot,
   ): Promise<boolean | UrlTree> {
-    const authenticationStatus = await this.websocketService.authenticationResolved;
-    if (authenticationStatus === ConnectionStatus.Authenticated) {
+    await this.websocketService.authenticationResolved;
+    if (this.websocketService.connectionStatus === ConnectionStatus.Authenticated) {
       return true;
     }
     this.router.navigate(["/login"]);

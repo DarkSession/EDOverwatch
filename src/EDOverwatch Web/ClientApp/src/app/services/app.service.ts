@@ -2,19 +2,37 @@ import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { ConnectionStatus, WebsocketService } from './websocket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
-  public isLoggedIn = false;
   public user: User | null = null;
   public onUserChanged: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
     private readonly httpClient: HttpClient,
     @Inject('API_URL') private readonly apiUrl: string,
-    private readonly router: Router) {
+    private readonly router: Router,
+    private readonly webSocketService: WebsocketService) {
+    this.webSocketService.onConnectionStatusChanged.subscribe((connectionStatus: ConnectionStatus) => {
+      if (connectionStatus === ConnectionStatus.Authenticated) {
+        this.requestUser();
+      }
+      else if (this.user) {
+        this.user = null;
+        this.onUserChanged.emit();
+      }
+    });
+  }
+
+  private async requestUser(): Promise<void> {
+    const response = await this.webSocketService.sendMessageAndWaitForResponse<User>("CommanderMe", {});
+    if (response) {
+      this.user = response.Data;
+      this.onUserChanged.emit();
+    }
   }
 
   public async oAuth(code: string, state: string): Promise<OAuthResponse> {
@@ -25,13 +43,8 @@ export class AppService {
       withCredentials: true,
     }));
     if (response.success) {
-      this.isLoggedIn = true;
-      this.user = response.me!.user;
-      this.onUserChanged.emit();
+      this.webSocketService.reconnect();
       this.router.navigate(["/"]);
-    }
-    else {
-      this.isLoggedIn = false;
     }
     return response;
   }
@@ -43,8 +56,8 @@ interface MeResponse {
 }
 
 export interface User {
-  commander: string | null;
-  journalLastImport: string | null;
+  Commander: string | null;
+  JournalLastImport: string | null;
 }
 
 interface OAuthResponse {

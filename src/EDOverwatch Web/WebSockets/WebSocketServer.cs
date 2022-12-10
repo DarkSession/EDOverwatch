@@ -245,7 +245,7 @@ namespace EDOverwatch_Web.WebSockets
                     try
                     {
                         WebSocketHandler webSocketHandler = (WebSocketHandler)ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, messageHandler);
-                        if (!webSocketHandler.AllowAnonymous && user != null)
+                        if (!webSocketHandler.AllowAnonymous && user == null)
                         {
                             WebSocketErrorMessage webSocketErrorMessage = new(webSocketMessage.Name, new List<string>() { "Unauthorized request" });
                             await webSocketErrorMessage.Send(webSocketSession.WebSocket, cancellationToken);

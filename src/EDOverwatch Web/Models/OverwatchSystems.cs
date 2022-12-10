@@ -34,7 +34,7 @@ namespace EDOverwatch_Web.Models
 
             var efforts = await dbContext.WarEfforts
                 .AsNoTracking()
-                .Where(w => w.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+                .Where(w => w.Date >= DateOnly.FromDateTime(DateTime.UtcNow) && w.StarSystem.WarRelevantSystem)
                 .GroupBy(w => new
                 {
                     w.StarSystemId,
