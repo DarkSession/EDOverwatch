@@ -70,11 +70,29 @@ namespace EDDataProcessor.Inara
         {
             ConflictDetails result = new();
             using IDocument? document = await Get($"thargoidwar-conflict/{systemId}/");
+            if (document?.GetElementsByTagName("div")?.Where(e => e is IHtmlDivElement i && i.TextContent == "Thargoids killed").Skip(1).FirstOrDefault() is IHtmlDivElement thargoidsKilledCell &&
+                thargoidsKilledCell.NextSibling is IHtmlDivElement thargoidsKilledValueCell &&
+                int.TryParse(thargoidsKilledValueCell.TextContent.Replace(",", string.Empty), out int thargoidsKilledTotal))
+            {
+                result.TotalThargoidsKilled = thargoidsKilledTotal;
+            }
+            if (document?.GetElementsByTagName("div")?.Where(e => e is IHtmlDivElement i && i.TextContent == "Rescues performed").Skip(1).FirstOrDefault() is IHtmlDivElement rescuesPerformedCell &&
+                rescuesPerformedCell.NextSibling is IHtmlDivElement rescuesPerformedValueCell &&
+                int.TryParse(rescuesPerformedValueCell.TextContent.Replace(",", string.Empty), out int rescuesPerfomedTotal))
+            {
+                result.TotalRescuesPerformed = rescuesPerfomedTotal;
+            }
+            if (document?.GetElementsByTagName("div")?.Where(e => e is IHtmlDivElement i && i.TextContent == "Supplies delivered").Skip(1).FirstOrDefault() is IHtmlDivElement suppliesDeliveredCell &&
+                suppliesDeliveredCell.NextSibling is IHtmlDivElement suppliesDeliveredValueCell &&
+                int.TryParse(suppliesDeliveredValueCell.TextContent.Replace(",", string.Empty), out int suppliesDeliveredTotal))
+            {
+                result.TotalSuppliesDelivered = suppliesDeliveredTotal;
+            }
             if (document?.GetElementsByTagName("div")?.Where(e => e is IHtmlDivElement i && i.TextContent == "Ships lost").Skip(1).FirstOrDefault() is IHtmlDivElement shipsLostCell &&
                 shipsLostCell.NextSibling is IHtmlDivElement shipsLostValueCell &&
-                int.TryParse(shipsLostValueCell.TextContent.Replace(",", string.Empty), out int shipsLost))
+                int.TryParse(shipsLostValueCell.TextContent.Replace(",", string.Empty), out int shipsLostTotal))
             {
-                result.ShipsLost = shipsLost;
+                result.TotalShipsLost = shipsLostTotal;
             }
 
             IHtmlTableElement? table = document?.GetElementsByTagName("table").FirstOrDefault() as IHtmlTableElement;
@@ -84,24 +102,23 @@ namespace EDDataProcessor.Inara
                 {
                     if (row.Cells.Length == 5)
                     {
-
                         if (// Date
                             !(row.Cells.ElementAt(0) is IHtmlTableDataCellElement dateCell && DateOnly.TryParseExact(dateCell.TextContent, "dd MMM yyyy", out DateOnly date)) ||
                             // Scout kills
-                            !(row.Cells.ElementAt(1) is IHtmlTableDataCellElement scoutKillCell && int.TryParse(scoutKillCell.TextContent.Replace(",", string.Empty), out int scoutKills)) ||
-                            // Interceptor kills
-                            !(row.Cells.ElementAt(2) is IHtmlTableDataCellElement interceptorKillCell &&
-                            interceptorKillCell.FirstChild is IText interceptorKillCellText &&
-                            int.TryParse(interceptorKillCellText.TextContent.Replace(",", string.Empty), out int interceptorKills)) ||
+                            !(row.Cells.ElementAt(1) is IHtmlTableDataCellElement killsCell && int.TryParse(killsCell.TextContent.Replace(",", string.Empty), out int kills)) ||
                             // Rescues
-                            !(row.Cells.ElementAt(3) is IHtmlTableDataCellElement rescueCell &&
+                            !(row.Cells.ElementAt(2) is IHtmlTableDataCellElement rescueCell &&
                             rescueCell.FirstChild is IText rescueCellText &&
-                            int.TryParse(rescueCellText.TextContent.Replace(",", string.Empty), out int rescues))
+                            int.TryParse(rescueCellText.TextContent.Replace(",", string.Empty), out int rescues)) ||
+                            // Supplies
+                            !(row.Cells.ElementAt(3) is IHtmlTableDataCellElement suppliesCell &&
+                            suppliesCell.FirstChild is IText suppliesCellText &&
+                            int.TryParse(suppliesCellText.TextContent.Replace(",", string.Empty), out int supplies))
                             )
                         {
                             continue;
                         }
-                        result.Details.Add((date, scoutKills, interceptorKills, rescues));
+                        result.Details.Add((date, kills, rescues, supplies));
                     }
                 }
             }
@@ -132,7 +149,10 @@ namespace EDDataProcessor.Inara
 
     internal class ConflictDetails
     {
-        public List<(DateOnly date, int scoutKills, int interceptorKills, int rescues)> Details { get; } = new();
-        public int ShipsLost { get; set; }
+        public List<(DateOnly date, int kills, int rescues, int supplies)> Details { get; } = new();
+        public int TotalThargoidsKilled { get; set; }
+        public int TotalRescuesPerformed { get; set; }
+        public int TotalSuppliesDelivered { get; set; }
+        public int TotalShipsLost { get; set; }
     }
 }
