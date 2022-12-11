@@ -59,7 +59,7 @@ export class WebsocketService {
         if (environment.websocketPort) {
             webSocketUrl += ":" + environment.websocketPort;
         }
-        webSocketUrl + "/ws";
+        webSocketUrl += "/ws";
         this.webSocket = new WebSocket(webSocketUrl);
         this.webSocket.onopen = () => {
             if (!environment.production) {
