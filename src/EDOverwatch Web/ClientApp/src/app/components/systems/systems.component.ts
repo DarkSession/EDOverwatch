@@ -70,7 +70,6 @@ export class SystemsComponent implements OnInit {
     const data = this.dataRaw.filter(d =>
       typeof this.maelstromsSelected.find(m => m.Name === d.Maelstrom.Name) !== 'undefined' &&
       typeof this.thargoidLevelsSelected.find(t => t.Level === d.ThargoidLevel.Level) !== 'undefined');
-      console.log(this.sort.active);
     data.sort((system1: OverwatchStarSystem, system2: OverwatchStarSystem) => {
       if (system1.ThargoidLevel.Level > system2.ThargoidLevel.Level) {
         return -1;
@@ -95,7 +94,7 @@ export class SystemsComponent implements OnInit {
       return system[columnName as keyof OverwatchStarSystem] as string;
     }
     this.changeDetectorRef.detectChanges();
-    
+
   }
 }
 

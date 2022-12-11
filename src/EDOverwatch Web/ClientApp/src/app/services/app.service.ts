@@ -17,7 +17,7 @@ export class AppService {
     private readonly router: Router,
     private readonly webSocketService: WebsocketService) {
     this.webSocketService.onConnectionStatusChanged.subscribe((connectionStatus: ConnectionStatus) => {
-      if (connectionStatus === ConnectionStatus.Authenticated) {
+      if (connectionStatus === ConnectionStatus.Connected && this.webSocketService.connectionIsAuthenticated) {
         this.requestUser();
       }
       else if (this.user) {

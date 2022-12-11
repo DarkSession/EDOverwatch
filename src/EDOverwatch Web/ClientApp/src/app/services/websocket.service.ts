@@ -19,6 +19,7 @@ export class WebsocketService {
     private eventSubscribers: {
         [key: string]: EventEmitter<WebSocketMessage<any>>;
     } = {};
+    public connectionIsAuthenticated = false;
 
     public constructor() {
         this.initalize();
@@ -34,7 +35,7 @@ export class WebsocketService {
 
     public disconnect(): void {
         if (this.webSocket?.readyState === 1) {
-            this.setConnectionStatus(ConnectionStatus.NotAuthenticated);
+            this.setConnectionStatus(ConnectionStatus.Disconnected);
             this.authenticationResolved = new Promise((resolve) => {
                 this.authenticationResolve = resolve;
             });
@@ -70,7 +71,7 @@ export class WebsocketService {
             if (!environment.production) {
                 console.log("WebSocket.onclose", event);
             }
-            if (!event.wasClean && this.connectionStatus == ConnectionStatus.Authenticated) {
+            if (!event.wasClean) {
                 if (this.initalizeTimeout !== null) {
                     clearTimeout(this.initalizeTimeout);
                 }
@@ -81,10 +82,8 @@ export class WebsocketService {
                     console.log("Unclean close. Scheduling another connection in 10s.");
                 }
             }
-            if (this.connectionStatus !== ConnectionStatus.NotAuthenticated) {
-                this.setConnectionStatus(ConnectionStatus.NoConnection);
-                this.failCallbacks();
-            }
+            this.setConnectionStatus(ConnectionStatus.Disconnected);
+            this.failCallbacks();
         };
         this.webSocket.onerror = (event: Event) => {
             if (!environment.production) {
@@ -111,16 +110,12 @@ export class WebsocketService {
         switch (message.Name) {
             case "Authentication": {
                 const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
-                if (authenticationData.IsAuthenticated) {
-                    this.setConnectionStatus(ConnectionStatus.Authenticated);
-                    for (const queueItem of this.messageQueue) {
-                        this.sendMessageInternal(queueItem.message, queueItem.callback);
-                    }
-                    this.messageQueue = [];
+                this.connectionIsAuthenticated = authenticationData.IsAuthenticated;
+                this.setConnectionStatus(ConnectionStatus.Connected);
+                for (const queueItem of this.messageQueue) {
+                    this.sendMessageInternal(queueItem.message, queueItem.callback);
                 }
-                else {
-                    this.setConnectionStatus(ConnectionStatus.NotAuthenticated);
-                }
+                this.messageQueue = [];
                 if (this.authenticationResolve) {
                     this.authenticationResolve();
                 }
@@ -163,7 +158,7 @@ export class WebsocketService {
     }
 
     private sendMessageInternal(message: WebSocketMessage, callback?: (response: WebSocketResponseMessage | null) => void): void {
-        if (this.connectionStatus === ConnectionStatus.Authenticated && this.webSocket !== null) {
+        if (this.connectionStatus === ConnectionStatus.Connected && this.webSocket !== null) {
             if (callback && message.MessageId) {
                 this.responseCallbacks[message.MessageId] = callback;
             }
@@ -190,9 +185,8 @@ export class WebsocketService {
 
 export enum ConnectionStatus {
     Connecting,
-    NotAuthenticated,
-    Authenticated,
-    NoConnection,
+    Connected,
+    Disconnected,
 }
 
 export interface WebSocketMessage<T = unknown> {
