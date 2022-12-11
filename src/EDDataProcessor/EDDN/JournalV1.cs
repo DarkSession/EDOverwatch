@@ -127,7 +127,7 @@ namespace EDDataProcessor.EDDN
                         if (station == null)
                         {
                             isNew = true;
-                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, Message.Timestamp, Message.Timestamp)
+                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, StationState.Normal, Message.Timestamp, Message.Timestamp)
                             {
                                 Type = await StationType.GetByName(Message.StationType, dbContext, cancellationToken)
                             };
@@ -151,6 +151,21 @@ namespace EDDataProcessor.EDDN
                             {
                                 station.MarketId = Message.MarketID;
                                 changed = true;
+                            }
+                            {
+                                StationState stationState = StationState.Normal;
+                                if (!string.IsNullOrEmpty(Message.StationState))
+                                {
+                                    if (!Enum.TryParse(Message.StationState, out stationState))
+                                    {
+                                        Console.WriteLine("Unknown station state: " + Message.StationState);
+                                    }
+                                }
+                                if (station.State != stationState)
+                                {
+                                    station.State = stationState;
+                                    changed = true;
+                                }
                             }
                             if (!string.IsNullOrEmpty(Message.StationEconomy))
                             {
@@ -247,6 +262,9 @@ namespace EDDataProcessor.EDDN
 
         [JsonProperty("StationEconomy")]
         public string StationEconomy { get; set; } = string.Empty;
+
+        [JsonProperty("StationState")]
+        public string StationState { get; set; } = string.Empty;
 
         [JsonProperty("StationEconomies")]
         public ICollection<DockedStationEconomy>? StationEconomies { get; set; }

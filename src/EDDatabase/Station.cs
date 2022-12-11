@@ -40,6 +40,9 @@
         public short LandingPadLarge { get; set; }
 
         [Column]
+        public StationState State { get; set; }
+
+        [Column]
         public DateTimeOffset Created { get; set; }
 
         [Column]
@@ -53,6 +56,7 @@
             short landingPadSmall,
             short landingPadMedium,
             short landingPadLarge,
+            StationState state,
             DateTimeOffset created,
             DateTimeOffset updated)
         {
@@ -63,8 +67,16 @@
             LandingPadSmall = landingPadSmall;
             LandingPadMedium = landingPadMedium;
             LandingPadLarge = landingPadLarge;
+            State = state;
             Created = created;
             Updated = updated;
         }
+    }
+
+    public enum StationState : byte
+    {
+        Normal,
+        UnderAttack,
+        Damaged,
     }
 }
