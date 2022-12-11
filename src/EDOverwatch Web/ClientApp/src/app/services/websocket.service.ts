@@ -55,7 +55,12 @@ export class WebsocketService {
         });
         this.failCallbacks();
         this.setConnectionStatus(ConnectionStatus.Connecting);
-        this.webSocket = new WebSocket(((window.location.protocol === "http:") ? "ws://" : "wss://") + window.location.hostname + ":44440/ws");
+        let webSocketUrl = ((window.location.protocol === "http:") ? "ws://" : "wss://") + window.location.hostname;
+        if (environment.websocketPort) {
+            webSocketUrl += ":" + environment.websocketPort;
+        }
+        webSocketUrl + "/ws";
+        this.webSocket = new WebSocket(webSocketUrl);
         this.webSocket.onopen = () => {
             if (!environment.production) {
                 console.log("WebSocket.onopen");
