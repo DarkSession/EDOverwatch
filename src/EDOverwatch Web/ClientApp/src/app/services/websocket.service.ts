@@ -20,6 +20,7 @@ export class WebsocketService {
         [key: string]: EventEmitter<WebSocketMessage<any>>;
     } = {};
     public connectionIsAuthenticated = false;
+    public messageBacklogChanged: EventEmitter<number> = new EventEmitter<number>();
 
     public constructor() {
         this.initalize();
@@ -104,6 +105,7 @@ export class WebsocketService {
             this.responseCallbacks[key](null);
         }
         this.responseCallbacks = {};
+        this.triggerMessageBacklogEvent();
     }
 
     private async processMessage(message: WebSocketResponseMessage): Promise<void> {
@@ -125,7 +127,12 @@ export class WebsocketService {
                 if (message.MessageId && this.responseCallbacks[message.MessageId]) {
                     const callback = this.responseCallbacks[message.MessageId];
                     delete this.responseCallbacks[message.MessageId];
-                    callback(message);
+                    try {
+                        callback(message);
+                    }
+                    catch (e) {
+                        console.error(e);
+                    }
                 }
                 else if (typeof this.eventSubscribers[message.Name] !== 'undefined') {
                     this.eventSubscribers[message.Name].emit(message);
@@ -135,6 +142,7 @@ export class WebsocketService {
                 }
             }
         }
+        this.triggerMessageBacklogEvent();
     }
 
     public sendMessage(name: string, data: any): void {
@@ -173,6 +181,12 @@ export class WebsocketService {
                 callback: callback,
             });
         }
+        this.triggerMessageBacklogEvent();
+    }
+
+    private triggerMessageBacklogEvent(): void {
+        const backlog = Object.keys(this.responseCallbacks).length + this.messageQueue.length;
+        this.messageBacklogChanged.emit(backlog);
     }
 
     public on<T>(name: string): EventEmitter<WebSocketMessage<T>> {

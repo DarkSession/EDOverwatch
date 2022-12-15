@@ -8,6 +8,7 @@ html,
 body {
   height: 100%;
   background-color: #2c2c2c;
+  font-size: 10pt;
 }
 
 body {
@@ -30,6 +31,10 @@ h3 {
 
 *:focus {
   outline: 0;
+}
+
+a {
+  color: #fbd7b4;
 }
 
 // Foreground Elements
@@ -276,8 +281,13 @@ $altTheme: (
   margin: 24px;
 }
 
-.content-box {
+.content-box-small {
   background-color: var(--accent-darker-color);
-  width: 500px;
+  width: 600px;
+  padding: 12px;
+}
+
+.content-box-large {
+  width: 95%;
   padding: 12px;
 }

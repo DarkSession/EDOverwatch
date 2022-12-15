@@ -45,6 +45,25 @@ namespace EDDatabase
             Side = side;
             Source = source;
         }
+
+        public static Dictionary<WarEffortType, WarEffortTypeGroup> WarEffortGroups => new()
+        {
+            { WarEffortType.KillGeneric, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidScout, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidCyclops, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidBasilisk, WarEffortTypeGroup.Kills},
+            { WarEffortType.KillThargoidMedusa, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidHydra, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidOrthrus, WarEffortTypeGroup.Kills },
+            { WarEffortType.Rescue, WarEffortTypeGroup.Rescue },
+            { WarEffortType.SupplyDelivery, WarEffortTypeGroup.Supply },
+            { WarEffortType.MissionCompletionGeneric, WarEffortTypeGroup.Mission },
+            { WarEffortType.MissionCompletionThargoidKill, WarEffortTypeGroup.Mission },
+            { WarEffortType.MissionCompletionPassengerEvacuation, WarEffortTypeGroup.Mission },
+            { WarEffortType.MissionCompletionDelivery, WarEffortTypeGroup.Mission },
+            { WarEffortType.MissionCompletionRescue, WarEffortTypeGroup.Mission },
+            { WarEffortType.ThargoidProbeCollection, WarEffortTypeGroup.Mission }, // Here in mission for now
+        };
     }
 
     public enum WarEffortType : byte
@@ -52,7 +71,7 @@ namespace EDDatabase
         [EnumMember(Value = "Kills")]
         KillGeneric = 1,
 
-        [EnumMember(Value = "Resuces")]
+        [EnumMember(Value = "Rescues")]
         Rescue,
 
         [EnumMember(Value = "Supply Delivery")]
@@ -95,6 +114,15 @@ namespace EDDatabase
         ThargoidProbeCollection,
     }
 
+    public enum WarEffortTypeGroup : byte
+    {
+        Kills,
+        Rescue,
+        Supply,
+        Mission,
+        // Disruption,
+    }
+
     public enum WarEffortSide : byte
     {
         Humans = 1,
@@ -104,8 +132,10 @@ namespace EDDatabase
     public enum WarEffortSource : byte
     {
         Unknown = 0,
+        [EnumMember(Value = "Operation IDA")]
         IDA,
         Inara,
+        [EnumMember(Value = "ED: Overwatch")]
         OverwatchCAPI,
     }
 }

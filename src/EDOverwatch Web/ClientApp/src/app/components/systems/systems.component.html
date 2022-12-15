@@ -22,7 +22,9 @@
             <ng-container matColumnDef="Name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
                 <td mat-cell *matCellDef="let row" class="cell-system-name">
-                    {{ row.Name }}
+                    <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
+                        {{ row.Name }}
+                    </span>
                     <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
                         (click)="copySystemName(row)"></fa-icon>
                 </td>
@@ -35,7 +37,9 @@
 
             <ng-container matColumnDef="Maelstrom">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Maelstrom</th>
-                <td mat-cell *matCellDef="let row">{{ row.Maelstrom.Name }}</td>
+                <td mat-cell *matCellDef="let row">
+                    <app-maelstrom-name [maelstrom]="row.Maelstrom"></app-maelstrom-name>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="Progress">

@@ -1,6 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
 
 @UntilDestroy()
 @Component({
@@ -10,7 +12,8 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 })
 export class MyEffortsComponent implements OnInit {
   public readonly displayedColumns = ['Date', 'SystemName', 'Type', 'Amount'];
-  public dataSource: CommanderWarEffort[] = [];
+  public dataSource: MatTableDataSource<CommanderWarEffort> = new MatTableDataSource<CommanderWarEffort>();
+  @ViewChild(MatSort) sort!: MatSort;
 
   public constructor(
     private readonly webSocketService: WebsocketService,
@@ -24,15 +27,22 @@ export class MyEffortsComponent implements OnInit {
       .on<CommanderWarEffort[]>("CommanderWarEfforts")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
-        this.dataSource = message.Data;
-        this.changeDetectorRef.detectChanges();
+        this.initEfforts(message.Data);
       });
   }
 
   public async loadMyEfforts(): Promise<void> {
     const response = await this.webSocketService.sendMessageAndWaitForResponse<CommanderWarEffort[]>("CommanderWarEfforts", {});
     if (response && response.Success) {
-      this.dataSource = response.Data;
+      this.initEfforts(response.Data);
+    }
+  }
+
+  private initEfforts(data: CommanderWarEffort[]): void {
+    this.dataSource = new MatTableDataSource<CommanderWarEffort>(data);
+    this.dataSource.sort = this.sort;
+    this.dataSource.sortingDataAccessor = (warEffort: CommanderWarEffort, columnName: string): string => {
+      return warEffort[columnName as keyof CommanderWarEffort] as string;
     }
     this.changeDetectorRef.detectChanges();
   }

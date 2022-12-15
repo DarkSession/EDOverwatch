@@ -34,6 +34,8 @@ import { AuthComponent } from './components/auth/auth.component';
 import { MyEffortsComponent } from './components/my-efforts/my-efforts.component';
 import { SystemComponent } from './components/system/system.component';
 import { NotAuthenticatedGuard } from './guards/not-authenticated.guard';
+import { MaelstromComponent } from './components/maelstrom/maelstrom.component';
+import { MaelstromNameComponent } from './components/maelstrom-name/maelstrom-name.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -53,6 +55,8 @@ export const httpInterceptorProviders = [
     AuthComponent,
     MyEffortsComponent,
     SystemComponent,
+    MaelstromComponent,
+    MaelstromNameComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -74,25 +78,8 @@ export const httpInterceptorProviders = [
 
     RouterModule.forRoot([
       {
-        path: 'systems',
-        component: SystemsComponent
-      },
-      {
         path: 'about',
         component: AboutComponent
-      },
-      {
-        path: 'get-involved',
-        component: GetInvolvedComponent
-      },
-      {
-        path: 'consumer-api',
-        component: ConsumerApiComponent,
-      },
-      {
-        path: 'login',
-        component: LoginComponent,
-        canActivate: [NotAuthenticatedGuard],
       },
       {
         path: 'auth',
@@ -100,9 +87,34 @@ export const httpInterceptorProviders = [
         canActivate: [NotAuthenticatedGuard],
       },
       {
+        path: 'consumer-api',
+        component: ConsumerApiComponent,
+      },
+      {
+        path: 'get-involved',
+        component: GetInvolvedComponent
+      },
+      {
+        path: 'login',
+        component: LoginComponent,
+        canActivate: [NotAuthenticatedGuard],
+      },
+      {
+        path: 'maelstrom/:name',
+        component: MaelstromComponent,
+      },
+      {
         path: 'my-efforts',
         component: MyEffortsComponent,
         canActivate: [AuthenticationGuard],
+      },
+      {
+        path: 'system/:id',
+        component: SystemComponent
+      },
+      {
+        path: 'systems',
+        component: SystemsComponent
       },
       {
         path: '**',

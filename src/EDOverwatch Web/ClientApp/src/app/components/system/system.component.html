@@ -1,1 +1,67 @@
-<p>system works!</p>
+<div class="overwatch-content">
+    <div class="content-box-large" *ngIf="starSystem">
+        <h2>{{ starSystem.Name }}</h2>
+        <div class="content-flex">
+            <table class="system-information">
+                <tbody>
+                    <tr>
+                        <td>Maelstrom</td>
+                        <td>
+                            <app-maelstrom-name [maelstrom]="starSystem.Maelstrom"></app-maelstrom-name>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Thargoid Level</td>
+                        <td>{{ starSystem.ThargoidLevel.Name }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="system-information">
+                <tbody>
+                    <tr>
+                        <td>Population</td>
+                        <td class="number">{{ starSystem.Population | number }}</td>
+                    </tr>
+                    <tr>
+                        <td>Player Focus</td>
+                        <td class="number">{{ starSystem.EffortFocus | percent }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <h3>Contributions</h3>
+        <table mat-table [dataSource]="warEfforts" matSort>
+            <ng-container matColumnDef="Date">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.Date }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Source">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Source</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.Source }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.Type }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Amount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+                <td mat-cell *matCellDef="let row" class="number">
+                    {{ row.Amount | number }}
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </div>
+</div>

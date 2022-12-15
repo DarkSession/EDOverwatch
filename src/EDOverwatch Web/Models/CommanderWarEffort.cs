@@ -4,16 +4,18 @@ namespace EDOverwatch_Web.Models
 {
     public class CommanderWarEffort
     {
-        public DateOnly Date { get; set; }
-        public string Type { get; set; }
-        public string SystemName { get; set; }
-        public long Amount { get; set; }
+        public DateOnly Date { get; }
+        public string Type { get; }
+        public string SystemName { get; }
+        public long SystemAddress { get; }
+        public long Amount { get; }
 
         public CommanderWarEffort(WarEffort warEffort)
         {
             Date = warEffort.Date;
             Type = warEffort.Type.GetEnumMemberValue();
             SystemName = warEffort.StarSystem?.Name ?? "Unknown";
+            SystemAddress = warEffort.StarSystem?.SystemAddress ?? 0;
             Amount = warEffort.Amount;
         }
 

@@ -10,7 +10,9 @@
         <ng-container matColumnDef="SystemName">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
             <td mat-cell *matCellDef="let row">
-                {{ row.SystemName }}
+                <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
+                    {{ row.SystemName }}
+                </span>
             </td>
         </ng-container>
 

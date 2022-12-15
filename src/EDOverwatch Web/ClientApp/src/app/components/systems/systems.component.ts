@@ -5,6 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 
 @UntilDestroy()
 @Component({
@@ -25,7 +26,7 @@ export class SystemsComponent implements OnInit {
   public thargoidLevels: OverwatchThargoidLevel[] = [];
   public thargoidLevelsSelected: OverwatchThargoidLevel[] = [];
 
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
   public constructor(
     private readonly webSocketService: WebsocketService,
@@ -67,20 +68,24 @@ export class SystemsComponent implements OnInit {
   }
 
   public updateDataSource(): void {
-    const data = this.dataRaw.filter(d =>
+    let data = this.dataRaw.filter(d =>
       typeof this.maelstromsSelected.find(m => m.Name === d.Maelstrom.Name) !== 'undefined' &&
       typeof this.thargoidLevelsSelected.find(t => t.Level === d.ThargoidLevel.Level) !== 'undefined');
-    data.sort((system1: OverwatchStarSystem, system2: OverwatchStarSystem) => {
-      if (system1.ThargoidLevel.Level > system2.ThargoidLevel.Level) {
-        return -1;
-      }
-      else if (system1.ThargoidLevel.Level < system2.ThargoidLevel.Level) {
-        return 1;
-      }
-      return system1.Name.localeCompare(system2.Name);
-    });
+    if (!this.sort?.active) {
+      this.dataSource.data.sort((system1: OverwatchStarSystem, system2: OverwatchStarSystem) => {
+        if (system1.ThargoidLevel.Level > system2.ThargoidLevel.Level) {
+          return -1;
+        }
+        else if (system1.ThargoidLevel.Level < system2.ThargoidLevel.Level) {
+          return 1;
+        }
+        return system1.Name.localeCompare(system2.Name);
+      });
+    }
+    else {
+      data = this.dataSource.sortData(data, this.sort);
+    }
     this.dataSource = new MatTableDataSource<OverwatchStarSystem>(data);
-
     this.dataSource.sort = this.sort;
     this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string => {
       switch (columnName) {
@@ -93,8 +98,8 @@ export class SystemsComponent implements OnInit {
       }
       return system[columnName as keyof OverwatchStarSystem] as string;
     }
+  
     this.changeDetectorRef.detectChanges();
-
   }
 }
 
@@ -104,17 +109,13 @@ interface OverwatchSystems {
   Systems: OverwatchStarSystem[];
 }
 
-interface OverwatchMaelstrom {
-  Name: string;
-  SystemName: string;
-}
-
 interface OverwatchThargoidLevel {
   Level: number;
   Name: string;
 }
 
-interface OverwatchStarSystem {
+export interface OverwatchStarSystem {
+  SystemAddress: number;
   Name: string;
   Maelstrom: OverwatchMaelstrom;
   ThargoidLevel: OverwatchThargoidLevel;

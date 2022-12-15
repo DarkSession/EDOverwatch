@@ -78,5 +78,6 @@
         Normal,
         UnderAttack,
         Damaged,
+        UnderRepairs,
     }
 }
