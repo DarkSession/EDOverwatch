@@ -1,6 +1,7 @@
 ﻿namespace EDDatabase
 {
     [Table("Station")]
+    [Index(nameof(MarketId))]
     public class Station
     {
         [Column]

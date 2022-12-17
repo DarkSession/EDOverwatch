@@ -15,6 +15,9 @@
         [ForeignKey("CycleStartId")]
         public ThargoidCycle? CycleStart { get; set; }
 
+        [ForeignKey("CycleStartId { get; set; }\r\n")]
+        public int? CycleStartId { get; set; }
+
         [ForeignKey("CycleEndId")]
         public ThargoidCycle? CycleEnd { get; set; }
 
@@ -44,16 +47,6 @@
         Controlled = 40,
         Maelstrom = 50,
         Recapture = 60,
+        Recovery = 70,
     }
-
-    /*
-     Invasion time:
-        33.000 pop: 5 weeks
-        95.000 pop: 5 weeks
-       128.000 pop: 7 weeks
-       145.000 pop: 6 weeks
-     2.900.000 pop: 7 weeks
-     5.100.000 pop: 5 weeks
-     ....
-    */
 }

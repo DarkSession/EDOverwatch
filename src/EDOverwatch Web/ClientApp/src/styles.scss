@@ -1,8 +1,8 @@
 @use '@angular/material' as mat;
 
-@include mat.core();
-
 @import 'material-icons/iconfont/material-icons.css';
+
+@include mat.core();
 
 html,
 body {
@@ -275,19 +275,61 @@ $altTheme: (
   }
 }
 
-.overwatch-content {
+div.overwatch-content-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div.overwatch-content-small,
+div.overwatch-content-large {
+  margin: 24px;
+  padding: 12px;
+
+  div.title {
+    font-weight: bold;
+    font-size: 16pt;
+  }
+
+  div.subtitle {
+    font-weight: bold;
+    font-size: 12pt;
+  }
+
+  div.content-box {
+    border-top: 2px solid var(--primary-color);
+  }
+}
+
+div.overwatch-content-small {
+  width: 600px;
+
+  div.content-box {
+    background-color: var(--accent-darker-color);
+    padding: 12px;
+  }
+}
+
+div.overwatch-content-large {
+  width: 95%;
+}
+
+div.table-container {
+  position: relative;
+}
+
+div.table {
+  position: relative;
+  overflow: auto;
+  border-top: 1px solid #fbd7b4;
+}
+
+div.empty-table {
+  background-color: #393939;
+  width: 100%;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.87);
   display: flex;
   justify-content: center;
-  margin: 24px;
-}
-
-.content-box-small {
-  background-color: var(--accent-darker-color);
-  width: 600px;
-  padding: 12px;
-}
-
-.content-box-large {
-  width: 95%;
   padding: 12px;
 }

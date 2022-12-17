@@ -14,7 +14,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
 
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            return new WebSocketHandlerResultSuccess(await Models.OverwatchSystems.Create(dbContext, cancellationToken), new SystemsObject());
+            return new WebSocketHandlerResultSuccess(await Models.OverwatchStarSystems.Create(dbContext, cancellationToken), new SystemsObject());
         }
     }
 }

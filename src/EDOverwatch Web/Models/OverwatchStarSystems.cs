@@ -1,34 +1,41 @@
 ﻿namespace EDOverwatch_Web.Models
 {
-    public class OverwatchSystems
+    public class OverwatchStarSystems
     {
         public List<OverwatchMaelstrom> Maelstroms { get; }
         public List<OverwatchThargoidLevel> Levels => Enum.GetValues<StarSystemThargoidLevelState>().Select(s => new OverwatchThargoidLevel(s)).ToList();
         public List<OverwatchStarSystem> Systems { get; } = new();
 
-        public OverwatchSystems(List<ThargoidMaelstrom> thargoidMaelstroms)
+        public OverwatchStarSystems(List<ThargoidMaelstrom> thargoidMaelstroms)
         {
             Maelstroms = thargoidMaelstroms.Select(t => new OverwatchMaelstrom(t)).ToList();
         }
 
-        public static async Task<OverwatchSystems> Create(EdDbContext dbContext, CancellationToken cancellationToken)
+        public static async Task<OverwatchStarSystems> Create(EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            List<StarSystem> starSystems = await dbContext.StarSystems
+            var systems = await dbContext.StarSystems
                .AsNoTracking()
-               .Include(s => s.ThargoidLevel)
-               .ThenInclude(t => t!.Maelstrom)
-               .ThenInclude(m => m!.StarSystem)
                .Where(s =>
                            s.ThargoidLevel != null &&
                            s.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert &&
                            s.ThargoidLevel.Maelstrom != null &&
                            s.ThargoidLevel.Maelstrom.StarSystem != null)
-               .ToListAsync(cancellationToken);
+                .Include(s => s.ThargoidLevel)
+                .ThenInclude(t => t!.Maelstrom)
+                .ThenInclude(m => m!.StarSystem)
+                .Select(s => new
+                {
+                    StarSystem = s,
+                    FactionOperations = s.FactionOperations!.Count(),
+                })
+                .ToListAsync(cancellationToken);
 
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
                 .Include(t => t.StarSystem)
                 .ToListAsync(cancellationToken);
+
+            Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
 
             var efforts = await dbContext.WarEfforts
                 .AsNoTracking()
@@ -46,27 +53,10 @@
                 })
                 .ToListAsync(cancellationToken);
 
-            Dictionary<WarEffortTypeGroup, long> totalEffortSums = new();
-            foreach (var total in efforts.GroupBy(e => e.Type).Select(e => new
+            OverwatchStarSystems result = new(maelstroms);
+            foreach (var system in systems)
             {
-                e.Key,
-                Amount = e.Sum(g => g.Amount),
-            }))
-            {
-                if (WarEffort.WarEffortGroups.TryGetValue(total.Key, out WarEffortTypeGroup group))
-                {
-                    if (!totalEffortSums.ContainsKey(group))
-                    {
-                        totalEffortSums[group] = total.Amount;
-                        continue;
-                    }
-                    totalEffortSums[group] += total.Amount;
-                }
-            }
-
-            OverwatchSystems result = new(maelstroms);
-            foreach (StarSystem starSystem in starSystems)
-            {
+                StarSystem starSystem = system.StarSystem;
                 decimal effortFocus = 0;
                 if (totalEffortSums.Any())
                 {
@@ -80,7 +70,7 @@
                             Amount = e.Sum(g => g.Amount),
                         }))
                     {
-                        if (WarEffort.WarEffortGroups.TryGetValue(systemEfforts.Key, out WarEffortTypeGroup group))
+                        if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(systemEfforts.Key, out WarEffortTypeGroup group))
                         {
                             if (!systemEffortSums.ContainsKey(group))
                             {
@@ -102,7 +92,7 @@
                         effortFocus = Math.Round(effortFocus, 2);
                     }
                 }
-                result.Systems.Add(new OverwatchStarSystem(starSystem, effortFocus));
+                result.Systems.Add(new OverwatchStarSystem(starSystem, effortFocus, system.FactionOperations));
             }
             return result;
         }

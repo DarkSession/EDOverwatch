@@ -22,9 +22,15 @@ namespace EDOverwatch_Web.Controllers.V1
         }
 
         [HttpGet]
-        public Task<OverwatchSystems> Systems(CancellationToken cancellationToken)
+        public Task<OverwatchStarSystems> Systems(CancellationToken cancellationToken)
         {
-            return OverwatchSystems.Create(DbContext, cancellationToken);
+            return OverwatchStarSystems.Create(DbContext, cancellationToken);
+        }
+
+        [HttpGet("{systemAddress}")]
+        public Task<OverwatchStarSystemDetail?> System(long systemAddress, CancellationToken cancellationToken)
+        {
+            return OverwatchStarSystemDetail.Create(systemAddress, DbContext, cancellationToken);
         }
     }
 }

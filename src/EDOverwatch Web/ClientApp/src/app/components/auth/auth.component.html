@@ -1,8 +1,12 @@
-<div class="overwatch-content">
-    <div class="content-box-small">
-        <h2>Frontier Development Authentication</h2>
-        <div *ngFor="let error of errors" class="error-msg">
-            {{ error }}
+<div class="overwatch-content-container">
+    <div class="overwatch-content-small">
+        <div class="title">
+            Frontier Development Authentication
+        </div>
+        <div class="content-box">
+            <div *ngFor="let error of errors" class="error-msg">
+                {{ error }}
+            </div>
         </div>
     </div>
 </div>

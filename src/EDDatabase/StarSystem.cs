@@ -29,6 +29,9 @@ namespace EDDatabase
         [Column]
         public long Population { get; set; }
 
+        [Column]
+        public long OriginalPopulation { get; set; }
+
         [ForeignKey("AllegianceId")]
         public FactionAllegiance? Allegiance { get; set; }
 
@@ -52,7 +55,7 @@ namespace EDDatabase
 
         public IEnumerable<StarSystemThargoidLevel>? ThargoidLevelHistory { get; set; }
 
-        public IEnumerable<StarSystemFssSignal>? FssSignals { get; set; }
+        public IEnumerable<DcohFactionOperation>? FactionOperations { get; set; }
 
         public StarSystem(
             long id,
@@ -62,6 +65,7 @@ namespace EDDatabase
             decimal locationY,
             decimal locationZ,
             long population,
+            long originalPopulation,
             bool warRelevantSystem,
             DateTimeOffset created,
             DateTimeOffset updated)
@@ -73,6 +77,7 @@ namespace EDDatabase
             LocationY = locationY;
             LocationZ = locationZ;
             Population = population;
+            OriginalPopulation = originalPopulation;
             WarRelevantSystem = warRelevantSystem;
             Created = created;
             Updated = updated;

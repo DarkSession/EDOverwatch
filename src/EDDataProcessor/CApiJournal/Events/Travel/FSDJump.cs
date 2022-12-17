@@ -25,6 +25,7 @@
 
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            long population = Population ?? 0;
             bool isNew = false;
             StarSystem? starSystem = await dbContext.StarSystems
                                                     .Include(s => s.Allegiance)
@@ -39,7 +40,8 @@
                     (decimal)StarPos[0],
                     (decimal)StarPos[1],
                     (decimal)StarPos[2],
-                    Population ?? 0,
+                    population,
+                    population,
                     false,
                     Timestamp,
                     Timestamp);
@@ -72,6 +74,11 @@
                         starSystem.Security = starSystemSecurity;
                         changed = true;
                     }
+                }
+                if (starSystem.Population != population)
+                {
+                    starSystem.Population = population;
+                    changed = true;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
                 if (changed)

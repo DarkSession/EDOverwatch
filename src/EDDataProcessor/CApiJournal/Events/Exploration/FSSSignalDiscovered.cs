@@ -80,6 +80,8 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
                     string maelStromName = maelstromMatch.Groups[1].Value;
                     ThargoidMaelstrom? thargoidMaelstrom = await dbContext.ThargoidMaelstroms
                         .Include(t => t.StarSystem)
+                        .ThenInclude(s => s!.ThargoidLevel)
+                        .ThenInclude(t => t!.Maelstrom)
                         .FirstOrDefaultAsync(t => t.Name == maelStromName, cancellationToken);
                     if (thargoidMaelstrom == null)
                     {
@@ -87,8 +89,6 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
                         {
                             StarSystem = starSystem,
                         };
-                        await dbContext.SaveChangesAsync(cancellationToken);
-                        starSystem.Maelstrom = thargoidMaelstrom;
                         await dbContext.SaveChangesAsync(cancellationToken);
                         createdUpdated = true;
                     }

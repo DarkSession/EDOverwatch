@@ -6,14 +6,12 @@ namespace EDDataProcessor.EDDN
 {
     internal class EDDNProcessor
     {
-        private IConfiguration Configuration { get; }
         private ILogger Log { get; }
         private IServiceProvider ServiceProvider { get; }
         private Dictionary<string, Type> EDDNProcessors { get; } = new();
 
-        public EDDNProcessor(IConfiguration configuration, ILogger<EDDNProcessor> log, IServiceProvider serviceProvider)
+        public EDDNProcessor(ILogger<EDDNProcessor> log, IServiceProvider serviceProvider)
         {
-            Configuration = configuration;
             Log = log;
             ServiceProvider = serviceProvider;
             foreach (Type type in typeof(Program).Assembly.GetTypes().Where(i => typeof(IEDDNEvent).IsAssignableFrom(i)))

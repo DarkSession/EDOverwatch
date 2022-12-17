@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { OverwatchStarSystem } from '../systems/systems.component';
+import { OverwatchStarSystem } from '../system-list/system-list.component';
 
 @UntilDestroy()
 @Component({
@@ -16,9 +16,14 @@ import { OverwatchStarSystem } from '../systems/systems.component';
 })
 export class SystemComponent implements OnInit {
   public starSystem: OverwatchStarSystemDetail | null = null;
+
   public warEfforts: MatTableDataSource<OverwatchStarSystemWarEffort> = new MatTableDataSource<OverwatchStarSystemWarEffort>();
-  public readonly displayedColumns = ['Date', 'Source', 'Type', 'Amount'];
-  @ViewChild(MatSort) sort!: MatSort;
+  public readonly warEffortsDisplayedColumns = ['Date', 'Source', 'Type', 'Amount'];
+  @ViewChild('warEffortsSort') warEffortsSort!: MatSort;
+
+  public factionOperations: MatTableDataSource<FactionOperation> = new MatTableDataSource<FactionOperation>();
+  public readonly factionOperationsDisplayedColumns = ['Faction', 'Type', 'Started'];
+  @ViewChild('factionOperationsSort') factionOperationsSort!: MatSort;
 
   public constructor(
     private readonly route: ActivatedRoute,
@@ -44,8 +49,15 @@ export class SystemComponent implements OnInit {
     });
     if (response && response.Data) {
       this.starSystem = response.Data;
+
+      this.factionOperations = new MatTableDataSource<FactionOperation>(this.starSystem.FactionOperationDetails);
+      this.factionOperations.sort = this.factionOperationsSort;
+      this.factionOperations.sortingDataAccessor = (factionOperations: FactionOperation, columnName: string): string => {
+        return factionOperations[columnName as keyof FactionOperation] as string;
+      }
+
       this.warEfforts = new MatTableDataSource<OverwatchStarSystemWarEffort>(this.starSystem.WarEfforts);
-      this.warEfforts.sort = this.sort;
+      this.warEfforts.sort = this.warEffortsSort;
       this.warEfforts.sortingDataAccessor = (warEffort: OverwatchStarSystemWarEffort, columnName: string): string => {
         return warEffort[columnName as keyof OverwatchStarSystemWarEffort] as string;
       }
@@ -57,6 +69,7 @@ export class SystemComponent implements OnInit {
 interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   Population: number;
   WarEfforts: OverwatchStarSystemWarEffort[];
+  FactionOperationDetails: FactionOperation[];
 }
 
 interface OverwatchStarSystemWarEffort {
@@ -64,4 +77,12 @@ interface OverwatchStarSystemWarEffort {
   Type: string;
   Source: string;
   Amount: number;
+}
+
+interface FactionOperation {
+  Faction: string;
+  Type: string;
+  Started: string;
+  SystemName: string;
+  SystemAddress: number;
 }

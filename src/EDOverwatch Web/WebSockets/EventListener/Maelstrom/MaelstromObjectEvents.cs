@@ -1,10 +1,11 @@
 ﻿using ActiveMQ.Artemis.Client;
+using EDOverwatch_Web.Models;
 using Messages;
 using Newtonsoft.Json.Linq;
 
-namespace EDOverwatch_Web.WebSockets.EventListener.System
+namespace EDOverwatch_Web.WebSockets.EventListener.Maelstrom
 {
-    public class SystemObjectEvents : IEventListener
+    public class MaelstromObjectEvents : IEventListener
     {
         public List<(string queueName, RoutingType routingType)> Events { get; } = new()
         {
@@ -35,11 +36,21 @@ namespace EDOverwatch_Web.WebSockets.EventListener.System
                 return;
             }
 
-            SystemObject systemObject = new(systemAddress);
-            List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(systemObject)).ToList();
+            StarSystem? starSystem = await dbContext.StarSystems
+                .AsNoTracking()
+                .Include(s => s.ThargoidLevel)
+                .ThenInclude(t => t!.Maelstrom)
+                .FirstOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
+            if (starSystem?.ThargoidLevel?.Maelstrom == null)
+            {
+                return;
+            }
+
+            MaelstromObject maelstromObject = new(starSystem.ThargoidLevel.Maelstrom.Name);
+            List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(maelstromObject)).ToList();
             if (sessions.Any())
             {
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystem), await Models.OverwatchStarSystemDetail.Create(systemAddress, dbContext, cancellationToken));
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchMaelstrom), await OverwatchMaelstromDetail.Create(starSystem.ThargoidLevel.Maelstrom, dbContext, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

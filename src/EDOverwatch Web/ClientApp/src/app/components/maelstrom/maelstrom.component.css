@@ -1,0 +1,11 @@
+table.system-information {
+    width: 300px;
+}
+
+div.table {
+    max-height: 35vh;
+}
+
+.thead {
+    background-color: #272727;
+}

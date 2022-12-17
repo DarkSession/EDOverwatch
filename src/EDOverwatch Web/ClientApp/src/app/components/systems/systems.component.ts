@@ -1,11 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
+import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-list.component';
 
 @UntilDestroy()
 @Component({
@@ -14,11 +11,8 @@ import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
   styleUrls: ['./systems.component.scss']
 })
 export class SystemsComponent implements OnInit {
-  public readonly faClipboard = faClipboard;
-  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Maelstrom', 'Progress', 'EffortFocus'];
-  private dataRaw: OverwatchStarSystem[] = [];
-
-  public dataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
+  public dataRaw: OverwatchStarSystem[] = [];
+  @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
 
   public maelstroms: OverwatchMaelstrom[] = [];
   public maelstromsSelected: OverwatchMaelstrom[] = [];
@@ -26,12 +20,8 @@ export class SystemsComponent implements OnInit {
   public thargoidLevels: OverwatchThargoidLevel[] = [];
   public thargoidLevelsSelected: OverwatchThargoidLevel[] = [];
 
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
-
   public constructor(
-    private readonly webSocketService: WebsocketService,
-    private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly matSnackBar: MatSnackBar) {
+    private readonly webSocketService: WebsocketService) {
   }
 
   public ngOnInit(): void {
@@ -57,49 +47,12 @@ export class SystemsComponent implements OnInit {
     this.maelstromsSelected = data.Maelstroms;
     this.thargoidLevels = data.Levels;
     this.thargoidLevelsSelected = data.Levels;
-    this.updateDataSource();
-  }
-
-  public copySystemName(starSystem: OverwatchStarSystem): void {
-    navigator.clipboard.writeText(starSystem.Name);
-    this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
-      duration: 2000,
-    });
   }
 
   public updateDataSource(): void {
-    let data = this.dataRaw.filter(d =>
-      typeof this.maelstromsSelected.find(m => m.Name === d.Maelstrom.Name) !== 'undefined' &&
-      typeof this.thargoidLevelsSelected.find(t => t.Level === d.ThargoidLevel.Level) !== 'undefined');
-    if (!this.sort?.active) {
-      this.dataSource.data.sort((system1: OverwatchStarSystem, system2: OverwatchStarSystem) => {
-        if (system1.ThargoidLevel.Level > system2.ThargoidLevel.Level) {
-          return -1;
-        }
-        else if (system1.ThargoidLevel.Level < system2.ThargoidLevel.Level) {
-          return 1;
-        }
-        return system1.Name.localeCompare(system2.Name);
-      });
+    if (this.systemList) {
+      this.systemList.updateDataSource();
     }
-    else {
-      data = this.dataSource.sortData(data, this.sort);
-    }
-    this.dataSource = new MatTableDataSource<OverwatchStarSystem>(data);
-    this.dataSource.sort = this.sort;
-    this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string => {
-      switch (columnName) {
-        case "ThargoidLevel": {
-          return system.ThargoidLevel.Name;
-        }
-        case "Maelstrom": {
-          return system.Maelstrom.Name;
-        }
-      }
-      return system[columnName as keyof OverwatchStarSystem] as string;
-    }
-  
-    this.changeDetectorRef.detectChanges();
   }
 }
 
@@ -109,16 +62,8 @@ interface OverwatchSystems {
   Systems: OverwatchStarSystem[];
 }
 
-interface OverwatchThargoidLevel {
+export interface OverwatchThargoidLevel {
   Level: number;
   Name: string;
 }
 
-export interface OverwatchStarSystem {
-  SystemAddress: number;
-  Name: string;
-  Maelstrom: OverwatchMaelstrom;
-  ThargoidLevel: OverwatchThargoidLevel;
-  Progress: number | null;
-  EffortFocus: number;
-}

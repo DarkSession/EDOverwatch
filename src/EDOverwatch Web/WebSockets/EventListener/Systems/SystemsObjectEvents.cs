@@ -25,7 +25,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
                 {
                     return;
                 }
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystems), await Models.OverwatchSystems.Create(dbContext, cancellationToken));
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystems), await Models.OverwatchStarSystems.Create(dbContext, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

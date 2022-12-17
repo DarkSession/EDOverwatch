@@ -10,7 +10,7 @@ namespace EDOverwatch_Web.Models
         public long SystemAddress { get; }
         public long Amount { get; }
 
-        public CommanderWarEffort(WarEffort warEffort)
+        public CommanderWarEffort(EDDatabase.WarEffort warEffort)
         {
             Date = warEffort.Date;
             Type = warEffort.Type.GetEnumMemberValue();
@@ -33,7 +33,7 @@ namespace EDOverwatch_Web.Models
 
         public static async Task<List<CommanderWarEffort>> Create(EdDbContext dbContext, int commanderId, CancellationToken cancellationToken)
         {
-            List<WarEffort> warEfforts = await dbContext.WarEfforts
+            List<EDDatabase.WarEffort> warEfforts = await dbContext.WarEfforts
                 .AsNoTracking()
                 .Include(w => w.StarSystem)
                 .Where(w => w.CommanderId == commanderId)

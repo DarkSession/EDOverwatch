@@ -1,4 +1,3 @@
-
 table.system-information {
     width: 300px;
 }
@@ -11,4 +10,8 @@ table.system-information {
 
 .number {
     text-align: right;
+}
+
+.thead {
+    background-color: #272727;
 }

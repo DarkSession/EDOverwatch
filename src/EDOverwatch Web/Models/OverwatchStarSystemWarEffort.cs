@@ -9,7 +9,7 @@ namespace EDOverwatch_Web.Models
         public string Source { get; set; }
         public long Amount { get; set; }
 
-        public OverwatchStarSystemWarEffort(WarEffort warEffort)
+        public OverwatchStarSystemWarEffort(EDDatabase.WarEffort warEffort)
         {
             Date = warEffort.Date;
             Type = warEffort.Type.GetEnumMemberValue();

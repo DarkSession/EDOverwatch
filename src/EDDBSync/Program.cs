@@ -52,7 +52,8 @@ namespace EDDBSync
                         EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
                         if (!await dbContext.StarSystems.AnyAsync(s => s.SystemAddress == eddbStarSystem.SystemAddress))
                         {
-                            StarSystem starSystem = new(0, eddbStarSystem.SystemAddress, eddbStarSystem.Name, eddbStarSystem.X, eddbStarSystem.Y, eddbStarSystem.Z, eddbStarSystem.Population ?? 0, false, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+                            long population = eddbStarSystem.Population ?? 0;
+                            StarSystem starSystem = new(0, eddbStarSystem.SystemAddress, eddbStarSystem.Name, eddbStarSystem.X, eddbStarSystem.Y, eddbStarSystem.Z, population, population, false, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
                             starSystem.WarRelevantSystem = starSystem.IsWarRelevantSystem;
                             if (!string.IsNullOrEmpty(eddbStarSystem.Allegiance))
                             {

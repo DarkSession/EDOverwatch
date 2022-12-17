@@ -33,6 +33,7 @@ namespace EDDataProcessor.EDDN
                             break;
                         }
                         bool isNew = false;
+                        long population = Message.Population ?? 0;
                         StarSystem? starSystem = await dbContext.StarSystems
                                                                 .Include(s => s.Allegiance)
                                                                 .Include(s => s.Security)
@@ -46,7 +47,8 @@ namespace EDDataProcessor.EDDN
                                 (decimal)starPos[0],
                                 (decimal)starPos[1],
                                 (decimal)starPos[2],
-                                Message.Population ?? 0,
+                                population,
+                                population,
                                 false,
                                 Message.Timestamp,
                                 Message.Timestamp);
@@ -79,6 +81,11 @@ namespace EDDataProcessor.EDDN
                                     starSystem.Security = starSystemSecurity;
                                     changed = true;
                                 }
+                            }
+                            if (starSystem.Population != population)
+                            {
+                                starSystem.Population = population;
+                                changed = true;
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)

@@ -8,8 +8,9 @@
         public OverwatchThargoidLevel ThargoidLevel { get; }
         public short? Progress { get; }
         public decimal EffortFocus { get; }
+        public int FactionOperations { get; protected set; }
 
-        public OverwatchStarSystem(StarSystem starSystem, decimal effortFocus)
+        public OverwatchStarSystem(StarSystem starSystem, decimal effortFocus, int factionOperations)
         {
             SystemAddress = starSystem.SystemAddress;
             Name = starSystem.Name;
@@ -17,6 +18,7 @@
             ThargoidLevel = new(starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
             Progress = starSystem.ThargoidLevel?.Progress;
             EffortFocus = effortFocus;
+            FactionOperations = factionOperations;
         }
     }
 }
