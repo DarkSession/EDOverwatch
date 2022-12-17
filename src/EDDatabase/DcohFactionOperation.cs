@@ -1,4 +1,6 @@
-﻿namespace EDDatabase
+﻿using System.Runtime.Serialization;
+
+namespace EDDatabase
 {
     [Table("DcohFactionOperation")]
     public class DcohFactionOperation
@@ -21,23 +23,25 @@
         [Column]
         public DateTimeOffset Created { get; set; }
 
-        [Column]
-        public ulong CreatedBy { get; set; }
+        [ForeignKey("CreatedById")]
+        public DcohDiscordUser? CreatedBy { get; set; }
 
-        public DcohFactionOperation(int id, DcohFactionOperationType type, DcohFactionOperationStatus status, DateTimeOffset created, ulong createdBy)
+        public DcohFactionOperation(int id, DcohFactionOperationType type, DcohFactionOperationStatus status, DateTimeOffset created)
         {
             Id = id;
             Type = type;
             Status = status;
             Created = created;
-            CreatedBy = createdBy;
         }
     }
 
     public enum DcohFactionOperationType : byte
     {
+        Unknown = 0,
+        [EnumMember(Value = "AX Combat")]
         AXCombat,
         Rescue,
+        Logistics,
     }
 
     public enum DcohFactionOperationStatus

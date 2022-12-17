@@ -3,6 +3,7 @@ using System;
 using EDDatabase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDDatabase.Migrations
 {
     [DbContext(typeof(EdDbContext))]
-    partial class EdDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221217190115_DiscordBotPart1")]
+    partial class DiscordBotPart1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,31 +222,6 @@ namespace EDDatabase.Migrations
                     b.ToTable("CommanderMission");
                 });
 
-            modelBuilder.Entity("EDDatabase.DcohDiscordUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<ulong>("DiscordId")
-                        .HasColumnType("bigint unsigned");
-
-                    b.Property<int?>("FactionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("FactionJoined")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DiscordId")
-                        .IsUnique();
-
-                    b.HasIndex("FactionId");
-
-                    b.ToTable("DcohDiscordUser");
-                });
-
             modelBuilder.Entity("EDDatabase.DcohFaction", b =>
                 {
                     b.Property<int>("Id")
@@ -307,6 +285,31 @@ namespace EDDatabase.Migrations
                     b.HasIndex("StarSystemId");
 
                     b.ToTable("DcohFactionOperation");
+                });
+
+            modelBuilder.Entity("EDDatabase.DochDiscordUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<ulong>("DiscordId")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<int?>("FactionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("FactionJoined")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscordId")
+                        .IsUnique();
+
+                    b.HasIndex("FactionId");
+
+                    b.ToTable("DochDiscordUser");
                 });
 
             modelBuilder.Entity("EDDatabase.Economy", b =>
@@ -787,18 +790,9 @@ namespace EDDatabase.Migrations
                     b.Navigation("System");
                 });
 
-            modelBuilder.Entity("EDDatabase.DcohDiscordUser", b =>
-                {
-                    b.HasOne("EDDatabase.DcohFaction", "Faction")
-                        .WithMany()
-                        .HasForeignKey("FactionId");
-
-                    b.Navigation("Faction");
-                });
-
             modelBuilder.Entity("EDDatabase.DcohFaction", b =>
                 {
-                    b.HasOne("EDDatabase.DcohDiscordUser", "CreatedBy")
+                    b.HasOne("EDDatabase.DochDiscordUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
@@ -807,7 +801,7 @@ namespace EDDatabase.Migrations
 
             modelBuilder.Entity("EDDatabase.DcohFactionOperation", b =>
                 {
-                    b.HasOne("EDDatabase.DcohDiscordUser", "CreatedBy")
+                    b.HasOne("EDDatabase.DochDiscordUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
@@ -824,6 +818,15 @@ namespace EDDatabase.Migrations
                     b.Navigation("Faction");
 
                     b.Navigation("StarSystem");
+                });
+
+            modelBuilder.Entity("EDDatabase.DochDiscordUser", b =>
+                {
+                    b.HasOne("EDDatabase.DcohFaction", "Faction")
+                        .WithMany()
+                        .HasForeignKey("FactionId");
+
+                    b.Navigation("Faction");
                 });
 
             modelBuilder.Entity("EDDatabase.StarSystem", b =>

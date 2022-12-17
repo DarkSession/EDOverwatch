@@ -1,6 +1,7 @@
 ﻿namespace EDDatabase
 {
     [Table("DcohFaction")]
+    [Index(nameof(Short), IsUnique = true)]
     public class DcohFaction
     {
         [Column]
@@ -15,16 +16,15 @@
         [Column]
         public DateTimeOffset Created { get; set; }
 
-        [Column]
-        public ulong CreatedBy { get; set; }
+        [ForeignKey("CreatedById")]
+        public DcohDiscordUser? CreatedBy { get; set; }
 
-        public DcohFaction(int id, string name, string @short, DateTimeOffset created, ulong createdBy)
+        public DcohFaction(int id, string name, string @short, DateTimeOffset created)
         {
             Id = id;
             Name = name;
             Short = @short;
             Created = created;
-            CreatedBy = createdBy;
         }
     }
 }

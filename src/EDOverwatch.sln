@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EDUtils", "EDUtils\EDUtils.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EDCApi", "EDCApi\EDCApi.csproj", "{DCF2C769-5A3D-456C-B95B-669201858539}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestEvents", "TestEvents\TestEvents.csproj", "{11A7D130-740B-4949-8F6A-F439793C5EB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestEvents", "TestEvents\TestEvents.csproj", "{11A7D130-740B-4949-8F6A-F439793C5EB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCoHTrackerDiscordBot", "DCoHTrackerDiscordBot\DCoHTrackerDiscordBot.csproj", "{A5AA2B52-09BB-424C-8FA1-F79219BE0BB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{11A7D130-740B-4949-8F6A-F439793C5EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11A7D130-740B-4949-8F6A-F439793C5EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11A7D130-740B-4949-8F6A-F439793C5EB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5AA2B52-09BB-424C-8FA1-F79219BE0BB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5AA2B52-09BB-424C-8FA1-F79219BE0BB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5AA2B52-09BB-424C-8FA1-F79219BE0BB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5AA2B52-09BB-424C-8FA1-F79219BE0BB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

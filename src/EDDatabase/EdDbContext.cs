@@ -12,6 +12,7 @@ namespace EDDatabase
         public DbSet<CommanderDeferredJournalEvent> CommanderDeferredJournalEvents { get; set; }
         public DbSet<CommanderMission> CommanderMissions { get; set; }
 
+        public DbSet<DcohDiscordUser> DcohDiscordUsers { get; set; }
         public DbSet<DcohFaction> DcohFactions { get; set; }
         public DbSet<DcohFactionOperation> DcohFactionOperations { get; set; }
 
