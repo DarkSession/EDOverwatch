@@ -25,7 +25,26 @@ jobs:
       run: dotnet restore
     - name: Build
       working-directory: ./src
-      run: dotnet build --no-restore
+      run: |
+        dotnet build -c Release --no-restore
+        dotnet publish -c Release
     - name: Test
       working-directory: ./src
       run: dotnet test --no-build --verbosity normal
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Web-UI
+        path: 'src/EDOverwatch Web/bin/Release/net7.0'
+    - uses: actions/upload-artifact@v3
+      with:
+        name: EDDataProcessor
+        path: 'src/EDDataProcessor/bin/Release/net7.0'
+    - uses: actions/upload-artifact@v3
+      with:
+        name: EDDNClient
+        path: 'src/EDDNClient/bin/Release/net7.0'
+    - uses: actions/upload-artifact@v3
+      with:
+        name: EDOverwatch
+        path: 'src/EDOverwatch/bin/Release/net7.0'
+        
