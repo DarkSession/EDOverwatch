@@ -1,6 +1,8 @@
-﻿using Discord.Interactions;
+﻿using Discord.Commands;
+using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace DCoHTrackerDiscordBot
@@ -34,11 +36,13 @@ namespace DCoHTrackerDiscordBot
 
             // Process the InteractionCreated payloads to execute Interactions commands
             Client.InteractionCreated += HandleInteraction;
+
+            Client.MessageReceived += MessageReceivedAsync;
         }
 
         private Task LogAsync(LogMessage log) => Events.Log.LogAsync(log);
 
-        private async Task InteractionExecuted(ICommandInfo commandInfo, IInteractionContext interactionContext, IResult result)
+        private async Task InteractionExecuted(ICommandInfo commandInfo, IInteractionContext interactionContext, Discord.Interactions.IResult result)
         {
             await HandleInteractionResult(interactionContext.Interaction, result);
         }
@@ -57,7 +61,7 @@ namespace DCoHTrackerDiscordBot
             }
         }
 
-        private static async ValueTask HandleInteractionResult(IDiscordInteraction interaction, IResult result)
+        private static async ValueTask HandleInteractionResult(IDiscordInteraction interaction, Discord.Interactions.IResult result)
         {
             if (!result.IsSuccess)
             {
@@ -80,7 +84,7 @@ namespace DCoHTrackerDiscordBot
                 SocketInteractionContext context = new(Client, interaction);
 
                 // Execute the incoming command.
-                IResult result = await Handler.ExecuteCommandAsync(context, Services);
+                Discord.Interactions.IResult result = await Handler.ExecuteCommandAsync(context, Services);
 
                 await HandleInteractionResult(interaction, result);
             }
@@ -102,6 +106,19 @@ namespace DCoHTrackerDiscordBot
                     }
                 }
             }
+        }
+
+        public async Task MessageReceivedAsync(SocketMessage rawMessage)
+        {
+            // Ignore system messages, or messages from other bots
+            if (rawMessage is not SocketUserMessage message || message.Source != MessageSource.User)
+            {
+                return;
+            }
+
+            await using AsyncServiceScope scope = Services.CreateAsyncScope();
+            MessagesHandler messagesHandler = scope.ServiceProvider.GetRequiredService<MessagesHandler>();
+            await messagesHandler.ProcessMessage(message);
         }
     }
 }

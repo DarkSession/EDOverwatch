@@ -19,7 +19,7 @@ namespace DCoHTrackerDiscordBot
         public static IServiceProvider? Services { get; private set; }
         private static DiscordSocketConfig SocketConfig { get; } = new()
         {
-            GatewayIntents = GatewayIntents.AllUnprivileged,
+            GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent,
         };
         private static InteractionServiceConfig InteractionServiceConfig { get; } = new()
         {
@@ -51,6 +51,7 @@ namespace DCoHTrackerDiscordBot
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()
+                .AddScoped<MessagesHandler>()
                 .BuildServiceProvider();
 
             Log = Services.GetRequiredService<ILogger<Program>>();

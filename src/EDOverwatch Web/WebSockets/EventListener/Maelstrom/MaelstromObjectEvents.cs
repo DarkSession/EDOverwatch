@@ -37,7 +37,6 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Maelstrom
             }
 
             StarSystem? starSystem = await dbContext.StarSystems
-                .AsNoTracking()
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .FirstOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);

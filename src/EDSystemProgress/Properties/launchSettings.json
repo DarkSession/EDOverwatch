@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EDSystemProgress": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

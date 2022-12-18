@@ -1,0 +1,473 @@
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using Tesseract;
+
+namespace EDSystemProgress
+{
+    public static class SystemProgressRecognition
+    {
+        private static List<ColorRange> InvasionProgressColors { get; } = new()
+        {
+            new ColorRange(80, 190, 15, 60, 105, 255),
+            new ColorRange(235, 255, 235, 255, 235, 255),
+        };
+
+        private static List<ColorRange> InvasionRemainingColors { get; } = new()
+        {
+            new ColorRange(30, 70, 40, 100, 0, 10),
+        };
+
+        private static List<ColorRange> AlertProgressColors { get; } = new()
+        {
+            new ColorRange(160, 180, 160, 180, 160, 180),
+            new ColorRange(170, 190, 170, 190, 170, 190),
+            new ColorRange(180, 200, 180, 200, 180, 200),
+            new ColorRange(190, 210, 190, 210, 190, 210),
+            new ColorRange(200, 220, 200, 220, 200, 220),
+            new ColorRange(210, 230, 210, 230, 210, 230),
+            new ColorRange(220, 240, 220, 240, 220, 240),
+            new ColorRange(230, 255, 230, 255, 230, 255),
+        };
+
+        private static List<ColorRange> AlertRemainingColors { get; } = new()
+        {
+            new ColorRange(120, 150, 50, 70, 0, 5),
+        };
+
+        public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent)
+        {
+            byte[] file = imageContent.ToArray();
+
+            using TesseractEngine engine = new("tessdata", "eng", EngineMode.Default, "config");
+            engine.SetVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijlmnopqrstuvwxyz01234567890:.- ");
+
+            using Pix img = Pix.LoadFromMemory(file);
+            using Page page = engine.Process(img);
+
+            using ResultIterator iter = page.GetIterator();
+
+            iter.Begin();
+
+            int paragraphNumber = 0;
+            int paragraphLineNumber = 0;
+            ImageProcessingStep processingStep = ImageProcessingStep.WaitForTitle;
+
+            string systemName = string.Empty;
+            string remainingTime = string.Empty;
+            SystemStatus systemStatus = SystemStatus.Unknown;
+            decimal progress = 0;
+            decimal remaining = 0;
+
+            int progressBarUpperY = 0;
+            int progressBarLowerY = 0;
+
+            do
+            {
+                do
+                {
+                    do
+                    {
+#if DEBUG
+                        if (iter.IsAtBeginningOf(PageIteratorLevel.Block))
+                        {
+                            Console.WriteLine("<BLOCK>");
+                        }
+#endif
+                        string text = iter.GetText(PageIteratorLevel.TextLine).Trim();
+#if DEBUG
+                        bool isFromDict = iter.GetWordIsFromDictionary();
+                        Console.Write($"Text: [{text} {isFromDict}]");
+                        Console.Write(" ");
+#endif
+
+                        switch (processingStep)
+                        {
+                            case ImageProcessingStep.WaitForTitle:
+                                {
+                                    if (text.Contains("THARGOID WAR INFORMATION"))
+                                    {
+                                        processingStep = ImageProcessingStep.SystemName;
+                                    }
+                                    break;
+                                }
+                            case ImageProcessingStep.SystemName:
+                                {
+                                    if (paragraphLineNumber == 1)
+                                    {
+                                        if (text.Contains("THARGOID WAR"))
+                                        {
+                                            systemName = "INVALID";
+                                        }
+                                        else
+                                        {
+                                            systemName = text;
+                                        }
+                                        processingStep = ImageProcessingStep.NextStep;
+                                    }
+                                    break;
+                                }
+                            case ImageProcessingStep.NextStep:
+                                {
+                                    if (paragraphNumber >= 2)
+                                    {
+                                        if (text.Contains("THARGOID INFESTATION IN"))
+                                        {
+                                            remainingTime = text;
+                                            systemStatus = SystemStatus.InvasionInProgress;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
+                                        else if (text.Contains("THARGOID CONTROL PREVENTED"))
+                                        {
+                                            systemStatus = SystemStatus.InvasionPrevented;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
+                                        else if (text.Contains("INCURSION THREAT IN"))
+                                        {
+                                            remainingTime = text;
+                                            systemStatus = SystemStatus.AlertInProgress;
+                                            processingStep = ImageProcessingStep.BelowProgressBar;
+                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                            {
+                                                progressBarUpperY = bounds.Y2;
+                                            }
+                                        }
+                                        else if (text.Contains("HUMAN CONTROL MAINTAINED"))
+                                        {
+                                            systemStatus = SystemStatus.AlertPrevented;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
+                                        else if (text.Contains("RECAPTURE ATTEMPT"))
+                                        {
+                                            remainingTime = text;
+                                            systemStatus = SystemStatus.ThargoidControlled;
+                                            processingStep = ImageProcessingStep.BelowProgressBar;
+                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                            {
+                                                progressBarUpperY = bounds.Y2;
+                                            }
+                                        }
+                                        else if (text.Contains("RECOVERY COMPLETE IN"))
+                                        {
+                                            remainingTime = text;
+                                            systemStatus = SystemStatus.Recovery;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
+                                    }
+                                    break;
+                                }
+                            case ImageProcessingStep.AboveProgressBar:
+                                {
+                                    bool match = false;
+                                    switch (systemStatus)
+                                    {
+                                        case SystemStatus.InvasionInProgress:
+                                            {
+                                                match = text.Contains("ACTIVE PORTS REMAINING");
+                                                break;
+                                            }
+                                        case SystemStatus.InvasionPrevented:
+                                            {
+                                                match = text.Contains("ACTIVE PORTS REMAINING");
+                                                if (!match && text.Contains("BEGINS"))
+                                                {
+                                                    remainingTime = text;
+                                                }
+                                                break;
+                                            }
+                                        case SystemStatus.AlertPrevented:
+                                            {
+                                                match = text.Contains("WITHDRAWAL");
+                                                remainingTime = text;
+                                                break;
+                                            }
+                                        case SystemStatus.Recovery:
+                                            {
+                                                match = text.Contains("INACTIVE PORTS");
+                                                break;
+                                            }
+                                    }
+                                    if (match)
+                                    {
+                                        if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                        {
+                                            progressBarUpperY = bounds.Y2;
+                                        }
+                                        processingStep = ImageProcessingStep.BelowProgressBar;
+                                    }
+                                    break;
+                                }
+                            case ImageProcessingStep.BelowProgressBar:
+                                {
+                                    bool match = false;
+                                    switch (systemStatus)
+                                    {
+                                        case SystemStatus.InvasionInProgress:
+                                        case SystemStatus.AlertInProgress:
+                                            {
+                                                match = text.Contains("DELIVER SUPPLIES") || text.Contains("JLENVETCNE");
+                                                break;
+                                            }
+                                        case SystemStatus.InvasionPrevented:
+                                            {
+                                                match = text.Contains("POST-THARGOID RECOVER") || text.Contains("POST THARGOID RECOVER");
+                                                break;
+                                            }
+                                        case SystemStatus.AlertPrevented:
+                                            {
+                                                match = text.Contains("HUMAN CONTROLLED");
+                                                break;
+                                            }
+                                        case SystemStatus.ThargoidControlled:
+                                            {
+                                                match = text.Contains("DESTROY THARGOID");
+                                                break;
+                                            }
+                                        case SystemStatus.Recovery:
+                                            {
+                                                match = text.Contains("DELIVER");
+                                                break;
+                                            }
+                                    }
+                                    if (match)
+                                    {
+                                        if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                        {
+                                            progressBarLowerY = bounds.Y1;
+                                        }
+                                        processingStep = ImageProcessingStep.Completed;
+                                    }
+                                    break;
+                                }
+                        }
+#if DEBUG
+                        if (iter.IsAtFinalOf(PageIteratorLevel.Para, PageIteratorLevel.TextLine))
+                        {
+                            Console.WriteLine("---");
+                        }
+#endif
+                        paragraphLineNumber++;
+                    } while (iter.Next(PageIteratorLevel.Para, PageIteratorLevel.TextLine));
+                    paragraphNumber++;
+                    paragraphLineNumber = 0;
+                } while (iter.Next(PageIteratorLevel.Block, PageIteratorLevel.Para));
+            } while (iter.Next(PageIteratorLevel.Block));
+
+            progressBarUpperY += 20;
+            progressBarLowerY -= 10;
+
+#if DEBUG
+            Console.WriteLine("systemName: " + systemName);
+            Console.WriteLine("remainingTime: " + remainingTime);
+            Console.WriteLine("progressBarUpperY: " + progressBarUpperY);
+            Console.WriteLine("progressBarLowerY: " + progressBarLowerY);
+#endif
+            bool success = (processingStep == ImageProcessingStep.Completed);
+            if (success)
+            {
+                List<ColorRange> progressColors = systemStatus switch
+                {
+                    SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionProgressColors,
+                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgress => AlertProgressColors,
+                    SystemStatus.ThargoidControlled => InvasionProgressColors,
+                    SystemStatus.Recovery => AlertProgressColors,
+                    _ => throw new NotImplementedException(),
+                };
+                List<ColorRange> remainingColors = systemStatus switch
+                {
+                    SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionRemainingColors,
+                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgress => AlertRemainingColors,
+                    SystemStatus.ThargoidControlled => InvasionRemainingColors,
+                    SystemStatus.Recovery => InvasionProgressColors,
+                    _ => throw new NotImplementedException(),
+                };
+
+                int pixelsProgress = 0;
+                int pixelsRemaining = 0;
+
+                using Image<Rgba32> image = await Image.LoadAsync<Rgba32>(imageContent);
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = progressBarUpperY; y < progressBarLowerY; y++)
+                    {
+                        Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
+                        // pixelRow.Length has the same value as accessor.Width,
+                        // but using pixelRow.Length allows the JIT to optimize away bounds checks:
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            // Get a reference to the pixel at position x
+                            ref Rgba32 pixel = ref pixelRow[x];
+
+                            foreach (ColorRange progressColor in progressColors)
+                            {
+                                if (progressColor.IsInRange(pixel))
+                                {
+                                    pixel.R = 255;
+                                    pixel.G = 0;
+                                    pixel.B = 0;
+                                    pixelsProgress++;
+                                    break;
+                                }
+                            }
+                            foreach (ColorRange remainingColor in remainingColors)
+                            {
+                                if (remainingColor.IsInRange(pixel))
+                                {
+                                    pixel.R = 0;
+                                    pixel.G = 255;
+                                    pixel.B = 0;
+                                    pixelsRemaining++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+#if DEBUG
+                await image.SaveAsPngAsync($"test_result{Guid.NewGuid()}.png");
+#endif
+                int progressRemainingPixels = pixelsProgress + pixelsRemaining;
+                if (progressRemainingPixels > 1000)
+                {
+                    progress = Math.Round((decimal)pixelsProgress / (decimal)progressRemainingPixels * 100, 0);
+                    remaining = Math.Round((decimal)pixelsRemaining / (decimal)progressRemainingPixels * 100, 0);
+#if DEBUG
+                    Console.WriteLine($"progress: {progress}% ({pixelsProgress}/{progressRemainingPixels})");
+                    Console.WriteLine($"remaining: {remaining}% ({pixelsRemaining}/{progressRemainingPixels})");
+#endif
+                }
+                else
+                {
+                    success = false;
+                }
+            }
+
+            if (SystemNameCorrections.TryGetValue(systemName, out string? newSystemName))
+            {
+                systemName = newSystemName;
+            }
+            TimeSpan remTime = TimeSpan.Zero;
+            if (!string.IsNullOrEmpty(remainingTime))
+            {
+                Regex r = new(@"IN ((\d{0,1})W|)\s{0,}((\d{0,1})D|)$", RegexOptions.IgnoreCase);
+                Match m = r.Match(remainingTime);
+                if (m.Success)
+                {
+                    string? weeksStr = m.Groups[2]?.Value;
+                    string? daysStr = m.Groups[4]?.Value;
+
+                    int days = 0;
+                    if (!string.IsNullOrEmpty(weeksStr))
+                    {
+                        days += int.Parse(weeksStr) * 7;
+                    }
+                    if (!string.IsNullOrEmpty(daysStr))
+                    {
+                        days += int.Parse(daysStr);
+                    }
+                    remTime = new(days, 0, 0, 0);
+                }
+            }
+
+            return new ExtractSystemProgressResult(
+                success,
+                systemName,
+                systemStatus,
+                progress,
+                remaining,
+                remTime);
+        }
+
+        // I had a hard time configuring Tesseract to use my word lists, but no success.
+        // So...
+        private static Dictionary<string, string> SystemNameCorrections { get; } = new()
+        {
+            { "WZTN", "AWARA" },
+            { "S:108", "EBISU" },
+            { "SERlIsZN", "63 ERIDANI" },
+            { "VAL", "VUKURBEH" },
+            { "OBASSI 0SAW", "OBASSI OSAW" },
+            { "ARIETIS SECTOR AG-P B5-0", "ARIETIS SECTOR AQ-P B5-0" },
+        };
+    }
+
+    public class ColorRange
+    {
+        public int RLow { get; }
+        public int RHigh { get; }
+        public int GLow { get; }
+        public int GHigh { get; }
+        public int BLow { get; }
+        public int BHigh { get; }
+
+        public ColorRange(int rLow, int rHigh, int gLow, int gHigh, int bLow, int bHigh)
+        {
+            RLow = rLow;
+            RHigh = rHigh;
+            GLow = gLow;
+            GHigh = gHigh;
+            BLow = bLow;
+            BHigh = bHigh;
+        }
+
+        public bool IsInRange(Rgba32 pixelColor)
+        {
+            return (
+                pixelColor.R >= RLow &&
+                pixelColor.R <= RHigh &&
+                pixelColor.G >= GLow &&
+                pixelColor.G <= GHigh &&
+                pixelColor.B >= BLow &&
+                pixelColor.B <= BHigh);
+        }
+    }
+
+    internal enum ImageProcessingStep
+    {
+        WaitForTitle,
+        SystemName,
+        NextStep,
+        AboveProgressBar,
+        BelowProgressBar,
+        Completed,
+    }
+
+    public enum SystemStatus
+    {
+        Unknown,
+        [EnumMember(Value = "Thargoid invasion")]
+        InvasionInProgress,
+        [EnumMember(Value = "Thargoid invasion prevented")]
+        InvasionPrevented,
+        [EnumMember(Value = "Thargoid alert")]
+        AlertInProgress,
+        [EnumMember(Value = "Thargoid alert prevented")]
+        AlertPrevented,
+        [EnumMember(Value = "Thargoid controlled")]
+        ThargoidControlled,
+        [EnumMember(Value = "Recovery")]
+        Recovery,
+    }
+
+    public readonly struct ExtractSystemProgressResult
+    {
+        public bool Success { get; }
+        public string SystemName { get; }
+        public SystemStatus SystemStatus { get; }
+        // public string SystemStatus { get; }
+        public decimal Progress { get; }
+        public decimal Remaining { get; }
+        public TimeSpan RemainingTime { get; }
+
+        public ExtractSystemProgressResult(bool success, string systemName, SystemStatus systemStatus, decimal progress, decimal remaining, TimeSpan remainingTime)
+        {
+            Success = success;
+            SystemName = systemName;
+            SystemStatus = systemStatus;
+            Progress = progress;
+            Remaining = remaining;
+            RemainingTime = remainingTime;
+        }
+    }
+}

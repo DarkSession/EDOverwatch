@@ -27,7 +27,10 @@ namespace DCoHTrackerDiscordBot.Module
         }
 
         [SlashCommand("update", "Update the focus of your sqadrons activities")]
-        public async Task Update([Summary("Operation", "Operation Type")] OperationType operation, [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
+        public async Task Update(
+            [Summary("Operation", "Operation Type")] OperationType operation,
+            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
+            [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
         {
             if (!await CheckElevatedGuild())
             {
@@ -84,11 +87,14 @@ namespace DCoHTrackerDiscordBot.Module
             };
             DbContext.DcohFactionOperations.Add(factionOperation);
             await DbContext.SaveChangesAsync();
-            await FollowupAsync($"Registered {type.GetEnumMemberValue()} operation by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
+            await FollowupAsync($"Registered {type.GetEnumMemberValue()} operations by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
         }
 
         [SlashCommand("view", "View operation by type")]
-        public async Task View([Summary("Operation", "Operation Type")] OperationType? operation = null, [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null)
+        public async Task View(
+            [Summary("Operation", "Operation Type")] OperationType? operation = null, 
+            [Summary("Maelstrom", "Maelstrom"), 
+            Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null)
         {
             await DeferAsync(true);
 
