@@ -38,6 +38,7 @@ import { MaelstromComponent } from './components/maelstrom/maelstrom.component';
 import { MaelstromNameComponent } from './components/maelstrom-name/maelstrom-name.component';
 import { SystemListComponent } from './components/system-list/system-list.component';
 import { NgChartsModule } from 'ng2-charts';
+import { FaqComponent } from './components/faq/faq.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -60,6 +61,7 @@ export const httpInterceptorProviders = [
     MaelstromComponent,
     MaelstromNameComponent,
     SystemListComponent,
+    FaqComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -94,6 +96,10 @@ export const httpInterceptorProviders = [
         component: ConsumerApiComponent,
       },
       {
+        path: 'faq',
+        component: FaqComponent,
+      },
+      {
         path: 'get-involved',
         component: GetInvolvedComponent
       },
@@ -124,7 +130,7 @@ export const httpInterceptorProviders = [
         component: HomeComponent
       },
     ]),
-      NgChartsModule,
+    NgChartsModule,
   ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]

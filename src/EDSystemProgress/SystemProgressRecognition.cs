@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
@@ -36,8 +37,11 @@ namespace EDSystemProgress
             new ColorRange(120, 150, 50, 70, 0, 5),
         };
 
-        public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent)
+        public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent, ILogger log)
         {
+            Guid fileId = Guid.NewGuid();
+            log.LogDebug("Starting analysis of file ({fileSize}). Id: {Id}", imageContent.Length, fileId);
+
             byte[] file = imageContent.ToArray();
 
             using TesseractEngine engine = new("tessdata", "eng", EngineMode.Default, "config");
@@ -69,18 +73,13 @@ namespace EDSystemProgress
                 {
                     do
                     {
-#if DEBUG
                         if (iter.IsAtBeginningOf(PageIteratorLevel.Block))
                         {
-                            Console.WriteLine("<BLOCK>");
+                            log.LogDebug("Start of new block");
                         }
-#endif
                         string text = iter.GetText(PageIteratorLevel.TextLine).Trim();
-#if DEBUG
-                        bool isFromDict = iter.GetWordIsFromDictionary();
-                        Console.Write($"Text: [{text} {isFromDict}]");
-                        Console.Write(" ");
-#endif
+
+                        log.LogDebug("Text: {text}", text);
 
                         switch (processingStep)
                         {
@@ -241,12 +240,10 @@ namespace EDSystemProgress
                                     break;
                                 }
                         }
-#if DEBUG
                         if (iter.IsAtFinalOf(PageIteratorLevel.Para, PageIteratorLevel.TextLine))
                         {
-                            Console.WriteLine("---");
+                            log.LogDebug("End of para");
                         }
-#endif
                         paragraphLineNumber++;
                     } while (iter.Next(PageIteratorLevel.Para, PageIteratorLevel.TextLine));
                     paragraphNumber++;
@@ -257,12 +254,8 @@ namespace EDSystemProgress
             progressBarUpperY += 20;
             progressBarLowerY -= 10;
 
-#if DEBUG
-            Console.WriteLine("systemName: " + systemName);
-            Console.WriteLine("remainingTime: " + remainingTime);
-            Console.WriteLine("progressBarUpperY: " + progressBarUpperY);
-            Console.WriteLine("progressBarLowerY: " + progressBarLowerY);
-#endif
+            log.LogInformation("{id}: processingStep: {processingStep} systemName: {systemName} remainingTime: {remainingTime} progressBarUpperY: {progressBarUpperY} progressBarLowerY: {progressBarLowerY}", fileId, processingStep, systemName, remainingTime, progressBarUpperY, progressBarLowerY);
+
             bool success = (processingStep == ImageProcessingStep.Completed && systemName != "INVALID");
             if (success)
             {
@@ -332,10 +325,8 @@ namespace EDSystemProgress
                 {
                     progress = Math.Round((decimal)pixelsProgress / (decimal)progressRemainingPixels * 100, 0);
                     remaining = Math.Round((decimal)pixelsRemaining / (decimal)progressRemainingPixels * 100, 0);
-#if DEBUG
-                    Console.WriteLine($"progress: {progress}% ({pixelsProgress}/{progressRemainingPixels})");
-                    Console.WriteLine($"remaining: {remaining}% ({pixelsRemaining}/{progressRemainingPixels})");
-#endif
+                    log.LogDebug("progress: {progress}% ({pixelsProgress}/{progressRemainingPixels})", progress, pixelsProgress, progressRemainingPixels);
+                    log.LogDebug("remaining: {remaining}% ({pixelsRemaining}/{progressRemainingPixels})", remaining, pixelsRemaining, progressRemainingPixels);
                 }
                 else
                 {
@@ -385,6 +376,7 @@ namespace EDSystemProgress
         {
             { "WZTN", "AWARA" },
             { "S:108", "EBISU" },
+            { "2:1E0", "EBISU" },
             { "SERlIsZN", "63 ERIDANI" },
             { "VAL", "VUKURBEH" },
             { "OBASSI 0SAW", "OBASSI OSAW" },
