@@ -263,7 +263,7 @@ namespace EDSystemProgress
             Console.WriteLine("progressBarUpperY: " + progressBarUpperY);
             Console.WriteLine("progressBarLowerY: " + progressBarLowerY);
 #endif
-            bool success = (processingStep == ImageProcessingStep.Completed);
+            bool success = (processingStep == ImageProcessingStep.Completed && systemName != "INVALID");
             if (success)
             {
                 List<ColorRange> progressColors = systemStatus switch

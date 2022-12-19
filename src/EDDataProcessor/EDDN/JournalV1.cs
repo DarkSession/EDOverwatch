@@ -211,7 +211,7 @@ namespace EDDataProcessor.EDDN
                             await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
                             {
-                                // await activeMqProducer.SendAsync("Station.Updated", new(JsonConvert.SerializeObject(new StationUpdated(Message.MarketID, Message.SystemAddress))), transaction, cancellationToken);
+                                await activeMqProducer.SendAsync(StationUpdated.QueueName, StationUpdated.Routing, new Message(JsonConvert.SerializeObject(new StationUpdated(Message.MarketID, Message.SystemAddress))), activeMqTransaction, cancellationToken);
                             }
                         }
                         break;

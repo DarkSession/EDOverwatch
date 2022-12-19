@@ -179,30 +179,53 @@ namespace DCoHTrackerDiscordBot.Module
             };
         }
 
-        public static List<string> Systems { get; set; } = new();
+        public static Dictionary<string, List<string>> Systems { get; set; } = new();
         public static async Task UpdateSystems(EdDbContext dbContext)
         {
-            Systems = await dbContext.StarSystems
+            Dictionary<string, List<string>> systems = new();
+            List<StarSystem> starSystems = await dbContext.StarSystems
                 .AsNoTracking()
+                .Include(s => s.ThargoidLevel)
+                .ThenInclude(t => t!.Maelstrom)
                 .Where(s => s.ThargoidLevel != null &&
                     s.ThargoidLevel.Maelstrom != null &&
                     s.ThargoidLevel.State > StarSystemThargoidLevelState.None)
-                .Select(s => s.Name)
-                .OrderBy(n => n)
                 .ToListAsync();
+            foreach (StarSystem starSystem in starSystems)
+            {
+                if (starSystem.ThargoidLevel?.Maelstrom is null)
+                {
+                    continue;
+                }
+                if (systems.TryGetValue(starSystem.ThargoidLevel.Maelstrom.Name, out List<string>? systemList))
+                {
+                    systemList.Add(starSystem.Name);
+                }
+                else
+                {
+                    systems[starSystem.ThargoidLevel.Maelstrom.Name] = new() { starSystem.Name };
+                }
+            }
+            Systems = systems;
         }
 
         public class StarSystemAutocompleteHandler : AutocompleteHandler
         {
             public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
             {
-                IEnumerable<string> systems = Systems;
+                string? maelstrom = autocompleteInteraction.Data.Options.FirstOrDefault(o => o.Name == "maelstrom")?.Value as string;
+                if (string.IsNullOrEmpty(maelstrom) || !Systems.TryGetValue(maelstrom, out List<string>? systemList))
+                {
+                    return Task.FromResult(AutocompletionResult.FromError(InteractionCommandError.BadArgs, "Maelstrom not found"));
+                }
+                IEnumerable<string> systems = systemList.OrderBy(s => s);
                 if (autocompleteInteraction.Data.Current.Value is string value)
                 {
                     value = value.Trim().ToLower();
                     if (value.Length > 0)
                     {
-                        systems = systems.Where(s => s.ToLower().StartsWith(value));
+                        systems = systems
+                            .Where(s => s.ToLower().StartsWith(value));
                     }
                 }
                 // max - 25 suggestions at a time (API limit)
