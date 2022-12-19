@@ -1,4 +1,5 @@
 using EDSystemProgress;
+using Microsoft.Extensions.Logging;
 
 namespace EDSystemProgressTest
 {
@@ -19,13 +20,16 @@ namespace EDSystemProgressTest
         [DataRow("image11.png", "HIP 23716", SystemStatus.Recovery, 14d, 24)]
         public async Task Test(string fileName, string systemName, SystemStatus systemStatus, double progress, int remainingDays)
         {
+            using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            ILogger log = loggerFactory.CreateLogger<ProgressTests>();
+
             await using MemoryStream imageContent = new();
             {
                 await using FileStream fileStream = File.OpenRead($"./test/{fileName}");
                 await fileStream.CopyToAsync(imageContent);
                 imageContent.Position = 0;
             }
-            ExtractSystemProgressResult result = await SystemProgressRecognition.ExtractSystemProgress(imageContent);
+            ExtractSystemProgressResult result = await SystemProgressRecognition.ExtractSystemProgress(imageContent, log);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(systemName, result.SystemName);
             Assert.AreEqual(systemStatus, result.SystemStatus);

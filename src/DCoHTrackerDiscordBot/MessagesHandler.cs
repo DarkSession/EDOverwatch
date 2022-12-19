@@ -9,10 +9,12 @@ namespace DCoHTrackerDiscordBot
     {
         private EdDbContext DbContext { get; }
         private IConfiguration Configuration { get; }
-        public MessagesHandler(EdDbContext dbContext, IConfiguration configuration)
+        private ILogger Log { get; }
+        public MessagesHandler(EdDbContext dbContext, IConfiguration configuration, ILogger<MessagesHandler> log)
         {
             DbContext = dbContext;
             Configuration = configuration;
+            Log = log;
         }
 
         public async ValueTask ProcessMessage(SocketUserMessage message)
@@ -40,7 +42,7 @@ namespace DCoHTrackerDiscordBot
                             if (imageContent.Length == attachment.Size)
                             {
                                 imageContent.Position = 0;
-                                ExtractSystemProgressResult result = await SystemProgressRecognition.ExtractSystemProgress(imageContent);
+                                ExtractSystemProgressResult result = await SystemProgressRecognition.ExtractSystemProgress(imageContent, Log);
                                 if (result.Success)
                                 {
                                     embed.AddField("System Name", Format.Sanitize(result.SystemName));
