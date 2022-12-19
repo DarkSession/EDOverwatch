@@ -205,7 +205,7 @@ namespace EDSystemProgress
                                         case SystemStatus.InvasionInProgress:
                                         case SystemStatus.AlertInProgress:
                                             {
-                                                match = text.Contains("DELIVER SUPPLIES") || text.Contains("JLENVETCNE");
+                                                match = text.Contains("DELIVER SUPPLIES") || text.Contains("JLENVETCNE") || text.Contains("JENVENNE");
                                                 break;
                                             }
                                         case SystemStatus.InvasionPrevented:
