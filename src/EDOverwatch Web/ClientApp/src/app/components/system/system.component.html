@@ -2,6 +2,8 @@
     <div class="overwatch-content-large" *ngIf="starSystem">
         <div class="title">
             {{ starSystem.Name }}
+            <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                (click)="copySystemName()"></fa-icon>
         </div>
         <div class="content-box">
             <div class="content-flex">
@@ -15,7 +17,9 @@
                         </tr>
                         <tr>
                             <td>Thargoid Level</td>
-                            <td>{{ starSystem.ThargoidLevel.Name }}</td>
+                            <td>
+                                <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -94,7 +98,6 @@
                                 {{ row.Amount | number }}
                             </td>
                         </ng-container>
-
                         <tr mat-header-row *matHeaderRowDef="warEffortsDisplayedColumns; sticky: true" class="thead">
                         </tr>
                         <tr mat-row *matRowDef="let row; columns: warEffortsDisplayedColumns;"></tr>

@@ -1,6 +1,5 @@
 ﻿using Discord.Interactions;
 using EDUtils;
-using Newtonsoft.Json.Linq;
 using System.Runtime.Serialization;
 
 namespace DCoHTrackerDiscordBot.Module
@@ -92,9 +91,8 @@ namespace DCoHTrackerDiscordBot.Module
 
         [SlashCommand("view", "View operation by type")]
         public async Task View(
-            [Summary("Operation", "Operation Type")] OperationType? operation = null, 
-            [Summary("Maelstrom", "Maelstrom"), 
-            Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null)
+            [Summary("Operation", "Operation Type")] OperationType? operation = null,
+            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null)
         {
             await DeferAsync(true);
 
@@ -168,7 +166,7 @@ namespace DCoHTrackerDiscordBot.Module
             await FollowupAsync(embed: embedMain.Build(), ephemeral: true);
         }
 
-        private static DcohFactionOperationType OperationTypeToDcohFactionOperationType(OperationType operation)
+        public static DcohFactionOperationType OperationTypeToDcohFactionOperationType(OperationType operation)
         {
             return operation switch
             {
@@ -179,7 +177,8 @@ namespace DCoHTrackerDiscordBot.Module
             };
         }
 
-        public static Dictionary<string, List<string>> Systems { get; set; } = new();
+        public static Dictionary<string, List<string>> SystemsByMaelstrom { get; private set; } = new();
+        public static List<string> Systems { get; private set; } = new();
         public static async Task UpdateSystems(EdDbContext dbContext)
         {
             Dictionary<string, List<string>> systems = new();
@@ -206,7 +205,8 @@ namespace DCoHTrackerDiscordBot.Module
                     systems[starSystem.ThargoidLevel.Maelstrom.Name] = new() { starSystem.Name };
                 }
             }
-            Systems = systems;
+            SystemsByMaelstrom = systems;
+            Systems = starSystems.Select(s => s.Name).ToList();
         }
 
         public class StarSystemAutocompleteHandler : AutocompleteHandler
@@ -214,9 +214,14 @@ namespace DCoHTrackerDiscordBot.Module
             public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
             {
                 string? maelstrom = autocompleteInteraction.Data.Options.FirstOrDefault(o => o.Name == "maelstrom")?.Value as string;
-                if (string.IsNullOrEmpty(maelstrom) || !Systems.TryGetValue(maelstrom, out List<string>? systemList))
+                List<string>? systemList = null;
+                if (!string.IsNullOrEmpty(maelstrom))
                 {
-                    return Task.FromResult(AutocompletionResult.FromError(InteractionCommandError.BadArgs, "Maelstrom not found"));
+                    SystemsByMaelstrom.TryGetValue(maelstrom, out systemList);
+                }
+                if (systemList == null)
+                {
+                    systemList = Systems;
                 }
                 IEnumerable<string> systems = systemList.OrderBy(s => s);
                 if (autocompleteInteraction.Data.Current.Value is string value)

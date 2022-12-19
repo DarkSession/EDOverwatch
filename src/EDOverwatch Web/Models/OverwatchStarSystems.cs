@@ -3,7 +3,10 @@
     public class OverwatchStarSystems
     {
         public List<OverwatchMaelstrom> Maelstroms { get; }
-        public List<OverwatchThargoidLevel> Levels => Enum.GetValues<StarSystemThargoidLevelState>().Select(s => new OverwatchThargoidLevel(s)).ToList();
+        public List<OverwatchThargoidLevel> Levels => Enum.GetValues<StarSystemThargoidLevelState>()
+            .Where(s => s > StarSystemThargoidLevelState.None)
+            .Select(s => new OverwatchThargoidLevel(s))
+            .ToList();
         public List<OverwatchStarSystem> Systems { get; } = new();
 
         public OverwatchStarSystems(List<ThargoidMaelstrom> thargoidMaelstroms)
@@ -13,6 +16,14 @@
 
         public static async Task<OverwatchStarSystems> Create(EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 0);
+
+            DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
+            if (currentThargoidCycle.Start < stationMaxAge)
+            {
+                stationMaxAge = currentThargoidCycle.Start;
+            }
+
             var systems = await dbContext.StarSystems
                .AsNoTracking()
                .Where(s =>
@@ -27,6 +38,14 @@
                 {
                     StarSystem = s,
                     FactionOperations = s.FactionOperations!.Count(),
+                    SpecialFactionOperations = s.FactionOperations!.Where(f => f.Faction!.SpecialFaction).Select(s => new
+                    {
+                        s.Faction!.Name,
+                        s.Faction!.Short,
+                    }),
+                    StationsUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && (s.State == StationState.UnderAttack)).Count(),
+                    StationsDamaged = s.Stations!.Where(s => s.Updated > stationMaxAge && (s.State == StationState.Damaged)).Count(),
+                    StationsUnderRepair = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderRepairs).Count(),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -92,7 +111,10 @@
                         effortFocus = Math.Round(effortFocus, 2);
                     }
                 }
-                result.Systems.Add(new OverwatchStarSystem(starSystem, effortFocus, system.FactionOperations));
+                List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
+                    .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
+                    .ToList();
+                result.Systems.Add(new OverwatchStarSystem(starSystem, effortFocus, system.FactionOperations, specialFactionOperations, system.StationsUnderRepair, system.StationsDamaged, system.StationsUnderAttack));
             }
             return result;
         }

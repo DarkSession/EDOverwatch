@@ -21,6 +21,14 @@
             {
                 throw new Exception("StarSystem is null");
             }
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 0);
+
+            DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
+            if (currentThargoidCycle.Start < stationMaxAge)
+            {
+                stationMaxAge = currentThargoidCycle.Start;
+            }
+
             var systems = await dbContext.StarSystems
                 .AsNoTracking()
                 .Where(s => s.ThargoidLevel!.Maelstrom == maelstrom && s.ThargoidLevel.State > StarSystemThargoidLevelState.None)
@@ -31,6 +39,14 @@
                 {
                     StarSystem = s,
                     FactionOperations = s.FactionOperations!.Count(),
+                    SpecialFactionOperations = s.FactionOperations!.Where(f => f.Faction!.SpecialFaction).Select(s => new
+                    {
+                        s.Faction!.Name,
+                        s.Faction!.Short,
+                    }),
+                    StationsUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack).Count(),
+                    StationsDamaged = s.Stations!.Where(s => s.Updated > stationMaxAge && (s.State == StationState.Damaged)).Count(),
+                    StationsUnderRepair = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderRepairs).Count(),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -91,7 +107,10 @@
                         effortFocus = Math.Round(effortFocus, 2);
                     }
                 }
-                resultStarSystems.Add(new OverwatchStarSystem(starSystem, effortFocus, system.FactionOperations));
+                List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
+                    .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
+                    .ToList();
+                resultStarSystems.Add(new OverwatchStarSystem(starSystem, effortFocus, system.FactionOperations, specialFactionOperations, system.StationsUnderRepair, system.StationsDamaged, system.StationsUnderAttack));
             }
 
             List<OverwatchMaelstromDetailSystemAtRisk> systemsAtRiskResult = new();

@@ -3,8 +3,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
-import { OverwatchThargoidLevel } from '../systems/systems.component';
+import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 
 @Component({
   selector: 'app-system-list',
@@ -14,7 +15,8 @@ import { OverwatchThargoidLevel } from '../systems/systems.component';
 })
 export class SystemListComponent implements OnChanges {
   public readonly faClipboard = faClipboard;
-  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations'];
+  public readonly faCircleCheck = faCircleCheck;
+  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations'];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @Input() systems: OverwatchStarSystem[] = [];
   @Input() maelstromsSelected: OverwatchMaelstrom[] | null = null;
@@ -51,7 +53,7 @@ export class SystemListComponent implements OnChanges {
     }
     this.dataSource = new MatTableDataSource<OverwatchStarSystem>(data);
     this.dataSource.sort = this.sort;
-    this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string => {
+    this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string | number => {
       switch (columnName) {
         case "ThargoidLevel": {
           return system.ThargoidLevel.Name;
@@ -59,8 +61,14 @@ export class SystemListComponent implements OnChanges {
         case "Maelstrom": {
           return system.Maelstrom.Name;
         }
+        case "Starports": {
+          return (system.StationsUnderAttack + system.StationsUnderRepair);
+        }
+        case "FactionOperations": {
+          return (system.FactionOperations + system.SpecialFactionOperations.length * 100);
+        }
       }
-      return system[columnName as keyof OverwatchStarSystem] as string;
+      return system[columnName as keyof OverwatchStarSystem] as string | number;
     }
 
     this.changeDetectorRef.detectChanges();
@@ -82,4 +90,13 @@ export interface OverwatchStarSystem {
   Progress: number | null;
   EffortFocus: number;
   FactionOperations: number;
+  SpecialFactionOperations: OverwatchStarSystemSpecialFactionOperation[];
+  StationsUnderRepair: number;
+  StationsDamaged: number;
+  StationsUnderAttack: number;
+}
+
+interface OverwatchStarSystemSpecialFactionOperation {
+  Tag: string;
+  Name: string;
 }

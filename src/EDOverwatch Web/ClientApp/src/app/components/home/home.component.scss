@@ -19,12 +19,12 @@
 }
 
 .side-content-container-human {
-  background-color: rgb(33, 29, 104);
+  background-color: rgb(65, 105, 140);
   justify-content: flex-end;
 }
 
 .side-content-container-thargoid {
-  background-color: #846a24;
+  background-color: rgb(120, 37, 7);
   justify-content: flex-start;
 }
 
@@ -134,24 +134,24 @@
   justify-content: flex-end;
 
   .line {
-    stroke: rgb(33, 29, 104);
+    stroke: rgb(65, 105, 140);
   }
 
   .triangle {
-    stroke: rgb(33, 29, 104);
-    fill: rgb(33, 29, 104);
+    stroke: rgb(65, 105, 140);
+    fill: rgb(65, 105, 140);
   }
 }
 
 .triangle-thargoids {
 
   .line {
-    stroke: #846a24;
+    stroke: rgb(120, 37, 7);
   }
 
   .triangle {
-    stroke: #846a24;
-    fill: #846a24;
+    stroke: rgb(120, 37, 7);
+    fill: rgb(120, 37, 7);
   }
 
   .key-indicators {

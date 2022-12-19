@@ -57,6 +57,8 @@ namespace EDDatabase
 
         public IEnumerable<DcohFactionOperation>? FactionOperations { get; set; }
 
+        public IEnumerable<Station>? Stations { get; set; }
+
         public StarSystem(
             long id,
             long systemAddress,

@@ -3,6 +3,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-list.component';
+import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 
 @UntilDestroy()
 @Component({
@@ -60,10 +61,5 @@ interface OverwatchSystems {
   Maelstroms: OverwatchMaelstrom[];
   Levels: OverwatchThargoidLevel[];
   Systems: OverwatchStarSystem[];
-}
-
-export interface OverwatchThargoidLevel {
-  Level: number;
-  Name: string;
 }
 

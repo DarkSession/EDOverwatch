@@ -28,7 +28,7 @@ export class AppService {
       if (connectionStatus === ConnectionStatus.Connected && this.webSocketService.connectionIsAuthenticated) {
         this.requestUser();
       }
-      else if (connectionStatus === ConnectionStatus.Disconnected) {
+      else if (connectionStatus !== ConnectionStatus.Connected) {
         this.webSocketLoading = true;
       }
     });

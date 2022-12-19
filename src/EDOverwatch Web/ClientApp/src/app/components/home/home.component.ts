@@ -118,6 +118,7 @@ interface OverwatchOverview {
     SystemsRecaptured: number;
     ThargoidKills: number | null;
     Rescues: number | null;
+    RescueSupplies: number | null;
     Missions: number | null;
   }
   Thargoids: {
@@ -130,5 +131,6 @@ interface OverwatchOverview {
     SystemsInInvasion: number;
     SystemsWithAlerts: number;
     SystemsBeingRecaptured: number;
+    SystemsInRecovery: number;
   }
 }

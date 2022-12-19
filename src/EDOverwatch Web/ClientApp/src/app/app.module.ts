@@ -39,6 +39,8 @@ import { MaelstromNameComponent } from './components/maelstrom-name/maelstrom-na
 import { SystemListComponent } from './components/system-list/system-list.component';
 import { NgChartsModule } from 'ng2-charts';
 import { FaqComponent } from './components/faq/faq.component';
+import { ThargoidLevelComponent } from './components/thargoid-level/thargoid-level.component';
+import { SystemStarportStatusComponent } from './components/system-starport-status/system-starport-status.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -62,6 +64,8 @@ export const httpInterceptorProviders = [
     MaelstromNameComponent,
     SystemListComponent,
     FaqComponent,
+    ThargoidLevelComponent,
+    SystemStarportStatusComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

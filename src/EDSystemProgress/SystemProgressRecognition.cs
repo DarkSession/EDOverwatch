@@ -7,7 +7,7 @@ using Tesseract;
 
 namespace EDSystemProgress
 {
-    public static class SystemProgressRecognition
+    public static partial class SystemProgressRecognition
     {
         private static List<ColorRange> InvasionProgressColors { get; } = new()
         {
@@ -256,7 +256,7 @@ namespace EDSystemProgress
 
             log.LogInformation("{id}: processingStep: {processingStep} systemName: {systemName} remainingTime: {remainingTime} progressBarUpperY: {progressBarUpperY} progressBarLowerY: {progressBarLowerY}", fileId, processingStep, systemName, remainingTime, progressBarUpperY, progressBarLowerY);
 
-            bool success = (processingStep == ImageProcessingStep.Completed && systemName != "INVALID");
+            bool success = processingStep == ImageProcessingStep.Completed && systemName != "INVALID";
             if (success)
             {
                 List<ColorRange> progressColors = systemStatus switch
@@ -291,7 +291,6 @@ namespace EDSystemProgress
                         {
                             // Get a reference to the pixel at position x
                             ref Rgba32 pixel = ref pixelRow[x];
-
                             foreach (ColorRange progressColor in progressColors)
                             {
                                 if (progressColor.IsInRange(pixel))
@@ -323,8 +322,25 @@ namespace EDSystemProgress
                 int progressRemainingPixels = pixelsProgress + pixelsRemaining;
                 if (progressRemainingPixels > 1000)
                 {
-                    progress = Math.Round((decimal)pixelsProgress / (decimal)progressRemainingPixels * 100, 0);
-                    remaining = Math.Round((decimal)pixelsRemaining / (decimal)progressRemainingPixels * 100, 0);
+                    progress = Math.Round(pixelsProgress / (decimal)progressRemainingPixels * 100, 0);
+                    remaining = Math.Round(pixelsRemaining / (decimal)progressRemainingPixels * 100, 0);
+
+                    switch (systemStatus)
+                    {
+                        case SystemStatus.InvasionInProgress:
+                        case SystemStatus.AlertInProgress:
+                        case SystemStatus.ThargoidControlled:
+                        case SystemStatus.Recovery:
+                            {
+                                if (progress >= 2)
+                                {
+                                    progress -= 2;
+                                    remaining += 2;
+                                }
+                                break;
+                            }
+                    }
+
                     log.LogDebug("progress: {progress}% ({pixelsProgress}/{progressRemainingPixels})", progress, pixelsProgress, progressRemainingPixels);
                     log.LogDebug("remaining: {remaining}% ({pixelsRemaining}/{progressRemainingPixels})", remaining, pixelsRemaining, progressRemainingPixels);
                 }
@@ -341,7 +357,7 @@ namespace EDSystemProgress
             TimeSpan remTime = TimeSpan.Zero;
             if (!string.IsNullOrEmpty(remainingTime))
             {
-                Regex r = new(@"IN ((\d{0,1})W|)\s{0,}((\d{0,1})D|)$", RegexOptions.IgnoreCase);
+                Regex r = DurationRegex();
                 Match m = r.Match(remainingTime);
                 if (m.Success)
                 {
@@ -382,6 +398,9 @@ namespace EDSystemProgress
             { "OBASSI 0SAW", "OBASSI OSAW" },
             { "ARIETIS SECTOR AG-P B5-0", "ARIETIS SECTOR AQ-P B5-0" },
         };
+
+        [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]
+        private static partial Regex DurationRegex();
     }
 
     public class ColorRange

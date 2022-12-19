@@ -1,0 +1,29 @@
+.dot {
+    height: 12px;
+    width: 12px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.thargoid-level {
+    display: flex;
+    align-items: center;
+}
+
+.thargoid-alert {
+    background-color: rgb(241, 194, 50);
+}
+
+.thargoid-invasion {
+    background-color: rgb(255, 82, 0);
+}
+
+.thargoid-controlled {
+    background-color: rgb(56, 118, 29);
+}
+
+.thargoid-maelstrom {
+    background-color: rgb(204, 0, 0);
+}

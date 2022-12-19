@@ -1,5 +1,6 @@
 ﻿using DCoHTrackerDiscordBot.Modals;
 using Discord.Interactions;
+using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -29,7 +30,7 @@ namespace DCoHTrackerDiscordBot.Module
         }
 
         [SlashCommand("squadron", "As a representative create a new or join an existing squadron on this Discord.")]
-        public async Task Squadron([Summary("Squadron", "Squadron Id (4 letter) of your squadron")] string squadronId)
+        public async Task Squadron([Summary("Squadron", "Squadron Id (4 letter) of your squadron"), Autocomplete(typeof(SquadronIdAutocompleteHandler))] string squadronId)
         {
             if (!await CheckElevatedGuild())
             {
@@ -154,7 +155,7 @@ namespace DCoHTrackerDiscordBot.Module
 
             squadronName = new CultureInfo("en").TextInfo.ToTitleCase(squadronName);
 
-            DcohFaction faction = new(0, squadronName, squadronId, DateTimeOffset.Now);
+            DcohFaction faction = new(0, squadronName, squadronId, false, DateTimeOffset.Now);
             DbContext.Add(faction);
             await DbContext.SaveChangesAsync();
 
@@ -186,5 +187,27 @@ namespace DCoHTrackerDiscordBot.Module
 
         [GeneratedRegex("^[A-Z0-9]{4}$", RegexOptions.Compiled, "en-CH")]
         private static partial Regex SquadronIdRegexGenerator();
+
+        public class SquadronIdAutocompleteHandler : AutocompleteHandler
+        {
+            public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+            {
+                if (autocompleteInteraction.Data.Current.Value is string value)
+                {
+                    value = value.Replace("%", string.Empty).Trim().ToLower();
+                    if (value.Length > 1)
+                    {
+                        await using AsyncServiceScope scope = services.CreateAsyncScope();
+                        EdDbContext dbContext = scope.ServiceProvider.GetRequiredService<EdDbContext>();
+                        List<DcohFaction> factions = await dbContext.DcohFactions
+                            .Where(d => EF.Functions.Like(d.Short, value + "%") || EF.Functions.Like(d.Name, value + "%"))
+                            .Take(20)
+                            .ToListAsync();
+                        return AutocompletionResult.FromSuccess(factions.Select(s => new AutocompleteResult($"{s.Name} ({s.Short})", s.Short)));
+                    }
+                }
+                return AutocompletionResult.FromSuccess(new List<AutocompleteResult>());
+            }
+        }
     }
 }

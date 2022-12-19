@@ -14,16 +14,20 @@
         public string Short { get; set; }
 
         [Column]
+        public bool SpecialFaction { get; set; }
+
+        [Column]
         public DateTimeOffset Created { get; set; }
 
         [ForeignKey("CreatedById")]
         public DcohDiscordUser? CreatedBy { get; set; }
 
-        public DcohFaction(int id, string name, string @short, DateTimeOffset created)
+        public DcohFaction(int id, string name, string @short, bool specialFaction, DateTimeOffset created)
         {
             Id = id;
             Name = name;
             Short = @short;
+            SpecialFaction = specialFaction;
             Created = created;
         }
     }

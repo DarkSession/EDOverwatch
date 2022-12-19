@@ -7,7 +7,7 @@
         public List<FactionOperation> FactionOperationDetails { get; }
 
         public OverwatchStarSystemDetail(StarSystem starSystem, decimal effortFocus, List<EDDatabase.WarEffort> warEfforts, List<FactionOperation> factionOperationDetails) :
-            base(starSystem, effortFocus, 0)
+            base(starSystem, effortFocus, 0, new(), 0, 0, 0)
         {
             Population = starSystem.Population;
             WarEfforts = warEfforts.Select(w => new OverwatchStarSystemWarEffort(w)).ToList();

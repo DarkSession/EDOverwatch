@@ -15,12 +15,6 @@
             </div>
             <div class="text-item">
               <div class="highlight">
-                {{ overview.Humans.SystemsRecaptured | number }}
-              </div>
-              systems recaptured
-            </div>
-            <div class="text-item">
-              <div class="highlight">
                 <span *ngIf="overview.Humans.ThargoidKills">
                   {{ overview.Humans.ThargoidKills | number }}+
                 </span>
@@ -43,14 +37,14 @@
             </div>
             <div class="text-item">
               <div class="highlight">
-                <span *ngIf="overview.Humans.Missions">
-                  {{ overview.Humans.Missions | number }}+
+                <span *ngIf="overview.Humans.RescueSupplies">
+                  {{ overview.Humans.RescueSupplies | number }}+ t
                 </span>
-                <span *ngIf="!overview.Humans.Missions">
+                <span *ngIf="!overview.Humans.RescueSupplies">
                   ???
                 </span>
               </div>
-              missions completed
+              of supplies delivered
             </div>
           </div>
         </div>
@@ -144,13 +138,19 @@
           </div>
           <div class="text-item clickable" routerLink="systems">
             <div class="highlight">
+              {{ overview.Contested.SystemsInRecovery | number }}
+            </div>
+            systems in recovery
+          </div>
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
               {{ overview.Contested.SystemsBeingRecaptured | number }}
             </div>
             systems being recaptured
           </div>
         </div>
         <br>
-        <button mat-raised-button color="warn" routerLink="get-involved">
+        <button mat-raised-button color="primary" routerLink="get-involved">
           <b>Get involved</b>
         </button>
       </div>

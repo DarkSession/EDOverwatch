@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
+import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
 
 @UntilDestroy()
@@ -15,6 +17,7 @@ import { OverwatchStarSystem } from '../system-list/system-list.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemComponent implements OnInit {
+  public readonly faClipboard = faClipboard;
   public starSystem: OverwatchStarSystemDetail | null = null;
 
   public warEfforts: MatTableDataSource<OverwatchStarSystemWarEffort> = new MatTableDataSource<OverwatchStarSystemWarEffort>();
@@ -28,7 +31,8 @@ export class SystemComponent implements OnInit {
   public constructor(
     private readonly route: ActivatedRoute,
     private readonly websocketService: WebsocketService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly matSnackBar: MatSnackBar
   ) {
   }
 
@@ -63,6 +67,16 @@ export class SystemComponent implements OnInit {
       }
       this.changeDetectorRef.markForCheck();
     }
+  }
+
+  public copySystemName(): void {
+    if (!this.starSystem) {
+      return;
+    }
+    navigator.clipboard.writeText(this.starSystem.Name);
+    this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
+      duration: 2000,
+    });
   }
 }
 

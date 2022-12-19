@@ -29,11 +29,16 @@ namespace EDDataProcessor.IDA
             GetRequest request = sheetsService.Spreadsheets.Get(speadsheetId);
             Spreadsheet response = await request.ExecuteAsync();
 
-            Regex systemNameRegex = SystemNameRegex();
+            Regex systemNameRegex1 = SystemNameRegex1();
+            Regex systemNameRegex2 = SystemNameRegex2();
 
             foreach (Sheet sheet in response.Sheets)
             {
-                Match match = systemNameRegex.Match(sheet.Properties.Title);
+                Match match = systemNameRegex1.Match(sheet.Properties.Title);
+                if (!match.Success)
+                {
+                    match = systemNameRegex2.Match(sheet.Properties.Title);
+                }
                 if (match.Success)
                 {
                     StarSystem? starSystem = await DbContext.StarSystems.FirstOrDefaultAsync(s => s.Name == match.Groups[1].Value && s.WarRelevantSystem);
@@ -123,6 +128,8 @@ namespace EDDataProcessor.IDA
         }
 
         [GeneratedRegex("^Thargoid War - (.*?)$", RegexOptions.IgnoreCase, "en-CH")]
-        private static partial Regex SystemNameRegex();
+        private static partial Regex SystemNameRegex1();
+        [GeneratedRegex("^(.*?) Recovery$", RegexOptions.IgnoreCase, "en-CH")]
+        private static partial Regex SystemNameRegex2();
     }
 }
