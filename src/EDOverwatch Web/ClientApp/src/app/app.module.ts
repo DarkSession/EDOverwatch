@@ -3,7 +3,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpRequestInterceptor } from './services/HttpRequestInterceptor';
 
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
@@ -41,6 +41,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { FaqComponent } from './components/faq/faq.component';
 import { ThargoidLevelComponent } from './components/thargoid-level/thargoid-level.component';
 import { SystemStarportStatusComponent } from './components/system-starport-status/system-starport-status.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 
 /** Http interceptor providers in outside-in order */
@@ -135,6 +136,12 @@ export const httpInterceptorProviders = [
       },
     ]),
     NgChartsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]

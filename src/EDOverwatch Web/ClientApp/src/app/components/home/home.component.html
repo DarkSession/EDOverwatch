@@ -1,4 +1,156 @@
 <div class="main-container">
+  <div class="container-center">
+    <div style="height: calc(100vh - 80px); width: calc(50vh - 40px);">
+      <svg viewBox="0 0 100 200">
+        <line x1="0" y1="-4" x2="44" y2="101" class="line" />
+        <line x1="100" y1="-4" x2="56" y2="101" class="line" />
+        <polygon points="8,0 50,100 92,0" class="triangle" />
+        <polygon points="8,200 50,100 92,200" class="triangle" />
+        <line x1="0" y1="204" x2="44" y2="99" class="line" />
+        <line x1="100" y1="204" x2="56" y2="99" class="line" />
+      </svg>
+    </div>
+  </div>
+  <div class="container-sides">
+    <div class="bg-human">
+      <div class="bg-human-img"></div>
+    </div>
+    <div class="bg-thargoid">
+      <div class="bg-thargoid-img"></div>
+    </div>
+  </div>
+  <div class="container-sides">
+    <div class="content content-human">
+      <div *ngIf="overview">
+        <h2>Humanity</h2>
+        <div class="text-item">
+          Controlling
+          <div class="highlight">
+            {{ overview.Humans.SystemsControlling | number }}
+          </div>
+          systems of the human 'bubble'
+        </div>
+        <div class="text-item">
+          <div class="highlight">
+            <span *ngIf="overview.Humans.ThargoidKills">
+              {{ overview.Humans.ThargoidKills | number }}+
+            </span>
+            <span *ngIf="!overview.Humans.ThargoidKills">
+              ???
+            </span>
+          </div>
+          confirmed Thargoid kills
+        </div>
+        <div class="text-item">
+          <div class="highlight">
+            <span *ngIf="overview.Humans.Rescues">
+              {{ overview.Humans.Rescues | number }}+
+            </span>
+            <span *ngIf="!overview.Humans.Rescues">
+              ???
+            </span>
+          </div>
+          completed rescues
+        </div>
+        <div class="text-item">
+          <div class="highlight">
+            <span *ngIf="overview.Humans.RescueSupplies">
+              {{ overview.Humans.RescueSupplies | number }}+ t
+            </span>
+            <span *ngIf="!overview.Humans.RescueSupplies">
+              ???
+            </span>
+          </div>
+          of supplies delivered
+        </div>
+      </div>
+    </div>
+    <div class="content content-middle">
+      <div class="item">
+        <span>Humanity is in the Aftermath War</span>
+        <span>with the Thargoids for</span>
+        <h1>{{ timeSince }}</h1>
+      </div>
+      <div class="item-center">
+        <div class="key-indicators" *ngIf="overview && overview.Humans">
+          <div>
+            <span class="key-highlight-description">Controlling</span>
+            <div class="key-highlight-value">{{ overview.Humans.ControllingPercentage | percent:'0.2-2' }}</div>
+          </div>
+        </div>
+        <div class="key-indicators" *ngIf="overview && overview.Thargoids">
+          <div>
+            <span class="key-highlight-description">Controlling</span>
+            <div class="key-highlight-value">{{ overview.Thargoids.ControllingPercentage | percent:'0.2-2' }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <ng-container *ngIf="overview && overview.Contested">
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.Contested.SystemsInInvasion | number }}
+            </div>
+            systems under Thargoid invasion
+          </div>
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.Contested.SystemsWithAlerts | number }}
+            </div>
+            systems reporting Thargoid alerts
+          </div>
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.Contested.SystemsInRecovery | number }}
+            </div>
+            systems in recovery
+          </div>
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.Contested.SystemsBeingRecaptured | number }}
+            </div>
+            systems being recaptured
+          </div>
+        </ng-container>
+        <br>
+        <button mat-raised-button color="primary" routerLink="get-involved">
+          <b>Get involved</b>
+        </button>
+      </div>
+    </div>
+    <div class="content content-thargoid">
+      <div *ngIf="overview">
+        <h2>Thargoids</h2>
+        <div class="text-item clickable" routerLink="systems">
+          Controlling
+          <div class="highlight">
+            {{ overview.Thargoids.SystemsControlling | number }}
+          </div>
+          systems of the human 'bubble'
+        </div>
+        <div class="text-item clickable" routerLink="systems">
+          <div class="highlight">
+            {{ overview.Thargoids.ActiveMaelstroms | number }}
+          </div>
+          active Maelstroms
+        </div>
+        <div class="text-item">
+          <div class="highlight">
+            <span *ngIf="overview.Thargoids.CommanderKills">
+              {{ overview.Thargoids.CommanderKills | number }}+
+            </span>
+            <span *ngIf="!overview.Thargoids.CommanderKills">
+              ???
+            </span>
+          </div>
+          confirmed Commander kills
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--
+<div class="main-container">
   <div class="sides">
     <div class="side">
       <div class="side-content-container side-content-container-human"
@@ -157,3 +309,4 @@
     </div>
   </div>
 </div>
+-->

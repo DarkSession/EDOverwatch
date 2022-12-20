@@ -1,160 +1,142 @@
-
-.sides {
+.main-container {
+  position: relative;
+  background-color: aliceblue;
   display: flex;
-}
-
-.side {
-  width: 50%;
-  display: flex;
-}
-
-.side-human {
-  justify-content: flex-end;
-}
-
-.side-content-container {
-  flex-grow: 1;
-  padding: 8px;
-  display: flex;
-}
-
-.side-content-container-human {
-  background-color: rgb(65, 105, 140);
-  justify-content: flex-end;
-}
-
-.side-content-container-thargoid {
-  background-color: rgb(120, 37, 7);
-  justify-content: flex-start;
-}
-
-.side-content {
-  display: flex;
-  flex-direction: column;
-  width: 200px;
   justify-content: center;
 }
 
-.side-content-thargoid {
-  align-items: flex-end;
-  text-align: right;
+.container-center {
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
 }
 
-.key-highlight,
-.text,
-.key-highlight-description {
-  font-size: 10pt;
-  line-height: 1;
+.line {
+  stroke-width: 4;
+  stroke: #2c2c2c;
+}
+
+.triangle {
+  stroke: #2c2c2c;
+  fill: #2c2c2c;
+}
+
+.container-sides {
+  position: absolute;
+  top: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+
+  .bg-human {
+    width: 50%;
+    background-color: rgb(65, 105, 140);
+    position: relative;
+  }
+
+  .bg-human-img {
+    background-image: url('/assets/bg_human.jpg');
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: center;
+    opacity: 0.25;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bg-thargoid {
+    background-color: rgb(120, 37, 7);
+    width: 50%;
+    position: relative;
+  }
+
+  .bg-thargoid-img {
+    background-image: url('/assets/bg_thargoid.jpg');
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: center;
+    opacity: 0.25;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .content {
+    z-index: 10;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .item {
+      flex-grow: 1;
+      height: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .highlight {
+      font-weight: bold;
+      font-size: 16pt;
+      font-family: 'Trebuchet MS', sans-serif;
+    }
+
+    .key-indicators {
+      z-index: 1;
+      padding: 36px;
+
+      .key-highlight,
+      .key-highlight-description {
+        font-size: 10pt;
+        line-height: 1;
+      }
+
+      .key-highlight-value {
+        line-height: 1;
+        font-weight: bold;
+        font-size: 20pt;
+        font-family: 'Trebuchet MS', sans-serif;
+      }
+    }
+  }
+
+  .content-human {
+    width: 35%;
+  }
+
+  .content-middle {
+    width: 30%;
+    justify-content: space-between;
+    height: 100%;
+
+    .item-center {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+      width: 100%;
+    }
+  }
+
+  .content-thargoid {
+    width: 35%;
+    text-align: right;
+  }
 }
 
 .text-item {
-  margin: 12px;
-}
-
-.text {
-  padding: 8px;
-
-  .highlight {
-    font-weight: bold;
-    font-size: 16pt;
-    font-family: 'Trebuchet MS', sans-serif;
-  }
-}
-
-.middle-container-wrapper {
-  position: absolute;
-  top: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.middle-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 90vh;
-
-  .middle-container-item {
-    flex-grow: 1;
-    height: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-.bottom-container {
-  .text {
-    text-align: center;
-  }
-
-  .text-item {
-    margin: 20px;
-  }
-}
-
-.triangle-container {
-  width: 30vh;
-  height: 90vh;
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex-grow: 0;
-
-  .bg {
-    position: absolute;
-    top: 0;
-  }
-
-  .line {
-    stroke-width: 8px;
-  }
-
-  .triangle {
-    fill: transparent;
-    stroke-width: 8px;
-  }
-
-  .key-indicators {
-    z-index: 1;
-    display: flex;
-    padding: 36px;
-  }
-
-  .key-highlight-value {
-    line-height: 1;
-    font-weight: bold;
-    font-size: 20pt;
-    font-family: 'Trebuchet MS', sans-serif;
-  }
-}
-
-.triangle-humans {
-  justify-content: flex-end;
-
-  .line {
-    stroke: rgb(65, 105, 140);
-  }
-
-  .triangle {
-    stroke: rgb(65, 105, 140);
-    fill: rgb(65, 105, 140);
-  }
-}
-
-.triangle-thargoids {
-
-  .line {
-    stroke: rgb(120, 37, 7);
-  }
-
-  .triangle {
-    stroke: rgb(120, 37, 7);
-    fill: rgb(120, 37, 7);
-  }
-
-  .key-indicators {
-    text-align: right;
-  }
+  margin-bottom: 12px;
+  margin-top: 12px;
+  line-height: 1;
+  font-size: 10pt;
 }

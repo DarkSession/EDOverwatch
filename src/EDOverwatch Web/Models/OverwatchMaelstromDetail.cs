@@ -99,7 +99,7 @@
                     {
                         foreach (KeyValuePair<WarEffortTypeGroup, long> effort in systemEffortSums)
                         {
-                            if (totalEffortSums.TryGetValue(effort.Key, out long totalAmount))
+                            if (totalEffortSums.TryGetValue(effort.Key, out long totalAmount) && totalAmount > 0)
                             {
                                 effortFocus += ((decimal)effort.Value / (decimal)totalAmount / (decimal)totalEffortSums.Count);
                             }

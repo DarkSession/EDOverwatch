@@ -21,6 +21,7 @@ export class WebsocketService {
     } = {};
     public connectionIsAuthenticated = false;
     public messageBacklogChanged: EventEmitter<number> = new EventEmitter<number>();
+    private connectionAttempt = 0;
 
     public constructor() {
         this.initalize();
@@ -76,9 +77,11 @@ export class WebsocketService {
                 if (this.initalizeTimeout !== null) {
                     clearTimeout(this.initalizeTimeout);
                 }
+                const timeout = this.connectionAttempt > 5 ? 30000 : 5000;
                 this.initalizeTimeout = setTimeout(() => {
                     this.initalize();
-                }, 10000);
+                }, timeout);
+                this.connectionAttempt++;
                 if (!environment.production) {
                     console.log("Unclean close. Scheduling another connection in 10s.");
                 }
@@ -114,6 +117,7 @@ export class WebsocketService {
                 const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
                 this.connectionIsAuthenticated = authenticationData.IsAuthenticated;
                 this.setConnectionStatus(ConnectionStatus.Connected);
+                this.connectionAttempt = 0;
                 for (const queueItem of this.messageQueue) {
                     this.sendMessageInternal(queueItem.message, queueItem.callback);
                 }

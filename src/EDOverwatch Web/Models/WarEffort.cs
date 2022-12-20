@@ -25,6 +25,10 @@
                 Amount = e.Sum(g => g.Amount),
             }))
             {
+                if (total.Amount == 0)
+                {
+                    continue;
+                }
                 if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(total.Key, out WarEffortTypeGroup group))
                 {
                     if (!totalEffortSums.ContainsKey(group))

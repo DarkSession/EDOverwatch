@@ -18,9 +18,15 @@ namespace EDSystemProgressTest
         [DataRow("image9.png", "HIP 20485", SystemStatus.AlertInProgress, 52d, 3)]
         [DataRow("image10.png", "ARIETIS SECTOR AQ-P B5-0", SystemStatus.ThargoidControlled, 0d, 3)] // 2 might not be right
         [DataRow("image11.png", "HIP 23716", SystemStatus.Recovery, 12d, 24)]
+        [DataRow("image12.png", "OBAMUMBO", SystemStatus.InvasionInProgress, 32d, 9)]
+        [DataRow("image13.png", "29 E ORIONIS", SystemStatus.InvasionPrevented, 100d, 1)]
         public async Task Test(string fileName, string systemName, SystemStatus systemStatus, double progress, int remainingDays)
         {
-            using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.SetMinimumLevel(LogLevel.Debug);
+            });
             ILogger log = loggerFactory.CreateLogger<ProgressTests>();
 
             await using MemoryStream imageContent = new();

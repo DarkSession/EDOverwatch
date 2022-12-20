@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Tesseract;
@@ -17,7 +18,7 @@ namespace EDSystemProgress
 
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
-            new ColorRange(30, 70, 40, 100, 0, 10),
+            new ColorRange(30, 67, 43, 100, 0, 10),
         };
 
         private static List<ColorRange> AlertProgressColors { get; } = new()
@@ -42,10 +43,17 @@ namespace EDSystemProgress
             Guid fileId = Guid.NewGuid();
             log.LogDebug("Starting analysis of file ({fileSize}). Id: {Id}", imageContent.Length, fileId);
 
-            byte[] file = imageContent.ToArray();
+            await using MemoryStream tempImage = new();
+            {
+                using Image image = await Image.LoadAsync(imageContent);
+                image.Mutate(x => x.Invert());
+                await image.SaveAsPngAsync(tempImage);
+                await image.SaveAsPngAsync("test.png");
+            }
+            byte[] file = tempImage.ToArray();
 
             using TesseractEngine engine = new("tessdata", "eng", EngineMode.Default, "config");
-            engine.SetVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijlmnopqrstuvwxyz01234567890:.- ");
+            engine.SetVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890:.- ");
 
             using Pix img = Pix.LoadFromMemory(file);
             using Page page = engine.Process(img);
@@ -93,18 +101,15 @@ namespace EDSystemProgress
                                 }
                             case ImageProcessingStep.SystemName:
                                 {
-                                    if (paragraphLineNumber == 1)
+                                    if (text.Contains("THARGOID WAR") || text.Contains("DISTANCE"))
                                     {
-                                        if (text.Contains("THARGOID WAR"))
-                                        {
-                                            systemName = "INVALID";
-                                        }
-                                        else
-                                        {
-                                            systemName = text;
-                                        }
-                                        processingStep = ImageProcessingStep.NextStep;
+                                        systemName = "INVALID";
                                     }
+                                    else
+                                    {
+                                        systemName = text;
+                                    }
+                                    processingStep = ImageProcessingStep.NextStep;
                                     break;
                                 }
                             case ImageProcessingStep.NextStep:
@@ -279,6 +284,7 @@ namespace EDSystemProgress
                 int pixelsProgress = 0;
                 int pixelsRemaining = 0;
 
+                imageContent.Position = 0;
                 using Image<Rgba32> image = await Image.LoadAsync<Rgba32>(imageContent);
                 image.ProcessPixelRows(accessor =>
                 {
@@ -390,12 +396,6 @@ namespace EDSystemProgress
         // So...
         private static Dictionary<string, string> SystemNameCorrections { get; } = new()
         {
-            { "WZTN", "AWARA" },
-            { "S:108", "EBISU" },
-            { "2:1E0", "EBISU" },
-            { "SERlIsZN", "63 ERIDANI" },
-            { "VAL", "VUKURBEH" },
-            { "OBASSI 0SAW", "OBASSI OSAW" },
             { "ARIETIS SECTOR AG-P B5-0", "ARIETIS SECTOR AQ-P B5-0" },
         };
 
