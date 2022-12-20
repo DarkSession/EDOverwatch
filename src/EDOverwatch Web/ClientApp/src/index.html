@@ -2,15 +2,15 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
   <title>DCoH Overwatch - Thargoid Overwatch - Defense Council of Humanity</title>
-  <base href="/"/>
+  <base href="/" />
   <!--
   <meta name="viewport" content="width=device-width, initial-scale=1" />
     -->
-  <meta name="viewport" content="width=700, height=600, initial-scale=1, minimum-scale=0.9, maximum-scale=2"/>
+  <meta name="viewport" content="width=700, height=600, initial-scale=1, minimum-scale=0.9, maximum-scale=2" />
 
-  <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <meta name="title" content="DCoH Overwatch - Thargoid Overwatch - Defense Council of Humanity">
   <meta name="description" content="DCoH Overwatch tracks the progress of humanity's war against the Thargoids.">
   <link rel="manifest" href="manifest.webmanifest">
@@ -20,12 +20,17 @@
 <body>
   <app-root>
     <div style="position: relative; height: 100%; width: 100%;">
-      <img src="assets/EDLoader1.svg" style="position: absolute; top: 50%; left: 50%; margin: -40px 0 0 -40px; width: 80px; height: 80px;"/>
+      <div
+        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <img src="assets/EDLoader1.svg" style="width: 80px; height: 80px;" />
+        <noscript>
+          <span style="color: #fff">
+            Javascript is required to run this application.
+          </span>
+        </noscript>
+      </div>
     </div>
   </app-root>
-  <noscript>
-    Javascript is required to run this application.
-  </noscript>
 </body>
 
 </html>
