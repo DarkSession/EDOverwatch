@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 
 @Component({
   selector: 'app-thargoid-level',
@@ -32,6 +32,7 @@ export class ThargoidLevelComponent implements OnChanges {
         break;
       }
       case StarSystemThargoidLevelState.Recovery: {
+        this.dotClass = "thargoid-recovery";
         break;
       }
     }

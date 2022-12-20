@@ -36,6 +36,8 @@ namespace EDOverwatch_Web
             builder.Services.AddControllers()
                     .AddNewtonsoftJson();
 
+            List<string> origins = (builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty).Split(",").ToList();
+
             ActiveMQ.Artemis.Client.Endpoint activeMqEndpont = ActiveMQ.Artemis.Client.Endpoint.Create(
                 builder.Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
                 builder.Configuration.GetValue<int>("ActiveMQ:Port"),
@@ -52,7 +54,7 @@ namespace EDOverwatch_Web
                 options.AddDefaultPolicy(
                     corsBuilder =>
                     {
-                        corsBuilder.WithOrigins(builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty)
+                        corsBuilder.WithOrigins(origins.ToArray())
                                 .AllowCredentials()
                                 .WithMethods(HttpMethods.Post, HttpMethods.Get, HttpMethods.Options)
                                 .WithHeaders("content-type", "content-length");
@@ -73,7 +75,10 @@ namespace EDOverwatch_Web
             {
                 KeepAliveInterval = TimeSpan.FromSeconds(120),
             };
-            webSocketOptions.AllowedOrigins.Add(builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty);
+            foreach (string origin in origins)
+            {
+                webSocketOptions.AllowedOrigins.Add(origin);
+            }
 
             app.UseWebSockets(webSocketOptions);
             app.UseHttpsRedirection();
