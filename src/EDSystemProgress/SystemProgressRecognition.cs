@@ -401,6 +401,7 @@ namespace EDSystemProgress
         private static Dictionary<string, string> SystemNameCorrections { get; } = new()
         {
             { "ARIETIS SECTOR AG-P B5-0", "ARIETIS SECTOR AQ-P B5-0" },
+            { "OBASSI 0SAW", "OBASSI OSAW" }
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

@@ -106,7 +106,7 @@ namespace DCoHTrackerDiscordBot
                                         }
                                     }
 
-                                    embed.AddField("System Name", Format.Sanitize(result.SystemName));
+                                    embed.AddField("System Name", Format.Sanitize(starSystem?.Name ?? result.SystemName));
                                     embed.AddField("System State", result.SystemStatus.GetEnumMemberValue(), true);
                                     embed.AddField("Progress", result.Progress + "%", true);
                                     embed.AddField("Remaining Time", string.Join(", ", remainingTime), true);

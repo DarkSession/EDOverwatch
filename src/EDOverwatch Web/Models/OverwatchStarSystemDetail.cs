@@ -109,7 +109,7 @@
                         .AsNoTracking()
                         .Include(d => d.Faction)
                         .Include(d => d.StarSystem)
-                        .Where(s => s.StarSystem == starSystem)
+                        .Where(s => s.StarSystem == starSystem && s.Status == DcohFactionOperationStatus.Active)
                         .ToListAsync(cancellationToken);
                     factionOperations = dcohFactionOperation.Select(d => new FactionOperation(d)).ToList();
                 }
