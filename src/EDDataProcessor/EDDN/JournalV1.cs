@@ -52,7 +52,7 @@ namespace EDDataProcessor.EDDN
                                 false,
                                 Message.Timestamp,
                                 Message.Timestamp);
-                            starSystem.WarRelevantSystem = starSystem.IsWarRelevantSystem;
+                            starSystem.UpdateWarRelevantSystem();
                             dbContext.StarSystems.Add(starSystem);
                         }
                         if (starSystem.Updated < Message.Timestamp || isNew)

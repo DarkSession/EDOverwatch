@@ -21,14 +21,22 @@
         [ForeignKey("CycleEndId")]
         public ThargoidCycle? CycleEnd { get; set; }
 
+        [ForeignKey("StateExpiresId")]
+        public ThargoidCycle? StateExpires { get; set; }
+
         [ForeignKey("MaelstromId")]
         public ThargoidMaelstrom? Maelstrom { get; set; }
 
         [Column]
         public short? Progress { get; set; }
 
+        [ForeignKey("CurrentProgressId")]
+        public StarSystemThargoidLevelProgress? CurrentProgress { get; set; }
+
         [Column]
         public DateTimeOffset Created { get; set; }
+
+        public IEnumerable<StarSystemThargoidLevelProgress>? ProgressHistory { get; set; }
 
         public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progress, DateTimeOffset created)
         {

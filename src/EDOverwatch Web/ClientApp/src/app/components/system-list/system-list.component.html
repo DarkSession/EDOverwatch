@@ -1,6 +1,6 @@
 <div class="table-container">
     <div class="table" [ngStyle]="{ 'height.vh': maxHeight }">
-        <table mat-table [dataSource]="dataSource" matSort>
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="FactionOperations" matSortDirection="desc" matSortDisableClear>
             <ng-container matColumnDef="Name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
                 <td mat-cell *matCellDef="let row">

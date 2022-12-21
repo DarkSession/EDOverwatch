@@ -1,0 +1,9 @@
+.station-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+.station-name {
+    display: flex;
+}

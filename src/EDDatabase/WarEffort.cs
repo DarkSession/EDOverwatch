@@ -117,8 +117,11 @@ namespace EDDatabase
     public enum WarEffortTypeGroup : byte
     {
         Kills,
+        [EnumMember(Value = "Rescues")]
         Rescue,
+        [EnumMember(Value = "Supplies")]
         Supply,
+        [EnumMember(Value = "Missions")]
         Mission,
         // Disruption,
     }

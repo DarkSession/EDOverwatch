@@ -42,10 +42,14 @@ namespace EDDatabase
         AXCombat,
         Rescue,
         Logistics,
+        [EnumMember(Value = "General Operations")]
+        General,
     }
 
     public enum DcohFactionOperationStatus
     {
-        Active = 1,
+        Inactive = 0,
+        Active,
+        Expired,
     }
 }

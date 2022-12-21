@@ -54,7 +54,7 @@ namespace EDDBSync
                         {
                             long population = eddbStarSystem.Population ?? 0;
                             StarSystem starSystem = new(0, eddbStarSystem.SystemAddress, eddbStarSystem.Name, eddbStarSystem.X, eddbStarSystem.Y, eddbStarSystem.Z, population, population, false, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
-                            starSystem.WarRelevantSystem = starSystem.IsWarRelevantSystem;
+                            starSystem.UpdateWarRelevantSystem();
                             if (!string.IsNullOrEmpty(eddbStarSystem.Allegiance))
                             {
                                 starSystem.Allegiance = await FactionAllegiance.GetByName(eddbStarSystem.Allegiance, dbContext);

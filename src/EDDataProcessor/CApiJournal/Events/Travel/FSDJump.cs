@@ -45,7 +45,7 @@
                     false,
                     Timestamp,
                     Timestamp);
-                starSystem.WarRelevantSystem = starSystem.IsWarRelevantSystem;
+                starSystem.UpdateWarRelevantSystem();
                 dbContext.StarSystems.Add(starSystem);
             }
             if (starSystem.Updated < Timestamp || isNew)

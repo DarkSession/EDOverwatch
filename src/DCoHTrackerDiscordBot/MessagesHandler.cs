@@ -44,12 +44,6 @@ namespace DCoHTrackerDiscordBot
                                 ExtractSystemProgressResult result = await SystemProgressRecognition.ExtractSystemProgress(imageContent, Log);
                                 if (result.Success)
                                 {
-                                    embed.AddField("System Name", Format.Sanitize(result.SystemName));
-                                    embed.AddField("System State", result.SystemStatus.GetEnumMemberValue(), true);
-                                    embed.AddField("Progress", result.Progress + "%", true);
-                                    embed.AddField("Remaining Time", result.RemainingTime.TotalDays + " days", true);
-                                    screenshots++;
-
                                     StarSystem? starSystem = await DbContext.StarSystems
                                         .Include(s => s.ThargoidLevel)
                                         .FirstOrDefaultAsync(s =>
@@ -70,6 +64,12 @@ namespace DCoHTrackerDiscordBot
                                         if (thargoidState == starSystem.ThargoidLevel.State && (starSystem.ThargoidLevel.Progress ?? 0) < progress)
                                         {
                                             starSystem.ThargoidLevel.Progress = progress;
+                                            StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, progress)
+                                            {
+                                                ThargoidLevel = starSystem.ThargoidLevel,
+                                            };
+                                            DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
+                                            starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
                                             await DbContext.SaveChangesAsync();
                                         }
                                     }
@@ -78,6 +78,39 @@ namespace DCoHTrackerDiscordBot
                                         imageContent.Position = 0;
                                         await File.WriteAllBytesAsync($"Failed_{Guid.NewGuid()}.png", imageContent.ToArray());
                                     }
+
+                                    List<string> remainingTime = new();
+                                    int weeks = (int)Math.Floor(result.RemainingTime.TotalDays / 7d);
+                                    int days = (int)result.RemainingTime.TotalDays - (weeks * 7);
+
+                                    if (days > 0)
+                                    {
+                                        if (days == 1)
+                                        {
+                                            remainingTime.Add("1 day");
+                                        }
+                                        else
+                                        {
+                                            remainingTime.Add($"{days} days");
+                                        }
+                                    }
+                                    if (weeks > 0)
+                                    {
+                                        if (weeks == 1)
+                                        {
+                                            remainingTime.Add("1 week");
+                                        }
+                                        else
+                                        {
+                                            remainingTime.Add($"{weeks} weeks");
+                                        }
+                                    }
+
+                                    embed.AddField("System Name", Format.Sanitize(result.SystemName));
+                                    embed.AddField("System State", result.SystemStatus.GetEnumMemberValue(), true);
+                                    embed.AddField("Progress", result.Progress + "%", true);
+                                    embed.AddField("Remaining Time", string.Join(", ", remainingTime), true);
+                                    screenshots++;
                                 }
                             }
                         }

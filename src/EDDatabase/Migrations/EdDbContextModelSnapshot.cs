@@ -508,6 +508,9 @@ namespace EDDatabase.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int?>("CurrentProgressId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("CycleEndId")
                         .HasColumnType("int");
 
@@ -526,7 +529,12 @@ namespace EDDatabase.Migrations
                     b.Property<byte>("State")
                         .HasColumnType("tinyint unsigned");
 
+                    b.Property<int?>("StateExpiresId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CurrentProgressId");
 
                     b.HasIndex("CycleEndId");
 
@@ -538,7 +546,31 @@ namespace EDDatabase.Migrations
 
                     b.HasIndex("State");
 
+                    b.HasIndex("StateExpiresId");
+
                     b.ToTable("StarSystemThargoidLevel");
+                });
+
+            modelBuilder.Entity("EDDatabase.StarSystemThargoidLevelProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<short?>("Progress")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("ThargoidLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("Updated")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ThargoidLevelId");
+
+                    b.ToTable("StarSystemThargoidLevelProgress");
                 });
 
             modelBuilder.Entity("EDDatabase.Station", b =>
@@ -867,6 +899,10 @@ namespace EDDatabase.Migrations
 
             modelBuilder.Entity("EDDatabase.StarSystemThargoidLevel", b =>
                 {
+                    b.HasOne("EDDatabase.StarSystemThargoidLevelProgress", "CurrentProgress")
+                        .WithMany()
+                        .HasForeignKey("CurrentProgressId");
+
                     b.HasOne("EDDatabase.ThargoidCycle", "CycleEnd")
                         .WithMany()
                         .HasForeignKey("CycleEndId");
@@ -883,6 +919,12 @@ namespace EDDatabase.Migrations
                         .WithMany("ThargoidLevelHistory")
                         .HasForeignKey("StarSystemId");
 
+                    b.HasOne("EDDatabase.ThargoidCycle", "StateExpires")
+                        .WithMany()
+                        .HasForeignKey("StateExpiresId");
+
+                    b.Navigation("CurrentProgress");
+
                     b.Navigation("CycleEnd");
 
                     b.Navigation("CycleStart");
@@ -890,6 +932,17 @@ namespace EDDatabase.Migrations
                     b.Navigation("Maelstrom");
 
                     b.Navigation("StarSystem");
+
+                    b.Navigation("StateExpires");
+                });
+
+            modelBuilder.Entity("EDDatabase.StarSystemThargoidLevelProgress", b =>
+                {
+                    b.HasOne("EDDatabase.StarSystemThargoidLevel", "ThargoidLevel")
+                        .WithMany("ProgressHistory")
+                        .HasForeignKey("ThargoidLevelId");
+
+                    b.Navigation("ThargoidLevel");
                 });
 
             modelBuilder.Entity("EDDatabase.Station", b =>
@@ -956,6 +1009,11 @@ namespace EDDatabase.Migrations
                     b.Navigation("Stations");
 
                     b.Navigation("ThargoidLevelHistory");
+                });
+
+            modelBuilder.Entity("EDDatabase.StarSystemThargoidLevel", b =>
+                {
+                    b.Navigation("ProgressHistory");
                 });
 #pragma warning restore 612, 618
         }

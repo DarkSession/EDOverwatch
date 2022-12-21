@@ -3,16 +3,37 @@
     public class OverwatchStarSystemDetail : OverwatchStarSystem
     {
         public long Population { get; }
+        public DateTimeOffset LastTickTime { get; }
+        public DateOnly LastTickDate { get; }
         public List<OverwatchStarSystemWarEffort> WarEfforts { get; }
         public List<FactionOperation> FactionOperationDetails { get; }
+        public List<OverwatchStation> Stations { get; }
+        public List<OverwatchStarSystemWarEffortType> WarEffortTypes => Enum.GetValues<WarEffortType>()
+            .Select(w => new OverwatchStarSystemWarEffortType(w))
+            .ToList();
+        public List<OverwatchStarSystemWarEffortSource> WarEffortSources => Enum.GetValues<WarEffortSource>()
+            .Select(w => new OverwatchStarSystemWarEffortSource(w))
+            .ToList();
 
-        public OverwatchStarSystemDetail(StarSystem starSystem, decimal effortFocus, List<EDDatabase.WarEffort> warEfforts, List<FactionOperation> factionOperationDetails) :
+        public OverwatchStarSystemDetail(
+            StarSystem starSystem,
+            decimal effortFocus,
+            List<EDDatabase.WarEffort> warEfforts,
+            List<FactionOperation> factionOperationDetails,
+            List<Station> stations
+            ) :
             base(starSystem, effortFocus, 0, new(), 0, 0, 0)
         {
             Population = starSystem.Population;
             WarEfforts = warEfforts.Select(w => new OverwatchStarSystemWarEffort(w)).ToList();
             FactionOperations = factionOperationDetails.Count;
             FactionOperationDetails = factionOperationDetails;
+            Stations = stations.Select(s => new OverwatchStation(s)).ToList();
+            StationsUnderRepair = stations.Where(s => s.State == StationState.UnderRepairs).Count();
+            StationsDamaged = stations.Where(s => s.State == StationState.Damaged).Count();
+            StationsUnderAttack = stations.Where(s => s.State == StationState.UnderAttack).Count();
+            LastTickTime = WeeklyTick.GetLastTick();
+            LastTickDate = DateOnly.FromDateTime(LastTickTime.DateTime);
         }
 
         public static async Task<OverwatchStarSystemDetail?> Create(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
@@ -26,7 +47,6 @@
             if (starSystem?.ThargoidLevel != null)
             {
                 Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
-
                 decimal effortFocus = 0;
                 if (totalEffortSums.Any())
                 {
@@ -94,9 +114,51 @@
                     factionOperations = dcohFactionOperation.Select(d => new FactionOperation(d)).ToList();
                 }
 
-                return new OverwatchStarSystemDetail(starSystem, effortFocus, warEfforts, factionOperations);
+                List<Station> stations = await dbContext.Stations
+                    .AsNoTracking()
+                    .Include(s => s.Type)
+                    .Where(s => s.StarSystem == starSystem && StationTypes.Contains(s.Type!.Name) && s.State != StationState.Normal)
+                    .ToListAsync(cancellationToken);
+
+                return new OverwatchStarSystemDetail(starSystem, effortFocus, warEfforts, factionOperations, stations);
             }
             return null;
+        }
+
+        private static List<string> StationTypes { get; } = new()
+        {
+            "Bernal",
+            "Orbis",
+            "Coriolis",
+            "CraterOutpost",
+            "MegaShip",
+            "Outpost",
+            "CraterPort",
+            "Ocellus",
+            "AsteroidBase",
+        };
+    }
+
+    public class OverwatchStarSystemWarEffortType
+    {
+        public int TypeId { get; }
+        public string Name { get; set; }
+
+        public OverwatchStarSystemWarEffortType(WarEffortType warEffortType)
+        {
+            TypeId = (int)warEffortType;
+            Name = warEffortType.GetEnumMemberValue();
+        }
+    }
+
+    public class OverwatchStarSystemWarEffortSource
+    {
+        public int SourceId { get; }
+        public string Name { get; }
+        public OverwatchStarSystemWarEffortSource(WarEffortSource warEffortSource)
+        {
+            SourceId = (int)warEffortSource;
+            Name = warEffortSource.GetEnumMemberValue();
         }
     }
 }

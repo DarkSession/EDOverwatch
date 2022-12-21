@@ -86,7 +86,12 @@ namespace EDDatabase
         }
 
         [NotMapped]
-        public bool IsWarRelevantSystem => Population > 0 && DistanceTo(Vector3.Zero) <= 1000f;
+        public bool RefreshedWarRelevantSystem => Population > 0 && DistanceTo(Vector3.Zero) <= 1000f;
+
+        public void UpdateWarRelevantSystem()
+        {
+            WarRelevantSystem = RefreshedWarRelevantSystem;
+        }
 
         public float DistanceTo(StarSystem system) => DistanceTo((float)system.LocationX, (float)system.LocationY, (float)system.LocationZ);
 

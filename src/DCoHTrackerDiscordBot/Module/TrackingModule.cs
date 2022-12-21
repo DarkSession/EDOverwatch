@@ -89,6 +89,65 @@ namespace DCoHTrackerDiscordBot.Module
             await FollowupAsync($"Registered {type.GetEnumMemberValue()} operations by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
         }
 
+        [SlashCommand("remove", "Remove a registered operation")]
+        public async Task Remove(
+            [Summary("Operation", "Operation Type")] OperationType operation,
+            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
+            [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
+        {
+            if (!await CheckElevatedGuild())
+            {
+                return;
+            }
+            starSystemName = starSystemName.Replace("%", string.Empty).Trim();
+            if (string.IsNullOrEmpty(starSystemName) || starSystemName.Length < 3 || starSystemName.Length > 64)
+            {
+                await RespondAsync("The system name is invalid.", ephemeral: true);
+                return;
+            }
+
+            DcohDiscordUser? user = await DbContext.DcohDiscordUsers
+                .Include(d => d.Faction)
+                .FirstOrDefaultAsync(d => d.DiscordId == Context.User.Id);
+            if (user?.Faction == null)
+            {
+                await RespondAsync("You are currently not registered to a squadron. Please run the `/squadron` command.", ephemeral: true);
+                return;
+            }
+
+            await DeferAsync();
+
+            StarSystem? starSystem = await DbContext.StarSystems
+                .Include(s => s.ThargoidLevel)
+                .ThenInclude(t => t!.Maelstrom)
+                .FirstOrDefaultAsync(s =>
+                    s.ThargoidLevel != null &&
+                    s.ThargoidLevel.Maelstrom != null &&
+                    s.ThargoidLevel.State > StarSystemThargoidLevelState.None &&
+                    EF.Functions.Like(s.Name, starSystemName));
+            if (starSystem == null)
+            {
+                await FollowupAsync("The system could not be found.", ephemeral: true);
+                return;
+            }
+
+            DcohFactionOperationType type = OperationTypeToDcohFactionOperationType(operation);
+            DcohFactionOperation? dcohFactionOperation = await DbContext.DcohFactionOperations.FirstOrDefaultAsync(d =>
+                        d.StarSystem == starSystem &&
+                        d.Status == DcohFactionOperationStatus.Active &&
+                        d.Faction == user.Faction &&
+                        d.Type == type);
+            if (dcohFactionOperation == null)
+            {
+                await FollowupAsync($"No {type.GetEnumMemberValue()} operation was found in {starSystem.Name} for your squadron.", ephemeral: true);
+                return;
+            }
+            dcohFactionOperation.Status = DcohFactionOperationStatus.Inactive;
+            await DbContext.SaveChangesAsync();
+
+            await FollowupAsync($"Removed {type.GetEnumMemberValue()} operations by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
+        }
+
         [SlashCommand("view", "View operation by type")]
         public async Task View(
             [Summary("Operation", "Operation Type")] OperationType? operation = null,
@@ -173,6 +232,7 @@ namespace DCoHTrackerDiscordBot.Module
                 OperationType.AXCombat => DcohFactionOperationType.AXCombat,
                 OperationType.Rescue => DcohFactionOperationType.Rescue,
                 OperationType.Logistics => DcohFactionOperationType.Logistics,
+                OperationType.General => DcohFactionOperationType.General,
                 _ => DcohFactionOperationType.Unknown,
             };
         }
@@ -274,5 +334,8 @@ namespace DCoHTrackerDiscordBot.Module
         AXCombat,
         Rescue,
         Logistics,
+        [EnumMember(Value = "General Purpose")]
+        [ChoiceDisplay("General Purpose")]
+        General,
     }
 }

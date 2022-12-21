@@ -1,0 +1,36 @@
+<div class="table-container">
+    <div class="table" style="max-height: 40vh">
+        <table mat-table [dataSource]="warEfforts" matSort>
+            <ng-container matColumnDef="Date">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.Date }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Source">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Source</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.Source }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.Type }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Amount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+                <td mat-cell *matCellDef="let row" class="number">
+                    {{ row.Amount | number }}
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="warEffortsDisplayedColumns; sticky: true" class="thead">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: warEffortsDisplayedColumns;"></tr>
+        </table>
+        <div *ngIf="warEfforts.data.length === 0" class="empty-table">
+            No records found.
+        </div>
+    </div>
+</div>

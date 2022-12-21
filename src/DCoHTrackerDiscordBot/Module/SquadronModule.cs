@@ -182,7 +182,7 @@ namespace DCoHTrackerDiscordBot.Module
             await RespondAsync($"{Context.User.Mention} registered the squadron **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})**.", allowedMentions: mentions);
         }
 
-        [GeneratedRegex("^[0-9a-z \\-]{4,64}$", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-CH")]
+        [GeneratedRegex(@"^[0-9a-z \-']{4,64}$", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-CH")]
         private static partial Regex SquadronNameRegexGenerator();
 
         [GeneratedRegex("^[A-Z0-9]{4}$", RegexOptions.Compiled, "en-CH")]

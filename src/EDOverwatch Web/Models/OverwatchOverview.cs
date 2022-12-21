@@ -30,7 +30,7 @@
                     .CountAsync(cancellationToken);
                 var warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
-                    .Where(w => w.Side == WarEffortSide.Thargoids)
+                    .Where(w => w.Side == WarEffortSide.Thargoids && w.StarSystem!.WarRelevantSystem && w.StarSystem!.ThargoidLevel != null)
                     .GroupBy(w => w.Type)
                     .Select(w => new
                     {
@@ -56,7 +56,7 @@
 
                 var warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
-                    .Where(w => w.Side == WarEffortSide.Humans)
+                    .Where(w => w.Side == WarEffortSide.Humans && w.StarSystem!.WarRelevantSystem && w.StarSystem!.ThargoidLevel != null)
                     .GroupBy(w => w.Type)
                     .Select(w => new
                     {

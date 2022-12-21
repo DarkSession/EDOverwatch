@@ -162,7 +162,7 @@ namespace EDOverwatch_Web.Controllers.V1
                         if (isCommanderNew)
                         {
                             CommanderCApi commanderCApi = new(oAuthenticationResult.CustomerId);
-                            await Producer.SendAsync(CommanderCApi.QueueName, CommanderCApi.Routing, commanderCApi.Message, cancellationToken);
+                            await Producer.SendAsync(CommanderCApi.QueueName, CommanderCApi.Routing, JsonConvert.SerializeObject(commanderCApi.Message), cancellationToken);
                         }
                         return new OAuthResponse(new MeResponse(commander.User));
                     }

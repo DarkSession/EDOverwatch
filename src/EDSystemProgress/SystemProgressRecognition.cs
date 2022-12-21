@@ -12,17 +12,19 @@ namespace EDSystemProgress
     {
         private static List<ColorRange> InvasionProgressColors { get; } = new()
         {
-            new ColorRange(80, 190, 15, 60, 105, 255),
+            new ColorRange(80, 190, 15, 65, 98, 255),
             new ColorRange(235, 255, 235, 255, 235, 255),
         };
 
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
-            new ColorRange(30, 67, 43, 100, 0, 10),
+            new ColorRange(30, 67, 43, 100, 0, 32),
         };
 
         private static List<ColorRange> AlertProgressColors { get; } = new()
         {
+            new ColorRange(140, 160, 140, 160, 140, 160),
+            new ColorRange(150, 170, 170, 180, 150, 170),
             new ColorRange(160, 180, 160, 180, 160, 180),
             new ColorRange(170, 190, 170, 190, 170, 190),
             new ColorRange(180, 200, 180, 200, 180, 200),
@@ -35,7 +37,7 @@ namespace EDSystemProgress
 
         private static List<ColorRange> AlertRemainingColors { get; } = new()
         {
-            new ColorRange(120, 150, 50, 70, 0, 5),
+            new ColorRange(120, 180, 50, 102, 0, 47),
         };
 
         public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent, ILogger log)
@@ -43,14 +45,16 @@ namespace EDSystemProgress
             Guid fileId = Guid.NewGuid();
             log.LogDebug("Starting analysis of file ({fileSize}). Id: {Id}", imageContent.Length, fileId);
 
-            await using MemoryStream tempImage = new();
+            await using MemoryStream invertedImage = new();
             {
                 using Image image = await Image.LoadAsync(imageContent);
                 image.Mutate(x => x.Invert());
-                await image.SaveAsPngAsync(tempImage);
-                await image.SaveAsPngAsync("test.png");
+                await image.SaveAsPngAsync(invertedImage);
+#if DEBUG
+                await image.SaveAsPngAsync($"test_result{fileId}_i.png");
+#endif
             }
-            byte[] file = tempImage.ToArray();
+            byte[] file = invertedImage.ToArray();
 
             using TesseractEngine engine = new("tessdata", "eng", EngineMode.Default, "config");
             engine.SetVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890:.- ");
@@ -168,12 +172,12 @@ namespace EDSystemProgress
                                     {
                                         case SystemStatus.InvasionInProgress:
                                             {
-                                                match = text.Contains("ACTIVE PORTS REMAINING");
+                                                match = text.Contains("PORTS REMAINING");
                                                 break;
                                             }
                                         case SystemStatus.InvasionPrevented:
                                             {
-                                                match = text.Contains("ACTIVE PORTS REMAINING");
+                                                match = text.Contains("PORTS REMAINING");
                                                 if (!match && text.Contains("BEGINS"))
                                                 {
                                                     remainingTime = text;
@@ -323,13 +327,13 @@ namespace EDSystemProgress
                     }
                 });
 #if DEBUG
-                await image.SaveAsPngAsync($"test_result{Guid.NewGuid()}.png");
+                await image.SaveAsPngAsync($"test_result{fileId}.png");
 #endif
                 int progressRemainingPixels = pixelsProgress + pixelsRemaining;
                 if (progressRemainingPixels > 1000)
                 {
-                    progress = Math.Round(pixelsProgress / (decimal)progressRemainingPixels * 100, 0);
-                    remaining = Math.Round(pixelsRemaining / (decimal)progressRemainingPixels * 100, 0);
+                    progress = Math.Round(pixelsProgress / (decimal)progressRemainingPixels * 50, 0) * 2;
+                    remaining = Math.Round(pixelsRemaining / (decimal)progressRemainingPixels * 50, 0) * 2;
 
                     switch (systemStatus)
                     {
@@ -466,7 +470,6 @@ namespace EDSystemProgress
         public bool Success { get; }
         public string SystemName { get; }
         public SystemStatus SystemStatus { get; }
-        // public string SystemStatus { get; }
         public decimal Progress { get; }
         public decimal Remaining { get; }
         public TimeSpan RemainingTime { get; }

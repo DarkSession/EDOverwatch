@@ -1,13 +1,15 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { OverwatchStation } from '../station-name/station-name.component';
+import { Chart, ChartConfiguration, ChartDataset, ChartEvent, ChartType, ChartTypeRegistry } from 'chart.js';
+
+import { AnnotationOptions, default as Annotation } from 'chartjs-plugin-annotation';
 
 @UntilDestroy()
 @Component({
@@ -16,17 +18,48 @@ import { OverwatchStarSystem } from '../system-list/system-list.component';
   styleUrls: ['./system.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SystemComponent implements OnInit {
+export class SystemComponent implements AfterViewInit {
   public readonly faClipboard = faClipboard;
   public starSystem: OverwatchStarSystemDetail | null = null;
+  public lineChartData: ChartConfiguration['data'] = {
+    datasets: [],
+    labels: [],
+  };
 
-  public warEfforts: MatTableDataSource<OverwatchStarSystemWarEffort> = new MatTableDataSource<OverwatchStarSystemWarEffort>();
-  public readonly warEffortsDisplayedColumns = ['Date', 'Source', 'Type', 'Amount'];
-  @ViewChild('warEffortsSort') warEffortsSort!: MatSort;
+  public lineChartOptions: ChartConfiguration['options'] = {
+    elements: {
+      line: {
+        tension: 0.5
+      }
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      // We use this empty structure as a placeholder for dynamic theming.
+      y: {
+        position: 'left',
+      }
+      /*
+      y1: {
+        position: 'right',
+        grid: {
+          color: 'rgba(255,0,0,0.3)',
+        },
+        ticks: {
+          color: 'red'
+        }
+      }
+      */
+    },
+    plugins: {
+      legend: { display: true },
+      annotation: {
+        annotations: [],
+      }
+    }
+  };
 
-  public factionOperations: MatTableDataSource<FactionOperation> = new MatTableDataSource<FactionOperation>();
-  public readonly factionOperationsDisplayedColumns = ['Faction', 'Type', 'Started'];
-  @ViewChild('factionOperationsSort') factionOperationsSort!: MatSort;
+  public lineChartType: ChartType = 'line';
 
   public constructor(
     private readonly route: ActivatedRoute,
@@ -34,9 +67,10 @@ export class SystemComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly matSnackBar: MatSnackBar
   ) {
+    Chart.register(Annotation)
   }
 
-  public ngOnInit(): void {
+  public ngAfterViewInit(): void {
     this.route.paramMap
       .pipe(untilDestroyed(this))
       .subscribe((p: ParamMap) => {
@@ -53,18 +87,51 @@ export class SystemComponent implements OnInit {
     });
     if (response && response.Data) {
       this.starSystem = response.Data;
-
-      this.factionOperations = new MatTableDataSource<FactionOperation>(this.starSystem.FactionOperationDetails);
-      this.factionOperations.sort = this.factionOperationsSort;
-      this.factionOperations.sortingDataAccessor = (factionOperations: FactionOperation, columnName: string): string => {
-        return factionOperations[columnName as keyof FactionOperation] as string;
+      let labels: string[] = [];
+      for (const warEffort of this.starSystem.WarEfforts) {
+        if (!labels.includes(warEffort.Date)) {
+          labels.push(warEffort.Date);
+        }
+      }
+      labels = labels.sort();
+      const totalAmounts: {
+        [key: string]: Int32Array
+      } = {};
+      for (const warEffort of this.starSystem.WarEfforts) {
+        if (!totalAmounts[warEffort.TypeGroup]) {
+          totalAmounts[warEffort.TypeGroup] = new Int32Array(labels.length);
+        }
+        const index = labels.findIndex(l => l === warEffort.Date);
+        totalAmounts[warEffort.TypeGroup][index] += warEffort.Amount;
       }
 
-      this.warEfforts = new MatTableDataSource<OverwatchStarSystemWarEffort>(this.starSystem.WarEfforts);
-      this.warEfforts.sort = this.warEffortsSort;
-      this.warEfforts.sortingDataAccessor = (warEffort: OverwatchStarSystemWarEffort, columnName: string): string => {
-        return warEffort[columnName as keyof OverwatchStarSystemWarEffort] as string;
+      const datasets: ChartDataset[] = [];
+      for (const label in totalAmounts) {
+        datasets.push({
+          label: label,
+          data: Array.from(totalAmounts[label]),
+        });
       }
+
+      const annotations: AnnotationOptions[] = [
+        {
+          type: 'line',
+          scaleID: 'x',
+          value: this.starSystem.LastTickDate,
+          borderColor: 'orange',
+          borderWidth: 2,
+          label: {
+            display: true,
+            position: 'center',
+            color: 'orange',
+            content: 'Weekly tick'
+          }
+        },
+      ];
+
+      this.lineChartData.labels = labels;
+      this.lineChartData.datasets = datasets;
+      this.lineChartOptions!.plugins!.annotation!.annotations = annotations;
       this.changeDetectorRef.markForCheck();
     }
   }
@@ -78,22 +145,36 @@ export class SystemComponent implements OnInit {
       duration: 2000,
     });
   }
+
+  public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
+    console.log(event, active);
+  }
+
+  public chartHovered({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
+    console.log(event, active);
+  }
 }
 
-interface OverwatchStarSystemDetail extends OverwatchStarSystem {
+export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   Population: number;
   WarEfforts: OverwatchStarSystemWarEffort[];
   FactionOperationDetails: FactionOperation[];
+  Stations: OverwatchStation[];
+  LastTickTime: string;
+  LastTickDate: string;
 }
 
-interface OverwatchStarSystemWarEffort {
+export interface OverwatchStarSystemWarEffort {
   Date: string;
   Type: string;
+  TypeId: number,
+  TypeGroup: string;
   Source: string;
+  SourceId: number;
   Amount: number;
 }
 
-interface FactionOperation {
+export interface FactionOperation {
   Faction: string;
   Type: string;
   Started: string;

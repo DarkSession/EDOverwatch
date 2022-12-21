@@ -1,4 +1,5 @@
 global using EDDatabase;
+global using EDUtils;
 global using Microsoft.EntityFrameworkCore;
 using ActiveMQ.Artemis.Client.Extensions.DependencyInjection;
 using ActiveMQ.Artemis.Client.Extensions.Hosting;

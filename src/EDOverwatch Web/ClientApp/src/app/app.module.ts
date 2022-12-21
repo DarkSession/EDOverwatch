@@ -20,6 +20,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { TimeagoModule } from 'ngx-timeago';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { AuthenticationGuard } from './guards/authentication.guard';
 
@@ -42,6 +43,10 @@ import { FaqComponent } from './components/faq/faq.component';
 import { ThargoidLevelComponent } from './components/thargoid-level/thargoid-level.component';
 import { SystemStarportStatusComponent } from './components/system-starport-status/system-starport-status.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { StationNameComponent } from './components/station-name/station-name.component';
+import { SystemStationsComponent } from './components/system-stations/system-stations.component';
+import { SystemOperationsComponent } from './components/system-operations/system-operations.component';
+import { SystemContributionsComponent } from './components/system-contributions/system-contributions.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -67,6 +72,10 @@ export const httpInterceptorProviders = [
     FaqComponent,
     ThargoidLevelComponent,
     SystemStarportStatusComponent,
+    StationNameComponent,
+    SystemStationsComponent,
+    SystemOperationsComponent,
+    SystemContributionsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -85,7 +94,8 @@ export const httpInterceptorProviders = [
     MatIconModule,
     MatButtonModule,
     MatProgressBarModule,
-
+    MatTabsModule,
+    NgChartsModule,
     RouterModule.forRoot([
       {
         path: 'about',
@@ -135,7 +145,6 @@ export const httpInterceptorProviders = [
         component: HomeComponent
       },
     ]),
-    NgChartsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

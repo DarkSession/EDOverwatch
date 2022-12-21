@@ -21,7 +21,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
             {
                 if (queueName == StarSystemUpdated.QueueName &&
                     json.ToObject<StarSystemUpdated>() is StarSystemUpdated starSystemUpdated &&
-                    !await dbContext.StarSystems.AnyAsync(s => s.SystemAddress == starSystemUpdated.SystemAddress && s.IsWarRelevantSystem, cancellationToken))
+                    !await dbContext.StarSystems.AnyAsync(s => s.SystemAddress == starSystemUpdated.SystemAddress && s.WarRelevantSystem, cancellationToken))
                 {
                     return;
                 }

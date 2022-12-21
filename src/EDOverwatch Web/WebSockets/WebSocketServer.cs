@@ -210,7 +210,11 @@ namespace EDOverwatch_Web.WebSockets
             await TriggerWebSocketAction(webSocketSession, WebSocketAction.OnUserDisconnected, serviceScopeFactory, cancellationToken);
             if (ws.State == WebSocketState.Open)
             {
-                await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancellationToken);
+                try
+                {
+                    await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancellationToken);
+                }
+                catch { }
             }
         }
 
