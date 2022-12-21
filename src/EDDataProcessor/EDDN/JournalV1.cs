@@ -159,6 +159,22 @@ namespace EDDataProcessor.EDDN
                                 station.MarketId = Message.MarketID;
                                 changed = true;
                             }
+                            if (Message.Event != MessageEvent.Location && Message.LandingPads != null)
+                            {
+                                if (station.LandingPadLarge != Message.LandingPads.Large)
+                                {
+                                    station.LandingPadLarge = Message.LandingPads.Large;
+                                }
+                                if (station.LandingPadMedium != Message.LandingPads.Medium)
+                                {
+                                    station.LandingPadMedium = Message.LandingPads.Medium;
+                                }
+                                if (station.LandingPadSmall != Message.LandingPads.Small)
+                                {
+                                    station.LandingPadSmall = Message.LandingPads.Small;
+                                }
+                            }
+                            if (Message.Event != MessageEvent.Location)
                             {
                                 StationState stationState = StationState.Normal;
                                 if (!string.IsNullOrEmpty(Message.StationState))

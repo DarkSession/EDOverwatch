@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Tesseract;
@@ -114,6 +115,33 @@ namespace EDSystemProgress
                                         systemName = text;
                                     }
                                     processingStep = ImageProcessingStep.NextStep;
+#if DEBUG
+                                    do
+                                    {
+                                        do
+                                        {
+                                            using ChoiceIterator choiceIter = iter.GetChoiceIterator();
+                                            float symbolConfidence = iter.GetConfidence(PageIteratorLevel.Symbol) / 100;
+                                            if (choiceIter != null)
+                                            {
+                                                log.LogDebug("<symbol text=\"{0}\" confidence=\"{1:P}\">", iter.GetText(PageIteratorLevel.Symbol), symbolConfidence);
+                                                log.LogDebug("<choices>");
+                                                do
+                                                {
+                                                    float choiceConfidence = choiceIter.GetConfidence() / 100;
+                                                    log.LogDebug("<choice text=\"{0}\" confidence\"{1:P}\"/>", choiceIter.GetText(), choiceConfidence);
+
+                                                } while (choiceIter.Next());
+                                                log.LogDebug("</choices>");
+                                                log.LogDebug("</symbol>");
+                                            }
+                                            else
+                                            {
+                                                log.LogDebug("<symbol text=\"{0}\" confidence=\"{1:P}\"/>", iter.GetText(PageIteratorLevel.Symbol), symbolConfidence);
+                                            }
+                                        } while (iter.Next(PageIteratorLevel.Word, PageIteratorLevel.Symbol));
+                                    } while (iter.Next(PageIteratorLevel.TextLine, PageIteratorLevel.Word));
+#endif
                                     break;
                                 }
                             case ImageProcessingStep.NextStep:
@@ -396,12 +424,14 @@ namespace EDSystemProgress
                 remTime);
         }
 
-        // I had a hard time configuring Tesseract to use my word lists, but no success.
-        // So...
+        // Manually fixing some stuff until a better solution is found...
         private static Dictionary<string, string> SystemNameCorrections { get; } = new()
         {
             { "ARIETIS SECTOR AG-P B5-0", "ARIETIS SECTOR AQ-P B5-0" },
-            { "OBASSI 0SAW", "OBASSI OSAW" }
+            { "OBASSI 0SAW", "OBASSI OSAW" },
+            { "HIP 20880", "HIP 20890" },
+            { "HIP 20816", "HIP 20916" },
+            { "HIP 208186", "HIP 20916" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

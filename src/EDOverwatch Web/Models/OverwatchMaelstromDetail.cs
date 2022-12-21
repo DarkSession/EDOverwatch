@@ -21,12 +21,11 @@
             {
                 throw new Exception("StarSystem is null");
             }
-            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 0);
-
+            DateTimeOffset lastTick = WeeklyTick.GetLastTick();
             DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
-            if (currentThargoidCycle.Start < stationMaxAge)
+            if (lastTick < stationMaxAge)
             {
-                stationMaxAge = currentThargoidCycle.Start;
+                stationMaxAge = lastTick;
             }
 
             var systems = await dbContext.StarSystems

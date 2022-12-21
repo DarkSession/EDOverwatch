@@ -70,6 +70,11 @@
         <span>Humanity is in the Aftermath War</span>
         <span>with the Thargoids for</span>
         <h1>{{ timeSince }}</h1>
+        <br>
+        <br>
+        <button mat-raised-button color="primary" routerLink="get-involved">
+          <b>Get involved</b>
+        </button>
       </div>
       <div class="item-center">
         <div class="key-indicators" *ngIf="overview && overview.Humans">
@@ -112,10 +117,6 @@
             systems being recaptured
           </div>
         </ng-container>
-        <br>
-        <button mat-raised-button color="primary" routerLink="get-involved">
-          <b>Get involved</b>
-        </button>
       </div>
     </div>
     <div class="content content-thargoid">

@@ -174,16 +174,24 @@ namespace EDOverwatch_Web.WebSockets
             while (ws.State == WebSocketState.Open && !disconnect)
             {
                 await using MemoryStream message = new();
+
                 WebSocketReceiveResult webSocketReceiveResult;
-                do
+                try
                 {
-                    webSocketReceiveResult = await ws.ReceiveAsync(buffer, cancellationToken);
-                    if (buffer.Array != null)
+                    do
                     {
-                        message.Write(buffer.Array, buffer.Offset, webSocketReceiveResult.Count);
+                        webSocketReceiveResult = await ws.ReceiveAsync(buffer, cancellationToken);
+                        if (buffer.Array != null)
+                        {
+                            message.Write(buffer.Array, buffer.Offset, webSocketReceiveResult.Count);
+                        }
                     }
+                    while (!webSocketReceiveResult.EndOfMessage);
                 }
-                while (!webSocketReceiveResult.EndOfMessage);
+                catch
+                {
+                    break;
+                }
                 message.Position = 0;
                 switch (webSocketReceiveResult.MessageType)
                 {

@@ -45,6 +45,12 @@
             Progress = progress;
             Created = created;
         }
+
+        public StarSystemThargoidLevel(short? progress, StarSystemThargoidLevelProgress? currentProgress)
+        {
+            Progress = progress;
+            CurrentProgress = currentProgress;
+        }
     }
 
     public enum StarSystemThargoidLevelState : byte
