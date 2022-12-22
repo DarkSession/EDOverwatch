@@ -37,36 +37,26 @@ export class MaelstromComponent implements OnInit {
       .subscribe((p: ParamMap) => {
         const name = p.get("name");
         if (name && this.maelstrom?.Name != name) {
-          this.requestMaelstrom(name);
+          this.websocketService.sendMessage("OverwatchMaelstrom", {
+            Name: name,
+          });
         }
       });
     this.websocketService.on<OverwatchMaelstromDetail>("OverwatchMaelstrom")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
         if (message && message.Data) {
-          this.updateMaelstrom(message.Data);
+          const data = message.Data;
+          this.maelstrom = data;
+          const sortedSystemsAtRisk = (this.sort) ? this.systemsAtRisk.sortData(data.SystemsAtRisk, this.sort) : data.SystemsAtRisk;
+          this.systemsAtRisk = new MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk>(sortedSystemsAtRisk);
+          this.systemsAtRisk.sortingDataAccessor = (system: OverwatchMaelstromDetailSystemAtRisk, columnName: string): string => {
+            return system[columnName as keyof OverwatchMaelstromDetailSystemAtRisk] as string;
+          }
+          this.systemsAtRisk.sort = this.sort;
+          this.changeDetectorRef.markForCheck();
         }
       });
-  }
-
-  private async requestMaelstrom(name: string): Promise<void> {
-    const response = await this.websocketService.sendMessageAndWaitForResponse<OverwatchMaelstromDetail>("OverwatchMaelstrom", {
-      Name: name,
-    });
-    if (response && response.Data) {
-      this.updateMaelstrom(response.Data);
-    }
-  }
-
-  private updateMaelstrom(data: OverwatchMaelstromDetail): void {
-    this.maelstrom = data;
-    const sortedSystemsAtRisk = (this.sort) ? this.systemsAtRisk.sortData(data.SystemsAtRisk, this.sort) : data.SystemsAtRisk;
-    this.systemsAtRisk = new MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk>(sortedSystemsAtRisk);
-    this.systemsAtRisk.sort = this.sort;
-    this.systemsAtRisk.sortingDataAccessor = (system: OverwatchMaelstromDetailSystemAtRisk, columnName: string): string => {
-      return system[columnName as keyof OverwatchMaelstromDetailSystemAtRisk] as string;
-    }
-    this.changeDetectorRef.markForCheck();
   }
 
   public copySystemName(starSystem: OverwatchMaelstromDetailSystemAtRisk): void {

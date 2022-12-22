@@ -21,6 +21,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { TimeagoModule } from 'ngx-timeago';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatInputModule } from '@angular/material/input';
 
 import { AuthenticationGuard } from './guards/authentication.guard';
 
@@ -47,6 +48,7 @@ import { StationNameComponent } from './components/station-name/station-name.com
 import { SystemStationsComponent } from './components/system-stations/system-stations.component';
 import { SystemOperationsComponent } from './components/system-operations/system-operations.component';
 import { SystemContributionsComponent } from './components/system-contributions/system-contributions.component';
+import { MaelstromsComponent } from './components/maelstroms/maelstroms.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -76,6 +78,7 @@ export const httpInterceptorProviders = [
     SystemStationsComponent,
     SystemOperationsComponent,
     SystemContributionsComponent,
+    MaelstromsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -95,6 +98,7 @@ export const httpInterceptorProviders = [
     MatButtonModule,
     MatProgressBarModule,
     MatTabsModule,
+    MatInputModule,
     NgChartsModule,
     RouterModule.forRoot([
       {
@@ -126,6 +130,10 @@ export const httpInterceptorProviders = [
       {
         path: 'maelstrom/:name',
         component: MaelstromComponent,
+      },
+      {
+        path: 'maelstroms',
+        component: MaelstromsComponent,
       },
       {
         path: 'my-efforts',

@@ -1,6 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Guid } from "guid-typescript";
+import * as idb from 'idb/with-async-ittr';
+import { DBSchema, IDBPDatabase } from 'idb/with-async-ittr';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +15,9 @@ export class WebsocketService {
     private responseCallbacks: {
         [key: string]: (response: WebSocketResponseMessage | null) => void;
     } = {};
+    private wsRequests: {
+        [key: string]: string;
+    } = {};
     public authenticationResolved!: Promise<void>;
     private authenticationResolve!: ((connectionStatus: void) => void);
     public onConnectionStatusChanged: EventEmitter<ConnectionStatus> = new EventEmitter<ConnectionStatus>();
@@ -22,9 +27,19 @@ export class WebsocketService {
     public connectionIsAuthenticated = false;
     public messageBacklogChanged: EventEmitter<number> = new EventEmitter<number>();
     private connectionAttempt = 0;
+    private cacheDb: IDBPDatabase<CacheDb> | null = null;
 
     public constructor() {
+        this.initDb();
         this.initalize();
+    }
+
+    private async initDb(): Promise<void> {
+        this.cacheDb = await idb.openDB<CacheDb>('OverwatchCache', 1, {
+            upgrade(db) {
+                db.createObjectStore('ws');
+            },
+        });
     }
 
     public reconnect(): void {
@@ -74,18 +89,18 @@ export class WebsocketService {
                 console.log("WebSocket.onclose", event);
             }
             if (!event.wasClean) {
-                if (this.initalizeTimeout !== null) {
-                    clearTimeout(this.initalizeTimeout);
-                }
-                const timeout = this.connectionAttempt > 5 ? 30000 : 5000;
-                this.initalizeTimeout = setTimeout(() => {
-                    this.initalize();
-                }, timeout);
-                this.connectionAttempt++;
                 if (!environment.production) {
                     console.log("Unclean close. Scheduling another connection in 10s.");
                 }
             }
+            if (this.initalizeTimeout !== null) {
+                clearTimeout(this.initalizeTimeout);
+            }
+            const timeout = this.connectionAttempt > 5 ? 30000 : 5000;
+            this.initalizeTimeout = setTimeout(() => {
+                this.initalize();
+            }, timeout);
+            this.connectionAttempt++;
             this.setConnectionStatus(ConnectionStatus.Disconnected);
             this.failCallbacks();
         };
@@ -99,7 +114,7 @@ export class WebsocketService {
                 console.log("WebSocket.onmessage", event);
             }
             const message: WebSocketResponseMessage = JSON.parse(event.data);
-            this.processMessage(message);
+            this.processMessage(message, false);
         };
     }
 
@@ -111,65 +126,86 @@ export class WebsocketService {
         this.triggerMessageBacklogEvent();
     }
 
-    private async processMessage(message: WebSocketResponseMessage): Promise<void> {
-        switch (message.Name) {
-            case "Authentication": {
-                const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
-                this.connectionIsAuthenticated = authenticationData.IsAuthenticated;
-                this.setConnectionStatus(ConnectionStatus.Connected);
-                this.connectionAttempt = 0;
-                for (const queueItem of this.messageQueue) {
-                    this.sendMessageInternal(queueItem.message, queueItem.callback);
-                }
-                this.messageQueue = [];
-                if (this.authenticationResolve) {
-                    this.authenticationResolve();
-                }
-                break;
+    private async processMessage(message: WebSocketResponseMessage, isCached: boolean): Promise<void> {
+        if (message.Name === "Authentication") {
+            const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
+            this.connectionIsAuthenticated = authenticationData.IsAuthenticated;
+            this.setConnectionStatus(ConnectionStatus.Connected);
+            this.connectionAttempt = 0;
+            for (const queueItem of this.messageQueue) {
+                this.sendMessageInternal(queueItem.message, !queueItem.message.CacheId, queueItem.callback);
             }
-            default: {
-                if (message.MessageId && this.responseCallbacks[message.MessageId]) {
-                    const callback = this.responseCallbacks[message.MessageId];
-                    delete this.responseCallbacks[message.MessageId];
-                    try {
-                        callback(message);
+            this.messageQueue = [];
+            if (this.authenticationResolve) {
+                this.authenticationResolve();
+            }
+        }
+        else {
+            if (!isCached && this.cacheDb) {
+                const cacheId = this.wsRequests[message.MessageId];
+                if (cacheId) {
+                    delete this.wsRequests[message.MessageId];
+                    if (!environment.production) {
+                        console.log(message, cacheId);
                     }
-                    catch (e) {
-                        console.error(e);
-                    }
+                    this.cacheDb.put('ws', message, cacheId);
                 }
-                else if (typeof this.eventSubscribers[message.Name] !== 'undefined') {
-                    this.eventSubscribers[message.Name].emit(message);
+            }
+            if (message.MessageId && this.responseCallbacks[message.MessageId]) {
+                const callback = this.responseCallbacks[message.MessageId];
+                delete this.responseCallbacks[message.MessageId];
+                try {
+                    callback(message);
                 }
-                else {
-                    console.warn("Unprocessed message", message);
+                catch (e) {
+                    console.error(e);
                 }
+            }
+            else if (typeof this.eventSubscribers[message.Name] !== 'undefined') {
+                this.eventSubscribers[message.Name].emit(message);
+            }
+            else {
+                console.warn("Unprocessed message", message);
             }
         }
         this.triggerMessageBacklogEvent();
     }
 
-    public sendMessage(name: string, data: any): void {
-        const message: WebSocketMessage = {
-            Name: name,
-            Data: data,
-        };
-        this.sendMessageInternal(message);
+    private async hash(input: string): Promise<string> {
+        const utf8 = new TextEncoder().encode(input);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+            .map((bytes) => bytes.toString(16).padStart(2, '0'))
+            .join('');
+        return hashHex;
     }
 
-    public sendMessageAndWaitForResponse<T>(name: string, data: any): Promise<WebSocketResponseMessage<T> | null> {
-        const message: WebSocketMessage = {
+    public sendMessage(name: string, data: any, isUnique: boolean = false): void {
+        const message: WebSocketRequestMessage = {
+            Name: name,
+            Data: data,
+            MessageId: Guid.create().toString(),
+        };
+        this.sendMessageInternal(message, isUnique);
+    }
+
+    public sendMessageAndWaitForResponse<T>(name: string, data: any, isUnique: boolean = false): Promise<WebSocketResponseMessage<T> | null> {
+        const message: WebSocketRequestMessage = {
             Name: name,
             Data: data,
             MessageId: Guid.create().toString(),
         };
         let messageResolve;
         const result: Promise<WebSocketResponseMessage<T> | null> = new Promise((resolve) => { messageResolve = resolve; });
-        this.sendMessageInternal(message, messageResolve);
+        this.sendMessageInternal(message, isUnique, messageResolve);
         return result;
     }
 
-    private sendMessageInternal(message: WebSocketMessage, callback?: (response: WebSocketResponseMessage | null) => void): void {
+    private async sendMessageInternal(message: WebSocketRequestMessage, isUnique: boolean, callback?: (response: WebSocketResponseMessage | null) => void): Promise<void> {
+        if (!isUnique && !message.CacheId) {
+            message.CacheId = await this.hash(message.Name + JSON.stringify(message.Data));
+        }
         if (this.connectionStatus === ConnectionStatus.Connected && this.webSocket !== null) {
             if (callback && message.MessageId) {
                 this.responseCallbacks[message.MessageId] = callback;
@@ -185,11 +221,24 @@ export class WebsocketService {
                 callback: callback,
             });
         }
+        if (message.CacheId) {
+            this.wsRequests[message.MessageId] = message.CacheId;
+            if (!callback && this.cacheDb) {
+                const cachedMessage: WebSocketResponseMessage | undefined = await this.cacheDb.get('ws', message.CacheId);
+                if (cachedMessage) {
+                    if (!environment.production) {
+                        console.log("Using cached message", cachedMessage);
+                    }
+                    cachedMessage.MessageId = "00000000-0000-0000-0000-000000000000";
+                    await this.processMessage(cachedMessage, false);
+                }
+            }
+        }
         this.triggerMessageBacklogEvent();
     }
 
     private triggerMessageBacklogEvent(): void {
-        const backlog = Object.keys(this.responseCallbacks).length + this.messageQueue.length;
+        const backlog = Object.keys(this.wsRequests).length + this.messageQueue.length;
         this.messageBacklogChanged.emit(backlog);
     }
 
@@ -210,7 +259,11 @@ export enum ConnectionStatus {
 export interface WebSocketMessage<T = unknown> {
     Name: string;
     Data: T;
-    MessageId?: string;
+    MessageId: string;
+}
+
+export interface WebSocketRequestMessage<T = unknown> extends WebSocketMessage<T> {
+    CacheId?: string;
 }
 
 export interface WebSocketResponseMessage<T = unknown> extends WebSocketMessage<T> {
@@ -219,10 +272,14 @@ export interface WebSocketResponseMessage<T = unknown> extends WebSocketMessage<
 }
 
 interface WebSocketMessageQueueItem {
-    message: WebSocketMessage;
+    message: WebSocketRequestMessage;
     callback?: (response: WebSocketResponseMessage | null) => void;
 }
 
 interface WebSocketMessageAuthenticationData {
     IsAuthenticated: boolean;
+}
+
+interface CacheDb extends DBSchema  {
+    'ws': { key: string, value: WebSocketResponseMessage };
 }

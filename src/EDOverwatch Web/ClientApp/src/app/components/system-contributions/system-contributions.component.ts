@@ -17,10 +17,10 @@ export class SystemContributionsComponent implements OnChanges, AfterViewInit {
 
   public ngOnChanges(): void {
     this.warEfforts = new MatTableDataSource<OverwatchStarSystemWarEffort>(this.starSystem.WarEfforts);
-    this.warEfforts.sort = this.sort;
     this.warEfforts.sortingDataAccessor = (warEffort: OverwatchStarSystemWarEffort, columnName: string): string => {
       return warEffort[columnName as keyof OverwatchStarSystemWarEffort] as string;
     }
+    this.warEfforts.sort = this.sort;
   }
 
   public ngAfterViewInit(): void {

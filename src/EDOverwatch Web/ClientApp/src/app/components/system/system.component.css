@@ -1,5 +1,7 @@
 table.system-information {
-    width: 300px;
+    min-width: 300px;
+    width: 25%;
+    margin-right: 8px;
 }
 
 .content-flex {
@@ -14,4 +16,22 @@ table.system-information {
 
 .thead {
     background-color: #272727;
+}
+
+.t {
+    font-weight: bold;
+    font-size: 105%;
+}
+
+.small {
+    font-size: 80%;
+    font-style: italic;
+}
+
+.population-decrease {
+    color: red;
+}
+
+.population-increase {
+    color: lime;
 }

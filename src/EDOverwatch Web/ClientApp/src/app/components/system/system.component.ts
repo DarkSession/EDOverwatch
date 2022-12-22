@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -7,7 +7,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
 import { OverwatchStation } from '../station-name/station-name.component';
-import { Chart, ChartConfiguration, ChartDataset, ChartEvent, ChartType, ChartTypeRegistry } from 'chart.js';
+import { Chart, ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
 
 import { AnnotationOptions, default as Annotation } from 'chartjs-plugin-annotation';
 
@@ -18,7 +18,7 @@ import { AnnotationOptions, default as Annotation } from 'chartjs-plugin-annotat
   styleUrls: ['./system.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SystemComponent implements AfterViewInit {
+export class SystemComponent implements OnInit {
   public readonly faClipboard = faClipboard;
   public starSystem: OverwatchStarSystemDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
@@ -35,21 +35,9 @@ export class SystemComponent implements AfterViewInit {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      // We use this empty structure as a placeholder for dynamic theming.
       y: {
         position: 'left',
       }
-      /*
-      y1: {
-        position: 'right',
-        grid: {
-          color: 'rgba(255,0,0,0.3)',
-        },
-        ticks: {
-          color: 'red'
-        }
-      }
-      */
     },
     plugins: {
       legend: { display: true },
@@ -70,70 +58,70 @@ export class SystemComponent implements AfterViewInit {
     Chart.register(Annotation)
   }
 
-  public ngAfterViewInit(): void {
+  public ngOnInit(): void {
     this.route.paramMap
       .pipe(untilDestroyed(this))
       .subscribe((p: ParamMap) => {
         const systemId = parseInt(p.get("id") ?? "0");
         if (systemId && this.starSystem?.SystemAddress != systemId) {
-          this.requestSystem(systemId);
+          this.websocketService.sendMessage("OverwatchSystem", {
+            SystemAddress: systemId,
+          });
         }
       });
-  }
-
-  private async requestSystem(systemAddress: number): Promise<void> {
-    const response = await this.websocketService.sendMessageAndWaitForResponse<OverwatchStarSystemDetail>("OverwatchSystem", {
-      SystemAddress: systemAddress,
-    });
-    if (response && response.Data) {
-      this.starSystem = response.Data;
-      let labels: string[] = [];
-      for (const warEffort of this.starSystem.WarEfforts) {
-        if (!labels.includes(warEffort.Date)) {
-          labels.push(warEffort.Date);
-        }
-      }
-      labels = labels.sort();
-      const totalAmounts: {
-        [key: string]: Int32Array
-      } = {};
-      for (const warEffort of this.starSystem.WarEfforts) {
-        if (!totalAmounts[warEffort.TypeGroup]) {
-          totalAmounts[warEffort.TypeGroup] = new Int32Array(labels.length);
-        }
-        const index = labels.findIndex(l => l === warEffort.Date);
-        totalAmounts[warEffort.TypeGroup][index] += warEffort.Amount;
-      }
-
-      const datasets: ChartDataset[] = [];
-      for (const label in totalAmounts) {
-        datasets.push({
-          label: label,
-          data: Array.from(totalAmounts[label]),
-        });
-      }
-
-      const annotations: AnnotationOptions[] = [
-        {
-          type: 'line',
-          scaleID: 'x',
-          value: this.starSystem.LastTickDate,
-          borderColor: 'orange',
-          borderWidth: 2,
-          label: {
-            display: true,
-            position: 'center',
-            color: 'orange',
-            content: 'Weekly tick'
+    this.websocketService.on<OverwatchStarSystemDetail>("OverwatchSystem")
+      .pipe(untilDestroyed(this))
+      .subscribe((message) => {
+        if (message && message.Data) {
+          this.starSystem = message.Data;
+          let labels: string[] = [];
+          for (const warEffort of this.starSystem.WarEfforts) {
+            if (!labels.includes(warEffort.Date)) {
+              labels.push(warEffort.Date);
+            }
           }
-        },
-      ];
+          labels = labels.sort();
+          const totalAmounts: {
+            [key: string]: Int32Array
+          } = {};
+          for (const warEffort of this.starSystem.WarEfforts) {
+            if (!totalAmounts[warEffort.TypeGroup]) {
+              totalAmounts[warEffort.TypeGroup] = new Int32Array(labels.length);
+            }
+            const index = labels.findIndex(l => l === warEffort.Date);
+            totalAmounts[warEffort.TypeGroup][index] += warEffort.Amount;
+          }
 
-      this.lineChartData.labels = labels;
-      this.lineChartData.datasets = datasets;
-      this.lineChartOptions!.plugins!.annotation!.annotations = annotations;
-      this.changeDetectorRef.markForCheck();
-    }
+          const datasets: ChartDataset[] = [];
+          for (const label in totalAmounts) {
+            datasets.push({
+              label: label,
+              data: Array.from(totalAmounts[label]),
+            });
+          }
+
+          const annotations: AnnotationOptions[] = [
+            {
+              type: 'line',
+              scaleID: 'x',
+              value: this.starSystem.LastTickDate,
+              borderColor: 'orange',
+              borderWidth: 2,
+              label: {
+                display: true,
+                position: 'center',
+                color: 'orange',
+                content: 'Weekly tick'
+              }
+            },
+          ];
+
+          this.lineChartData.labels = labels;
+          this.lineChartData.datasets = datasets;
+          this.lineChartOptions!.plugins!.annotation!.annotations = annotations;
+          this.changeDetectorRef.markForCheck();
+        }
+      });
   }
 
   public copySystemName(): void {
@@ -145,18 +133,11 @@ export class SystemComponent implements AfterViewInit {
       duration: 2000,
     });
   }
-
-  public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
-    console.log(event, active);
-  }
-
-  public chartHovered({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
-    console.log(event, active);
-  }
 }
 
 export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   Population: number;
+  PopulationOriginal: number;
   WarEfforts: OverwatchStarSystemWarEffort[];
   FactionOperationDetails: FactionOperation[];
   Stations: OverwatchStation[];

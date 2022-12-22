@@ -36,6 +36,7 @@
     "chartjs-plugin-annotation": "^2.1.0",
     "dayjs": "^1.11.6",
     "guid-typescript": "^1.0.9",
+    "idb": "^7.1.1",
     "jquery": "^3.6.0",
     "material-icons": "^1.13.1",
     "ng2-charts": "^4.1.1",

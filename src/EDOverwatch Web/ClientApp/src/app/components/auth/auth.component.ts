@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AppService } from '../../services/app.service';
 
@@ -9,10 +9,12 @@ import { AppService } from '../../services/app.service';
 })
 export class AuthComponent {
   public errors: string[] = [];
+  public loading = true;
 
   public constructor(
     private readonly route: ActivatedRoute,
-    private readonly appService: AppService
+    private readonly appService: AppService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) { }
 
   public ngOnInit(): void {
@@ -24,6 +26,11 @@ export class AuthComponent {
   }
 
   private async authenticate(code: string, state: string): Promise<void> {
-    await this.appService.oAuth(code, state);
+    const response = await this.appService.oAuth(code, state);
+    if (response.error) {
+      this.errors = response.error;
+    }
+    this.loading = false;
+    this.changeDetectorRef.detectChanges();
   }
 }

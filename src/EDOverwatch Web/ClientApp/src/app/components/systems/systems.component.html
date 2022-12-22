@@ -6,9 +6,14 @@
         <div class="content-box systems-container">
             <div style="height: 24px;"></div>
             <div class="systems-filter">
+                <mat-form-field appearance="outline" floatLabel="always">
+                    <mat-label>System Name</mat-label>
+                    <input matInput [(ngModel)]="systemNameFilter" (ngModelChange)="updateDataSource()"
+                        placeholder="Filter by system name">
+                </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Maelstroms</mat-label>
-                    <mat-select [(ngModel)]="maelstromsSelected" (ngModelChange)="updateDataSource()" multiple>
+                    <mat-select [(ngModel)]="maelstromsSelected" (ngModelChange)="settingChanged()" multiple>
                         <mat-option *ngFor="let maelstrom of maelstroms" [value]="maelstrom">
                             {{ maelstrom.Name }}
                         </mat-option>
@@ -16,7 +21,7 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Thargoid Level</mat-label>
-                    <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="updateDataSource()" multiple>
+                    <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="settingChanged()" multiple>
                         <mat-option *ngFor="let thargoidLevel of thargoidLevels" [value]="thargoidLevel">
                             {{ thargoidLevel.Name }}
                         </mat-option>
@@ -24,7 +29,7 @@
                 </mat-form-field>
             </div>
             <app-system-list [systems]="dataRaw" [maelstromsSelected]="maelstromsSelected"
-                [thargoidLevelsSelected]="thargoidLevelsSelected"></app-system-list>
+                [thargoidLevelsSelected]="thargoidLevelsSelected" [systemNameFilter]="systemNameFilter"></app-system-list>
         </div>
     </div>
 </div>

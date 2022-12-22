@@ -2,7 +2,6 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Tesseract;
@@ -59,6 +58,8 @@ namespace EDSystemProgress
 
             using TesseractEngine engine = new("tessdata", "eng", EngineMode.Default, "config");
             engine.SetVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890:.- ");
+
+            log.LogInformation("TesseractEngine version {version}", engine.Version);
 
             using Pix img = Pix.LoadFromMemory(file);
             using Page page = engine.Process(img);
@@ -291,7 +292,7 @@ namespace EDSystemProgress
             progressBarUpperY += 20;
             progressBarLowerY -= 10;
 
-            log.LogInformation("{id}: processingStep: {processingStep} systemName: {systemName} remainingTime: {remainingTime} progressBarUpperY: {progressBarUpperY} progressBarLowerY: {progressBarLowerY}", fileId, processingStep, systemName, remainingTime, progressBarUpperY, progressBarLowerY);
+            log.LogInformation("{id}: processingStep: {processingStep} systemName: {systemName} systemStatus: {} remainingTime: {remainingTime} progressBarUpperY: {progressBarUpperY} progressBarLowerY: {progressBarLowerY}", fileId, processingStep, systemName, systemStatus, remainingTime, progressBarUpperY, progressBarLowerY);
 
             bool success = processingStep == ImageProcessingStep.Completed && systemName != "INVALID";
             if (success)
@@ -432,6 +433,7 @@ namespace EDSystemProgress
             { "HIP 20880", "HIP 20890" },
             { "HIP 20816", "HIP 20916" },
             { "HIP 208186", "HIP 20916" },
+            { "O0BAMUMBO", "OBAMUMBO" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

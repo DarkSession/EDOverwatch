@@ -1,6 +1,10 @@
-<span *ngIf="(starSystem.StationsUnderAttack + starSystem.StationsDamaged) > 0">
-    {{ (starSystem.StationsUnderAttack + starSystem.StationsDamaged) }}
+<span *ngIf="starSystem.StationsUnderAttack > 0">
+    {{ starSystem.StationsUnderAttack }}
     <img src="assets/station-attacked.png" style="width: 16px; height: 16px;" matTooltip="Under attack" />
+</span>
+<span *ngIf="starSystem.StationsDamaged > 0">
+    {{ starSystem.StationsDamaged }}
+    <img src="assets/station-damaged.png" style="width: 16px; height: 16px;" matTooltip="Damaged" />
 </span>
 <span *ngIf="starSystem.StationsUnderRepair > 0">
     {{ starSystem.StationsUnderRepair }}

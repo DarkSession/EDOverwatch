@@ -10,13 +10,13 @@
                 <table class="system-information">
                     <tbody>
                         <tr>
-                            <td>Maelstrom</td>
+                            <td class="t">Maelstrom</td>
                             <td>
                                 <app-maelstrom-name [maelstrom]="starSystem.Maelstrom"></app-maelstrom-name>
                             </td>
                         </tr>
                         <tr>
-                            <td>Thargoid Level</td>
+                            <td class="t">Thargoid Level</td>
                             <td>
                                 <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
                             </td>
@@ -26,12 +26,31 @@
                 <table class="system-information">
                     <tbody>
                         <tr>
-                            <td>Population</td>
-                            <td class="number">{{ starSystem.Population | number }}</td>
+                            <td class="t">Population</td>
+                            <td class="number">
+                                <div>
+                                    {{ starSystem.Population | number }}
+                                </div>
+                                <div class="small" *ngIf="starSystem.Population != starSystem.PopulationOriginal"
+                                    [ngClass]="{
+                                  'population-decrease': (starSystem.Population < starSystem.PopulationOriginal),
+                                  'population-increase': (starSystem.Population > starSystem.PopulationOriginal)
+                                }">
+                                    {{ (starSystem.Population - starSystem.PopulationOriginal) | number }}
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td>Player Focus</td>
-                            <td class="number">{{ starSystem.EffortFocus | percent }}</td>
+                            <td class="t">Player Focus</td>
+                            <td class="number">
+                                {{ starSystem.EffortFocus | percent }}
+                            </td>
+                        </tr>
+                        <tr *ngIf="starSystem.ProgressPercent">
+                            <td class="t">Progress</td>
+                            <td class="number">
+                                {{ starSystem.ProgressPercent | percent }}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -39,8 +58,7 @@
             <br>
             <div>
                 <canvas baseChart class="chart" [data]="lineChartData" [options]="lineChartOptions"
-                    [type]="lineChartType" (chartHover)="chartHovered($event)"
-                    (chartClick)="chartClicked($event)" height="300"></canvas>
+                    [type]="lineChartType" height="300"></canvas>
             </div>
             <br>
             <br>

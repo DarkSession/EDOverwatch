@@ -1,6 +1,7 @@
 <div class="table-container">
     <div class="table" [ngStyle]="{ 'height.vh': maxHeight }">
-        <table mat-table [dataSource]="dataSource" matSort matSortActive="FactionOperations" matSortDirection="desc" matSortDisableClear>
+        <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)"
+            [matSortActive]="sortColumn" [matSortDirection]="sortDirection" matSortDisableClear>
             <ng-container matColumnDef="Name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
                 <td mat-cell *matCellDef="let row">
@@ -53,7 +54,8 @@
                 <td mat-cell *matCellDef="let row">
                     {{ row.FactionOperations | number }}
                     <span *ngFor="let specialFactionOperation of row.SpecialFactionOperations">
-                        <img src="assets/badges/{{ specialFactionOperation.Tag }}.png" style="width: 24px; height: 24px" matTooltip="{{ specialFactionOperation.Name }} operation" />
+                        <img src="assets/badges/{{ specialFactionOperation.Tag }}.png" style="width: 24px; height: 24px"
+                            matTooltip="{{ specialFactionOperation.Name }} operation" />
                     </span>
                 </td>
             </ng-container>

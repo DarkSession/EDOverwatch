@@ -17,10 +17,10 @@ export class SystemOperationsComponent implements OnChanges, AfterViewInit {
 
   public ngOnChanges(): void {
     this.factionOperations = new MatTableDataSource<FactionOperation>(this.starSystem.FactionOperationDetails);
-    this.factionOperations.sort = this.sort;
     this.factionOperations.sortingDataAccessor = (factionOperations: FactionOperation, columnName: string): string => {
       return factionOperations[columnName as keyof FactionOperation] as string;
     }
+    this.factionOperations.sort = this.sort;
   }
 
   public ngAfterViewInit(): void {

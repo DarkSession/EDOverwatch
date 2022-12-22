@@ -7,6 +7,9 @@
             <div *ngFor="let error of errors" class="error-msg">
                 {{ error }}
             </div>
+            <div *ngIf="loading">
+                Please wait, we are verifying your credentials...
+            </div>
         </div>
     </div>
 </div>

@@ -18,10 +18,10 @@ export class SystemStationsComponent implements OnChanges, AfterViewInit {
 
   public ngOnChanges(): void {
     this.stations = new MatTableDataSource<OverwatchStation>(this.starSystem.Stations);
-    this.stations.sort = this.sort;
     this.stations.sortingDataAccessor = (station: OverwatchStation, columnName: string): string => {
       return station[columnName as keyof OverwatchStation] as string;
     }
+    this.stations.sort = this.sort;
   }
 
   public ngAfterViewInit(): void {

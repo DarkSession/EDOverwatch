@@ -58,6 +58,7 @@ namespace EDOverwatch_Web.WebSockets
         public string Name { get; set; }
         public JObject? Data { get; set; }
         public string? MessageId { get; set; }
+        public string? CacheId { get; set; }
 
         public WebSocketMessageReceived(string name, JObject? data, string? messageId)
         {

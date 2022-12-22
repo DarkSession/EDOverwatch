@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
+import { AppService } from 'src/app/services/app.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 
@@ -13,7 +14,7 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
   styleUrls: ['./system-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SystemListComponent implements OnChanges {
+export class SystemListComponent implements OnInit, OnChanges {
   public readonly faClipboard = faClipboard;
   public readonly faCircleCheck = faCircleCheck;
   public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations'];
@@ -21,12 +22,32 @@ export class SystemListComponent implements OnChanges {
   @Input() systems: OverwatchStarSystem[] = [];
   @Input() maelstromsSelected: OverwatchMaelstrom[] | null = null;
   @Input() thargoidLevelsSelected: OverwatchThargoidLevel[] | null = null;
+  @Input() systemNameFilter: string | null = null;
   @Input() maxHeight: number | null = null;
   public dataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
+  public sortColumn: string = "FactionOperations";
+  public sortDirection: SortDirection = "desc";
 
   public constructor(
+    private readonly appService: AppService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly matSnackBar: MatSnackBar) {
+    this.initDataSource([]);
+  }
+
+  public ngOnInit(): void {
+    this.updateSort();
+  }
+
+  public sortData(sort: Sort): void {
+    this.appService.updateTableSort("SystemList", sort.active, sort.direction);
+  }
+
+  private async updateSort(): Promise<void> {
+    const sort = await this.appService.getTableSort("SystemList", this.sortColumn, this.sortDirection);
+    this.sortColumn = sort.Column;
+    this.sortDirection = sort.Direction;
+    this.changeDetectorRef.markForCheck();
   }
 
   public ngOnChanges(): void {
@@ -34,25 +55,20 @@ export class SystemListComponent implements OnChanges {
   }
 
   public updateDataSource(): void {
+    const systemNameFilter = (this.systemNameFilter ?? "").trim().toUpperCase();
     let data = this.systems.filter(d =>
       (this.maelstromsSelected === null || typeof this.maelstromsSelected.find(m => m.Name === d.Maelstrom.Name) !== 'undefined') &&
-      (this.thargoidLevelsSelected === null || typeof this.thargoidLevelsSelected.find(t => t.Level === d.ThargoidLevel.Level) !== 'undefined'));
-    if (!this.sort?.active) {
-      this.dataSource.data.sort((system1: OverwatchStarSystem, system2: OverwatchStarSystem) => {
-        if (system1.ThargoidLevel.Level > system2.ThargoidLevel.Level) {
-          return -1;
-        }
-        else if (system1.ThargoidLevel.Level < system2.ThargoidLevel.Level) {
-          return 1;
-        }
-        return system1.Name.localeCompare(system2.Name);
-      });
-    }
-    else {
+      (this.thargoidLevelsSelected === null || typeof this.thargoidLevelsSelected.find(t => t.Level === d.ThargoidLevel.Level) !== 'undefined') &&
+      (systemNameFilter === "" || d.Name.toUpperCase().includes(systemNameFilter)));
+    if (this.sort?.active) {
       data = this.dataSource.sortData(data, this.sort);
     }
+    this.initDataSource(data);
+    this.changeDetectorRef.detectChanges();
+  }
+
+  private initDataSource(data: OverwatchStarSystem[]) {
     this.dataSource = new MatTableDataSource<OverwatchStarSystem>(data);
-    this.dataSource.sort = this.sort;
     this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string | number => {
       switch (columnName) {
         case "ThargoidLevel": {
@@ -70,8 +86,7 @@ export class SystemListComponent implements OnChanges {
       }
       return system[columnName as keyof OverwatchStarSystem] as string | number;
     }
-
-    this.changeDetectorRef.detectChanges();
+    this.dataSource.sort = this.sort;
   }
 
   public copySystemName(starSystem: OverwatchStarSystem): void {
@@ -88,6 +103,7 @@ export interface OverwatchStarSystem {
   Maelstrom: OverwatchMaelstrom;
   ThargoidLevel: OverwatchThargoidLevel;
   Progress: number | null;
+  ProgressPercent: number | null;
   EffortFocus: number;
   FactionOperations: number;
   SpecialFactionOperations: OverwatchStarSystemSpecialFactionOperation[];

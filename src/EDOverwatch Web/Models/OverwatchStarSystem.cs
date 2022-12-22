@@ -24,7 +24,7 @@
             Maelstrom = new(starSystem.ThargoidLevel?.Maelstrom ?? throw new Exception("Thargoid level must have a maelstrom property"));
             ThargoidLevel = new(starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
             Progress = starSystem.ThargoidLevel?.Progress;
-            ProgressPercent = (Progress != null) ? Progress / 100 : null;
+            ProgressPercent = (Progress != null) ? (decimal)Progress / 100m : null;
             EffortFocus = effortFocus;
             FactionOperations = factionOperations;
             SpecialFactionOperations = specialFactionOperations;

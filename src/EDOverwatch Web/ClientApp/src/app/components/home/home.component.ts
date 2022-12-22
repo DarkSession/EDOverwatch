@@ -43,7 +43,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       });
     this.updateTimeSince();
-    this.loadOverview();
+    this.webSocketService.sendMessage("OverwatchHome", {});
   }
 
   public ngAfterViewInit(): void {
@@ -53,14 +53,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateTriangleLeft(): void {
     if (this.triangleLeft) {
       this.sideSontentContainerMaxHeight = this.triangleLeft.nativeElement.getBoundingClientRect().height;
-      this.changeDetectorRef.detectChanges();
-    }
-  }
-
-  private async loadOverview(): Promise<void> {
-    const response = await this.webSocketService.sendMessageAndWaitForResponse<OverwatchOverview>("OverwatchHome", {});
-    if (response && response.Success) {
-      this.overview = response.Data;
       this.changeDetectorRef.detectChanges();
     }
   }

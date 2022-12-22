@@ -22,28 +22,21 @@ export class MyEffortsComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.loadMyEfforts();
     this.webSocketService
       .on<CommanderWarEffort[]>("CommanderWarEfforts")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
         this.initEfforts(message.Data);
       });
-  }
-
-  public async loadMyEfforts(): Promise<void> {
-    const response = await this.webSocketService.sendMessageAndWaitForResponse<CommanderWarEffort[]>("CommanderWarEfforts", {});
-    if (response && response.Success) {
-      this.initEfforts(response.Data);
-    }
+    this.webSocketService.sendMessage("CommanderWarEfforts", {});
   }
 
   private initEfforts(data: CommanderWarEffort[]): void {
     this.dataSource = new MatTableDataSource<CommanderWarEffort>(data);
-    this.dataSource.sort = this.sort;
     this.dataSource.sortingDataAccessor = (warEffort: CommanderWarEffort, columnName: string): string => {
       return warEffort[columnName as keyof CommanderWarEffort] as string;
     }
+    this.dataSource.sort = this.sort;
     this.changeDetectorRef.detectChanges();
   }
 }

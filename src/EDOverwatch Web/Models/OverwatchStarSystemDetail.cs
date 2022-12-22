@@ -3,6 +3,7 @@
     public class OverwatchStarSystemDetail : OverwatchStarSystem
     {
         public long Population { get; }
+        public long PopulationOriginal { get; }
         public DateTimeOffset LastTickTime { get; }
         public DateOnly LastTickDate { get; }
         public List<OverwatchStarSystemWarEffort> WarEfforts { get; }
@@ -25,6 +26,7 @@
             base(starSystem, effortFocus, 0, new(), 0, 0, 0)
         {
             Population = starSystem.Population;
+            PopulationOriginal = starSystem.OriginalPopulation;
             WarEfforts = warEfforts.Select(w => new OverwatchStarSystemWarEffort(w)).ToList();
             FactionOperations = factionOperationDetails.Count;
             FactionOperationDetails = factionOperationDetails;
