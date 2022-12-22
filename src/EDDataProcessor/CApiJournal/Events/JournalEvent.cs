@@ -42,8 +42,7 @@
             {
                 warEffort.Amount += amount;
             }
-            WarEffortUpdated warEffortUpdated = new(starSystem?.SystemAddress ?? 0, journalParameters.Commander.FDevCustomerId);
-            await journalParameters.ActiveMqProducer.SendAsync(WarEffortUpdated.QueueName, WarEffortUpdated.Routing, warEffortUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
+            journalParameters.AddWarEffortSystemAddress(starSystem?.SystemAddress ?? 0);
         }
 
         protected async Task DeferEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
@@ -70,9 +69,9 @@
         public Commander Commander { get; }
         public StarSystem? CommanderCurrentStarSystem { get; }
         public bool DeferRequested { get; set; }
-
         public IAnonymousProducer ActiveMqProducer { get; }
         public Transaction ActiveMqTransaction { get; }
+        public List<long>? WarEffortsUpdatedSystemAddresses { get; set; }
 
         public JournalParameters(bool isDeferred, WarEffortSource source, Commander commander, StarSystem? commanderCurrentStarSystem, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction)
         {
@@ -82,6 +81,12 @@
             CommanderCurrentStarSystem = commanderCurrentStarSystem;
             ActiveMqProducer = activeMqProducer;
             ActiveMqTransaction = activeMqTransaction;
+        }
+
+        public void AddWarEffortSystemAddress(long systemAddress)
+        {
+            WarEffortsUpdatedSystemAddresses ??= new();
+            WarEffortsUpdatedSystemAddresses.Add(systemAddress);
         }
     }
 }

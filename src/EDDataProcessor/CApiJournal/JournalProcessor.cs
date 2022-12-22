@@ -1,4 +1,5 @@
 ﻿using EDCApi;
+using EDDatabase;
 using EDDataProcessor.CApiJournal.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
@@ -83,6 +84,7 @@ namespace EDDataProcessor.CApiJournal
             {
                 return;
             }
+            List<long> warEffortsUpdatedSystemAddresses = new();
             {
                 List<CommanderDeferredJournalEvent> commanderDeferredJournalEvents = await dbContext.CommanderDeferredJournalEvents
                      .Where(c => c.Commander == commander && c.Status == CommanderDeferredJournalEventStatus.Pending)
@@ -97,9 +99,24 @@ namespace EDDataProcessor.CApiJournal
                     {
                         commanderDeferredJournalEvent.Status = CommanderDeferredJournalEventStatus.Processed;
                     }
+                    if (journalParameters.WarEffortsUpdatedSystemAddresses != null)
+                    {
+                        warEffortsUpdatedSystemAddresses.AddRange(journalParameters.WarEffortsUpdatedSystemAddresses);
+                    }
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
+
+            if (warEffortsUpdatedSystemAddresses.Any())
+            {
+                foreach (long systemAddress in warEffortsUpdatedSystemAddresses.Distinct())
+                {
+                    WarEffortUpdated warEffortUpdated = new(systemAddress, commander.FDevCustomerId);
+                    await activeMqProducer.SendAsync(WarEffortUpdated.QueueName, WarEffortUpdated.Routing, warEffortUpdated.Message, activeMqTransaction, cancellationToken);
+                }
+                warEffortsUpdatedSystemAddresses.Clear();
+            }
+
             if (!commander.CanProcessCApiJournal)
             {
                 return;
@@ -149,6 +166,10 @@ namespace EDDataProcessor.CApiJournal
                                 {
                                     commander.JournalLastActivity = t;
                                 }
+                                if (journalParameters.WarEffortsUpdatedSystemAddresses != null)
+                                {
+                                    warEffortsUpdatedSystemAddresses.AddRange(journalParameters.WarEffortsUpdatedSystemAddresses);
+                                }
                             }
                             while (!string.IsNullOrEmpty(journalLine));
                         }
@@ -163,6 +184,15 @@ namespace EDDataProcessor.CApiJournal
                     {
                         commander.JournalLastLine = 0;
                         commander.JournalDay = day;
+                    }
+                    if (warEffortsUpdatedSystemAddresses.Any())
+                    {
+                        foreach (long systemAddress in warEffortsUpdatedSystemAddresses.Distinct())
+                        {
+                            WarEffortUpdated warEffortUpdated = new(systemAddress, commander.FDevCustomerId);
+                            await activeMqProducer.SendAsync(WarEffortUpdated.QueueName, WarEffortUpdated.Routing, warEffortUpdated.Message, activeMqTransaction, cancellationToken);
+                        }
+                        warEffortsUpdatedSystemAddresses.Clear();
                     }
                     day = day.AddDays(1);
                     await Task.WhenAll(Task.Delay(TimeSpan.FromMilliseconds(500), cancellationToken), dbContext.SaveChangesAsync(cancellationToken));
