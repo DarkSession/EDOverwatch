@@ -37,8 +37,8 @@
                 .Select(s => new
                 {
                     StarSystem = s,
-                    FactionOperations = s.FactionOperations!.Count(),
-                    SpecialFactionOperations = s.FactionOperations!.Where(f => f.Faction!.SpecialFaction).Select(s => new
+                    FactionOperations = s.FactionOperations!.Where(f => f.Status == DcohFactionOperationStatus.Active).Count(),
+                    SpecialFactionOperations = s.FactionOperations!.Where(f => f.Faction!.SpecialFaction && f.Status == DcohFactionOperationStatus.Active).Select(s => new
                     {
                         s.Faction!.Name,
                         s.Faction!.Short,
