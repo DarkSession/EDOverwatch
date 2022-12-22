@@ -14,6 +14,8 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
                 bool isThargoidKill = KillerShip switch
                 {
                     "scout_q" => true,
+                    "scout_nq" => true,
+                    "scout" => true,
                     "thargonswarm" => true,
                     "thargon" => true,
                     _ => false
