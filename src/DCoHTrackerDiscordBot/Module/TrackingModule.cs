@@ -86,7 +86,7 @@ namespace DCoHTrackerDiscordBot.Module
             };
             DbContext.DcohFactionOperations.Add(factionOperation);
             await DbContext.SaveChangesAsync();
-            await FollowupAsync($"Registered {type.GetEnumMemberValue()} operations by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
+            await FollowupAsync($"Registered {type.GetEnumMemberValue()} activities by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
         }
 
         [SlashCommand("remove", "Remove a registered operation")]
@@ -139,13 +139,13 @@ namespace DCoHTrackerDiscordBot.Module
                         d.Type == type);
             if (dcohFactionOperation == null)
             {
-                await FollowupAsync($"No {type.GetEnumMemberValue()} operation was found in {starSystem.Name} for your squadron.", ephemeral: true);
+                await FollowupAsync($"No {type.GetEnumMemberValue()} activity was found in {starSystem.Name} for your squadron.", ephemeral: true);
                 return;
             }
             dcohFactionOperation.Status = DcohFactionOperationStatus.Inactive;
             await DbContext.SaveChangesAsync();
 
-            await FollowupAsync($"Removed {type.GetEnumMemberValue()} operations by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
+            await FollowupAsync($"Removed {type.GetEnumMemberValue()} activities by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
         }
 
         [SlashCommand("view", "View operation by type")]
@@ -200,10 +200,10 @@ namespace DCoHTrackerDiscordBot.Module
                 .ThenBy(s => s.StarSystem!.Name)
                 .ToListAsync();
             EmbedBuilder embedMain = new EmbedBuilder()
-                           .WithTitle("Operations");
+                           .WithTitle("Operations / Activities");
             if (factionOperations.Any())
             {
-                string description = $"{operationTypeString} operations".Trim();
+                string description = $"{operationTypeString} activities".Trim();
                 description += (!string.IsNullOrEmpty(maelstromNameString) ? " around " + maelstromNameString : "") + ":";
                 embedMain.Description = description;
                 if (string.IsNullOrEmpty(maelstromNameString))
@@ -219,7 +219,7 @@ namespace DCoHTrackerDiscordBot.Module
             }
             else
             {
-                embedMain.Description = "There are no known active operations that meet the criterias.";
+                embedMain.Description = "There are no known active activities that meet the criterias.";
             }
 
             await FollowupAsync(embed: embedMain.Build(), ephemeral: true);

@@ -7,6 +7,7 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    flex-wrap: wrap;
 
     mat-form-field {
         width: 300px;

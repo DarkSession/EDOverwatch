@@ -18,6 +18,10 @@
                 _ => 0,
             };
             DateTimeOffset lastThursday = dateTimeOffset.AddDays(dayOffset);
+            if (dateTimeOffset.DayOfWeek == DayOfWeek.Thursday && dateTimeOffset.Hour < 7)
+            {
+                weekOffset -= 1;
+            }
             DateTimeOffset lastThursdayCycle = new(lastThursday.Year, lastThursday.Month, lastThursday.Day, 7, 0, 0, TimeSpan.Zero);
             return lastThursdayCycle.AddDays(weekOffset * 7);
         }

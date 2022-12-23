@@ -105,7 +105,7 @@ namespace EDDataProcessor.EDDN
                             .FirstOrDefaultAsync(t => t.Name == maelStromName, cancellationToken);
                         if (thargoidMaelstrom == null)
                         {
-                            thargoidMaelstrom = new(0, maelStromName, 20m, Message.Timestamp)
+                            thargoidMaelstrom = new(0, maelStromName, 20m, 0, Message.Timestamp)
                             {
                                 StarSystem = starSystem,
                             };

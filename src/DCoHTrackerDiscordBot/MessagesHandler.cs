@@ -46,6 +46,8 @@ namespace DCoHTrackerDiscordBot
                                 {
                                     StarSystem? starSystem = await DbContext.StarSystems
                                         .Include(s => s.ThargoidLevel)
+                                        .ThenInclude(t => t!.Maelstrom)
+                                        .Include(s => s.ThargoidLevel.StateExpires)
                                         .FirstOrDefaultAsync(s =>
                                             EF.Functions.Like(s.Name, result.SystemName.Replace("%", string.Empty)) &&
                                             s.ThargoidLevel != null &&
@@ -70,6 +72,17 @@ namespace DCoHTrackerDiscordBot
                                             };
                                             DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
                                             starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+
+                                            if (result.RemainingTime > TimeSpan.Zero && starSystem.ThargoidLevel.StateExpires == null)
+                                            {
+                                                DateTimeOffset remainingTimeEnd = DateTimeOffset.UtcNow.Add(result.RemainingTime);
+                                                if (remainingTimeEnd.DayOfWeek == DayOfWeek.Wednesday || (remainingTimeEnd.DayOfWeek == DayOfWeek.Thursday && remainingTimeEnd.Hour < 7))
+                                                {
+                                                    remainingTimeEnd = new DateTimeOffset(remainingTimeEnd.Year, remainingTimeEnd.Month, remainingTimeEnd.Day, 0, 0, 0, TimeSpan.Zero);
+                                                    ThargoidCycle thargoidCycle = await DbContext.GetThargoidCycle(remainingTimeEnd, CancellationToken.None);
+                                                    starSystem.ThargoidLevel.StateExpires = thargoidCycle;
+                                                }
+                                            }
                                             await DbContext.SaveChangesAsync();
                                         }
                                     }
@@ -83,27 +96,21 @@ namespace DCoHTrackerDiscordBot
                                     int weeks = (int)Math.Floor(result.RemainingTime.TotalDays / 7d);
                                     int days = (int)result.RemainingTime.TotalDays - (weeks * 7);
 
-                                    if (days > 0)
+                                    if (days == 1)
                                     {
-                                        if (days == 1)
-                                        {
-                                            remainingTime.Add("1 day");
-                                        }
-                                        else
-                                        {
-                                            remainingTime.Add($"{days} days");
-                                        }
+                                        remainingTime.Add("1 day");
                                     }
-                                    if (weeks > 0)
+                                    else if (days > 0)
                                     {
-                                        if (weeks == 1)
-                                        {
-                                            remainingTime.Add("1 week");
-                                        }
-                                        else
-                                        {
-                                            remainingTime.Add($"{weeks} weeks");
-                                        }
+                                        remainingTime.Add($"{days} days");
+                                    }
+                                    if (weeks == 1)
+                                    {
+                                        remainingTime.Add("1 week");
+                                    }
+                                    else if (weeks > 0)
+                                    {
+                                        remainingTime.Add($"{weeks} weeks");
                                     }
 
                                     string remainingTimeStr = string.Join(", ", remainingTime);
@@ -112,7 +119,11 @@ namespace DCoHTrackerDiscordBot
                                         remainingTimeStr = "-";
                                     }
 
-                                    embed.AddField("System Name", Format.Sanitize(starSystem?.Name ?? result.SystemName));
+                                    embed.AddField("System Name", Format.Sanitize(starSystem?.Name ?? result.SystemName), (starSystem?.ThargoidLevel?.Maelstrom == null));
+                                    if (starSystem?.ThargoidLevel?.Maelstrom != null)
+                                    {
+                                        embed.AddField("Maelstrom", starSystem.ThargoidLevel.Maelstrom.Name ?? "-");
+                                    }
                                     embed.AddField("System State", result.SystemStatus.GetEnumMemberValue(), true);
                                     embed.AddField("Progress", result.Progress + "%", true);
                                     embed.AddField("Remaining Time", remainingTimeStr, true);

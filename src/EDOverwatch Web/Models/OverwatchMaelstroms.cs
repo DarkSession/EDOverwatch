@@ -13,6 +13,7 @@
         {
             var maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
+                .Include(t => t.StarSystem)
                 .Select(t => new
                 {
                     Maelstrom = t,

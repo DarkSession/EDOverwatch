@@ -4,6 +4,8 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -12,13 +14,15 @@ import { MatTableDataSource } from '@angular/material/table';
   styleUrls: ['./maelstroms.component.css']
 })
 export class MaelstromsComponent implements OnInit {
-  public readonly displayedColumns = ['Name', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery'];
+  public readonly displayedColumns = ['Name', 'SystemName', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery'];
   @ViewChild(MatSort) sort!: MatSort;
+  public readonly faClipboard = faClipboard;
   public dataSource: MatTableDataSource<OverwatchMaelstromBasic> = new MatTableDataSource<OverwatchMaelstromBasic>();
 
   public constructor(
     private readonly websocketService: WebsocketService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly matSnackBar: MatSnackBar
   ) {
   }
 
@@ -36,6 +40,13 @@ export class MaelstromsComponent implements OnInit {
         }
       });
     this.websocketService.sendMessage("OverwatchMaelstroms", {});
+  }
+
+  public copySystemName(maelstrom: OverwatchMaelstromBasic): void {
+    navigator.clipboard.writeText(maelstrom.SystemName);
+    this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
+      duration: 2000,
+    });
   }
 }
 

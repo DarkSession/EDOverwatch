@@ -201,12 +201,12 @@ namespace EDSystemProgress
                                     {
                                         case SystemStatus.InvasionInProgress:
                                             {
-                                                match = text.Contains("PORTS REMAINING");
+                                                match = text.Contains("PORTS REMAININ");
                                                 break;
                                             }
                                         case SystemStatus.InvasionPrevented:
                                             {
-                                                match = text.Contains("PORTS REMAINING");
+                                                match = text.Contains("PORTS REMAININ");
                                                 if (!match && text.Contains("BEGINS"))
                                                 {
                                                     remainingTime = text;
@@ -243,7 +243,7 @@ namespace EDSystemProgress
                                         case SystemStatus.InvasionInProgress:
                                         case SystemStatus.AlertInProgress:
                                             {
-                                                match = text.Contains("DELIVER SUPPLIES") || text.Contains("JLENVETCNE") || text.Contains("JENVENNE");
+                                                match = text.Contains("DELIVER SUPPLIES") || text.Contains("ELVER SUPPLES") || text.Contains("JLENVETCNE") || text.Contains("JENVENNE");
                                                 break;
                                             }
                                         case SystemStatus.InvasionPrevented:
@@ -263,7 +263,7 @@ namespace EDSystemProgress
                                             }
                                         case SystemStatus.Recovery:
                                             {
-                                                match = text.Contains("DELIVER");
+                                                match = text.Contains("DELIVER") || text.Contains("ELVER SUPPLES");
                                                 break;
                                             }
                                     }

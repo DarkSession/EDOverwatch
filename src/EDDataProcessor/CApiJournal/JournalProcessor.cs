@@ -1,5 +1,4 @@
 ﻿using EDCApi;
-using EDDatabase;
 using EDDataProcessor.CApiJournal.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
@@ -216,7 +215,18 @@ namespace EDDataProcessor.CApiJournal
 
         private async Task<DateTimeOffset?> ProcessCommanderCApiMessageEvent(JournalParameters journalParameters, string journalLine, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            JObject journalObject = JObject.Parse(journalLine);
+            JObject journalObject;
+            try
+            {
+                journalObject  = JObject.Parse(journalLine);
+            }
+            catch (Exception e)
+            {
+                Log.LogError(e, "Error while parsing journal line {journalLine}", journalLine);
+                journalParameters.DeferRequested = true;
+                return null;
+            }
+
             if (journalObject.TryGetValue("event", out JToken? eventJToken) &&
                 eventJToken.Value<string>() is string eventName &&
                 !string.IsNullOrEmpty(eventName) &&

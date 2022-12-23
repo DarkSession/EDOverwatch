@@ -15,6 +15,9 @@
         public int StationsUnderRepair { get; protected set; }
         public int StationsDamaged { get; protected set; }
         public int StationsUnderAttack { get; protected set; }
+        public DateTimeOffset StateStartCycle { get; }
+        public OverwatchStarSystemStateExpires? StateExpiration { get; }
+        public OverwatchStarSystemStateProgress StateProgress { get; }
 
         public OverwatchStarSystem(StarSystem starSystem, decimal effortFocus, int factionOperations, List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations, int stationsUnderRepair, int stationsDamaged, int stationsUnderAttack)
         {
@@ -31,6 +34,28 @@
             StationsUnderRepair = stationsUnderRepair;
             StationsDamaged = stationsDamaged;
             StationsUnderAttack = stationsUnderAttack;
+            StateStartCycle = starSystem.ThargoidLevel?.CycleStart?.Start ?? throw new Exception("Thargoid level must have a cycle property");
+            if (starSystem.ThargoidLevel!.StateExpires != null)
+            {
+                DateTimeOffset stateExpires = starSystem.ThargoidLevel.StateExpires.End;
+                DateTimeOffset currentCycleEnds;
+                short? cyclesLeft = 0;
+                if (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Recovery)
+                {
+                    currentCycleEnds = stateExpires;
+                    cyclesLeft = null;
+                }
+                else
+                {
+                    currentCycleEnds = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
+                    if ((stateExpires - currentCycleEnds).TotalDays >= 7)
+                    {
+                        cyclesLeft = (short?)Math.Floor((double)(stateExpires - currentCycleEnds).TotalDays / 7d);
+                    }
+                }
+                StateExpiration = new(stateExpires, currentCycleEnds, cyclesLeft);
+            }
+            StateProgress = new(ProgressPercent, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
         }
     }
 
@@ -55,6 +80,47 @@
             X = x;
             Y = y;
             Z = z;
+        }
+    }
+
+    public class OverwatchStarSystemStateExpires
+    {
+        public DateTimeOffset StateExpires { get; }
+        public DateTimeOffset CurrentCycleEnds { get; }
+        public short? RemainingCycles { get; }
+
+        public OverwatchStarSystemStateExpires(DateTimeOffset stateExpires, DateTimeOffset currentCycleEnds, short? remainingCycles)
+        {
+            StateExpires = stateExpires;
+            CurrentCycleEnds = currentCycleEnds;
+            RemainingCycles = remainingCycles;
+        }
+    }
+
+    public class OverwatchStarSystemStateProgress
+    {
+        public decimal? ProgressPercent { get; }
+        public bool IsCompleted { get; }
+        public OverwatchThargoidLevel? NextSystemState { get; }
+        public DateTimeOffset? SystemStateChanges { get; }
+        public OverwatchStarSystemStateProgress(decimal? progressPercent, StarSystemThargoidLevelState currentSystemState)
+        {
+            ProgressPercent = progressPercent;
+            IsCompleted = (ProgressPercent >= 1);
+            if (IsCompleted)
+            {
+                StarSystemThargoidLevelState nextSystemState = currentSystemState switch
+                {
+                    StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.None,
+                    StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Recovery,
+                    StarSystemThargoidLevelState.Controlled => StarSystemThargoidLevelState.Recapture,
+                    StarSystemThargoidLevelState.Recapture => StarSystemThargoidLevelState.Recovery,
+                    StarSystemThargoidLevelState.Recovery => StarSystemThargoidLevelState.None,
+                    _ => StarSystemThargoidLevelState.None,
+                };
+                NextSystemState = new(nextSystemState);
+                SystemStateChanges   = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
+            }
         }
     }
 }

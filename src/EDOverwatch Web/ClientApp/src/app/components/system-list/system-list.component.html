@@ -13,9 +13,14 @@
                 </td>
             </ng-container>
             <ng-container matColumnDef="ThargoidLevel">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid Level</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
                 <td mat-cell *matCellDef="let row">
                     <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
+                    <div *ngIf="row.StateProgress?.IsCompleted && row.StateProgress.NextSystemState" class="state-change">
+                        Changes to&nbsp;
+                        <app-thargoid-level [thargoidLevel]="row.StateProgress.NextSystemState"></app-thargoid-level>
+                        &nbsp;in {{ row.StateProgress.SystemStateChanges | dateAgo:1 }}
+                    </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Starports">
@@ -41,6 +46,9 @@
                                 matTooltip="Completed"></fa-icon>
                         </div>
                     </div>
+                    <div *ngIf="!row.StateProgress?.IsCompleted && row.StateExpiration?.CurrentCycleEnds" class="small">
+                        Resets in {{ row.StateExpiration?.CurrentCycleEnds | dateAgo }}
+                    </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="EffortFocus">
@@ -55,8 +63,16 @@
                     {{ row.FactionOperations | number }}
                     <span *ngFor="let specialFactionOperation of row.SpecialFactionOperations">
                         <img src="assets/badges/{{ specialFactionOperation.Tag }}.png" style="width: 24px; height: 24px"
-                            matTooltip="{{ specialFactionOperation.Name }} operation" />
+                            matTooltip="{{ specialFactionOperation.Name }} target" />
                     </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="StateExpiration">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Remaining time<br>in current state</th>
+                <td mat-cell *matCellDef="let row">
+                    <div *ngIf="row.StateExpiration?.StateExpires">
+                        {{ row.StateExpiration?.StateExpires | dateAgo }}
+                    </div>
                 </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>

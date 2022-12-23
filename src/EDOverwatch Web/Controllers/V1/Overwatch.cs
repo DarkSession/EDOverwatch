@@ -32,5 +32,11 @@ namespace EDOverwatch_Web.Controllers.V1
         {
             return OverwatchStarSystemDetail.Create(systemAddress, DbContext, cancellationToken);
         }
+
+        [HttpGet]
+        public Task<OverwatchMaelstroms> Maelstroms(CancellationToken cancellationToken)
+        {
+            return OverwatchMaelstroms.Create(DbContext, cancellationToken);
+        }
     }
 }

@@ -17,7 +17,7 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
 export class SystemListComponent implements OnInit, OnChanges {
   public readonly faClipboard = faClipboard;
   public readonly faCircleCheck = faCircleCheck;
-  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations'];
+  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @Input() systems: OverwatchStarSystem[] = [];
   @Input() maelstromsSelected: OverwatchMaelstrom[] | null = null;
@@ -83,6 +83,9 @@ export class SystemListComponent implements OnInit, OnChanges {
         case "FactionOperations": {
           return (system.FactionOperations + system.SpecialFactionOperations.length * 100);
         }
+        case "StateExpiration": {
+          return (system.StateExpiration?.StateExpires ?? "");
+        }
       }
       return system[columnName as keyof OverwatchStarSystem] as string | number;
     }
@@ -110,9 +113,24 @@ export interface OverwatchStarSystem {
   StationsUnderRepair: number;
   StationsDamaged: number;
   StationsUnderAttack: number;
+  StateExpiration: OverwatchStarSystemStateExpires | null;
+  StateProgress: StateProgress;
 }
 
 interface OverwatchStarSystemSpecialFactionOperation {
   Tag: string;
   Name: string;
+}
+
+interface OverwatchStarSystemStateExpires {
+  StateExpires: string;
+  CurrentCycleEnds: string;
+  RemainingCycles: number;
+}
+
+interface StateProgress {
+  ProgressPercent: number;
+  IsCompleted: boolean;
+  NextSystemState: OverwatchThargoidLevel | null;
+  SystemStateChanges: string;
 }

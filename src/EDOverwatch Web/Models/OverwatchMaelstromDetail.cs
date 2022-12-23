@@ -34,6 +34,8 @@
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)
+                .Include(s => s.ThargoidLevel!.CycleStart)
+                .Include(s => s.ThargoidLevel!.StateExpires)
                 .Select(s => new
                 {
                     StarSystem = s,
