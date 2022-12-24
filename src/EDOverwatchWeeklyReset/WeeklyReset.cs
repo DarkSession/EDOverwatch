@@ -70,8 +70,8 @@ namespace EDDataProcessor
                                 }
 
                                 List<DcohFactionOperation> factionOperations = await dbContext.DcohFactionOperations
-                                    .Where(s => 
-                                        s.StarSystem == starSystem && 
+                                    .Where(s =>
+                                        s.StarSystem == starSystem &&
                                         s.Status == DcohFactionOperationStatus.Active &&
                                         s.Type != DcohFactionOperationType.Logistics)
                                     .ToListAsync(cancellationToken);

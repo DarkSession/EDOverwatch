@@ -52,6 +52,37 @@ namespace DCoHTrackerDiscordBot
                                             EF.Functions.Like(s.Name, result.SystemName.Replace("%", string.Empty)) &&
                                             s.ThargoidLevel != null &&
                                             s.ThargoidLevel.State > StarSystemThargoidLevelState.None);
+                                    if (starSystem == null)
+                                    {
+                                        Log.LogWarning("Star system {name} not found!", result.SystemName);
+                                        List<string> allStarSystems =  (await DbContext.StarSystems
+                                            .AsNoTracking()
+                                            .Where(s =>
+                                                s.ThargoidLevel != null &&
+                                                s.ThargoidLevel.State > StarSystemThargoidLevelState.None)
+                                            .Select(s => s.Name)
+                                            .ToListAsync()).Select(s => s.ToUpper()).ToList();
+
+                                        List<string> similarStarSystemNames = allStarSystems
+                                            .Where(a => StringUtil.ComputeSimilarity(a, result.SystemName) <= 1)
+                                            .ToList();
+                                        if (similarStarSystemNames.Any())
+                                        {
+                                            Log.LogWarning("Found {count} similar star system names", similarStarSystemNames.Count);
+                                            if (similarStarSystemNames.Count == 1)
+                                            {
+                                                string starSystemName = similarStarSystemNames.First();
+                                                starSystem = await DbContext.StarSystems
+                                                                                        .Include(s => s.ThargoidLevel)
+                                                                                        .ThenInclude(t => t!.Maelstrom)
+                                                                                        .Include(s => s.ThargoidLevel.StateExpires)
+                                                                                        .FirstOrDefaultAsync(s =>
+                                                                                            EF.Functions.Like(s.Name, starSystemName) &&
+                                                                                            s.ThargoidLevel != null &&
+                                                                                            s.ThargoidLevel.State > StarSystemThargoidLevelState.None);
+                                            }
+                                        }
+                                    }
                                     if (starSystem?.ThargoidLevel != null)
                                     {
                                         StarSystemThargoidLevelState thargoidState = result.SystemStatus switch
@@ -63,7 +94,7 @@ namespace DCoHTrackerDiscordBot
                                             _ => StarSystemThargoidLevelState.None,
                                         };
                                         short progress = (short)result.Progress;
-                                        if (thargoidState == starSystem.ThargoidLevel.State && (starSystem.ThargoidLevel.Progress ?? 0) < progress)
+                                        if (thargoidState == starSystem.ThargoidLevel.State && ((starSystem.ThargoidLevel.Progress ?? -1) < progress))
                                         {
                                             starSystem.ThargoidLevel.Progress = progress;
                                             StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, progress)
@@ -119,7 +150,7 @@ namespace DCoHTrackerDiscordBot
                                         remainingTimeStr = "-";
                                     }
 
-                                    embed.AddField("System Name", Format.Sanitize(starSystem?.Name ?? result.SystemName), (starSystem?.ThargoidLevel?.Maelstrom == null));
+                                    embed.AddField("System Name", Format.Sanitize(starSystem?.Name ?? result.SystemName));
                                     if (starSystem?.ThargoidLevel?.Maelstrom != null)
                                     {
                                         embed.AddField("Maelstrom", starSystem.ThargoidLevel.Maelstrom.Name ?? "-");
@@ -127,6 +158,7 @@ namespace DCoHTrackerDiscordBot
                                     embed.AddField("System State", result.SystemStatus.GetEnumMemberValue(), true);
                                     embed.AddField("Progress", result.Progress + "%", true);
                                     embed.AddField("Remaining Time", remainingTimeStr, true);
+
                                     screenshots++;
                                 }
                             }

@@ -28,7 +28,9 @@ namespace DCoHTrackerDiscordBot.Module
         [SlashCommand("update", "Update the focus of your sqadrons activities")]
         public async Task Update(
             [Summary("Operation", "Operation Type")] OperationType operation,
+#pragma warning disable IDE0060 // Remove unused parameter
             [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
+#pragma warning restore IDE0060 // Remove unused parameter
             [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
         {
             if (!await CheckElevatedGuild())
@@ -92,7 +94,9 @@ namespace DCoHTrackerDiscordBot.Module
         [SlashCommand("remove", "Remove a registered operation")]
         public async Task Remove(
             [Summary("Operation", "Operation Type")] OperationType operation,
+#pragma warning disable IDE0060 // Remove unused parameter
             [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
+#pragma warning restore IDE0060 // Remove unused parameter
             [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
         {
             if (!await CheckElevatedGuild())
@@ -279,10 +283,7 @@ namespace DCoHTrackerDiscordBot.Module
                 {
                     SystemsByMaelstrom.TryGetValue(maelstrom, out systemList);
                 }
-                if (systemList == null)
-                {
-                    systemList = Systems;
-                }
+                systemList ??= Systems;
                 IEnumerable<string> systems = systemList.OrderBy(s => s);
                 if (autocompleteInteraction.Data.Current.Value is string value)
                 {

@@ -119,7 +119,7 @@
                     _ => StarSystemThargoidLevelState.None,
                 };
                 NextSystemState = new(nextSystemState);
-                SystemStateChanges   = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
+                SystemStateChanges = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
             }
         }
     }

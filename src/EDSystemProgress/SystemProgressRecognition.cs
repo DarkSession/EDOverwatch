@@ -434,6 +434,7 @@ namespace EDSystemProgress
             { "HIP 20816", "HIP 20916" },
             { "HIP 208186", "HIP 20916" },
             { "O0BAMUMBO", "OBAMUMBO" },
+            { "LAHUA n", "LAHUA" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

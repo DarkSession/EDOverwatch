@@ -218,7 +218,7 @@ namespace EDDataProcessor.CApiJournal
             JObject journalObject;
             try
             {
-                journalObject  = JObject.Parse(journalLine);
+                journalObject = JObject.Parse(journalLine);
             }
             catch (Exception e)
             {
