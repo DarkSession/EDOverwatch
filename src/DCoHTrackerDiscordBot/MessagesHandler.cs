@@ -114,6 +114,14 @@ namespace DCoHTrackerDiscordBot
                                                     starSystem.ThargoidLevel.StateExpires = thargoidCycle;
                                                 }
                                             }
+                                            if (progress >= 100)
+                                            {
+                                                await DbContext.DcohFactionOperations
+                                                    .Where(d =>
+                                                        d.StarSystem == starSystem &&
+                                                        d.Status == DcohFactionOperationStatus.Active)
+                                                    .ForEachAsync(d => d.Status = DcohFactionOperationStatus.Expired);
+                                            }
                                             await DbContext.SaveChangesAsync();
                                         }
                                     }
