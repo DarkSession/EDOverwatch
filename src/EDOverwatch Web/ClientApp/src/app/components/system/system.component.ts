@@ -10,6 +10,7 @@ import { OverwatchStation } from '../station-name/station-name.component';
 import { Chart, ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
 
 import { AnnotationOptions, default as Annotation } from 'chartjs-plugin-annotation';
+import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 
 @UntilDestroy()
 @Component({
@@ -37,6 +38,17 @@ export class SystemComponent implements OnInit {
     scales: {
       y: {
         position: 'left',
+      },
+      y1: {
+        min: 0,
+        max: 100,
+        position: 'right',
+        grid: {
+          color: 'rgba(233, 94, 3, 0.3)',
+        },
+        ticks: {
+          color: '#e95e03'
+        }
       }
     },
     plugins: {
@@ -55,7 +67,7 @@ export class SystemComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly matSnackBar: MatSnackBar
   ) {
-    Chart.register(Annotation)
+    Chart.register(Annotation);
   }
 
   public ngOnInit(): void {
@@ -100,6 +112,32 @@ export class SystemComponent implements OnInit {
             });
           }
 
+          let previousProgress = 0;
+          const progress: number[] = [];
+          for (const label of labels) {
+            const maxNumber = Math.max(...this.starSystem.ProgressDetails.filter(p => p.Date === label).map(p => p.Progress));
+            if (isNaN(maxNumber) || maxNumber === Infinity || maxNumber === -Infinity) {
+              progress.push(previousProgress);
+            }
+            else {
+              progress.push(maxNumber);
+              previousProgress = maxNumber;
+            }
+          }
+
+          datasets.push({
+            label: 'Progress',
+            data: progress,
+            yAxisID: 'y1',
+            backgroundColor: 'rgba(251, 215, 180, 0.2)',
+            borderColor: '#f07b05',
+            pointBackgroundColor: '#fbd7b4',
+            pointBorderColor: '#ffffff',
+            pointHoverBackgroundColor: '#ffffff',
+            pointHoverBorderColor: 'rgba(233, 94, 3, 0.8)',
+            fill: 'origin',
+          });
+
           const annotations: AnnotationOptions[] = [
             {
               type: 'line',
@@ -139,6 +177,7 @@ export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   Population: number;
   PopulationOriginal: number;
   WarEfforts: OverwatchStarSystemWarEffort[];
+  ProgressDetails: OverwatchStarSystemDetailProgress[];
   FactionOperationDetails: FactionOperation[];
   Stations: OverwatchStation[];
   LastTickTime: string;
@@ -161,4 +200,12 @@ export interface FactionOperation {
   Started: string;
   SystemName: string;
   SystemAddress: number;
+}
+
+interface OverwatchStarSystemDetailProgress {
+  State: OverwatchThargoidLevel;
+  Date: string;
+  DateTime: string;
+  Progress: number;
+  ProgressPercentage: number;
 }

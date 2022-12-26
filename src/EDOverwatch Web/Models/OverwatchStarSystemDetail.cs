@@ -7,6 +7,7 @@
         public DateTimeOffset LastTickTime { get; }
         public DateOnly LastTickDate { get; }
         public List<OverwatchStarSystemWarEffort> WarEfforts { get; }
+        public List<OverwatchStarSystemDetailProgress> ProgressDetails { get; }
         public List<FactionOperation> FactionOperationDetails { get; }
         public List<OverwatchStation> Stations { get; }
         public List<OverwatchStarSystemWarEffortType> WarEffortTypes => Enum.GetValues<WarEffortType>()
@@ -16,12 +17,13 @@
             .Select(w => new OverwatchStarSystemWarEffortSource(w))
             .ToList();
 
-        public OverwatchStarSystemDetail(
+        protected OverwatchStarSystemDetail(
             StarSystem starSystem,
             decimal effortFocus,
             List<EDDatabase.WarEffort> warEfforts,
             List<FactionOperation> factionOperationDetails,
-            List<Station> stations
+            List<Station> stations,
+            List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress
             ) :
             base(starSystem, effortFocus, 0, new(), 0, 0, 0)
         {
@@ -36,6 +38,7 @@
             StationsUnderAttack = stations.Where(s => s.State == StationState.UnderAttack).Count();
             LastTickTime = WeeklyTick.GetLastTick();
             LastTickDate = DateOnly.FromDateTime(LastTickTime.DateTime);
+            ProgressDetails = starSystemThargoidLevelProgress.Select(s => new OverwatchStarSystemDetailProgress(s)).ToList();
         }
 
         public static async Task<OverwatchStarSystemDetail?> Create(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
@@ -124,7 +127,14 @@
                     .Where(s => s.StarSystem == starSystem && StationTypes.Contains(s.Type!.Name) && s.State != StationState.Normal)
                     .ToListAsync(cancellationToken);
 
-                return new OverwatchStarSystemDetail(starSystem, effortFocus, warEfforts, factionOperations, stations);
+                List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress = await dbContext.StarSystemThargoidLevelProgress
+                    .AsNoTracking()
+                    .Include(s => s.ThargoidLevel)
+                    .Where(s => s.ThargoidLevel!.StarSystem == starSystem && s.Updated >= DateTimeOffset.UtcNow.AddDays(-7))
+                    .OrderByDescending(s => s.Updated)
+                    .ToListAsync(cancellationToken);
+
+                return new OverwatchStarSystemDetail(starSystem, effortFocus, warEfforts, factionOperations, stations, starSystemThargoidLevelProgress);
             }
             return null;
         }
@@ -163,6 +173,23 @@
         {
             SourceId = (int)warEffortSource;
             Name = warEffortSource.GetEnumMemberValue();
+        }
+    }
+
+    public class OverwatchStarSystemDetailProgress
+    {
+        public OverwatchThargoidLevel State { get; }
+        public DateOnly Date { get; }
+        public DateTimeOffset DateTime { get; }
+        public short Progress { get; }
+        public decimal ProgressPercentage { get; }
+        public OverwatchStarSystemDetailProgress(StarSystemThargoidLevelProgress starSystemThargoidLevelProgress)
+        {
+            State = new(starSystemThargoidLevelProgress.ThargoidLevel?.State ?? throw new Exception("ThargoidLevel cannot be null"));
+            Date = DateOnly.FromDateTime(starSystemThargoidLevelProgress.Updated.DateTime);
+            DateTime = starSystemThargoidLevelProgress.Updated;
+            Progress = starSystemThargoidLevelProgress.Progress ?? 0;
+            ProgressPercentage = (decimal)(starSystemThargoidLevelProgress.Progress ?? 0m) / 100m;
         }
     }
 }

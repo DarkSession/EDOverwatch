@@ -38,6 +38,14 @@ namespace DCoHTrackerDiscordBot
                 .AddUserSecrets<Program>()
                 .Build();
 
+            Endpoint activeMqEndpont = Endpoint.Create(
+                Configuration!.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
+                Configuration!.GetValue<int>("ActiveMQ:Port"),
+                Configuration!.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
+                Configuration!.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
+            ConnectionFactory connectionFactory = new();
+            await using ActiveMQ.Artemis.Client.IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont);
+
             Services = new ServiceCollection()
                 .AddSingleton(Configuration)
                 .AddLogging(builder =>
@@ -51,6 +59,7 @@ namespace DCoHTrackerDiscordBot
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()
+                .AddSingleton(connection)
                 .AddScoped<MessagesHandler>()
                 .BuildServiceProvider();
 
@@ -73,22 +82,14 @@ namespace DCoHTrackerDiscordBot
             await client.LoginAsync(TokenType.Bot, Configuration.GetValue<string>("Discord:Token"));
             await client.StartAsync();
 
-            _ = ProcessEvents();
+            _ = ProcessEvents(connection);
 
             // Never quit the program until manually forced to.
             await Task.Delay(Timeout.Infinite);
         }
 
-        private static async Task ProcessEvents()
+        private static async Task ProcessEvents(ActiveMQ.Artemis.Client.IConnection connection)
         {
-            Endpoint activeMqEndpont = Endpoint.Create(
-                Configuration!.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
-                Configuration!.GetValue<int>("ActiveMQ:Port"),
-                Configuration!.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
-                Configuration!.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
-            ConnectionFactory connectionFactory = new();
-            await using ActiveMQ.Artemis.Client.IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont);
-
             await using IConsumer consumer = await connection.CreateConsumerAsync(StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing);
             while (true)
             {

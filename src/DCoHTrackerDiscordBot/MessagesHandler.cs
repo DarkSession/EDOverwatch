@@ -1,6 +1,8 @@
-﻿using Discord.WebSocket;
+﻿using ActiveMQ.Artemis.Client;
+using Discord.WebSocket;
 using EDSystemProgress;
 using EDUtils;
+using Messages;
 
 namespace DCoHTrackerDiscordBot
 {
@@ -9,11 +11,13 @@ namespace DCoHTrackerDiscordBot
         private EdDbContext DbContext { get; }
         private IConfiguration Configuration { get; }
         private ILogger Log { get; }
-        public MessagesHandler(EdDbContext dbContext, IConfiguration configuration, ILogger<MessagesHandler> log)
+        private ActiveMQ.Artemis.Client.IConnection Connection { get; }
+        public MessagesHandler(EdDbContext dbContext, IConfiguration configuration, ILogger<MessagesHandler> log, ActiveMQ.Artemis.Client.IConnection connection)
         {
             DbContext = dbContext;
             Configuration = configuration;
             Log = log;
+            Connection = connection;
         }
 
         public async ValueTask ProcessMessage(SocketUserMessage message)
@@ -55,7 +59,7 @@ namespace DCoHTrackerDiscordBot
                                     if (starSystem == null)
                                     {
                                         Log.LogWarning("Star system {name} not found!", result.SystemName);
-                                        List<string> allStarSystems =  (await DbContext.StarSystems
+                                        List<string> allStarSystems = (await DbContext.StarSystems
                                             .AsNoTracking()
                                             .Where(s =>
                                                 s.ThargoidLevel != null &&
@@ -124,6 +128,11 @@ namespace DCoHTrackerDiscordBot
                                                     .ForEachAsync(d => d.Status = DcohFactionOperationStatus.Expired);
                                             }
                                             await DbContext.SaveChangesAsync();
+
+                                            await using IProducer starSystemThargoidLevelChangedProducer = await Connection.CreateProducerAsync(StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing);
+
+                                            StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress);
+                                            await starSystemThargoidLevelChangedProducer.SendAsync(starSystemThargoidLevelChanged.Message);
                                         }
                                     }
                                     else
