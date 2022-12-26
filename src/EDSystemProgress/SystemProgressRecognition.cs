@@ -191,6 +191,11 @@ namespace EDSystemProgress
                                             systemStatus = SystemStatus.Recovery;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
+                                        else if (text.Contains("RECOVERY WORK COMPLETE"))
+                                        {
+                                            systemStatus = SystemStatus.RecoveryComplete;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
                                     }
                                     break;
                                 }
@@ -224,6 +229,15 @@ namespace EDSystemProgress
                                                 match = text.Contains("INACTIVE PORTS");
                                                 break;
                                             }
+                                        case SystemStatus.RecoveryComplete:
+                                            {
+                                                match = text.Contains("ACTIVE IN");
+                                                if (match)
+                                                {
+                                                    remainingTime = text;
+                                                }
+                                                break;
+                                            }
                                     }
                                     if (match)
                                     {
@@ -252,6 +266,7 @@ namespace EDSystemProgress
                                                 break;
                                             }
                                         case SystemStatus.AlertPrevented:
+                                        case SystemStatus.RecoveryComplete:
                                             {
                                                 match = text.Contains("HUMAN CONTROLLED");
                                                 break;
@@ -302,7 +317,7 @@ namespace EDSystemProgress
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionProgressColors,
                     SystemStatus.AlertPrevented or SystemStatus.AlertInProgress => AlertProgressColors,
                     SystemStatus.ThargoidControlled => InvasionProgressColors,
-                    SystemStatus.Recovery => AlertProgressColors,
+                    SystemStatus.Recovery or SystemStatus.RecoveryComplete => AlertProgressColors,
                     _ => throw new NotImplementedException(),
                 };
                 List<ColorRange> remainingColors = systemStatus switch
@@ -310,7 +325,7 @@ namespace EDSystemProgress
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionRemainingColors,
                     SystemStatus.AlertPrevented or SystemStatus.AlertInProgress => AlertRemainingColors,
                     SystemStatus.ThargoidControlled => InvasionRemainingColors,
-                    SystemStatus.Recovery => InvasionProgressColors,
+                    SystemStatus.Recovery or SystemStatus.RecoveryComplete => InvasionProgressColors,
                     _ => throw new NotImplementedException(),
                 };
 
@@ -497,6 +512,8 @@ namespace EDSystemProgress
         ThargoidControlled,
         [EnumMember(Value = "Recovery")]
         Recovery,
+        [EnumMember(Value = "Recovery completed")]
+        RecoveryComplete,
     }
 
     public readonly struct ExtractSystemProgressResult

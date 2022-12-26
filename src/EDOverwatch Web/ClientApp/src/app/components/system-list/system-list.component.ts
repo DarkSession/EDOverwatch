@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -19,6 +20,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faCircleCheck = faCircleCheck;
   public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
   @Input() systems: OverwatchStarSystem[] = [];
   @Input() maelstromsSelected: OverwatchMaelstrom[] | null = null;
   @Input() thargoidLevelsSelected: OverwatchThargoidLevel[] | null = null;
@@ -69,6 +71,7 @@ export class SystemListComponent implements OnInit, OnChanges {
 
   private initDataSource(data: OverwatchStarSystem[]) {
     this.dataSource = new MatTableDataSource<OverwatchStarSystem>(data);
+    this.dataSource.paginator = this.paginator;
     this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string | number => {
       switch (columnName) {
         case "ThargoidLevel": {

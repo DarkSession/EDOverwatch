@@ -22,6 +22,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { TimeagoModule } from 'ngx-timeago';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { AuthenticationGuard } from './guards/authentication.guard';
 
@@ -102,6 +103,7 @@ export const httpInterceptorProviders = [
     MatTabsModule,
     MatInputModule,
     NgChartsModule,
+    MatPaginatorModule,
     RouterModule.forRoot([
       {
         path: 'about',
