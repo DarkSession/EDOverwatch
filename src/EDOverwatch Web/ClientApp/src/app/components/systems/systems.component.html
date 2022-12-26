@@ -28,6 +28,17 @@
                     </mat-select>
                 </mat-form-field>
             </div>
+            <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length"
+                class="filtered-view">
+                <div>
+                    <fa-icon [icon]="faFilter"></fa-icon>
+                    Filtered view
+                </div>
+                <div class="clickable" (click)="resetFilter()">
+                    <fa-icon [icon]="faCircleXmark"></fa-icon>
+                    Reset filter
+                </div>
+            </div>
             <app-system-list [systems]="dataRaw" [maelstromsSelected]="maelstromsSelected"
                 [thargoidLevelsSelected]="thargoidLevelsSelected"
                 [systemNameFilter]="systemNameFilter"></app-system-list>

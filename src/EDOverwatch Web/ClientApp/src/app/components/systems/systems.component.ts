@@ -5,6 +5,7 @@ import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-list.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { AppService } from 'src/app/services/app.service';
+import { faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -14,6 +15,8 @@ import { AppService } from 'src/app/services/app.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemsComponent implements OnInit {
+  public readonly faFilter = faFilter;
+  public readonly faCircleXmark = faCircleXmark;
   public dataRaw: OverwatchStarSystem[] = [];
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
 
@@ -90,6 +93,16 @@ export class SystemsComponent implements OnInit {
     if (this.systemList) {
       this.systemList.updateDataSource();
     }
+  }
+
+  public async resetFilter(): Promise<void> {
+    this.maelstromsSelected = this.maelstroms;
+    this.thargoidLevelsSelected = this.thargoidLevels;
+    if (this.systemList) {
+      this.systemList.updateDataSource();
+    }
+    await this.appService.deleteSetting("Maelstroms");
+    await this.appService.deleteSetting("ThargoidLevels");
   }
 }
 

@@ -35,11 +35,17 @@ export class WebsocketService {
     }
 
     private async initDb(): Promise<void> {
-        this.cacheDb = await idb.openDB<CacheDb>('OverwatchCache', 1, {
-            upgrade(db) {
-                db.createObjectStore('ws');
-            },
-        });
+        try {
+            this.cacheDb = await idb.openDB<CacheDb>('OverwatchCache', 1, {
+                upgrade(db) {
+                    db.createObjectStore('ws');
+                },
+            });
+        }
+        catch (e) {
+            console.error(e);
+            this.cacheDb = null;
+        }
     }
 
     public reconnect(): void {
@@ -141,14 +147,16 @@ export class WebsocketService {
             }
         }
         else {
-            if (!isCached && this.cacheDb) {
+            if (!isCached) {
                 const cacheId = this.wsRequests[message.MessageId];
                 if (cacheId) {
                     delete this.wsRequests[message.MessageId];
                     if (!environment.production) {
                         console.log(message, cacheId);
                     }
-                    this.cacheDb.put('ws', message, cacheId);
+                    if (this.cacheDb) {
+                        this.cacheDb.put('ws', message, cacheId);
+                    }
                 }
             }
             if (message.MessageId && this.responseCallbacks[message.MessageId]) {
@@ -280,6 +288,6 @@ interface WebSocketMessageAuthenticationData {
     IsAuthenticated: boolean;
 }
 
-interface CacheDb extends DBSchema  {
+interface CacheDb extends DBSchema {
     'ws': { key: string, value: WebSocketResponseMessage };
 }

@@ -59,12 +59,18 @@ export class AppService {
     this.settingsDbReady = new Promise((resolve) => {
       readyResolve = resolve;
     });
-    this.settingsDb = await idb.openDB<SettingsDb>('OverwatchSettings', 1, {
-      upgrade(db) {
-        db.createObjectStore('TableSort');
-        db.createObjectStore('Settings');
-      },
-    });
+    try {
+      this.settingsDb = await idb.openDB<SettingsDb>('OverwatchSettings', 1, {
+        upgrade(db) {
+          db.createObjectStore('TableSort');
+          db.createObjectStore('Settings');
+        },
+      });
+    }
+    catch (e) {
+      console.error(e);
+      this.settingsDb = null;
+    }
     if (readyResolve!) {
       readyResolve();
       this.settingsDbReady = null;

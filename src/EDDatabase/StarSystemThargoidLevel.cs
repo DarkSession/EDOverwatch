@@ -1,4 +1,6 @@
-﻿namespace EDDatabase
+﻿using System.Runtime.Serialization;
+
+namespace EDDatabase
 {
     [Table("StarSystemThargoidLevel")]
     [Index(nameof(State))]
@@ -55,6 +57,7 @@
 
     public enum StarSystemThargoidLevelState : byte
     {
+        [EnumMember(Value = "Clear")]
         None = 0,
         Alert = 20,
         Invasion = 30,

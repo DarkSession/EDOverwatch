@@ -47,7 +47,7 @@
                         </div>
                     </div>
                     <div *ngIf="!row.StateProgress?.IsCompleted && row.StateExpiration?.CurrentCycleEnds" class="small">
-                        Resets in {{ row.StateExpiration?.CurrentCycleEnds | dateAgo }}
+                        Resets in {{ row.StateExpiration?.CurrentCycleEnds | dateAgo:1 }}
                     </div>
                 </td>
             </ng-container>

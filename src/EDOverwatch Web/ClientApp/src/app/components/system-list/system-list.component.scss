@@ -19,7 +19,13 @@
 }
 
 .state-change {
-    display: flex;
+    display: none;
     font-size: 80%;
     font-style: italic;
+}
+
+@media (min-width: 992px) {
+    .state-change {
+        display: flex;
+    }
 }
