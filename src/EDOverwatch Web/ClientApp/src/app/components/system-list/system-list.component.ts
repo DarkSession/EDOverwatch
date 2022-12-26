@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -26,6 +26,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   @Input() thargoidLevelsSelected: OverwatchThargoidLevel[] | null = null;
   @Input() systemNameFilter: string | null = null;
   @Input() maxHeight: number | null = null;
+  public pageSize: number = 50;
   public dataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
   public sortColumn: string = "FactionOperations";
   public sortDirection: SortDirection = "desc";
@@ -38,22 +39,36 @@ export class SystemListComponent implements OnInit, OnChanges {
   }
 
   public ngOnInit(): void {
-    this.updateSort();
+    this.updateSettings();
   }
 
   public sortData(sort: Sort): void {
     this.appService.updateTableSort("SystemList", sort.active, sort.direction);
   }
 
-  private async updateSort(): Promise<void> {
+  private async updateSettings(): Promise<void> {
     const sort = await this.appService.getTableSort("SystemList", this.sortColumn, this.sortDirection);
     this.sortColumn = sort.Column;
     this.sortDirection = sort.Direction;
+    const pageSizeSetting = await this.appService.getSetting("SystemListPageSize");
+    if (pageSizeSetting) {
+      const pageSize = parseInt(pageSizeSetting);
+      if (!isNaN(pageSize) && pageSize >= 10) {
+        this.pageSize = pageSize;
+      }
+    }
     this.changeDetectorRef.markForCheck();
   }
 
   public ngOnChanges(): void {
     this.updateDataSource();
+  }
+
+  public async handlePageEvent(e: PageEvent): Promise<void> {
+    if (e.pageSize) {
+      this.pageSize = e.pageSize;
+      this.appService.saveSetting("SystemListPageSize", e.pageSize.toString());
+    }
   }
 
   public updateDataSource(): void {

@@ -4,7 +4,10 @@ global using Microsoft.EntityFrameworkCore;
 using ActiveMQ.Artemis.Client.Extensions.DependencyInjection;
 using ActiveMQ.Artemis.Client.Extensions.Hosting;
 using EDCApi;
+using EDOverwatch_Web.Authentication;
 using EDOverwatch_Web.WebSockets;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration.Json;
 
 namespace EDOverwatch_Web
@@ -31,7 +34,10 @@ namespace EDOverwatch_Web
                     options.User.AllowedUserNameCharacters += " ";
                 })
                 .AddEntityFrameworkStores<EdDbContext>();
-            builder.Services.AddAuthentication();
+
+            
+            builder.Services.AddAuthentication()
+                .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKeyAuthentication", null);
 
             // Add services to the container.
             builder.Services.AddControllers()

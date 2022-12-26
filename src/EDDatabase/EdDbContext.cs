@@ -8,6 +8,7 @@ namespace EDDatabase
 {
     public class EdDbContext : DbContext
     {
+        public DbSet<ApiKey> ApiKeys { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Commander> Commanders { get; set; }
         public DbSet<CommanderDeferredJournalEvent> CommanderDeferredJournalEvents { get; set; }
