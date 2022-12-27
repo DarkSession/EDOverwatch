@@ -91,7 +91,7 @@ namespace DCoHTrackerDiscordBot
                                     {
                                         StarSystemThargoidLevelState thargoidState = result.SystemStatus switch
                                         {
-                                            SystemStatus.AlertInProgress or SystemStatus.AlertPrevented => StarSystemThargoidLevelState.Alert,
+                                            SystemStatus.AlertInProgressPopulated or SystemStatus.AlertInProgressUnpopulated or SystemStatus.AlertPrevented => StarSystemThargoidLevelState.Alert,
                                             SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => StarSystemThargoidLevelState.Invasion,
                                             SystemStatus.ThargoidControlled => StarSystemThargoidLevelState.Controlled,
                                             SystemStatus.Recovery => StarSystemThargoidLevelState.Recovery,

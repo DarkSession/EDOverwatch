@@ -25,6 +25,7 @@ namespace EDDataProcessor
                         s.ThargoidLevel!.StateExpires!.End <= currentThargoidCycle.Start &&
                         s.ThargoidLevel.Progress != 100 &&
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Controlled && // Nothing happens with controlled systems
+                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Maelstrom && // Or systems with a maelstrom
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // We do not yet know what happens if we fail to complete systems in recovery
                         )
                     .ToListAsync(cancellationToken);
@@ -160,7 +161,7 @@ namespace EDDataProcessor
 
             dbContext.ChangeTracker.Clear();
 
-            // Last we reset the progresss for all systems except systems in recevoery
+            // Last we reset the progress for all systems except systems in recovery
             {
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>

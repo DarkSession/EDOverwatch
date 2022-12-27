@@ -10,9 +10,8 @@ namespace EDOverwatch_Web
             Producer = producer;
         }
 
-        public Task SendAsync(string address, RoutingType routingType, object body, CancellationToken cancellationToken = default)
+        public Task SendAsync(string address, RoutingType routingType, Message msg, CancellationToken cancellationToken = default)
         {
-            Message msg = new(body);
             return Producer.SendAsync(address, routingType, msg, cancellationToken);
         }
     }

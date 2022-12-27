@@ -18,7 +18,7 @@ namespace EDSystemProgress
 
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
-            new ColorRange(30, 67, 43, 100, 0, 32),
+            new ColorRange(28, 67, 43, 100, 0, 32),
         };
 
         private static List<ColorRange> AlertProgressColors { get; } = new()
@@ -160,10 +160,17 @@ namespace EDSystemProgress
                                             systemStatus = SystemStatus.InvasionPrevented;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
-                                        else if (text.Contains("INCURSION THREAT IN"))
+                                        else if (text.Contains("INCURSION THREAT IN") || text.Contains("THARGOID CONTROL IN"))
                                         {
                                             remainingTime = text;
-                                            systemStatus = SystemStatus.AlertInProgress;
+                                            if (text.Contains("INCURSION THREAT IN"))
+                                            {
+                                                systemStatus = SystemStatus.AlertInProgressPopulated;
+                                            }
+                                            else
+                                            {
+                                                systemStatus = SystemStatus.AlertInProgressUnpopulated;
+                                            }
                                             processingStep = ImageProcessingStep.BelowProgressBar;
                                             if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
                                             {
@@ -255,9 +262,12 @@ namespace EDSystemProgress
                                     switch (systemStatus)
                                     {
                                         case SystemStatus.InvasionInProgress:
-                                        case SystemStatus.AlertInProgress:
+                                        case SystemStatus.AlertInProgressPopulated:
                                             {
-                                                match = text.Contains("DELIVER SUPPLIES") || text.Contains("ELVER SUPPLES") || text.Contains("JLENVETCNE") || text.Contains("JENVENNE");
+                                                match = text.Contains("DELIVER SUPPLIES") || 
+                                                        text.Contains("ELVER SUPPLES") || 
+                                                        text.Contains("JLENVETCNE") || 
+                                                        text.Contains("JENVENNE");
                                                 break;
                                             }
                                         case SystemStatus.InvasionPrevented:
@@ -272,6 +282,7 @@ namespace EDSystemProgress
                                                 break;
                                             }
                                         case SystemStatus.ThargoidControlled:
+                                        case SystemStatus.AlertInProgressUnpopulated:
                                             {
                                                 match = text.Contains("DESTROY THARGOID");
                                                 break;
@@ -315,15 +326,15 @@ namespace EDSystemProgress
                 List<ColorRange> progressColors = systemStatus switch
                 {
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionProgressColors,
-                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgress => AlertProgressColors,
+                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated or SystemStatus.AlertInProgressUnpopulated => AlertProgressColors,
                     SystemStatus.ThargoidControlled => InvasionProgressColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => AlertProgressColors,
                     _ => throw new NotImplementedException(),
                 };
                 List<ColorRange> remainingColors = systemStatus switch
                 {
-                    SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionRemainingColors,
-                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgress => AlertRemainingColors,
+                    SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented or SystemStatus.AlertInProgressUnpopulated => InvasionRemainingColors,
+                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated => AlertRemainingColors,
                     SystemStatus.ThargoidControlled => InvasionRemainingColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => InvasionProgressColors,
                     _ => throw new NotImplementedException(),
@@ -382,7 +393,8 @@ namespace EDSystemProgress
                     switch (systemStatus)
                     {
                         case SystemStatus.InvasionInProgress:
-                        case SystemStatus.AlertInProgress:
+                        case SystemStatus.AlertInProgressPopulated:
+                        case SystemStatus.AlertInProgressUnpopulated:
                         case SystemStatus.ThargoidControlled:
                         case SystemStatus.Recovery:
                             {
@@ -505,7 +517,9 @@ namespace EDSystemProgress
         [EnumMember(Value = "Thargoid invasion prevented")]
         InvasionPrevented,
         [EnumMember(Value = "Thargoid alert")]
-        AlertInProgress,
+        AlertInProgressPopulated,
+        [EnumMember(Value = "Thargoid alert")]
+        AlertInProgressUnpopulated,
         [EnumMember(Value = "Thargoid alert prevented")]
         AlertPrevented,
         [EnumMember(Value = "Thargoid controlled")]
