@@ -24,13 +24,19 @@ namespace EDDataProcessor
                     .Where(s =>
                         s.ThargoidLevel!.StateExpires!.End <= currentThargoidCycle.Start &&
                         s.ThargoidLevel.Progress != 100 &&
-                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Controlled && // Nothing happens with controlled systems
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Maelstrom && // Or systems with a maelstrom
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // We do not yet know what happens if we fail to complete systems in recovery
                         )
                     .ToListAsync(cancellationToken);
                 foreach (StarSystem starSystem in starSystems)
                 {
+                    if (starSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
+                    {
+                        // If its controlled, we just reset the timer
+                        starSystem.ThargoidLevel.StateExpires = null;
+                        continue;
+                    }
+
                     StarSystemThargoidLevel oldThargoidLevel = starSystem.ThargoidLevel!;
                     oldThargoidLevel.CycleEnd = currentThargoidCycle;
 
@@ -89,11 +95,12 @@ namespace EDDataProcessor
                         case StarSystemThargoidLevelState.Recovery:
                             {
                                 List<Station> stations = await dbContext.Stations
-                                    .Where(s => s.StarSystem == starSystem && s.State != StationState.Normal)
+                                    .Where(s => s.StarSystem == starSystem && s.State != StationState.Normal && s.Updated < currentThargoidCycle.Start)
                                     .ToListAsync(cancellationToken);
                                 foreach (Station station in stations)
                                 {
                                     station.State = StationState.UnderRepairs;
+                                    station.Updated = currentThargoidCycle.Start;
                                 }
 
                                 List<DcohFactionOperation> factionOperations = await dbContext.DcohFactionOperations
@@ -111,11 +118,12 @@ namespace EDDataProcessor
                         case StarSystemThargoidLevelState.None when oldThargoidLevel.State == StarSystemThargoidLevelState.Recovery:
                             {
                                 List<Station> stations = await dbContext.Stations
-                                    .Where(s => s.StarSystem == starSystem && s.State != StationState.Normal)
+                                    .Where(s => s.StarSystem == starSystem && s.State != StationState.Normal && s.Updated < currentThargoidCycle.Start)
                                     .ToListAsync(cancellationToken);
                                 foreach (Station station in stations)
                                 {
                                     station.State = StationState.Normal;
+                                    station.Updated = currentThargoidCycle.Start;
                                 }
 
                                 List<DcohFactionOperation> factionOperations = await dbContext.DcohFactionOperations
@@ -144,7 +152,8 @@ namespace EDDataProcessor
                         s.StarSystem!.WarRelevantSystem &&
                         s.StarSystem.ThargoidLevel != null &&
                         s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Invasion &&
-                        (s.State == StationState.UnderAttack || s.State == StationState.Damaged))
+                        (s.State == StationState.UnderAttack || s.State == StationState.Damaged) && 
+                        s.Updated < currentThargoidCycle.Start)
                     .ToListAsync(cancellationToken);
                 foreach (Station station in stations)
                 {
@@ -154,6 +163,7 @@ namespace EDDataProcessor
                         StationState.Damaged => StationState.Abandoned,
                         _ => station.State
                     };
+                    station.Updated = currentThargoidCycle.Start;
                 }
 
                 await dbContext.SaveChangesAsync(cancellationToken);
@@ -176,6 +186,8 @@ namespace EDDataProcessor
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
+
+            dbContext.ChangeTracker.Clear();
         }
     }
 }

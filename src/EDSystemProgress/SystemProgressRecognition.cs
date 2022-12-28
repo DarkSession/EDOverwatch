@@ -12,13 +12,14 @@ namespace EDSystemProgress
     {
         private static List<ColorRange> InvasionProgressColors { get; } = new()
         {
-            new ColorRange(73, 190, 13, 65, 98, 255),
-            new ColorRange(235, 255, 235, 255, 235, 255),
+            new ColorRange(45, 50, 20, 25, 30, 40),
+            new ColorRange(73, 190, 11, 65, 98, 255),
+            new ColorRange(230, 255, 230, 255, 230, 255),
         };
 
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
-            new ColorRange(24, 67, 40, 100, 0, 32),
+            new ColorRange(24, 67, 34, 100, 0, 32),
         };
 
         private static List<ColorRange> AlertProgressColors { get; } = new()
@@ -37,7 +38,7 @@ namespace EDSystemProgress
 
         private static List<ColorRange> AlertRemainingColors { get; } = new()
         {
-            new ColorRange(120, 180, 50, 102, 0, 47),
+            new ColorRange(113, 180, 44, 102, 0, 47),
         };
 
         public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent, ILogger log)
@@ -469,6 +470,7 @@ namespace EDSystemProgress
             { "O0BAMUMBO", "OBAMUMBO" },
             { "LAHUA n", "LAHUA" },
             { "GLIESE 8035", "GLIESE 9035" },
+            { "HIP 20418", "HIP 20419" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]
