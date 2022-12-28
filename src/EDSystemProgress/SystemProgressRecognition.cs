@@ -270,9 +270,9 @@ namespace EDSystemProgress
                                         case SystemStatus.InvasionInProgress:
                                         case SystemStatus.AlertInProgressPopulated:
                                             {
-                                                match = text.Contains("DELIVER SUPPLIES") || 
-                                                        text.Contains("ELVER SUPPLES") || 
-                                                        text.Contains("JLENVETCNE") || 
+                                                match = text.Contains("DELIVER SUPPLIES") ||
+                                                        text.Contains("ELVER SUPPLES") ||
+                                                        text.Contains("JLENVETCNE") ||
                                                         text.Contains("JENVENNE");
                                                 break;
                                             }

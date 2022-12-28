@@ -12,7 +12,7 @@ namespace EDOverwatch_Web.Authentication
         public ApiKeyAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, EdDbContext dbContext)
             : base(options, logger, encoder, clock)
         {
-            DbContext= dbContext;
+            DbContext = dbContext;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()

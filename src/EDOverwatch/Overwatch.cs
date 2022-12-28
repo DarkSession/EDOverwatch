@@ -303,7 +303,7 @@ namespace EDOverwatch
         private async Task UpdateStarSystemThargoidLevel(StarSystem starSystem, StarSystemThargoidLevelState newThargoidLevel, ThargoidMaelstrom maelstrom, EdDbContext dbContext, IProducer starSystemThargoidLevelChangedProducer, Transaction transaction, CancellationToken cancellationToken)
         {
             // For now we only allow the state to move forward
-            if (starSystem.ThargoidLevel?.State == null || starSystem.ThargoidLevel.State < newThargoidLevel)
+            if (starSystem.ThargoidLevel?.State == null || starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Alert || starSystem.ThargoidLevel.State < newThargoidLevel)
             {
                 ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
                 if (starSystem.ThargoidLevel != null)

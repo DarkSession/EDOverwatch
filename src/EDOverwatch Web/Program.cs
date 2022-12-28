@@ -7,7 +7,6 @@ using EDCApi;
 using EDOverwatch_Web.Authentication;
 using EDOverwatch_Web.WebSockets;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration.Json;
 
 namespace EDOverwatch_Web
@@ -35,7 +34,7 @@ namespace EDOverwatch_Web
                 })
                 .AddEntityFrameworkStores<EdDbContext>();
 
-            
+
             builder.Services.AddAuthentication()
                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKeyAuthentication", null);
 

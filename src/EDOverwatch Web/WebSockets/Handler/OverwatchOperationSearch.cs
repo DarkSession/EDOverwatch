@@ -72,7 +72,6 @@ namespace EDOverwatch_Web.WebSockets.Handler
                             factionOperations = factionOperations.Where(f => f.StarSystem != null && (decimal)f.StarSystem.DistanceTo(starSystem) < maxDistance).ToList();
                         }
                     }
-                    
                 }
                 else if (!string.IsNullOrEmpty(data.Maelstrom))
                 {
@@ -84,7 +83,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
                 {
                     response.Operations = factionOperations.Select(f => new FactionOperation(f)).ToList();
                 }
-            } 
+            }
 
             return new WebSocketHandlerResultSuccess(response, null);
         }
