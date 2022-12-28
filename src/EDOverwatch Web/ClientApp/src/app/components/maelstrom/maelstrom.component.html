@@ -30,8 +30,9 @@
             <br>
             <div class="subtitle">Unaffected systems at risk</div>
             <div class="table-container">
-                <div class="table">
-                    <table mat-table [dataSource]="systemsAtRisk" matSort>
+                <div class="table" style="max-height: 35vh">
+                    <table mat-table [dataSource]="systemsAtRisk" matSort matSortActive="Distance" matSortDirection="asc"
+                        matSortDisableClear>
                         <ng-container matColumnDef="Name">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
                             <td mat-cell *matCellDef="let row">

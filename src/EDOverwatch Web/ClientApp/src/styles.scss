@@ -282,6 +282,7 @@ div.overwatch-content-container {
 }
 
 div.overwatch-content-small,
+div.overwatch-content-medium,
 div.overwatch-content-large {
   margin: 24px;
   padding: 12px;
@@ -303,6 +304,15 @@ div.overwatch-content-large {
 
 div.overwatch-content-small {
   width: 600px;
+
+  div.content-box {
+    background-color: var(--accent-darker-color);
+    padding: 12px;
+  }
+}
+
+div.overwatch-content-medium {
+  width: 800px;
 
   div.content-box {
     background-color: var(--accent-darker-color);

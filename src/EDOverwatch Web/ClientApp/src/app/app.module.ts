@@ -22,6 +22,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { TimeagoModule } from 'ngx-timeago';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { AuthenticationGuard } from './guards/authentication.guard';
@@ -51,6 +52,7 @@ import { SystemOperationsComponent } from './components/system-operations/system
 import { SystemContributionsComponent } from './components/system-contributions/system-contributions.component';
 import { MaelstromsComponent } from './components/maelstroms/maelstroms.component';
 import { DateAgoPipe } from './pipes/date-ago.pipe';
+import { OperationSearchComponent } from './components/operation-search/operation-search.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -82,6 +84,7 @@ export const httpInterceptorProviders = [
     SystemContributionsComponent,
     MaelstromsComponent,
     DateAgoPipe,
+    OperationSearchComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -102,6 +105,7 @@ export const httpInterceptorProviders = [
     MatProgressBarModule,
     MatTabsModule,
     MatInputModule,
+    MatFormFieldModule,
     NgChartsModule,
     MatPaginatorModule,
     RouterModule.forRoot([
@@ -143,6 +147,10 @@ export const httpInterceptorProviders = [
         path: 'my-efforts',
         component: MyEffortsComponent,
         canActivate: [AuthenticationGuard],
+      },
+      {
+        path: 'operation-search',
+        component: OperationSearchComponent,
       },
       {
         path: 'system/:id',

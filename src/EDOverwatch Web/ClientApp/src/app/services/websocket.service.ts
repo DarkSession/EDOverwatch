@@ -21,6 +21,7 @@ export class WebsocketService {
     public authenticationResolved!: Promise<void>;
     private authenticationResolve!: ((connectionStatus: void) => void);
     public onConnectionStatusChanged: EventEmitter<ConnectionStatus> = new EventEmitter<ConnectionStatus>();
+    public onReconnected: EventEmitter<void> = new EventEmitter<void>();
     private eventSubscribers: {
         [key: string]: EventEmitter<WebSocketMessage<any>>;
     } = {};
@@ -28,6 +29,7 @@ export class WebsocketService {
     public messageBacklogChanged: EventEmitter<number> = new EventEmitter<number>();
     private connectionAttempt = 0;
     private cacheDb: IDBPDatabase<CacheDb> | null = null;
+    private wasConnected = false;
 
     public constructor() {
         this.initDb();
@@ -71,6 +73,14 @@ export class WebsocketService {
     private setConnectionStatus(connectionStatus: ConnectionStatus): void {
         this.connectionStatus = connectionStatus;
         this.onConnectionStatusChanged.emit(connectionStatus);
+        if (this.connectionStatus === ConnectionStatus.Connected) {
+            if (this.wasConnected) {
+                this.onReconnected.emit();
+            }
+            else {
+                this.wasConnected = true;
+            }
+        }
     }
 
     private initalize(): void {

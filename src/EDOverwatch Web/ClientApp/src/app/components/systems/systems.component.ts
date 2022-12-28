@@ -42,7 +42,13 @@ export class SystemsComponent implements OnInit {
       .subscribe((message) => {
         this.update(message.Data);
       });
-    this.webSocketService.sendMessage("OverwatchSystems", {})
+    this.webSocketService
+      .onReconnected
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this.webSocketService.sendMessage("OverwatchSystems", {});
+      });
+    this.webSocketService.sendMessage("OverwatchSystems", {});
   }
 
   private async update(data: OverwatchSystems) {

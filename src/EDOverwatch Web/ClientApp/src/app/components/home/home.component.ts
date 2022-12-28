@@ -42,6 +42,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.overview = message.Data;
         this.changeDetectorRef.detectChanges();
       });
+    this.webSocketService
+      .onReconnected
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this.webSocketService.sendMessage("OverwatchHome", {});
+      });
     this.updateTimeSince();
     this.webSocketService.sendMessage("OverwatchHome", {});
   }

@@ -12,19 +12,19 @@ namespace EDSystemProgress
     {
         private static List<ColorRange> InvasionProgressColors { get; } = new()
         {
-            new ColorRange(80, 190, 15, 65, 98, 255),
+            new ColorRange(73, 190, 13, 65, 98, 255),
             new ColorRange(235, 255, 235, 255, 235, 255),
         };
 
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
-            new ColorRange(28, 67, 43, 100, 0, 32),
+            new ColorRange(24, 67, 40, 100, 0, 32),
         };
 
         private static List<ColorRange> AlertProgressColors { get; } = new()
         {
             new ColorRange(140, 160, 140, 160, 140, 160),
-            new ColorRange(150, 170, 170, 180, 150, 170),
+            new ColorRange(150, 170, 150, 180, 150, 170),
             new ColorRange(160, 180, 160, 180, 160, 180),
             new ColorRange(170, 190, 170, 190, 170, 190),
             new ColorRange(180, 200, 180, 200, 180, 200),
@@ -80,6 +80,7 @@ namespace EDSystemProgress
 
             int progressBarUpperY = 0;
             int progressBarLowerY = 0;
+            int leftSideBorder = 0;
 
             do
             {
@@ -102,6 +103,11 @@ namespace EDSystemProgress
                                     if (text.Contains("THARGOID WAR INFORMATION"))
                                     {
                                         processingStep = ImageProcessingStep.SystemName;
+
+                                        if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                        {
+                                            leftSideBorder = bounds.X1;
+                                        }
                                     }
                                     break;
                                 }
@@ -352,7 +358,7 @@ namespace EDSystemProgress
                         Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
                         // pixelRow.Length has the same value as accessor.Width,
                         // but using pixelRow.Length allows the JIT to optimize away bounds checks:
-                        for (int x = 0; x < pixelRow.Length; x++)
+                        for (int x = leftSideBorder; x < pixelRow.Length; x++)
                         {
                             // Get a reference to the pixel at position x
                             ref Rgba32 pixel = ref pixelRow[x];
@@ -462,6 +468,7 @@ namespace EDSystemProgress
             { "HIP 208186", "HIP 20916" },
             { "O0BAMUMBO", "OBAMUMBO" },
             { "LAHUA n", "LAHUA" },
+            { "GLIESE 8035", "GLIESE 9035" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

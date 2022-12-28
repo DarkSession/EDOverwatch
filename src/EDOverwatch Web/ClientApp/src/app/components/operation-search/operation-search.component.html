@@ -1,0 +1,98 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-medium">
+        <div class="title">
+            Operation Search
+        </div>
+        <div class="content-box">
+            <div class="ctx">
+                <div class="search">
+                    <div>
+                        Search
+                    </div>
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Operation Type</mat-label>
+                            <mat-select [(ngModel)]="operationTypeSelected" (ngModelChange)="settingChanged()" required>
+                                <mat-option *ngFor="let operationType of operationTypes" [value]="operationType">
+                                    {{ operationType.value }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        operations near
+                    </div>
+                    <div class="search-near">
+                        <div>
+                            <mat-form-field appearance="outline">
+                                <mat-label>Maelstrom</mat-label>
+                                <mat-select [(ngModel)]="maelstromSelected" (ngModelChange)="settingChanged()"
+                                    [disabled]="!!systemName">
+                                    <mat-option *ngFor="let maelstrom of maelstroms" [value]="maelstrom">
+                                        {{ maelstrom }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="or">
+                            <b>OR</b>
+                        </div>
+                        <div>
+                            <mat-form-field appearance="outline">
+                                <mat-label>System Name</mat-label>
+                                <input matInput [(ngModel)]="systemName" (ngModelChange)="settingChanged()"
+                                    placeholder="Near system name" [disabled]="!!maelstromSelected">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchNotFound" class="error-msg">
+                Your request did not return any valid results.
+            </div>
+        </div>
+    </div>
+    <div class="overwatch-content-large" *ngIf="!searchNotFound && operationTypeSelected && (maelstromSelected || systemName)">
+        <div class="table-container">
+            <div class="table" style="max-height: 40vh">
+                <table mat-table [dataSource]="operations" matSort matSortActive="SystemName" matSortDirection="asc"
+                    matSortDisableClear>
+                    <ng-container matColumnDef="SystemName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
+                        <td mat-cell *matCellDef="let row">
+                            <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
+                                {{ row.SystemName }}
+                            </span>
+                            <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                                (click)="copySystemName(row)"></fa-icon>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Faction">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Faction</th>
+                        <td mat-cell *matCellDef="let row">
+                            {{ row.Faction }}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Type">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Operation</th>
+                        <td mat-cell *matCellDef="let row">
+                            {{ row.Type }}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Started">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Start</th>
+                        <td mat-cell *matCellDef="let row">
+                            {{ row.Started | date }}
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="operationsDisplayedColumns; sticky: true" class="thead">
+                    </tr>
+                    <tr mat-row *matRowDef="let row; columns: operationsDisplayedColumns;"></tr>
+                </table>
+                <div *ngIf="operations.data.length === 0" class="empty-table">
+                    No records found.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

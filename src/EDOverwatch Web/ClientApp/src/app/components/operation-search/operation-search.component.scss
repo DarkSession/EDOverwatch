@@ -1,0 +1,45 @@
+.search {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    div {
+        margin: 8px;
+    }
+}
+
+.search-near {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ctx {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:host ::ng-deep .mat-mdc-form-field-bottom-align {
+    display: none;
+}
+
+.thead {
+    background-color: #272727;
+}
+
+.overwatch-content-container {
+    flex-direction: column;
+}
+
+.table-container {
+    width: 100%;
+}
+
+.error-msg {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: red;
+}
