@@ -58,6 +58,11 @@ namespace EDDataProcessor
                     };
                     dbContext.StarSystemThargoidLevels.Add(newThargoidCycle);
                     starSystem.ThargoidLevel = newThargoidCycle;
+
+                    if (newState == StarSystemThargoidLevelState.Controlled)
+                    {
+                        starSystem.Population = 0;
+                    }
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }

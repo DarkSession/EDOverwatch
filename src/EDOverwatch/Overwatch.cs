@@ -433,7 +433,8 @@ namespace EDOverwatch
                 (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Controlled && newThargoidLevel == StarSystemThargoidLevelState.None) ||
                 starSystem.ThargoidLevel.State < newThargoidLevel)
             {
-                if (starSystem.ThargoidLevel?.State == newThargoidLevel && (progress != null && starSystem.ThargoidLevel?.Progress == progress))
+                if (starSystem.ThargoidLevel?.State == newThargoidLevel && 
+                    (progress == null || starSystem.ThargoidLevel?.Progress == progress))
                 {
                     return false;
                 }
@@ -457,6 +458,10 @@ namespace EDOverwatch
                     Maelstrom = maelstrom,
                     Progress = progress,
                 };
+                if (newThargoidLevel == StarSystemThargoidLevelState.Alert)
+                {
+                    starSystem.ThargoidLevel.StateExpires = currentThargoidCycle;
+                }
                 if (isManualUpdate)
                 {
                     starSystem.ThargoidLevel.ManualUpdateCycle = currentThargoidCycle;
