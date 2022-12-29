@@ -74,6 +74,8 @@ export class SystemsComponent implements OnInit {
     else {
       this.thargoidLevelsSelected = data.Levels;
     }
+    this.hideUnpopulated = (await this.appService.getSetting("SystemListHideUnpopulated")) == "1";
+    this.hideCompleted = (await this.appService.getSetting("SystemListHideCompleted")) == "1";
     this.changeDetectorRef.markForCheck();
   }
 
@@ -94,8 +96,8 @@ export class SystemsComponent implements OnInit {
         await this.appService.saveSetting("ThargoidLevels", this.thargoidLevelsSelected.map(m => m.Name).join(","));
       }
     }
-    await this.appService.saveSetting("SystemListHideUnpopulated", this.hideUnpopulated ? "1": "0");
-    await this.appService.saveSetting("SystemListHideCompleted", this.hideCompleted ? "1": "0");
+    await this.appService.saveSetting("SystemListHideUnpopulated", this.hideUnpopulated ? "1" : "0");
+    await this.appService.saveSetting("SystemListHideCompleted", this.hideCompleted ? "1" : "0");
     this.updateDataSource();
   }
 

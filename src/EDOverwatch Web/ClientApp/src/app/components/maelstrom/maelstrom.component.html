@@ -45,7 +45,7 @@
                         <ng-container matColumnDef="Population">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Population</th>
                             <td mat-cell *matCellDef="let row">
-                                {{ row.Population | number }}
+                                {{ row.Population | numberSuffix:1 }}
                             </td>
                         </ng-container>
 
