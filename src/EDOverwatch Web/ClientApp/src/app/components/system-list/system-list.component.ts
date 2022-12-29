@@ -18,7 +18,7 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
 export class SystemListComponent implements OnInit, OnChanges {
   public readonly faClipboard = faClipboard;
   public readonly faCircleCheck = faCircleCheck;
-  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
+  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
   @Input() systems: OverwatchStarSystem[] = [];
@@ -96,7 +96,7 @@ export class SystemListComponent implements OnInit, OnChanges {
           return system.Maelstrom.Name;
         }
         case "Starports": {
-          return (system.StationsUnderAttack + system.StationsUnderRepair);
+          return (system.StationsUnderAttack + system.StationsDamaged + system.StationsUnderRepair);
         }
         case "FactionOperations": {
           return (system.FactionOperations + system.SpecialFactionOperations.length * 10);
@@ -133,6 +133,7 @@ export interface OverwatchStarSystem {
   StationsUnderAttack: number;
   StateExpiration: OverwatchStarSystemStateExpires | null;
   StateProgress: StateProgress;
+  Population: number;
 }
 
 interface OverwatchStarSystemSpecialFactionOperation {

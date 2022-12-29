@@ -154,8 +154,10 @@ export class SystemComponent implements OnInit {
             },
           ];
 
-          this.lineChartData.labels = labels;
-          this.lineChartData.datasets = datasets;
+          this.lineChartData = {
+            datasets: datasets,
+            labels: labels,
+          };
           this.lineChartOptions!.plugins!.annotation!.annotations = annotations;
           this.changeDetectorRef.markForCheck();
         }
@@ -174,7 +176,6 @@ export class SystemComponent implements OnInit {
 }
 
 export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
-  Population: number;
   PopulationOriginal: number;
   WarEfforts: OverwatchStarSystemWarEffort[];
   ProgressDetails: OverwatchStarSystemDetailProgress[];

@@ -7,6 +7,7 @@ using ActiveMQ.Artemis.Client;
 using DCoHTrackerDiscordBot.Module;
 using Discord.Interactions;
 using Discord.WebSocket;
+using EDUtils;
 using Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -45,6 +46,7 @@ namespace DCoHTrackerDiscordBot
                 Configuration!.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
             ConnectionFactory connectionFactory = new();
             await using ActiveMQ.Artemis.Client.IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont);
+            await using IAnonymousProducer anonymousProducer = await connection.CreateAnonymousProducerAsync();
 
             Services = new ServiceCollection()
                 .AddSingleton(Configuration)
@@ -60,6 +62,7 @@ namespace DCoHTrackerDiscordBot
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton(connection)
+                .AddSingleton(anonymousProducer)
                 .AddScoped<MessagesHandler>()
                 .BuildServiceProvider();
 
@@ -82,13 +85,22 @@ namespace DCoHTrackerDiscordBot
             await client.LoginAsync(TokenType.Bot, Configuration.GetValue<string>("Discord:Token"));
             await client.StartAsync();
 
-            _ = ProcessEvents(connection);
+            TaskCompletionSource t = new();
+            client.Ready += () =>
+            {
+                t.TrySetResult();
+                return Task.CompletedTask;
+            };
+
+            await t.Task;
+            _ = ProcessStarSystemThargoidLevelChangedEvents(connection);
+            _ = ProcessStarSystemUpdateQueueItemUpdatedEvents(connection);
 
             // Never quit the program until manually forced to.
             await Task.Delay(Timeout.Infinite);
         }
 
-        private static async Task ProcessEvents(ActiveMQ.Artemis.Client.IConnection connection)
+        private static async Task ProcessStarSystemThargoidLevelChangedEvents(ActiveMQ.Artemis.Client.IConnection connection)
         {
             await using IConsumer consumer = await connection.CreateConsumerAsync(StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing);
             while (true)
@@ -105,6 +117,98 @@ namespace DCoHTrackerDiscordBot
                     if (starSystemThargoidLevelChanged != null)
                     {
                         await TrackingModule.UpdateSystems(dbContext);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log!.LogError(e, "Event listener exception");
+                }
+            }
+        }
+
+        private static async Task ProcessStarSystemUpdateQueueItemUpdatedEvents(ActiveMQ.Artemis.Client.IConnection connection)
+        {
+            await using IConsumer consumer = await connection.CreateConsumerAsync(StarSystemUpdateQueueItemUpdated.QueueName, StarSystemUpdateQueueItemUpdated.Routing);
+            while (true)
+            {
+                try
+                {
+                    Message message = await consumer.ReceiveAsync();
+                    await consumer.AcceptAsync(message);
+
+                    await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
+                    EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+                    DiscordSocketClient client = serviceScope.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+                    string jsonString = message.GetBody<string>();
+                    StarSystemUpdateQueueItemUpdated? starSystemUpdateQueueItemUpdated = JsonConvert.DeserializeObject<StarSystemUpdateQueueItemUpdated>(jsonString);
+                    if (starSystemUpdateQueueItemUpdated != null &&
+                        await dbContext.StarSystemUpdateQueueItems
+                            .Include(s => s.StarSystem)
+                            .ThenInclude(s => s!.ThargoidLevel)
+                            .ThenInclude(t => t!.Maelstrom)
+                            .SingleOrDefaultAsync(s => s.Id == starSystemUpdateQueueItemUpdated.Id) is StarSystemUpdateQueueItem starSystemUpdateQueueItem &&
+                        starSystemUpdateQueueItem.Status == StarSystemUpdateQueueItemStatus.PendingNotification &&
+                        starSystemUpdateQueueItem.StarSystem != null)
+                    {
+                        try
+                        {
+                            var channel = await client.GetChannelAsync(starSystemUpdateQueueItem.DiscordChannelId);
+                            var u = await client.GetUserAsync(starSystemUpdateQueueItem.DiscordUserId);
+                            if (channel is ITextChannel textChannel &&
+                                u is IUser user)
+                            {
+                                AllowedMentions mentions = new()
+                                {
+                                    AllowedTypes = AllowedMentionTypes.Users,
+                                };
+
+                                string text = $"{user.Mention}, your system update request for **{Format.Sanitize(starSystemUpdateQueueItem.StarSystem.Name)}** has been ";
+                                text += starSystemUpdateQueueItem.ResultBy switch
+                                {
+                                    StarSystemUpdateQueueItemResultBy.Manual => "manually reviewed",
+                                    _ => "automatically reviewed by Overwatch",
+                                };
+                                text += ".\r\n";
+                                text += starSystemUpdateQueueItem.Result switch
+                                {
+                                    StarSystemUpdateQueueItemResult.NotUpdated => "**No** changes have been made as at the time of the review we believe all data was updated and correct.",
+                                    _ => "The system has been updated to reflect the in-game status and data.",
+                                };
+                                text += "\r\n";
+                                if (starSystemUpdateQueueItem.ResultBy == StarSystemUpdateQueueItemResultBy.Automatic)
+                                {
+                                    text += "If you believe that the data is still not updated or wrong, please submit another request and it will undergo a manual review.\r\n";
+                                }
+                                text += "Thank you for your contribution in keeping all data correct and updated.";
+
+                                EmbedBuilder embed = new EmbedBuilder()
+                                    .WithTitle("System Update Request")
+                                    .WithDescription(text);
+
+                                embed.AddField("System", starSystemUpdateQueueItem.StarSystem.Name, true);
+                                if (!string.IsNullOrEmpty(starSystemUpdateQueueItem.StarSystem.ThargoidLevel?.Maelstrom?.Name))
+                                {
+                                    embed.AddField("Maelstrom", starSystemUpdateQueueItem.StarSystem.ThargoidLevel.Maelstrom.Name, true);
+                                }
+                                string systemState = starSystemUpdateQueueItem.StarSystem.ThargoidLevel?.State.GetEnumMemberValue() ?? "Clear";
+                                embed.AddField("System State", systemState, true);
+                                if (starSystemUpdateQueueItem.StarSystem.ThargoidLevel?.Progress != null)
+                                {
+                                    embed.AddField("Progress", starSystemUpdateQueueItem.StarSystem.ThargoidLevel.Progress + " %", true);
+                                }
+                                await textChannel.SendMessageAsync(embed: embed.Build(), allowedMentions: mentions);
+                            }
+                            else
+                            {
+                                Log!.LogWarning("StarSystemUpdateQueueItemUpdated {id}: Unable to send message. Channel or user not found.", starSystemUpdateQueueItem.Id);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Log!.LogError(e, "Error while processing StarSystemUpdateQueueItemUpdated event");
+                        }
+                        starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.Completed;
+                        await dbContext.SaveChangesAsync();
                     }
                 }
                 catch (Exception e)

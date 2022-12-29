@@ -18,6 +18,7 @@
         public DateTimeOffset StateStartCycle { get; }
         public OverwatchStarSystemStateExpires? StateExpiration { get; }
         public OverwatchStarSystemStateProgress StateProgress { get; }
+        public long Population { get; }
 
         public OverwatchStarSystem(StarSystem starSystem, decimal effortFocus, int factionOperations, List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations, int stationsUnderRepair, int stationsDamaged, int stationsUnderAttack)
         {
@@ -35,6 +36,7 @@
             StationsDamaged = stationsDamaged;
             StationsUnderAttack = stationsUnderAttack;
             StateStartCycle = starSystem.ThargoidLevel?.CycleStart?.Start ?? throw new Exception("Thargoid level must have a cycle property");
+            Population = starSystem.Population;
             if (starSystem.ThargoidLevel!.StateExpires != null)
             {
                 DateTimeOffset stateExpires = starSystem.ThargoidLevel.StateExpires.End;

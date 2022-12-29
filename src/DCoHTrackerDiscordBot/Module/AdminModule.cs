@@ -30,7 +30,7 @@ namespace DCoHTrackerDiscordBot.Module
         public async Task Update(
             [Summary("Squadron", "Squadron Id (4 letter) of the squadron"), Autocomplete(typeof(SquadronIdAutocompleteHandler))] string squadronId,
             [Summary("Operation", "Operation Type")] OperationType operation,
-            [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
+            [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName)
         {
             if (!await CheckElevatedGuild())
             {

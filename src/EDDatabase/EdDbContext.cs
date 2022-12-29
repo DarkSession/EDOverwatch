@@ -32,6 +32,7 @@ namespace EDDatabase
         public DbSet<StarSystemThargoidLevel> StarSystemThargoidLevels { get; set; }
         public DbSet<StarSystemThargoidLevelProgress> StarSystemThargoidLevelProgress { get; set; }
         public DbSet<StarSystemSecurity> StarSystemSecurities { get; set; }
+        public DbSet<StarSystemUpdateQueueItem> StarSystemUpdateQueueItems { get; set; }
 
         public DbSet<Station> Stations { get; set; }
         public DbSet<StationType> StationTypes { get; set; }

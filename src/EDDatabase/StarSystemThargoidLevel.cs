@@ -26,6 +26,9 @@ namespace EDDatabase
         [ForeignKey("StateExpiresId")]
         public ThargoidCycle? StateExpires { get; set; }
 
+        [ForeignKey("ManualUpdateCycleId")]
+        public ThargoidCycle? ManualUpdateCycle { get; set; }
+
         [ForeignKey("MaelstromId")]
         public ThargoidMaelstrom? Maelstrom { get; set; }
 

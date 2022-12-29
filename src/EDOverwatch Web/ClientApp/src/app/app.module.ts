@@ -53,6 +53,7 @@ import { SystemContributionsComponent } from './components/system-contributions/
 import { MaelstromsComponent } from './components/maelstroms/maelstroms.component';
 import { DateAgoPipe } from './pipes/date-ago.pipe';
 import { OperationSearchComponent } from './components/operation-search/operation-search.component';
+import { NumberSuffixPipe } from './pipes/number-suffix.pipe';
 
 
 /** Http interceptor providers in outside-in order */
@@ -85,6 +86,7 @@ export const httpInterceptorProviders = [
     MaelstromsComponent,
     DateAgoPipe,
     OperationSearchComponent,
+    NumberSuffixPipe,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

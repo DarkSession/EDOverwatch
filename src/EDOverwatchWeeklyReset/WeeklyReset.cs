@@ -24,7 +24,7 @@ namespace EDDataProcessor
                     .Include(s => s.ThargoidLevel!.Maelstrom)
                     .Include(s => s.ThargoidLevel!.StateExpires)
                     .Where(s =>
-                        (s.ThargoidLevel!.StateExpires!.End <= currentThargoidCycle.Start || 
+                        (s.ThargoidLevel!.StateExpires!.End <= currentThargoidCycle.Start ||
                         (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
                         s.ThargoidLevel.Progress != 100 &&
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Maelstrom && // Or systems with a maelstrom
@@ -182,12 +182,12 @@ namespace EDDataProcessor
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Recovery &&
-                        s.ThargoidLevel.Progress != null)
+                        s.ThargoidLevel.Progress != null && s.ThargoidLevel.Progress != 0)
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
                 {
-                    starSystem.ThargoidLevel!.Progress = null;
+                    starSystem.ThargoidLevel!.Progress = 0;
                     starSystem.ThargoidLevel!.CurrentProgress = null;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);

@@ -1,5 +1,8 @@
-﻿using Discord.Interactions;
+﻿using ActiveMQ.Artemis.Client;
+using Discord.Interactions;
 using EDUtils;
+using Messages;
+using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.Serialization;
 
 namespace DCoHTrackerDiscordBot.Module
@@ -8,11 +11,13 @@ namespace DCoHTrackerDiscordBot.Module
     {
         private IConfiguration Configuration { get; }
         private EdDbContext DbContext { get; }
+        private IAnonymousProducer AnonymousProducer { get; }
 
-        public TrackingModule(EdDbContext dbContext, IConfiguration configuration)
+        public TrackingModule(EdDbContext dbContext, IConfiguration configuration, IAnonymousProducer anonymousProducer)
         {
             DbContext = dbContext;
             Configuration = configuration;
+            AnonymousProducer = anonymousProducer;
         }
 
         private async ValueTask<bool> CheckElevatedGuild()
@@ -31,7 +36,7 @@ namespace DCoHTrackerDiscordBot.Module
 #pragma warning disable IDE0060 // Remove unused parameter
             [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
 #pragma warning restore IDE0060 // Remove unused parameter
-            [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
+            [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName)
         {
             if (!await CheckElevatedGuild())
             {
@@ -97,7 +102,7 @@ namespace DCoHTrackerDiscordBot.Module
 #pragma warning disable IDE0060 // Remove unused parameter
             [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
 #pragma warning restore IDE0060 // Remove unused parameter
-            [Summary("System", "System Name"), Autocomplete(typeof(StarSystemAutocompleteHandler))] string starSystemName)
+            [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName)
         {
             if (!await CheckElevatedGuild())
             {
@@ -229,6 +234,56 @@ namespace DCoHTrackerDiscordBot.Module
             await FollowupAsync(embed: embedMain.Build(), ephemeral: true);
         }
 
+        [SlashCommand("system-update", "Request an automatic or manual review of system data")]
+        public async Task SystemUpdateRequest(
+            [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName)
+        {
+            await DeferAsync(true);
+
+            if (await DbContext.StarSystemUpdateQueueItems.CountAsync(s => s.DiscordUserId == Context.User.Id && s.Status != StarSystemUpdateQueueItemStatus.Completed) > 5)
+            {
+                await FollowupAsync("There are still 5 system updates requested by you pending. You need to wait until one of those is completed before you can submit another request.", ephemeral: true);
+                return;
+            }
+
+            StarSystem? starSystem = await DbContext.StarSystems
+                .Where(s => EF.Functions.Like(s.Name, starSystemName.Replace("%", string.Empty)))
+                .FirstOrDefaultAsync();
+            if (starSystem == null)
+            {
+                await FollowupAsync($"Could not find system **{Format.Sanitize(starSystemName)}**.", ephemeral: true);
+                return;
+            }
+            else if (await DbContext.StarSystemUpdateQueueItems.AnyAsync(s => s.StarSystem == starSystem && s.Status != StarSystemUpdateQueueItemStatus.Completed))
+            {
+                await FollowupAsync($"System **{Format.Sanitize(starSystem.Name)}** has already been requested and is still pending.", ephemeral: true);
+                return;
+            }
+
+            StarSystemUpdateQueueItem starSystemUpdateQueueItem = new(default, Context.User.Id, Context.Channel.Id, StarSystemUpdateQueueItemStatus.PendingAutomaticReview, StarSystemUpdateQueueItemResult.Pending, default, DateTimeOffset.Now, null)
+            {
+                StarSystem = starSystem,
+            };
+            DbContext.StarSystemUpdateQueueItems.Add(starSystemUpdateQueueItem);
+            if (await DbContext.StarSystemUpdateQueueItems.AnyAsync(s =>
+                            s.StarSystem == starSystem &&
+                            s.Status == StarSystemUpdateQueueItemStatus.Completed &&
+                            s.Completed >= DateTimeOffset.Now.AddDays(-1) &&
+                            s.Result != StarSystemUpdateQueueItemResult.Pending))
+            {
+                starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.PendingManualReview;
+                await FollowupAsync($"System **{Format.Sanitize(starSystem.Name)}** queued for manual review.", ephemeral: true);
+            }
+            else
+            {
+                await FollowupAsync($"System **{Format.Sanitize(starSystem.Name)}** queued for automatic review.", ephemeral: true);
+            }
+            await DbContext.SaveChangesAsync();
+
+            StarSystemUpdateQueueItemUpdated starSystemUpdateQueueItemUpdated = new(starSystemUpdateQueueItem.Id);
+            await AnonymousProducer.SendAsync(StarSystemUpdateQueueItemUpdated.QueueName, StarSystemUpdateQueueItemUpdated.Routing, starSystemUpdateQueueItemUpdated.Message);
+        }
+
         public static DcohFactionOperationType OperationTypeToDcohFactionOperationType(OperationType operation)
         {
             return operation switch
@@ -273,7 +328,7 @@ namespace DCoHTrackerDiscordBot.Module
             Systems = starSystems.Select(s => s.Name).ToList();
         }
 
-        public class StarSystemAutocompleteHandler : AutocompleteHandler
+        public class WarStarSystemAutocompleteHandler : AutocompleteHandler
         {
             public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
             {
@@ -296,6 +351,32 @@ namespace DCoHTrackerDiscordBot.Module
                 }
                 // max - 25 suggestions at a time (API limit)
                 return Task.FromResult(AutocompletionResult.FromSuccess(systems.Select(s => new AutocompleteResult(s, s)).Take(25)));
+            }
+        }
+
+        public class AnyStarSystemAutocompleteHandler : AutocompleteHandler
+        {
+            public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+            {
+                EdDbContext dbContext = services.GetRequiredService<EdDbContext>();
+                List<string>? systemList = null;
+                if (autocompleteInteraction.Data.Current.Value is string value)
+                {
+                    value = value.Trim().Replace("%", string.Empty).ToLower();
+                    if (value.Length >= 2)
+                    {
+                        systemList = await dbContext.StarSystems
+                            .AsNoTracking()
+                            .Where(s => EF.Functions.Like(s.Name, $"{value}%"))
+                            .Take(10)
+                            .Select(s => s.Name)
+                            .OrderBy(n => n)
+                            .ToListAsync();
+                    }
+                }
+                systemList ??= new();
+                // max - 25 suggestions at a time (API limit)
+                return AutocompletionResult.FromSuccess(systemList.Select(s => new AutocompleteResult(s, s)).Take(25));
             }
         }
 

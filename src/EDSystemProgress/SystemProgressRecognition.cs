@@ -240,7 +240,7 @@ namespace EDSystemProgress
                                             }
                                         case SystemStatus.Recovery:
                                             {
-                                                match = text.Contains("INACTIVE PORTS");
+                                                match = text.Contains("INACTIVE PORTS") || text.Contains("PORTS REMAINING");
                                                 break;
                                             }
                                         case SystemStatus.RecoveryComplete:

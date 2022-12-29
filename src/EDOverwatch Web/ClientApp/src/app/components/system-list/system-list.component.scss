@@ -24,6 +24,19 @@
     font-style: italic;
 }
 
+.header-align-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    min-height: 56px;
+}
+
+.cell-right {
+    text-align: right;
+}
+
+
 @media (min-width: 992px) {
     .state-change {
         display: flex;

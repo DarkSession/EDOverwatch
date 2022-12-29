@@ -24,6 +24,12 @@
                     </div>
                 </td>
             </ng-container>
+            <ng-container matColumnDef="Population">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-align-right">Population</th>
+                <td mat-cell *matCellDef="let row" class="cell-right">
+                    {{ row.Population | numberSuffix:1 }}
+                </td>
+            </ng-container>
             <ng-container matColumnDef="Starports">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Starports</th>
                 <td mat-cell *matCellDef="let row">
@@ -39,7 +45,7 @@
             <ng-container matColumnDef="Progress">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
                 <td mat-cell *matCellDef="let row">
-                    <div class="progress-cell" *ngIf="row.Progress">
+                    <div class="progress-cell" *ngIf="row.Progress !== null">
                         <mat-progress-bar mode="determinate" [value]="row.Progress" [matTooltip]="row.Progress + '%'"
                             color="red"></mat-progress-bar>
                         <div class="progress-completed">
@@ -47,7 +53,8 @@
                                 matTooltip="Completed"></fa-icon>
                         </div>
                     </div>
-                    <div *ngIf="!row.StateProgress?.IsCompleted && row.StateExpiration?.CurrentCycleEnds" class="small">
+                    <div *ngIf="row.Progress !== null && !row.StateProgress?.IsCompleted && row.StateExpiration?.CurrentCycleEnds"
+                        class="small">
                         Resets in {{ row.StateExpiration?.CurrentCycleEnds | dateAgo:1 }}
                     </div>
                 </td>
