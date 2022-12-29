@@ -24,6 +24,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { AuthenticationGuard } from './guards/authentication.guard';
 
@@ -110,6 +111,7 @@ export const httpInterceptorProviders = [
     MatFormFieldModule,
     NgChartsModule,
     MatPaginatorModule,
+    MatCheckboxModule,
     RouterModule.forRoot([
       {
         path: 'about',

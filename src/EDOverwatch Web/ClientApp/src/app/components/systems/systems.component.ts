@@ -18,6 +18,8 @@ export class SystemsComponent implements OnInit {
   public readonly faFilter = faFilter;
   public readonly faCircleXmark = faCircleXmark;
   public dataRaw: OverwatchStarSystem[] = [];
+  public hideUnpopulated: boolean = false;
+  public hideCompleted: boolean = false;
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
 
   public systemNameFilter: string = "";
@@ -92,6 +94,8 @@ export class SystemsComponent implements OnInit {
         await this.appService.saveSetting("ThargoidLevels", this.thargoidLevelsSelected.map(m => m.Name).join(","));
       }
     }
+    await this.appService.saveSetting("SystemListHideUnpopulated", this.hideUnpopulated ? "1": "0");
+    await this.appService.saveSetting("SystemListHideCompleted", this.hideCompleted ? "1": "0");
     this.updateDataSource();
   }
 
@@ -102,6 +106,8 @@ export class SystemsComponent implements OnInit {
   }
 
   public async resetFilter(): Promise<void> {
+    this.hideUnpopulated = false;
+    this.hideCompleted = false;
     this.maelstromsSelected = this.maelstroms;
     this.thargoidLevelsSelected = this.thargoidLevels;
     if (this.systemList) {
@@ -109,6 +115,8 @@ export class SystemsComponent implements OnInit {
     }
     await this.appService.deleteSetting("Maelstroms");
     await this.appService.deleteSetting("ThargoidLevels");
+    await this.appService.deleteSetting("SystemListHideUnpopulated");
+    await this.appService.deleteSetting("SystemListHideUnpopulated");
   }
 }
 

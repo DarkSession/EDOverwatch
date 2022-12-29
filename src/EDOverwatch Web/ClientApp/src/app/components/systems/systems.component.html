@@ -28,6 +28,16 @@
                     </mat-select>
                 </mat-form-field>
             </div>
+            <div class="systems-filter">
+                <div>
+                    <mat-checkbox [(ngModel)]="hideUnpopulated" (ngModelChange)="settingChanged()">Hide unpopulated
+                        systems</mat-checkbox>
+                </div>
+                <div>
+                    <mat-checkbox [(ngModel)]="hideCompleted" (ngModelChange)="settingChanged()">Hide completed
+                        systems</mat-checkbox>
+                </div>
+            </div>
             <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length"
                 class="filtered-view">
                 <div>
@@ -40,8 +50,8 @@
                 </div>
             </div>
             <app-system-list [systems]="dataRaw" [maelstromsSelected]="maelstromsSelected"
-                [thargoidLevelsSelected]="thargoidLevelsSelected"
-                [systemNameFilter]="systemNameFilter"></app-system-list>
+                [thargoidLevelsSelected]="thargoidLevelsSelected" [hideUnpopulated]="hideUnpopulated"
+                [hideCompleted]="hideCompleted" [systemNameFilter]="systemNameFilter"></app-system-list>
         </div>
     </div>
 </div>
