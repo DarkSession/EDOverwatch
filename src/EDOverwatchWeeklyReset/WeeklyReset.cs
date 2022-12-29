@@ -7,8 +7,6 @@ namespace EDDataProcessor
     {
         public static async Task ProcessWeeklyReset(EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
-
             IQueryable<StarSystem> starSystemPreQuery = dbContext.StarSystems
                         .Include(s => s.ThargoidLevel)
                         .Include(s => s.ThargoidLevel!.Maelstrom)
@@ -20,9 +18,14 @@ namespace EDDataProcessor
 
             // We start with all the system which are at the end of the timer but did not progress to 100%
             {
+                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
                 List<StarSystem> starSystems = await starSystemPreQuery
+                    .Include(s => s.ThargoidLevel)
+                    .Include(s => s.ThargoidLevel!.Maelstrom)
+                    .Include(s => s.ThargoidLevel!.StateExpires)
                     .Where(s =>
-                        s.ThargoidLevel!.StateExpires!.End <= currentThargoidCycle.Start &&
+                        (s.ThargoidLevel!.StateExpires!.End <= currentThargoidCycle.Start || 
+                        (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
                         s.ThargoidLevel.Progress != 100 &&
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Maelstrom && // Or systems with a maelstrom
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // We do not yet know what happens if we fail to complete systems in recovery
@@ -63,6 +66,7 @@ namespace EDDataProcessor
 
             // Next we update all the systems which have been cleared in the previous week to their new state
             {
+                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>
                         s.ThargoidLevel!.Progress == 100)
@@ -147,12 +151,13 @@ namespace EDDataProcessor
 
             // Next, we change the station states for systems in invasion
             {
+                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
                 List<Station> stations = await dbContext.Stations
                     .Where(s =>
                         s.StarSystem!.WarRelevantSystem &&
                         s.StarSystem.ThargoidLevel != null &&
                         s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Invasion &&
-                        (s.State == StationState.UnderAttack || s.State == StationState.Damaged) && 
+                        (s.State == StationState.UnderAttack || s.State == StationState.Damaged) &&
                         s.Updated < currentThargoidCycle.Start)
                     .ToListAsync(cancellationToken);
                 foreach (Station station in stations)
@@ -161,7 +166,7 @@ namespace EDDataProcessor
                     {
                         StationState.UnderAttack => StationState.Damaged,
                         StationState.Damaged => StationState.Abandoned,
-                        _ => station.State
+                        _ => station.State,
                     };
                     station.Updated = currentThargoidCycle.Start;
                 }
@@ -173,6 +178,7 @@ namespace EDDataProcessor
 
             // Last we reset the progress for all systems except systems in recovery
             {
+                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Recovery &&
