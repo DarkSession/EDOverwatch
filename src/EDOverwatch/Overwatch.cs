@@ -308,6 +308,10 @@ namespace EDOverwatch
                 (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Controlled && newThargoidLevel == StarSystemThargoidLevelState.None) ||
                 starSystem.ThargoidLevel.State < newThargoidLevel)
             {
+                if (starSystem.ThargoidLevel?.State == newThargoidLevel)
+                {
+                    return;
+                }
                 ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
                 if (starSystem.ThargoidLevel != null)
                 {
