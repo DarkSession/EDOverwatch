@@ -110,15 +110,34 @@ namespace EDOverwatch_Web.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<ActionResult> SystemUpdateFailed([FromBody] UpdateModel model, CancellationToken cancellationToken)
+        public async Task<ActionResult> SystemUpdateFailed([FromBody] SystemUpdateFailedRequest model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
+                StarSystem? starSystem = await DbContext.StarSystems
+                    .Include(s => s.ThargoidLevel)
+                    .FirstOrDefaultAsync(s => s.SystemAddress == model.SystemAddress, cancellationToken);
+                if (starSystem == null)
+                {
+                    return NotFound();
+                }
 
+                List<StarSystemUpdateQueueItem> starSystemUpdateQueueItems = await DbContext.StarSystemUpdateQueueItems
+                    .Where(s => s.StarSystem == starSystem && s.Status == StarSystemUpdateQueueItemStatus.PendingAutomaticReview)
+                    .ToListAsync(cancellationToken);
+                foreach (StarSystemUpdateQueueItem starSystemUpdateQueueItem in starSystemUpdateQueueItems)
+                {
+                    starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.PendingManualReview;
+                    StarSystemUpdateQueueItemUpdated starSystemUpdateQueueItemUpdated = new(starSystemUpdateQueueItem.Id);
+                    await Producer.SendAsync(StarSystemUpdateQueueItemUpdated.QueueName, StarSystemUpdateQueueItemUpdated.Routing, starSystemUpdateQueueItemUpdated.Message, cancellationToken);
+                }
+                await DbContext.SaveChangesAsync(cancellationToken);
+                return Ok();
             }
+            return BadRequest();
         }
 
-            [HttpGet]
+        [HttpGet]
         public async Task<SystemUpdateRequestedResponse> SystemUpdatePending(CancellationToken cancellationToken)
         {
             List<StarSystemUpdateQueueItem> starSystemUpdateQueueItems = await DbContext.StarSystemUpdateQueueItems
