@@ -7,15 +7,18 @@ namespace EDDataProcessor.Inara
 {
     internal partial class InaraClient : IDisposable
     {
-        private const string BaseUrl = "https://inara.cz/elite/";
+        private string BaseUrl { get; }
         private IBrowsingContext IBrowsingContext { get; }
         private Regex PathRegex { get; } = PathRegexGen();
         private DateTimeOffset LastRequest { get; set; } = DateTimeOffset.Now;
+        private ILogger Log { get; }
 
-        public InaraClient()
+        public InaraClient(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<InaraClient> log)
         {
             AngleSharp.IConfiguration config = Configuration.Default;
             IBrowsingContext = BrowsingContext.New(config);
+            BaseUrl = configuration.GetValue<string>("Inara:BaseUrl") ?? throw new Exception("Inara:BaseUrl is not configured");
+            Log = log;
         }
 
         public void Dispose()
@@ -139,6 +142,10 @@ namespace EDDataProcessor.Inara
             {
                 string content = await response.Content.ReadAsStringAsync();
                 return await IBrowsingContext.OpenAsync(req => req.Content(content));
+            }
+            else
+            {
+                Log.LogError("Response code: {responseCode}", response.StatusCode);
             }
             return null;
         }
