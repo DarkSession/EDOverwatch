@@ -1,4 +1,5 @@
 ﻿using ActiveMQ.Artemis.Client;
+using DCoHTrackerDiscordBot.Module;
 using Discord.WebSocket;
 using EDSystemProgress;
 using EDUtils;
@@ -12,12 +13,20 @@ namespace DCoHTrackerDiscordBot
         private IConfiguration Configuration { get; }
         private ILogger Log { get; }
         private ActiveMQ.Artemis.Client.IConnection Connection { get; }
-        public MessagesHandler(EdDbContext dbContext, IConfiguration configuration, ILogger<MessagesHandler> log, ActiveMQ.Artemis.Client.IConnection connection)
+        private IAnonymousProducer AnonymousProducer { get; }
+
+        public MessagesHandler(
+            EdDbContext dbContext,
+            IConfiguration configuration,
+            ILogger<MessagesHandler> log,
+            ActiveMQ.Artemis.Client.IConnection connection,
+            IAnonymousProducer anonymousProducer)
         {
             DbContext = dbContext;
             Configuration = configuration;
             Log = log;
             Connection = connection;
+            AnonymousProducer = anonymousProducer;
         }
 
         public async ValueTask ProcessMessage(SocketUserMessage message)
@@ -99,7 +108,11 @@ namespace DCoHTrackerDiscordBot
                                             _ => StarSystemThargoidLevelState.None,
                                         };
                                         short progress = (short)result.Progress;
-                                        if (thargoidState == starSystem.ThargoidLevel.State && ((starSystem.ThargoidLevel.Progress ?? -1) < progress))
+                                        if (thargoidState != starSystem.ThargoidLevel.State)
+                                        {
+                                            (bool success, string updateRequestMessage) = await TrackingModule.SystemUpdateRequest(starSystem.Name, message.Author.Id, message.Channel.Id, DbContext, AnonymousProducer);
+                                        }
+                                        else if ((starSystem.ThargoidLevel.Progress ?? -1) < progress)
                                         {
                                             starSystem.ThargoidLevel.Progress = progress;
                                             StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, progress)

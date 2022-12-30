@@ -117,6 +117,7 @@ namespace EDDataProcessor
                         if (ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, typeof(UpdateFromInara)) is UpdateFromInara updateFromInara)
                         {
                             List<long> systemsUpdated = await updateFromInara.Update().ToListAsync(cancellationToken);
+                            log.LogInformation("Inara: Updated {systemsCount} systems", systemsUpdated.Count);
                             if (systemsUpdated.Any())
                             {
                                 foreach (long systemAddress in systemsUpdated.Distinct())

@@ -109,7 +109,16 @@ namespace EDOverwatch_Web.Controllers.V1
             return BadRequest();
         }
 
-        [HttpGet]
+        [HttpPost]
+        public async Task<ActionResult> SystemUpdateFailed([FromBody] UpdateModel model, CancellationToken cancellationToken)
+        {
+            if (ModelState.IsValid)
+            {
+
+            }
+        }
+
+            [HttpGet]
         public async Task<SystemUpdateRequestedResponse> SystemUpdatePending(CancellationToken cancellationToken)
         {
             List<StarSystemUpdateQueueItem> starSystemUpdateQueueItems = await DbContext.StarSystemUpdateQueueItems
@@ -165,6 +174,16 @@ namespace EDOverwatch_Web.Controllers.V1
         public SystemUpdateRequestedResponseSystem(StarSystem starSystem)
         {
             SystemName = starSystem.Name;
+            SystemAddress = starSystem.SystemAddress;
+        }
+    }
+
+    public class SystemUpdateFailedRequest
+    {
+        public long SystemAddress { get; set; }
+
+        public SystemUpdateFailedRequest(StarSystem starSystem)
+        {
             SystemAddress = starSystem.SystemAddress;
         }
     }

@@ -13,7 +13,10 @@ namespace DCoHTrackerDiscordBot.Module
         private EdDbContext DbContext { get; }
         private IAnonymousProducer AnonymousProducer { get; }
 
-        public TrackingModule(EdDbContext dbContext, IConfiguration configuration, IAnonymousProducer anonymousProducer)
+        public TrackingModule(
+            EdDbContext dbContext,
+            IConfiguration configuration,
+            IAnonymousProducer anonymousProducer)
         {
             DbContext = dbContext;
             Configuration = configuration;
@@ -240,48 +243,59 @@ namespace DCoHTrackerDiscordBot.Module
         {
             await DeferAsync(true);
 
-            if (await DbContext.StarSystemUpdateQueueItems.CountAsync(s => s.DiscordUserId == Context.User.Id && s.Status != StarSystemUpdateQueueItemStatus.Completed) > 5)
+            (_, string message) = await SystemUpdateRequest(starSystemName, Context.User.Id, Context.Channel.Id, DbContext, AnonymousProducer);
+
+            await FollowupAsync(message, ephemeral: true);
+        }
+
+        public static async Task<(bool success, string userMessage)> SystemUpdateRequest(
+            string starSystemName,
+            ulong discordUserId, 
+            ulong discordChannelId, 
+            EdDbContext dbContext,
+            IAnonymousProducer anonymousProducer)
+        {
+            if (await dbContext.StarSystemUpdateQueueItems.CountAsync(s => s.DiscordUserId == discordUserId && s.Status != StarSystemUpdateQueueItemStatus.Completed) > 5)
             {
-                await FollowupAsync("There are still 5 system updates requested by you pending. You need to wait until one of those is completed before you can submit another request.", ephemeral: true);
-                return;
+                return (false, "There are still 5 system updates requested by you pending. You need to wait until one of those is completed before you can submit another request.");
             }
 
-            StarSystem? starSystem = await DbContext.StarSystems
+            StarSystem? starSystem = await dbContext.StarSystems
                 .Where(s => EF.Functions.Like(s.Name, starSystemName.Replace("%", string.Empty)))
                 .FirstOrDefaultAsync();
             if (starSystem == null)
             {
-                await FollowupAsync($"Could not find system **{Format.Sanitize(starSystemName)}**.", ephemeral: true);
-                return;
+                return (false, $"Could not find system **{Format.Sanitize(starSystemName)}**.");
             }
-            else if (await DbContext.StarSystemUpdateQueueItems.AnyAsync(s => s.StarSystem == starSystem && s.Status != StarSystemUpdateQueueItemStatus.Completed))
+            else if (await dbContext.StarSystemUpdateQueueItems.AnyAsync(s => s.StarSystem == starSystem && s.Status != StarSystemUpdateQueueItemStatus.Completed))
             {
-                await FollowupAsync($"System **{Format.Sanitize(starSystem.Name)}** has already been requested and is still pending.", ephemeral: true);
-                return;
+                return (false, $"System **{Format.Sanitize(starSystem.Name)}** has already been requested and is still pending.");
             }
 
-            StarSystemUpdateQueueItem starSystemUpdateQueueItem = new(default, Context.User.Id, Context.Channel.Id, StarSystemUpdateQueueItemStatus.PendingAutomaticReview, StarSystemUpdateQueueItemResult.Pending, default, DateTimeOffset.Now, null)
+            StarSystemUpdateQueueItem starSystemUpdateQueueItem = new(default, discordUserId, discordChannelId, StarSystemUpdateQueueItemStatus.PendingAutomaticReview, StarSystemUpdateQueueItemResult.Pending, default, DateTimeOffset.Now, null)
             {
                 StarSystem = starSystem,
             };
-            DbContext.StarSystemUpdateQueueItems.Add(starSystemUpdateQueueItem);
-            if (await DbContext.StarSystemUpdateQueueItems.AnyAsync(s =>
+            dbContext.StarSystemUpdateQueueItems.Add(starSystemUpdateQueueItem);
+            string text;
+            if (await dbContext.StarSystemUpdateQueueItems.AnyAsync(s =>
                             s.StarSystem == starSystem &&
                             s.Status == StarSystemUpdateQueueItemStatus.Completed &&
                             s.Completed >= DateTimeOffset.Now.AddDays(-1) &&
                             s.Result != StarSystemUpdateQueueItemResult.Pending))
             {
                 starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.PendingManualReview;
-                await FollowupAsync($"System **{Format.Sanitize(starSystem.Name)}** queued for manual review.", ephemeral: true);
+                text = $"System **{Format.Sanitize(starSystem.Name)}** queued for manual review.";
             }
             else
             {
-                await FollowupAsync($"System **{Format.Sanitize(starSystem.Name)}** queued for automatic review.", ephemeral: true);
+                text = $"System **{Format.Sanitize(starSystem.Name)}** queued for automatic review.";
             }
-            await DbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
 
             StarSystemUpdateQueueItemUpdated starSystemUpdateQueueItemUpdated = new(starSystemUpdateQueueItem.Id);
-            await AnonymousProducer.SendAsync(StarSystemUpdateQueueItemUpdated.QueueName, StarSystemUpdateQueueItemUpdated.Routing, starSystemUpdateQueueItemUpdated.Message);
+            await anonymousProducer.SendAsync(StarSystemUpdateQueueItemUpdated.QueueName, StarSystemUpdateQueueItemUpdated.Routing, starSystemUpdateQueueItemUpdated.Message);
+            return (true, text);
         }
 
         public static DcohFactionOperationType OperationTypeToDcohFactionOperationType(OperationType operation)
