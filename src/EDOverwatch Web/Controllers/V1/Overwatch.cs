@@ -1,5 +1,6 @@
 ﻿using EDOverwatch_Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EDOverwatch_Web.Controllers.V1
@@ -7,6 +8,7 @@ namespace EDOverwatch_Web.Controllers.V1
     [ApiController]
     [Route("api/v1/[controller]/[action]")]
     [AllowAnonymous]
+    [EnableCors("ApiCORS")]
     public class Overwatch : ControllerBase
     {
         private EdDbContext DbContext { get; }

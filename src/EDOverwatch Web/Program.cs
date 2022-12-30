@@ -65,6 +65,13 @@ namespace EDOverwatch_Web
                                 .WithMethods(HttpMethods.Post, HttpMethods.Get, HttpMethods.Options)
                                 .WithHeaders("content-type", "content-length");
                     });
+                options.AddPolicy(name: "ApiCORS",
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin()
+                                          .WithMethods(HttpMethods.Get, HttpMethods.Options)
+                                          .WithHeaders("content-type");
+                                  });
             });
             builder.Services.AddScoped<FDevOAuth>();
 

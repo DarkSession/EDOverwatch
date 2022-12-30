@@ -1,5 +1,6 @@
 ﻿using ActiveMQ.Artemis.Client;
 using DCoHTrackerDiscordBot.Module;
+using Discord;
 using Discord.WebSocket;
 using EDSystemProgress;
 using EDUtils;
@@ -40,6 +41,7 @@ namespace DCoHTrackerDiscordBot
                 EmbedBuilder embed = new EmbedBuilder()
                     .WithTitle("Thargoid War Progress")
                     .WithFooter("This feature is still in a beta stage and not perfect.");
+                List<(string systemName, string message)> updateRequests = new();
                 int screenshots = 0;
                 foreach (Attachment attachment in message.Attachments.Take(5))
                 {
@@ -110,7 +112,8 @@ namespace DCoHTrackerDiscordBot
                                         short progress = (short)result.Progress;
                                         if (thargoidState != starSystem.ThargoidLevel.State)
                                         {
-                                            (bool success, string updateRequestMessage) = await TrackingModule.SystemUpdateRequest(starSystem.Name, message.Author.Id, message.Channel.Id, DbContext, AnonymousProducer);
+                                            (_, string updateRequestMessage) = await TrackingModule.SystemUpdateRequest(starSystem.Name, message.Author.Id, message.Channel.Id, DbContext, AnonymousProducer);
+                                            updateRequests.Add((starSystem.Name, updateRequestMessage));
                                         }
                                         else if ((starSystem.ThargoidLevel.Progress ?? -1) < progress)
                                         {
@@ -152,6 +155,12 @@ namespace DCoHTrackerDiscordBot
                                     {
                                         imageContent.Position = 0;
                                         await File.WriteAllBytesAsync($"Failed_{Guid.NewGuid()}.png", imageContent.ToArray());
+
+                                        if (starSystem != null)
+                                        {
+                                            (_, string updateRequestMessage) = await TrackingModule.SystemUpdateRequest(starSystem.Name, message.Author.Id, message.Channel.Id, DbContext, AnonymousProducer);
+                                            updateRequests.Add((starSystem.Name, updateRequestMessage));
+                                        }
                                     }
 
                                     List<string> remainingTime = new();
@@ -206,7 +215,27 @@ namespace DCoHTrackerDiscordBot
                     {
                         embed.Description = "Screenshots show the following information about the Thargoid war progress.";
                     }
-                    await message.ReplyAsync(embed: embed.Build());
+                    List<Embed> embeds = new()
+                    {
+                        embed.Build(),
+                    };
+                    if (updateRequests.Any())
+                    {
+                        EmbedBuilder updateEmebed = new EmbedBuilder()
+                            .WithTitle("System Update Request");
+
+                        string text;
+                        if (updateRequests.Count == 1)
+                        {
+                            text = "One screenshot";
+                        }
+                        else
+                        {
+                            text = $"{updateRequests.Count} screenshots";
+                        }
+                        text += " submitted did conflict with the data currenty in overwatch. An update request was submitted:\r\n";
+                    }
+                    await message.ReplyAsync(embeds: embeds.ToArray());
                 }
             }
         }
