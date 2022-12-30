@@ -325,7 +325,7 @@ namespace EDSystemProgress
             progressBarUpperY += 20;
             progressBarLowerY -= 10;
 
-            log.LogInformation("{id}: processingStep: {processingStep} systemName: {systemName} systemStatus: {} remainingTime: {remainingTime} progressBarUpperY: {progressBarUpperY} progressBarLowerY: {progressBarLowerY}", fileId, processingStep, systemName, systemStatus, remainingTime, progressBarUpperY, progressBarLowerY);
+            log.LogInformation("{id}: processingStep: {processingStep} systemName: {systemName} systemStatus: {systemStatus} remainingTime: {remainingTime} progressBarUpperY: {progressBarUpperY} progressBarLowerY: {progressBarLowerY}", fileId, processingStep, systemName, systemStatus, remainingTime, progressBarUpperY, progressBarLowerY);
 
             bool success = processingStep == ImageProcessingStep.Completed && systemName != "INVALID";
             if (success)

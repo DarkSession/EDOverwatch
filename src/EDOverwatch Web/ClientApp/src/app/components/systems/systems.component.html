@@ -38,7 +38,7 @@
                         systems</mat-checkbox>
                 </div>
             </div>
-            <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length"
+            <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length || hideUnpopulated || hideCompleted"
                 class="filtered-view">
                 <div>
                     <fa-icon [icon]="faFilter"></fa-icon>
