@@ -133,7 +133,7 @@ namespace EDDataProcessor
                         log.LogError(e, "Inara update exception");
                     }
                 }
-                await Task.Delay(TimeSpan.FromMinutes(20), cancellationToken);
+                await Task.Delay(TimeSpan.FromHours(1), cancellationToken);
             }
         }
 
