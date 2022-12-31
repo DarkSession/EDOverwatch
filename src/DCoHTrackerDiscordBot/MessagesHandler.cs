@@ -233,7 +233,16 @@ namespace DCoHTrackerDiscordBot
                         {
                             text = $"{updateRequests.Count} screenshots";
                         }
-                        text += " submitted did conflict with the data currenty in overwatch. An update request was submitted:\r\n";
+                        text += " submitted did conflict with the data currently in overwatch. An update request was submitted.";
+
+                        updateEmebed.Description = text;
+
+                        foreach ((string systemName, string updateRequestMessage) in updateRequests)
+                        {
+                            updateEmebed.AddField(Format.Sanitize(systemName), updateRequestMessage);
+                        }
+
+                        embeds.Add(updateEmebed.Build());
                     }
                     await message.ReplyAsync(embeds: embeds.ToArray());
                 }

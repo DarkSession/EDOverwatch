@@ -471,6 +471,7 @@ namespace EDSystemProgress
             { "LAHUA n", "LAHUA" },
             { "GLIESE 8035", "GLIESE 9035" },
             { "HIP 20418", "HIP 20419" },
+            { "HIP 18138", "HIP 19198" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

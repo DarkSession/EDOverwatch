@@ -196,7 +196,7 @@ namespace DCoHTrackerDiscordBot
                                 {
                                     embed.AddField("Progress", starSystemUpdateQueueItem.StarSystem.ThargoidLevel.Progress + " %", true);
                                 }
-                                await textChannel.SendMessageAsync(embed: embed.Build(), allowedMentions: mentions);
+                                await textChannel.SendMessageAsync($"{user.Mention}", embed: embed.Build(), allowedMentions: mentions);
                             }
                             else
                             {
