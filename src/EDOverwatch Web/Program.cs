@@ -104,7 +104,7 @@ namespace EDOverwatch_Web
 
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline';");
+                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'self' https://map.canonn.tech;");
                 // trusted-types angular angular#bundler; require-trusted-types-for 'script';
                 context.Response.Headers.Add("X-Frame-Options", "deny");
                 context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
