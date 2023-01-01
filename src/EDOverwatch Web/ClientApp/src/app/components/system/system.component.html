@@ -7,7 +7,7 @@
         </div>
         <div class="content-box">
             <div class="content-flex">
-                <table class="system-information">
+                <table class="information">
                     <tbody>
                         <tr>
                             <td class="t">Maelstrom</td>
@@ -16,14 +16,14 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="t">Thargoid Level</td>
+                            <td class="t">Thargoid State</td>
                             <td>
                                 <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <table class="system-information">
+                <table class="information">
                     <tbody>
                         <tr>
                             <td class="t">Population</td>
@@ -56,21 +56,24 @@
                 </table>
             </div>
             <br>
-            <div>
+            <div *ngIf="lineChartData && lineChartData.labels && lineChartData.labels.length">
                 <canvas baseChart class="chart" [data]="lineChartData" [options]="lineChartOptions"
                     [type]="lineChartType" height="300"></canvas>
             </div>
             <br>
             <br>
             <mat-tab-group>
-                <mat-tab label="Stations">
+                <mat-tab label="Stations ({{ starSystem.Stations.length }})">
                     <app-system-stations [starSystem]="starSystem"></app-system-stations>
                 </mat-tab>
-                <mat-tab label="Operations">
+                <mat-tab label="Operations ({{ starSystem.FactionOperationDetails.length }})">
                     <app-system-operations [starSystem]="starSystem"></app-system-operations>
                 </mat-tab>
                 <mat-tab label="Contributions">
                     <app-system-contributions [starSystem]="starSystem"></app-system-contributions>
+                </mat-tab>
+                <mat-tab label="History">
+                    <app-system-history [starSystem]="starSystem"></app-system-history>
                 </mat-tab>
             </mat-tab-group>
         </div>

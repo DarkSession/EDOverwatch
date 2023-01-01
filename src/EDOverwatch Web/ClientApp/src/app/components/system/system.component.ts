@@ -67,10 +67,10 @@ export class SystemComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly matSnackBar: MatSnackBar
   ) {
-    Chart.register(Annotation);
   }
 
   public ngOnInit(): void {
+    Chart.register(Annotation);
     this.route.paramMap
       .pipe(untilDestroyed(this))
       .subscribe((p: ParamMap) => {
@@ -138,8 +138,10 @@ export class SystemComponent implements OnInit {
             fill: 'origin',
           });
 
-          const annotations: AnnotationOptions[] = [
-            {
+          const annotations: AnnotationOptions[] = [];
+
+          if (labels.includes(this.starSystem.LastTickDate)) {
+            annotations.push({
               type: 'line',
               scaleID: 'x',
               value: this.starSystem.LastTickDate,
@@ -151,8 +153,8 @@ export class SystemComponent implements OnInit {
                 color: 'orange',
                 content: 'Weekly tick'
               }
-            },
-          ];
+            });
+          }
 
           this.lineChartData = {
             datasets: datasets,
@@ -183,6 +185,8 @@ export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   Stations: OverwatchStation[];
   LastTickTime: string;
   LastTickDate: string;
+  WarEffortSources: OverwatchStarSystemWarEffortType[];
+  StateHistory: OverwatchStarSystemThargoidLevelHistory[];
 }
 
 export interface OverwatchStarSystemWarEffort {
@@ -209,4 +213,20 @@ interface OverwatchStarSystemDetailProgress {
   DateTime: string;
   Progress: number;
   ProgressPercentage: number;
+}
+
+interface OverwatchStarSystemWarEffortType {
+  TypeId: number;
+  Name: string;
+}
+
+export interface OverwatchStarSystemThargoidLevelHistory {
+  AllowDetailAnalysisDisplay: boolean;
+  AnalysisCycle: string;
+  ThargoidLevel: OverwatchThargoidLevel;
+  StateStart: string;
+  StateEnds: string | null;
+  StateIngameTimerExpires: string | null;
+  Progress: number | null;
+  ProgressPercentage: number | null;
 }

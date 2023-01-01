@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 import { OverwatchStation } from '../station-name/station-name.component';
 import { OverwatchStarSystemDetail } from '../system/system.component';
 
@@ -10,6 +11,7 @@ import { OverwatchStarSystemDetail } from '../system/system.component';
   styleUrls: ['./system-stations.component.css']
 })
 export class SystemStationsComponent implements OnChanges, AfterViewInit {
+  public readonly faSquareCheck = faSquareCheck;
   public stations: MatTableDataSource<OverwatchStation> = new MatTableDataSource<OverwatchStation>();
   public readonly stationsDisplayedColumns = ['Name', 'State', 'DistanceFromStarLS'];
   @ViewChild(MatSort) sort!: MatSort;

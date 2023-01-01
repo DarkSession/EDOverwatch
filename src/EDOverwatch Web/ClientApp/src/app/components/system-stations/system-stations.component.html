@@ -12,6 +12,9 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
                 <td mat-cell *matCellDef="let row">
                     <ng-container [ngSwitch]="row.State">
+                        <span *ngSwitchCase="'Normal'">
+                            <fa-icon [icon]="faSquareCheck"></fa-icon> Operational
+                        </span>
                         <span *ngSwitchCase="'UnderAttack'">
                             <img src="assets/station-attacked.png" style="width: 16px; height: 16px;"
                                 matTooltip="Under attack" /> Under attack
@@ -23,6 +26,10 @@
                         <span *ngSwitchCase="'UnderRepairs'">
                             <img src="assets/station-repair.png" style="width: 16px; height: 16px;"
                                 matTooltip="Under repair" /> Under repair
+                        </span>
+                        <span *ngSwitchCase="'Abandoned'">
+                            <img src="assets/station-abandoned.png" style="width: 16px; height: 16px;"
+                                matTooltip="Abandoned" /> Abandoned
                         </span>
                     </ng-container>
                 </td>

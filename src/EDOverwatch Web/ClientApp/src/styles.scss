@@ -348,3 +348,20 @@ hr {
   border: none;
   border-top: 1px solid #fbd7b4;
 }
+
+.content-flex {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+
+  table.information {
+    min-width: 300px;
+    width: 25%;
+    margin-right: 8px;
+  }
+
+  .t {
+    font-weight: bold;
+    font-size: 105%;
+  }
+}

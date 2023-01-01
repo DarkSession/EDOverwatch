@@ -1,0 +1,53 @@
+<div class="table-container">
+    <div class="table" style="max-height: 40vh">
+        <table mat-table [dataSource]="history" matSort matSortActive="StateStart" matSortDirection="desc"
+            matSortDisableClear>
+            <ng-container matColumnDef="ThargoidLevel">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
+                <td mat-cell *matCellDef="let row">
+                    <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="StateStart">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Start</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.StateStart | date }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="StateEnds">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Ended</th>
+                <td mat-cell *matCellDef="let row">
+                    <span *ngIf="row.StateEnds">
+                        {{ row.StateEnds | date }}
+                    </span>
+                    <span *ngIf="!row.StateEnds">
+                        <i>Ongoing</i>
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="StateIngameTimerExpires">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>In-game timer expires</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.StateIngameTimerExpires | date }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="ProgressPercentage">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.ProgressPercentage | percent }}
+                    <span *ngIf="row.AllowDetailAnalysisDisplay" class="clickable"
+                        [routerLink]="['/system', starSystem.SystemAddress, 'analyze', row.AnalysisCycle]"
+                        matTooltip="Show details related to progress">
+                        <fa-icon [icon]="faMagnifyingGlassChart"></fa-icon>
+                    </span>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="historyDisplayedColumns; sticky: true" class="thead">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: historyDisplayedColumns;"></tr>
+        </table>
+        <div *ngIf="history.data.length === 0" class="empty-table">
+            No records found.
+        </div>
+    </div>
+</div>

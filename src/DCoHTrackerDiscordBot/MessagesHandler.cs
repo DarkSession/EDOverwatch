@@ -1,6 +1,5 @@
 ﻿using ActiveMQ.Artemis.Client;
 using DCoHTrackerDiscordBot.Module;
-using Discord;
 using Discord.WebSocket;
 using EDSystemProgress;
 using EDUtils;

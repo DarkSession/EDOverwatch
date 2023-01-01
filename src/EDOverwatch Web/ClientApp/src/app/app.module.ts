@@ -56,6 +56,8 @@ import { DateAgoPipe } from './pipes/date-ago.pipe';
 import { OperationSearchComponent } from './components/operation-search/operation-search.component';
 import { NumberSuffixPipe } from './pipes/number-suffix.pipe';
 import { MapComponent } from './components/map/map.component';
+import { SystemHistoryComponent } from './components/system-history/system-history.component';
+import { SystemStateAnalysisComponent } from './components/system-state-analysis/system-state-analysis.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -90,6 +92,8 @@ export const httpInterceptorProviders = [
     OperationSearchComponent,
     NumberSuffixPipe,
     MapComponent,
+    SystemHistoryComponent,
+    SystemStateAnalysisComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -161,6 +165,10 @@ export const httpInterceptorProviders = [
       {
         path: 'operation-search',
         component: OperationSearchComponent,
+      },
+      {
+        path: 'system/:id/analyze/:cycle',
+        component: SystemStateAnalysisComponent,
       },
       {
         path: 'system/:id',

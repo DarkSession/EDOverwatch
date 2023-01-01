@@ -10,14 +10,14 @@
         public string TypeGroup { get; }
         public long Amount { get; }
 
-        public OverwatchStarSystemWarEffort(EDDatabase.WarEffort warEffort)
+        public OverwatchStarSystemWarEffort(DateOnly date, WarEffortType type, WarEffortSource source, long amount)
         {
-            Date = warEffort.Date;
-            Type = warEffort.Type.GetEnumMemberValue();
-            TypeId = (int)warEffort.Type;
-            Source = warEffort.Source.GetEnumMemberValue();
-            SourceId = (int)warEffort.Source;
-            if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(warEffort.Type, out WarEffortTypeGroup group))
+            Date = date;
+            Type = type.GetEnumMemberValue();
+            TypeId = (int)type;
+            Source = source.GetEnumMemberValue();
+            SourceId = (int)source;
+            if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(type, out WarEffortTypeGroup group))
             {
                 TypeGroup = group.GetEnumMemberValue();
             }
@@ -25,7 +25,7 @@
             {
                 TypeGroup = string.Empty;
             }
-            Amount = warEffort.Amount;
+            Amount = amount;
         }
     }
 }

@@ -1,0 +1,78 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-large" *ngIf="systemCycleAnalysis && available">
+        <div class="title">
+            {{ systemCycleAnalysis.SystemName }}
+            <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                (click)="copySystemName()"></fa-icon>
+        </div>
+        <div class="content-box">
+            <div class="content-flex">
+                <table class="information">
+                    <tbody>
+                        <tr>
+                            <td class="t">Progress Start</td>
+                            <td>
+                                {{ systemCycleAnalysis.ProgressStart | date }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="t">Progress Reported End</td>
+                            <td>
+                                {{ systemCycleAnalysis.ProgressCompleted | date }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="t">Thargoid State</td>
+                            <td>
+                                <app-thargoid-level
+                                    [thargoidLevel]="systemCycleAnalysis.ThargoidState"></app-thargoid-level>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <span>
+                The following contributions were logged for the days the cycle began until the system was reported to be
+                completed.
+            </span>
+            <br>
+            <br>
+            <div class="table-container">
+                <div class="table">
+                    <table mat-table [dataSource]="contributions" matSort matSortActive="Type" matSortDirection="asc"
+                        matSortDisableClear>
+                        <ng-container matColumnDef="Type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                            <td mat-cell *matCellDef="let row">
+                                {{ row.Type }}
+                            </td>
+                        </ng-container>
+                        <ng-container *ngFor="let source of sources" [matColumnDef]="source">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ source }}</th>
+                            <td mat-cell *matCellDef="let row" class="number">
+                                {{ getSourceAmount(source, row) | number }}
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead">
+                        </tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                    <div *ngIf="contributions.data.length === 0" class="empty-table">
+                        No records found.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overwatch-content-small" *ngIf="!available">
+        <div class="title">
+            System analysis
+        </div>
+        <div class="content-box">
+            <span>
+                Analysis of system not available as not enough data has been collected.
+            </span>
+        </div>
+    </div>
+</div>

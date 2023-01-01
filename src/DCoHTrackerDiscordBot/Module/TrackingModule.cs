@@ -250,8 +250,8 @@ namespace DCoHTrackerDiscordBot.Module
 
         public static async Task<(bool success, string userMessage)> SystemUpdateRequest(
             string starSystemName,
-            ulong discordUserId, 
-            ulong discordChannelId, 
+            ulong discordUserId,
+            ulong discordChannelId,
             EdDbContext dbContext,
             IAnonymousProducer anonymousProducer)
         {

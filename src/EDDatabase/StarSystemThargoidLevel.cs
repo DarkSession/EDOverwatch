@@ -17,7 +17,7 @@ namespace EDDatabase
         [ForeignKey("CycleStartId")]
         public ThargoidCycle? CycleStart { get; set; }
 
-        [ForeignKey("CycleStartId { get; set; }\r\n")]
+        [ForeignKey("CycleStartId")]
         public int? CycleStartId { get; set; }
 
         [ForeignKey("CycleEndId")]

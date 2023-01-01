@@ -11,7 +11,7 @@ export class ThargoidLevelComponent implements OnChanges {
   public dotClass = "";
 
   public ngOnChanges(): void {
-    switch (this.thargoidLevel.Level) {
+    switch (this.thargoidLevel?.Level) {
       case StarSystemThargoidLevelState.Alert: {
         this.dotClass = "thargoid-alert";
         break;

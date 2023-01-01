@@ -25,5 +25,23 @@
             DateTimeOffset lastThursdayCycle = new(lastThursday.Year, lastThursday.Month, lastThursday.Day, 7, 0, 0, TimeSpan.Zero);
             return lastThursdayCycle.AddDays(weekOffset * 7);
         }
+
+        public static DateTimeOffset GetTickTime(DateOnly date, int weekOffset = 0)
+        {
+            int dayOffset = date.DayOfWeek switch
+            {
+                DayOfWeek.Sunday => -3,
+                DayOfWeek.Monday => -4,
+                DayOfWeek.Tuesday => -5,
+                DayOfWeek.Wednesday => -6,
+                DayOfWeek.Thursday => 0,
+                DayOfWeek.Friday => -1,
+                DayOfWeek.Saturday => -2,
+                _ => 0,
+            };
+            DateOnly thursday = date.AddDays(dayOffset);
+            DateTimeOffset lastThursdayCycle = new(thursday.Year, thursday.Month, thursday.Day, 7, 0, 0, TimeSpan.Zero);
+            return lastThursdayCycle.AddDays(weekOffset * 7);
+        }
     }
 }

@@ -1,26 +1,9 @@
-table.system-information {
-    min-width: 300px;
-    width: 25%;
-    margin-right: 8px;
-}
-
-.content-flex {
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-}
-
 .number {
     text-align: right;
 }
 
 .thead {
     background-color: #272727;
-}
-
-.t {
-    font-weight: bold;
-    font-size: 105%;
 }
 
 .small {
