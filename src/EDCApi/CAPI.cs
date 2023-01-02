@@ -53,7 +53,7 @@ namespace EDCApi
                 }
                 return (response.StatusCode, null);
             }
-            else
+            else if (!response.IsSuccessStatusCode)
             {
                 Log.LogWarning("GetUrl {url} returned {statusCode}", url, response.StatusCode);
             }

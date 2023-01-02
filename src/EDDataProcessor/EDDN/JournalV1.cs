@@ -122,13 +122,17 @@ namespace EDDataProcessor.EDDN
                         if (isFleetCarrier)
                         {
                             station = await dbContext.Stations
+                                .Include(s => s.StarSystem)
                                 .Include(s => s.Government)
+                                .Include(s => s.PrimaryEconomy)
                                 .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID || s.MarketId == 0 && s.Name == Message.StationName, cancellationToken);
                         }
                         else
                         {
                             station = await dbContext.Stations
+                                .Include(s => s.StarSystem)
                                 .Include(s => s.Government)
+                                .Include(s => s.PrimaryEconomy)
                                 .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
                         }
                         if (station == null)
@@ -154,7 +158,7 @@ namespace EDDataProcessor.EDDN
                                 station.DistanceFromStarLS = Message.DistFromStarLS;
                                 changed = true;
                             }
-                            if (isFleetCarrier && station.MarketId == Message.MarketID)
+                            if (isFleetCarrier && station.MarketId != Message.MarketID)
                             {
                                 station.MarketId = Message.MarketID;
                                 changed = true;
@@ -177,12 +181,9 @@ namespace EDDataProcessor.EDDN
                             if (Message.Event != MessageEvent.Location)
                             {
                                 StationState stationState = StationState.Normal;
-                                if (!string.IsNullOrEmpty(Message.StationState))
+                                if (!string.IsNullOrEmpty(Message.StationState) && !Enum.TryParse(Message.StationState, out stationState))
                                 {
-                                    if (!Enum.TryParse(Message.StationState, out stationState))
-                                    {
-                                        Console.WriteLine("Unknown station state: " + Message.StationState);
-                                    }
+                                    Console.WriteLine("Unknown station state: " + Message.StationState);
                                 }
                                 if (station.State != stationState)
                                 {
