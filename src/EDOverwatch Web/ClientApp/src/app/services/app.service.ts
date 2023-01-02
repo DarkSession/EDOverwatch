@@ -162,6 +162,33 @@ export class AppService {
     }
     return response;
   }
+
+  public async oAuthStart(): Promise<void> {
+    try {
+      const response = await firstValueFrom(this.httpClient.post<OAuthGetStateResponse>(this.apiUrl + 'user/OAuthGetUrl', {}, {
+        withCredentials: true,
+      }));
+      if (response) {
+        window.location.href = response.url;
+      }
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
+  public async logout(): Promise<void> {
+    try {
+      await firstValueFrom(this.httpClient.get<OAuthGetStateResponse>(this.apiUrl + 'user/Logout', {
+        withCredentials: true,
+      }));
+      this.user = null;
+      this.onUserChanged.emit();
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
 }
 
 interface MeResponse {
@@ -171,6 +198,7 @@ interface MeResponse {
 
 export interface User {
   Commander: string | null;
+  HasActiveToken: boolean;
   JournalLastImport: string | null;
 }
 
@@ -178,6 +206,10 @@ interface OAuthResponse {
   success: boolean;
   me: MeResponse | null;
   error: string[] | null;
+}
+
+interface OAuthGetStateResponse {
+  url: string;
 }
 
 interface TableSortSetting {

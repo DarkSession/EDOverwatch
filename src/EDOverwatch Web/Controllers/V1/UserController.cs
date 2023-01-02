@@ -281,9 +281,9 @@ namespace EDOverwatch_Web.Controllers.V1
         public MeResponse(ApplicationUser? applicationUser)
         {
             LoggedIn = applicationUser != null;
-            if (applicationUser != null)
+            if (applicationUser?.Commander != null)
             {
-                User = new(applicationUser.Commander?.Name ?? applicationUser.UserName ?? "Unknown", applicationUser.Commander?.JournalLastActivity);
+                User = new(applicationUser.Commander);
             }
         }
     }

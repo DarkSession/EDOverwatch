@@ -4,6 +4,8 @@
     {
         public string Name { get; set; }
         public long MissionID { get; set; }
+        public int PassengerCount { get; set; }
+        public int Count { get; set; }
 
         public MissionAccepted(string name, long missionID)
         {
@@ -14,7 +16,12 @@
         {
             if (Name.StartsWith("Mission_TW") && !await dbContext.CommanderMissions.AnyAsync(c => c.MissionId == MissionID, cancellationToken))
             {
-                dbContext.CommanderMissions.Add(new(0, MissionID, Timestamp, CommanderMissionStatus.Accepted)
+                int count = Count;
+                if (Name.StartsWith("Mission_TW_PassengerEvacuation"))
+                {
+                    count = PassengerCount;
+                }
+                dbContext.CommanderMissions.Add(new(0, MissionID, Timestamp, CommanderMissionStatus.Accepted, count)
                 {
                     Commander = journalParameters.Commander,
                     System = journalParameters.CommanderCurrentStarSystem,

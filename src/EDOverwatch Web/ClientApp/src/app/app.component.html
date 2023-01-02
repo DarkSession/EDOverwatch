@@ -16,14 +16,33 @@
     <div class="user">
       <span *ngIf="appService.user">
         CMDR {{ appService.user.Commander }}<br>
-        <div *ngIf="appService.user.JournalLastImport">
+        <div *ngIf="appService.user.HasActiveToken && appService.user.JournalLastImport">
           Last journal event:
           {{ appService.user.JournalLastImport | timeago:true }}
         </div>
+        <div *ngIf="!appService.user.HasActiveToken">
+          Journal access expired.
+          <a class="link clickable" (click)="appService.oAuthStart()">Refresh</a>
+        </div>
       </span>
       <span *ngIf="!appService.user">
-        <button mat-raised-button color="primary" routerLink="login">Login</button>
+        <button mat-raised-button color="primary" routerLink="contribute">Contribute</button>
       </span>
+      <div *ngIf="appService.user">
+        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="appService.oAuthStart()" [disabled]="appService.user.HasActiveToken">
+            <mat-icon>refresh</mat-icon>
+            <span>Refresh journal import</span>
+          </button>
+          <button mat-menu-item (click)="appService.logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
     </div>
   </mat-toolbar>
   <mat-sidenav-container style="min-height: calc(100vh - 80px)">
@@ -38,7 +57,10 @@
         <div routerLink="systems" class="clickable">Systems</div>
       </div>
       <div *ngIf="appService.user">
-        <div routerLink="my-efforts" class="clickable">My contributions</div>
+        <div routerLink="my-efforts" class="clickable">My war contributions</div>
+      </div>
+      <div>
+        <div routerLink="contribute" class="clickable">Contribute</div>
       </div>
       <hr>
       <div>

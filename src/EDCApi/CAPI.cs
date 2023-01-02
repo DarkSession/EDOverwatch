@@ -12,6 +12,7 @@ namespace EDCApi
         private IConfiguration Configuration { get; }
         private ILogger Log { get; }
         private FDevOAuth FDevOAuth { get; }
+        private static DateTimeOffset LastRequest { get; set; } = DateTimeOffset.Now.AddMinutes(-1);
 
         public CAPI(IConfiguration configuration, ILogger<CAPI> log, FDevOAuth fDevOAuth)
         {
@@ -28,6 +29,12 @@ namespace EDCApi
 
         protected async Task<(HttpStatusCode httpStatusCode, string? content)> GetUrl(string url, OAuthCredentials oAuthCredentials, CancellationToken cancellationToken)
         {
+            TimeSpan timeSinceLastRequest = DateTimeOffset.Now - LastRequest;
+            if (timeSinceLastRequest < TimeSpan.FromMilliseconds(500))
+            {
+                TimeSpan waitTime = TimeSpan.FromMilliseconds(500) - timeSinceLastRequest;
+                await Task.Delay(waitTime, cancellationToken);
+            }
             using HttpRequestMessage request = new(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue(oAuthCredentials.TokenType, oAuthCredentials.AccessToken);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -45,6 +52,10 @@ namespace EDCApi
                     return await GetUrlProcessResponse(newResponse, cancellationToken);
                 }
                 return (response.StatusCode, null);
+            }
+            else
+            {
+                Log.LogWarning("GetUrl {url} returned {statusCode}", url, response.StatusCode);
             }
             return await GetUrlProcessResponse(response, cancellationToken);
         }

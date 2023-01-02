@@ -1,6 +1,5 @@
 ﻿using EDCApi;
 using EDDataProcessor.CApiJournal.Events;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System.Data;
 
@@ -199,10 +198,13 @@ namespace EDDataProcessor.CApiJournal
                 while (day <= today);
 
                 commander.JournalLastProcessed = DateTimeOffset.Now;
+
+                CommanderUpdated commanderUpdated = new(commander.FDevCustomerId);
+                await activeMqProducer.SendAsync(CommanderUpdated.QueueName, CommanderUpdated.Routing, commanderUpdated.Message, activeMqTransaction, cancellationToken);
             }
             if (oAuthCredentials.Status == OAuthCredentialsStatus.Expired)
             {
-                commander.OAuthStatus = CommanderOAuthStatus.Expires;
+                commander.OAuthStatus = CommanderOAuthStatus.Expired;
             }
             else if (oAuthCredentials.Status == OAuthCredentialsStatus.Refreshed)
             {

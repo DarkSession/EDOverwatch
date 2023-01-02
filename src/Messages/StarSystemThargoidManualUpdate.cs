@@ -13,6 +13,7 @@ namespace Messages
         public string? SystemName { get; set; }
         public StarSystemThargoidLevelState State { get; set; }
         public short? Progress { get; set; }
+        public short? DaysLeft { get; set; }
 
         public StarSystemThargoidManualUpdate(long systemAddress, string? systemName, StarSystemThargoidLevelState state, short? progress)
         {

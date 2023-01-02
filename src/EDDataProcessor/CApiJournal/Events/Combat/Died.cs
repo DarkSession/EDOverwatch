@@ -99,16 +99,25 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
             unknownsaucer, // Whatever this is
             unknownsaucer_h,
             unknownsaucer_f,
+            unknownsaucer_e,
+
+            scout_cargo,
 
             [EnumMember(Value = "carrierdockb")]
             FleetCarrier,
             oneillcylinder,
             coriolis,
             oneillorbis,
+            ps_turretbasesmall_3m,
+            ps_turretbasemedium02_6m,
             ps_turretbasemedium_skiff_6m,
+            megashipdocka,
+            bernalsphere,
 
             skimmerdrone,
+            bossskimmer,
 
+            citizensuitai_scientific,
             assaultsuitai_class1,
             assaultsuitai_class2,
             assaultsuitai_class3,

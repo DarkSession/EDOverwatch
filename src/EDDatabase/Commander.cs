@@ -77,6 +77,6 @@
     {
         Inactive = 0,
         Active,
-        Expires,
+        Expired,
     }
 }

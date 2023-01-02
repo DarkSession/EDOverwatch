@@ -101,7 +101,10 @@ namespace EDOverwatch_Web.Controllers.V1
                 }
                 else
                 {
-                    StarSystemThargoidManualUpdate starSystemThargoidManualUpdate = new(model.SystemAddress, null, model.SystemState, model.Progress);
+                    StarSystemThargoidManualUpdate starSystemThargoidManualUpdate = new(model.SystemAddress, null, model.SystemState, model.Progress)
+                    {
+                        DaysLeft = model.DaysLeft,
+                    };
                     await Producer.SendAsync(StarSystemThargoidManualUpdate.QueueName, StarSystemThargoidManualUpdate.Routing, starSystemThargoidManualUpdate.Message, cancellationToken);
                 }
                 return Ok();

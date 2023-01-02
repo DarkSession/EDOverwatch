@@ -11,7 +11,7 @@ namespace EDSystemProgressTest
         [DataRow("image2.png", "AWARA", SystemStatus.InvasionInProgress, 72d, 17)]
         [DataRow("image3.png", "EBISU", SystemStatus.InvasionInProgress, 90d, 24)]
         [DataRow("image4.png", "EBISU", SystemStatus.InvasionPrevented, 100d, 3)]
-        [DataRow("image5.png", "63 ERIDANI", SystemStatus.InvasionInProgress, 58d, 4)] // P: 56
+        [DataRow("image5.png", "63 ERIDANI", SystemStatus.InvasionInProgress, 56d, 4)]
         [DataRow("image6.png", "VUKURBEH", SystemStatus.AlertPrevented, 100d, 4)]
         [DataRow("image7.png", "VUKURBEH", SystemStatus.AlertInProgressPopulated, 12d, 6)]
         [DataRow("image8.png", "HIP 20485", SystemStatus.AlertInProgressPopulated, 90d, 1)]
@@ -30,7 +30,7 @@ namespace EDSystemProgressTest
         [DataRow("image21.png", "NU GUANG", SystemStatus.InvasionInProgress, 2d, 27)]
         [DataRow("image22.png", "OBAMUMBO", SystemStatus.InvasionInProgress, 10d, 6)]
         [DataRow("image23.png", "HIP 23716", SystemStatus.Recovery, 26d, 20)]
-        // [DataRow("image24.png", "MUCHIHIKS", SystemStatus.InvasionInProgress, 10d, 12)]
+        [DataRow("image24.png", "MUCHIHIKS", SystemStatus.InvasionInProgress, 10d, 0)]
         [DataRow("image25.png", "MURUIDOOGES", SystemStatus.RecoveryComplete, 100d, 3)]
         [DataRow("image26.png", "78 THETA-2 TAURI", SystemStatus.AlertInProgressUnpopulated, 0d, 2)]
         [DataRow("image27.png", "HIP 8525", SystemStatus.InvasionInProgress, 70d, 9)]
@@ -54,6 +54,8 @@ namespace EDSystemProgressTest
         [DataRow("image45.png", "HUILE", SystemStatus.AlertInProgressPopulated, 4d, 6)]
         [DataRow("image46.png", "HIP 7338", SystemStatus.InvasionInProgress, 12d, 11)]
         [DataRow("image47.png", "HIP 19198", SystemStatus.InvasionInProgress, 94d, 4)]
+        [DataRow("image48.png", "HIP 7338", SystemStatus.InvasionInProgress, 22d, 9)]
+        [DataRow("image49.png", "GLIESE 9035", SystemStatus.InvasionInProgress, 70d, 16)]
         public async Task Test(string fileName, string systemName, SystemStatus systemStatus, double progress, int remainingDays)
         {
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>

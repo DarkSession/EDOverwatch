@@ -22,12 +22,16 @@
         [Column]
         public CommanderMissionStatus Status { get; set; }
 
-        public CommanderMission(int id, long missionId, DateTimeOffset date, CommanderMissionStatus status)
+        [Column]
+        public int Count { get; set; }
+
+        public CommanderMission(int id, long missionId, DateTimeOffset date, CommanderMissionStatus status, int count)
         {
             Id = id;
             MissionId = missionId;
             Date = date;
             Status = status;
+            Count = count;
         }
     }
 

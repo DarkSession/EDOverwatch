@@ -12,14 +12,21 @@ namespace EDSystemProgress
     {
         private static List<ColorRange> InvasionProgressColors { get; } = new()
         {
+            // Bar
             new ColorRange(45, 50, 20, 25, 30, 40),
-            new ColorRange(73, 190, 11, 65, 98, 255),
+            new ColorRange(50, 100, 0, 50, 75, 130),
+            new ColorRange(70, 190, 11, 95, 98, 255),
+
+            // Arrow
+            new ColorRange(120, 140, 120, 140, 120, 140),
+            new ColorRange(140, 160, 140, 160, 140, 160),
             new ColorRange(230, 255, 230, 255, 230, 255),
         };
 
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
-            new ColorRange(24, 67, 34, 100, 0, 32),
+            new ColorRange(15, 30, 20, 40, 0, 15),
+            new ColorRange(25, 67, 34, 100, 0, 32),
         };
 
         private static List<ColorRange> AlertProgressColors { get; } = new()

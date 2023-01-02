@@ -21,7 +21,7 @@
             {
                 throw new Exception("commander is null");
             }
-            return new WebSocketHandlerResultSuccess(new Models.User(user.Commander?.Name ?? user.UserName ?? "Unknown", user.Commander?.JournalLastActivity), null);
+            return new WebSocketHandlerResultSuccess(new Models.User(user.Commander), null);
         }
     }
 }

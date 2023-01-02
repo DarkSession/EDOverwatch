@@ -1,0 +1,73 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-small">
+        <div class="title">
+            Contribute
+        </div>
+        <div class="content-box">
+            In order to give the community better insights about the efforts and the progress of the Thargoid war
+            we need to collect Thargoid war related game journal from as many players as possible.
+            <br>
+            <br>
+            <b>Sharing is caring 🧡</b>
+            <br>
+            We make collected data available through our <a routerLink="/consumer-api">APIs</a> so other great community
+            projects can use it.
+            <br>
+            <hr>
+            If you would like to contribute data you have the following possibilities:
+            <br>
+            <br>
+            <div class="subtitle">
+                Running Elite: Dangerous Market Connector (or similar)
+                <span class="badge">PC only</span>
+            </div>
+            <div>
+                Running the
+                <a href="https://github.com/EDCD/EDMarketConnector/releases/latest" target="_blank">Elite: Dangerous
+                    Market
+                    Connector</a>
+                or any similar tool which transmits data to the EDDN while playing the game helps Overwatch and
+                other community projects to collect data around systems, starports and more.
+            </div>
+            <br>
+            <div class="subtitle">
+                Overwatch Market Connector plug-in
+                <span class="badge">PC only</span>
+            </div>
+            <div>
+                <i>This is not available yet but eventually will be.</i><br>
+                If you are running the Elite: Dangerous Market Connector and also want to contribute your
+                commander data around the Thargoid war such as kills, rescues and supplies you can install
+                this plug-in.
+            </div>
+            <br>
+            <div class="subtitle">
+                Game journal via Frontier servers
+            </div>
+            <div>
+                We give you the possibility to share your game journals from Frontier servers directly.<br>
+                Your game journal is downloaded periodically and automatically from Frontier servers and processed in
+                Overwatch.<br>
+                We use this data to update systems and stations as well as to collect your contributions to the war
+                efforts such as Thargoid kills, rescues and supplies.<br>
+                <br>
+                We are following a privacy by design in Overwatch which is why beside the Frontier customer Id and
+                commander name we do not collect any data related to users.
+                <br><br>
+                You can authorize us to access your game journals by using the button below. Once authorized, we usually
+                have access to your game journals for about 28 days. After this time expires, you need to grant
+                authorization again if you wish to continue to contribute your data this way.<br>
+                You can revoke the authorization at any time in the <a href="https://user.frontierstore.net/"
+                    target="_blank">Frontier user portal</a> under <b>Authorised applications</b>.
+                <br>
+                <br>
+                <div style="display: flex; justify-content: center;">
+                    <button mat-raised-button color="primary" [disabled]="loginDisabled" (click)="oAuth()">
+                        Share game journals via Frontier servers
+                    </button>
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>

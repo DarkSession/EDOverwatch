@@ -4,6 +4,7 @@ global using EDDatabase;
 global using Messages;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Newtonsoft.Json;
 using EDCApi;
@@ -11,7 +12,6 @@ using EDDataProcessor.CApiJournal;
 using EDDataProcessor.EDDN;
 using EDDataProcessor.IDA;
 using EDDataProcessor.Inara;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace EDDataProcessor
 {
@@ -139,7 +139,7 @@ namespace EDDataProcessor
 
         private static async Task CommanderJournalUpdateQueue(IConnection connection, CancellationToken cancellationToken)
         {
-            await using IProducer commanderCApiproducer = await connection.CreateProducerAsync(CommanderCApi.QueueName, CommanderCApi.Routing, cancellationToken);
+            await using IProducer commanderCApiProducer = await connection.CreateProducerAsync(CommanderCApi.QueueName, CommanderCApi.Routing, cancellationToken);
             ILogger log = Services!.GetRequiredService<ILogger<Program>>();
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -149,12 +149,15 @@ namespace EDDataProcessor
                     EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
                     List<Commander> commanders = await dbContext.Commanders
                         .AsNoTracking()
-                        .Where(c => c.OAuthStatus == CommanderOAuthStatus.Active && c.JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-30))
+                        .Where(c =>
+                            c.OAuthStatus == CommanderOAuthStatus.Active &&
+                            (c.JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-60) ||
+                            (c.JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-30) && c.JournalLastActivity < DateTimeOffset.UtcNow.AddHours(-2))))
                         .ToListAsync(cancellationToken);
                     foreach (Commander commander in commanders)
                     {
                         CommanderCApi commanderCApi = new(commander.FDevCustomerId);
-                        await commanderCApiproducer.SendAsync(commanderCApi.Message, cancellationToken);
+                        await commanderCApiProducer.SendAsync(commanderCApi.Message, cancellationToken);
                     }
                     await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
                 }

@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Inject } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Component } from '@angular/core';
+import { AppService } from 'src/app/services/app.service';
 
 @Component({
   selector: 'app-login',
@@ -10,9 +9,7 @@ import { firstValueFrom } from 'rxjs';
 export class LoginComponent {
   public loginDisabled = false;
 
-  public constructor(
-    private readonly httpClient: HttpClient,
-    @Inject('API_URL') private readonly apiUrl: string) {
+  public constructor(private readonly appService: AppService) {
   }
 
   public async oAuth(): Promise<void> {
@@ -20,20 +17,7 @@ export class LoginComponent {
       return;
     }
     this.loginDisabled = true;
-    try {
-      const response = await firstValueFrom(this.httpClient.post<OAuthGetStateResponse>(this.apiUrl + 'user/OAuthGetUrl', {}, {
-        withCredentials: true,
-      }));
-      if (response) {
-        window.location.href = response.url;
-      }
-    }
-    catch (e) {
-      console.error(e);
-    }
+    this.appService.oAuthStart();
   }
 }
 
-interface OAuthGetStateResponse {
-  url: string;
-}

@@ -25,6 +25,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { AuthenticationGuard } from './guards/authentication.guard';
 
@@ -58,6 +59,7 @@ import { NumberSuffixPipe } from './pipes/number-suffix.pipe';
 import { MapComponent } from './components/map/map.component';
 import { SystemHistoryComponent } from './components/system-history/system-history.component';
 import { SystemStateAnalysisComponent } from './components/system-state-analysis/system-state-analysis.component';
+import { ContributeDataComponent } from './components/contribute-data/contribute-data.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -94,6 +96,7 @@ export const httpInterceptorProviders = [
     MapComponent,
     SystemHistoryComponent,
     SystemStateAnalysisComponent,
+    ContributeDataComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -118,6 +121,7 @@ export const httpInterceptorProviders = [
     NgChartsModule,
     MatPaginatorModule,
     MatCheckboxModule,
+    MatMenuModule,
     RouterModule.forRoot([
       {
         path: 'about',
@@ -125,12 +129,15 @@ export const httpInterceptorProviders = [
       },
       {
         path: 'auth',
-        component: AuthComponent,
-        canActivate: [NotAuthenticatedGuard],
+        component: AuthComponent
       },
       {
         path: 'consumer-api',
         component: ConsumerApiComponent,
+      },
+      {
+        path: 'contribute',
+        component: ContributeDataComponent,
       },
       {
         path: 'faq',

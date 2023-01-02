@@ -3,11 +3,13 @@
     public class User
     {
         public string Commander { get; set; }
+        public bool HasActiveToken { get; set; }
         public DateTimeOffset? JournalLastImport { get; set; }
-        public User(string commander, DateTimeOffset? journalLastImport)
+        public User(Commander commander)
         {
-            Commander = commander;
-            JournalLastImport = journalLastImport;
+            Commander = commander.Name ?? commander.User?.UserName ?? "Unknown";
+            HasActiveToken = commander.OAuthStatus == CommanderOAuthStatus.Active;
+            JournalLastImport = commander.JournalLastActivity;
         }
     }
 }

@@ -19,18 +19,22 @@
                 if (commanderMission != null)
                 {
                     commanderMission.Status = CommanderMissionStatus.Completed;
-                    WarEffortType warEffortType;
+                    WarEffortType missionWarEffortType;
+                    WarEffortType? countWarEffortType = null;
                     if (Name.StartsWith("Mission_TW_Collect"))
                     {
-                        warEffortType = WarEffortType.MissionCompletionDelivery;
+                        missionWarEffortType = WarEffortType.MissionCompletionDelivery;
+                        countWarEffortType = WarEffortType.SupplyDelivery;
                     }
                     else if (Name.StartsWith("Mission_TW_Rescue"))
                     {
-                        warEffortType = WarEffortType.MissionCompletionRescue;
+                        missionWarEffortType = WarEffortType.MissionCompletionRescue;
+                        countWarEffortType = WarEffortType.Rescue;
                     }
                     else if (Name.StartsWith("Mission_TW_PassengerEvacuation"))
                     {
-                        warEffortType = WarEffortType.MissionCompletionPassengerEvacuation;
+                        missionWarEffortType = WarEffortType.MissionCompletionPassengerEvacuation;
+                        countWarEffortType = WarEffortType.Rescue;
                     }
                     else if (Name.StartsWith("Mission_TW_Massacre"))
                     {
@@ -39,19 +43,17 @@
                         // Mission_TW_Massacre_Basilisk_Plural
                         // Mission_TW_Massacre_Medusa_Plural
                         // Mission_TW_Massacre_Hydra_Plural
-                        warEffortType = WarEffortType.MissionCompletionThargoidKill;
+                        missionWarEffortType = WarEffortType.MissionCompletionThargoidKill;
                     }
                     else
-                    {
-                        warEffortType = WarEffortType.MissionCompletionGeneric;
-                    }
-                    if (warEffortType == WarEffortType.MissionCompletionGeneric)
                     {
                         await DeferEvent(journalParameters, dbContext, cancellationToken);
+                        return;
                     }
-                    else
+                    await AddOrUpdateWarEffort(journalParameters, commanderMission.System, missionWarEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
+                    if (commanderMission.Count > 0 && countWarEffortType != null)
                     {
-                        await AddOrUpdateWarEffort(journalParameters, commanderMission.System, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
+                        await AddOrUpdateWarEffort(journalParameters, commanderMission.System, (WarEffortType)countWarEffortType, commanderMission.Count, WarEffortSide.Humans, dbContext, cancellationToken);
                     }
                 }
             }

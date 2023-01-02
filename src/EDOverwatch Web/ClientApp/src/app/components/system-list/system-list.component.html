@@ -76,7 +76,7 @@
                 </td>
             </ng-container>
             <ng-container matColumnDef="StateExpiration">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Remaining time<br>in current state</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Remaining time</th>
                 <td mat-cell *matCellDef="let row">
                     <div *ngIf="row.StateExpiration?.StateExpires">
                         {{ row.StateExpiration?.StateExpires | dateAgo }}
