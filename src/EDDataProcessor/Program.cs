@@ -152,7 +152,7 @@ namespace EDDataProcessor
                         .Where(c =>
                             c.OAuthStatus == CommanderOAuthStatus.Active &&
                             (c.JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-60) ||
-                            (c.JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-30) && c.JournalLastActivity < DateTimeOffset.UtcNow.AddHours(-2))))
+                            (c.JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-30) && c.JournalLastActivity > DateTimeOffset.UtcNow.AddHours(-2))))
                         .ToListAsync(cancellationToken);
                     foreach (Commander commander in commanders)
                     {

@@ -202,6 +202,10 @@ namespace EDDataProcessor.CApiJournal
                 CommanderUpdated commanderUpdated = new(commander.FDevCustomerId);
                 await activeMqProducer.SendAsync(CommanderUpdated.QueueName, CommanderUpdated.Routing, commanderUpdated.Message, activeMqTransaction, cancellationToken);
             }
+            else
+            {
+                commander.JournalLastProcessed = DateTimeOffset.Now;
+            }
             if (oAuthCredentials.Status == OAuthCredentialsStatus.Expired)
             {
                 commander.OAuthStatus = CommanderOAuthStatus.Expired;

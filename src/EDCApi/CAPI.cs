@@ -40,6 +40,7 @@ namespace EDCApi
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Method = HttpMethod.Get;
             using HttpResponseMessage response = await HttpClient.SendAsync(request, cancellationToken);
+            LastRequest = DateTimeOffset.Now;
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 if (await FDevOAuth.TokenRefresh(oAuthCredentials, cancellationToken))
