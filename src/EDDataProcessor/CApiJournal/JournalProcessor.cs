@@ -170,6 +170,11 @@ namespace EDDataProcessor.CApiJournal
                                 }
                             }
                             while (!string.IsNullOrEmpty(journalLine));
+
+                            if (string.IsNullOrWhiteSpace(journalLine)) // The last line very likely is empty
+                            {
+                                line--;
+                            }
                         }
                         catch (Exception e)
                         {
