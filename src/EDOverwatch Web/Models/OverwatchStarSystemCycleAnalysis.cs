@@ -55,9 +55,14 @@
                 {
                     DateOnly cycleStartDate = DateOnly.FromDateTime(thargoidCycle.Start.DateTime);
                     DateTimeOffset progressCompleted = historicalThargoidLevel.ProgressHistory.OrderBy(p => p.Updated).Select(p => p.Updated).First();
+                    DateOnly progressCompletedDate = DateOnly.FromDateTime(progressCompleted.DateTime);
                     List<OverwatchStarSystemCycleAnalysisWarEffort> warEfforts = await dbContext.WarEfforts
                         .AsNoTracking()
-                        .Where(w => w.Date >= cycleStartDate && w.Date <= cycleStartDate && w.StarSystem == starSystem)
+                        .Where(w => 
+                                w.Date >= cycleStartDate && 
+                                w.Date <= progressCompletedDate && 
+                                w.StarSystem == starSystem && 
+                                w.Side == WarEffortSide.Humans)
                         .GroupBy(w => new
                         {
                             w.Source,

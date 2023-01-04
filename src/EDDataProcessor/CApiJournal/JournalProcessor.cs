@@ -154,7 +154,7 @@ namespace EDDataProcessor.CApiJournal
                             {
                                 journalLine = await strReader.ReadLineAsync(cancellationToken);
                                 line++;
-                                if (line < lineStart || string.IsNullOrEmpty(journalLine))
+                                if (line < lineStart || string.IsNullOrWhiteSpace(journalLine))
                                 {
                                     continue;
                                 }

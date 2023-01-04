@@ -52,7 +52,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     .Include(s => s.StarSystem)
                     .Include(s => s.Government)
                     .Include(s => s.PrimaryEconomy)
-                    .FirstOrDefaultAsync(s => s.MarketId == MarketID || s.MarketId == 0 && s.Name == StationName, cancellationToken);
+                    .FirstOrDefaultAsync(s => s.MarketId == MarketID || (s.MarketId == 0 && s.Name == StationName), cancellationToken);
             }
             else
             {

@@ -125,7 +125,7 @@ namespace EDDataProcessor.EDDN
                                 .Include(s => s.StarSystem)
                                 .Include(s => s.Government)
                                 .Include(s => s.PrimaryEconomy)
-                                .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID || s.MarketId == 0 && s.Name == Message.StationName, cancellationToken);
+                                .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID || (s.MarketId == 0 && s.Name == Message.StationName), cancellationToken);
                         }
                         else
                         {

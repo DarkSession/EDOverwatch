@@ -29,6 +29,13 @@ namespace EDOverwatch_Web.Controllers.V1
             return OverwatchStarSystems.Create(DbContext, cancellationToken);
         }
 
+        [HttpGet("{cycle}")]
+        public Task<OverwatchStarSystemsHistorical> Systems(string cycle, CancellationToken cancellationToken)
+        {
+            DateOnly date = DateOnly.FromDateTime(DateTime.Today);
+            return OverwatchStarSystemsHistorical.Create(date, DbContext, cancellationToken);
+        }
+
         [HttpGet("{systemAddress}")]
         public Task<OverwatchStarSystemDetail?> System(long systemAddress, CancellationToken cancellationToken)
         {

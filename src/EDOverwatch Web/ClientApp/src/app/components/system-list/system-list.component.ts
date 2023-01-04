@@ -32,6 +32,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   public dataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
   public sortColumn: string = "FactionOperations";
   public sortDirection: SortDirection = "desc";
+  public progressShowPercentage = false;
 
   public constructor(
     private readonly appService: AppService,
@@ -59,6 +60,7 @@ export class SystemListComponent implements OnInit, OnChanges {
         this.pageSize = pageSize;
       }
     }
+    this.progressShowPercentage = (await this.appService.getSetting("SystemListProgressShowPercentage") === "1");
     this.changeDetectorRef.markForCheck();
   }
 
@@ -119,6 +121,11 @@ export class SystemListComponent implements OnInit, OnChanges {
     this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
       duration: 2000,
     });
+  }
+
+  public toggleProgressShowPercentage(): void {
+    this.progressShowPercentage = !this.progressShowPercentage;
+    this.appService.saveSetting("SystemListProgressShowPercentage", this.progressShowPercentage ? "1" : "0");
   }
 }
 

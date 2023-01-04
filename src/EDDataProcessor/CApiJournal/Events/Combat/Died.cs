@@ -9,7 +9,7 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
 
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            if (!string.IsNullOrEmpty(KillerShip) && !Enum.TryParse<Ship>(KillerShip, true, out _))
+            if (!string.IsNullOrEmpty(KillerShip))
             {
                 bool isThargoidKill = KillerShip switch
                 {
@@ -24,10 +24,6 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
                 if (isThargoidKill)
                 {
                     await AddOrUpdateWarEffort(journalParameters, WarEffortType.KillGeneric, 1, WarEffortSide.Thargoids, dbContext, cancellationToken);
-                }
-                else
-                {
-                    await DeferEvent(journalParameters, dbContext, cancellationToken);
                 }
             }
         }
@@ -102,6 +98,7 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
             unknownsaucer_e,
 
             scout_cargo,
+            guardian_sentinel,
 
             [EnumMember(Value = "carrierdockb")]
             FleetCarrier,
@@ -114,10 +111,14 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
             megashipdocka,
             bernalsphere,
 
+            planetporta,
+
             skimmerdrone,
             bossskimmer,
 
             citizensuitai_scientific,
+            citizensuitai_industrial,
+
             assaultsuitai_class1,
             assaultsuitai_class2,
             assaultsuitai_class3,
@@ -138,6 +139,16 @@ namespace EDDataProcessor.CApiJournal.Events.Combat
             lightassaultsuitai_class3,
             lightassaultsuitai_class4,
             lightassaultsuitai_class5,
+            rangedsuitai_class1,
+            rangedsuitai_class2,
+            rangedsuitai_class3,
+            rangedsuitai_class4,
+            rangedsuitai_class5,
+            utilitysuit_class1,
+            utilitysuit_class2,
+            utilitysuit_class3,
+            utilitysuit_class4,
+            utilitysuit_class5,
 
             [EnumMember(Value = "vulture_taxi")]
             VultureTaxi = 999999800,

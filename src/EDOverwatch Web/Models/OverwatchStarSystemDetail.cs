@@ -9,6 +9,7 @@
         public List<OverwatchStarSystemDetailProgress> ProgressDetails { get; }
         public List<FactionOperation> FactionOperationDetails { get; }
         public List<OverwatchStation> Stations { get; }
+        public float DistanceToMaelstrom { get; }
         public List<OverwatchStarSystemWarEffortType> WarEffortTypes => Enum.GetValues<WarEffortType>()
             .Select(w => new OverwatchStarSystemWarEffortType(w))
             .ToList();
@@ -33,6 +34,10 @@
             FactionOperations = factionOperationDetails.Count;
             FactionOperationDetails = factionOperationDetails;
             Stations = stations.Select(s => new OverwatchStation(s)).ToList();
+            if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem != null)
+            {
+                DistanceToMaelstrom = starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem);
+            }
             StationsUnderRepair = stations.Where(s => s.State == StationState.UnderRepairs).Count();
             StationsDamaged = stations.Where(s => s.State == StationState.Damaged).Count();
             StationsUnderAttack = stations.Where(s => s.State == StationState.UnderAttack).Count();
@@ -61,7 +66,10 @@
                     Dictionary<WarEffortTypeGroup, long> systemEffortSums = new();
                     var systemEfforts = await dbContext.WarEfforts
                         .AsNoTracking()
-                        .Where(w => w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) && w.StarSystem == starSystem)
+                        .Where(w => 
+                                w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) && 
+                                w.StarSystem == starSystem && 
+                                w.Side == WarEffortSide.Humans)
                         .GroupBy(w => new
                         {
                             w.Type,
@@ -107,7 +115,10 @@
 
                 List<OverwatchStarSystemWarEffort> warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
-                    .Where(w => w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)) && w.StarSystem == starSystem)
+                    .Where(w => 
+                            w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)) && 
+                            w.StarSystem == starSystem && 
+                            w.Side == WarEffortSide.Humans)
                     .OrderByDescending(w => w.Date)
                     .GroupBy(w => new
                     {
