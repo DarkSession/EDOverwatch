@@ -451,7 +451,8 @@ namespace EDOverwatch
                 {
                     return false;
                 }
-                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(isManualUpdate ? DateTimeOffset.UtcNow : starSystem.Updated, cancellationToken);
+                DateTimeOffset time = isManualUpdate ? DateTimeOffset.UtcNow : starSystem.Updated;
+                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(time, cancellationToken);
                 if (!isManualUpdate && starSystem.ThargoidLevel?.ManualUpdateCycle?.Id == currentThargoidCycle.Id)
                 {
                     return false;
@@ -476,7 +477,7 @@ namespace EDOverwatch
                         {
                             Log.LogWarning("Star System {systemAddress} ({systemName}): New thargoid level in the same cycle! {currentLevel} -> {newLevel}", starSystem.SystemAddress, starSystem.Name, starSystem.ThargoidLevel.State, newThargoidLevel);
                         }
-                        thargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken, -1);
+                        thargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(time, cancellationToken, -1);
                     }
                     thargoidLevel = new(0, newThargoidLevel, null, DateTimeOffset.UtcNow)
                     {
