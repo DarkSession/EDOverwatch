@@ -217,6 +217,16 @@ namespace EDSystemProgress
                                             systemStatus = SystemStatus.RecoveryComplete;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
+                                        else if (text.Contains("system is currently populated"))
+                                        {
+                                            systemStatus = SystemStatus.HumanControlled;
+                                            processingStep = ImageProcessingStep.Completed;
+                                        }
+                                        else if (text.Contains("no human population present"))
+                                        {
+                                            systemStatus = SystemStatus.Unpopulated;
+                                            processingStep = ImageProcessingStep.Completed;
+                                        }
                                     }
                                     break;
                                 }
@@ -335,7 +345,7 @@ namespace EDSystemProgress
             log.LogInformation("{id}: processingStep: {processingStep} systemName: {systemName} systemStatus: {systemStatus} remainingTime: {remainingTime} progressBarUpperY: {progressBarUpperY} progressBarLowerY: {progressBarLowerY}", fileId, processingStep, systemName, systemStatus, remainingTime, progressBarUpperY, progressBarLowerY);
 
             bool success = processingStep == ImageProcessingStep.Completed && systemName != "INVALID";
-            if (success)
+            if (success && systemStatus != SystemStatus.HumanControlled && systemStatus != SystemStatus.Unpopulated)
             {
                 List<ColorRange> progressColors = systemStatus switch
                 {
@@ -545,6 +555,9 @@ namespace EDSystemProgress
         Recovery,
         [EnumMember(Value = "Recovery completed")]
         RecoveryComplete,
+        [EnumMember(Value = "Human controlled")]
+        HumanControlled,
+        Unpopulated,
     }
 
     public readonly struct ExtractSystemProgressResult

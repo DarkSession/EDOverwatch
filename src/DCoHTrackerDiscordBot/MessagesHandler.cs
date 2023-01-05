@@ -104,8 +104,8 @@ namespace DCoHTrackerDiscordBot
                                             SystemStatus.AlertInProgressPopulated or SystemStatus.AlertInProgressUnpopulated or SystemStatus.AlertPrevented => StarSystemThargoidLevelState.Alert,
                                             SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => StarSystemThargoidLevelState.Invasion,
                                             SystemStatus.ThargoidControlled => StarSystemThargoidLevelState.Controlled,
-                                            SystemStatus.Recovery => StarSystemThargoidLevelState.Recovery,
-                                            SystemStatus.RecoveryComplete => StarSystemThargoidLevelState.Recovery,
+                                            SystemStatus.Recovery or SystemStatus.RecoveryComplete => StarSystemThargoidLevelState.Recovery,
+                                            SystemStatus.HumanControlled or SystemStatus.Unpopulated => StarSystemThargoidLevelState.None,
                                             _ => StarSystemThargoidLevelState.None,
                                         };
                                         short progress = (short)result.Progress;

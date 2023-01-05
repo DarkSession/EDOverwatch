@@ -239,7 +239,7 @@ namespace DCoHTrackerDiscordBot.Module
 
         [SlashCommand("system-update", "Request an automatic or manual review of system data")]
         public async Task SystemUpdateRequest(
-            [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName)
+            [Summary("System", "System Name"), Autocomplete(typeof(AnyStarSystemAutocompleteHandler))] string starSystemName)
         {
             await DeferAsync(true);
 

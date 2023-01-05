@@ -56,6 +56,8 @@ namespace EDSystemProgressTest
         [DataRow("image47.png", "HIP 19198", SystemStatus.InvasionInProgress, 94d, 4)]
         [DataRow("image48.png", "HIP 7338", SystemStatus.InvasionInProgress, 22d, 9)]
         [DataRow("image49.png", "GLIESE 9035", SystemStatus.InvasionInProgress, 70d, 16)]
+        [DataRow("image50.png", "HYADES SECTOR MY-I BS-0", SystemStatus.Unpopulated, 0d, 0)]
+        [DataRow("image51.png", "LUNGUNI", SystemStatus.HumanControlled, 0d, 0)]
         public async Task Test(string fileName, string systemName, SystemStatus systemStatus, double progress, int remainingDays)
         {
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>

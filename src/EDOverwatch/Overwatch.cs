@@ -458,14 +458,6 @@ namespace EDOverwatch
                 {
                     return false;
                 }
-                if (starSystem.ThargoidLevel != null)
-                {
-                    if (starSystem.ThargoidLevel.CycleStartId == currentThargoidCycle.Id)
-                    {
-                        Log.LogWarning("Star System {systemAddress} ({systemName}): New thargoid level in the same cycle! {currentLevel} -> {newLevel}", starSystem.SystemAddress, starSystem.Name, starSystem.ThargoidLevel.State, newThargoidLevel);
-                    }
-                    starSystem.ThargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken, -1);
-                }
                 StarSystemThargoidLevel? thargoidLevel = starSystem.ThargoidLevel;
                 ThargoidCycle? stateExpires = null;
                 if (remainingTime > TimeSpan.Zero)
@@ -480,6 +472,14 @@ namespace EDOverwatch
 
                 if (thargoidLevel?.State != newThargoidLevel)
                 {
+                    if (thargoidLevel != null)
+                    {
+                        if (thargoidLevel.CycleStartId == currentThargoidCycle.Id)
+                        {
+                            Log.LogWarning("Star System {systemAddress} ({systemName}): New thargoid level in the same cycle! {currentLevel} -> {newLevel}", starSystem.SystemAddress, starSystem.Name, starSystem.ThargoidLevel.State, newThargoidLevel);
+                        }
+                        thargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken, -1);
+                    }
                     thargoidLevel = new(0, newThargoidLevel, null, DateTimeOffset.UtcNow)
                     {
                         StarSystem = starSystem,

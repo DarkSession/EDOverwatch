@@ -18,7 +18,7 @@ namespace EDDataProcessor
 
             // We start with all the system which are at the end of the timer but did not progress to 100%
             {
-                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Include(s => s.ThargoidLevel)
@@ -72,7 +72,7 @@ namespace EDDataProcessor
 
             // Next we update all the systems which have been cleared in the previous week to their new state
             {
-                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
@@ -159,7 +159,7 @@ namespace EDDataProcessor
 
             // Next, we change the station states for systems in invasion
             {
-                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
 
                 List<Station> stations = await dbContext.Stations
@@ -188,7 +188,7 @@ namespace EDDataProcessor
 
             // Last we reset the progress for all systems except systems in recovery
             {
-                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
@@ -204,8 +204,6 @@ namespace EDDataProcessor
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
-
-            dbContext.ChangeTracker.Clear();
         }
     }
 }
