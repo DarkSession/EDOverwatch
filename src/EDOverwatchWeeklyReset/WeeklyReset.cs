@@ -63,6 +63,12 @@ namespace EDDataProcessor
                     if (newState == StarSystemThargoidLevelState.Controlled)
                     {
                         starSystem.Population = 0;
+                        await dbContext.Stations
+                            .Where(s => s.StarSystem == starSystem && s.State != StationState.Abandoned)
+                            .ForEachAsync((s) =>
+                            {
+                                s.State = StationState.Abandoned;
+                            }, cancellationToken);
                     }
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);

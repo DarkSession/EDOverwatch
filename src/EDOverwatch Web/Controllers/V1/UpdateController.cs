@@ -1,4 +1,5 @@
-﻿using Messages;
+﻿using EDOverwatch_Web.Models;
+using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -16,6 +17,40 @@ namespace EDOverwatch_Web.Controllers.V1
         {
             DbContext = dbContext;
             Producer = producer;
+        }
+
+        [HttpGet]
+        public async Task<List<OverwatchStarSystemMin>> PossibleNewSystems(CancellationToken cancellationToken)
+        {
+            List<OverwatchStarSystemMin> result = new();
+            List<ThargoidMaelstrom> thargoidMaelstroms = await DbContext.ThargoidMaelstroms
+                .AsNoTracking()
+                .Include(t => t.StarSystem)
+                .ToListAsync(cancellationToken);
+            foreach (ThargoidMaelstrom maelstrom in thargoidMaelstroms)
+            {
+                if (maelstrom.StarSystem == null)
+                {
+                    continue;
+                }
+                decimal distance = maelstrom.InfluenceSphere + 5m;
+                List<StarSystem> starSystems = await DbContext.StarSystems
+                    .AsNoTracking()
+                    .Where(s =>
+                        (s.ThargoidLevel == null || s.ThargoidLevel.State == StarSystemThargoidLevelState.None) &&
+                        s.LocationX >= maelstrom.StarSystem.LocationX - distance && s.LocationX <= maelstrom.StarSystem.LocationX + distance &&
+                        s.LocationY >= maelstrom.StarSystem.LocationY - distance && s.LocationY <= maelstrom.StarSystem.LocationY + distance &&
+                        s.LocationZ >= maelstrom.StarSystem.LocationZ - distance && s.LocationZ <= maelstrom.StarSystem.LocationZ + distance)
+                    .ToListAsync(cancellationToken);
+                foreach (StarSystem starSystem in starSystems)
+                {
+                    if (starSystem.DistanceTo(maelstrom.StarSystem) <= (float)distance)
+                    {
+                        result.Add(new(starSystem));
+                    }
+                }
+            }
+            return result;
         }
 
         [HttpPost]

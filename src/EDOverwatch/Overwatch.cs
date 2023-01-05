@@ -314,8 +314,7 @@ namespace EDOverwatch
                                 using AsyncLockInstance l = await Lock(cancellationToken);
                                 ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
                                 TimeSpan timeSinceLastTick = DateTimeOffset.UtcNow - currentThargoidCycle.Start;
-                                TimeSpan signalSourceMaxAge = (timeSinceLastTick > TimeSpan.FromDays(1)) ? timeSinceLastTick : TimeSpan.FromDays(1);
-                                (_, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, signalSourceMaxAge, dbContext, cancellationToken);
+                                (_, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, timeSinceLastTick, dbContext, cancellationToken);
                                 if (maelstrom != null)
                                 {
                                     TimeSpan timeLeft = TimeSpan.Zero;
@@ -444,7 +443,6 @@ namespace EDOverwatch
         {
             if (isManualUpdate ||
                 starSystem.ThargoidLevel?.State == null ||
-                starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Alert ||
                 (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Controlled && newThargoidLevel == StarSystemThargoidLevelState.None) ||
                 starSystem.ThargoidLevel.State < newThargoidLevel)
             {
@@ -453,7 +451,7 @@ namespace EDOverwatch
                 {
                     return false;
                 }
-                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
+                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(isManualUpdate ? DateTimeOffset.UtcNow : starSystem.Updated, cancellationToken);
                 if (!isManualUpdate && starSystem.ThargoidLevel?.ManualUpdateCycle?.Id == currentThargoidCycle.Id)
                 {
                     return false;
