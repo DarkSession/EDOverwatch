@@ -25,8 +25,7 @@
                 int thargoidsSystemsControlling = await dbContext.StarSystems
                     .Where(s =>
                         s.WarRelevantSystem &&
-                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled ||
-                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
                     .CountAsync(cancellationToken);
                 var warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()

@@ -475,7 +475,7 @@ namespace EDOverwatch
                     {
                         if (thargoidLevel.CycleStartId == currentThargoidCycle.Id)
                         {
-                            Log.LogWarning("Star System {systemAddress} ({systemName}): New thargoid level in the same cycle! {currentLevel} -> {newLevel}", starSystem.SystemAddress, starSystem.Name, starSystem.ThargoidLevel.State, newThargoidLevel);
+                            Log.LogWarning("Star System {systemAddress} ({systemName}): New thargoid level in the same cycle! {currentLevel} -> {newLevel}", starSystem.SystemAddress, starSystem.Name, thargoidLevel.State, newThargoidLevel);
                         }
                         thargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(time, cancellationToken, -1);
                     }

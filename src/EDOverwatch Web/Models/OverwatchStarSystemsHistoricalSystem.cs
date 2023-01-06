@@ -17,22 +17,21 @@ namespace EDOverwatch_Web.Models
 
             StarSystemThargoidLevel thargoidLevel = starSystem.ThargoidLevelHistory
                 .OrderByDescending(t => t.CycleStart!.Start)
-                .First(t => (t.CycleEnd?.End ?? WeeklyTick.GetLastTick()) <= thargoidCycle.End);
+                .First(t => t.CycleEnd!.End >= thargoidCycle.End);
 
             StarSystemThargoidLevel? previousThargoidLevel = starSystem.ThargoidLevelHistory
-                .Where(t => t != thargoidLevel)
                 .OrderBy(t => t.CycleStart!.Start)
-                .FirstOrDefault(t => t.CycleStart!.Start >= previousThargoidCycle.Start || t.CycleEnd?.End == previousThargoidCycle.End);
+                .FirstOrDefault(t => t.CycleStart!.Start < thargoidCycle.Start);
 
             ThargoidLevel = new(thargoidLevel.State);
             PreviousThargoidLevel = new(previousThargoidLevel?.State ?? thargoidLevel.State);
 
             OverwatchStarSystemsHistoricalSystemState state;
-            if (thargoidLevel.State != previousThargoidLevel?.State)
+            if (previousThargoidLevel != null && thargoidLevel.State != previousThargoidLevel.State)
             {
                 state = thargoidLevel.State switch
                 {
-                    StarSystemThargoidLevelState.None => OverwatchStarSystemsHistoricalSystemState.ClearNew,
+                    StarSystemThargoidLevelState.None =>    OverwatchStarSystemsHistoricalSystemState.ClearNew,
                     StarSystemThargoidLevelState.Alert => OverwatchStarSystemsHistoricalSystemState.AlertNew,
                     StarSystemThargoidLevelState.Invasion => OverwatchStarSystemsHistoricalSystemState.InvasionNew,
                     StarSystemThargoidLevelState.Controlled => OverwatchStarSystemsHistoricalSystemState.ControlledNew,
@@ -46,7 +45,7 @@ namespace EDOverwatch_Web.Models
                 state = thargoidLevel.State switch
                 {
                     StarSystemThargoidLevelState.None => OverwatchStarSystemsHistoricalSystemState.Clear,
-                    StarSystemThargoidLevelState.Alert => OverwatchStarSystemsHistoricalSystemState.Alert,
+                    StarSystemThargoidLevelState.Alert => OverwatchStarSystemsHistoricalSystemState.AlertNew,
                     StarSystemThargoidLevelState.Invasion => OverwatchStarSystemsHistoricalSystemState.Invasion,
                     StarSystemThargoidLevelState.Controlled => OverwatchStarSystemsHistoricalSystemState.Controlled,
                     StarSystemThargoidLevelState.Maelstrom => OverwatchStarSystemsHistoricalSystemState.Maelstrom,
@@ -62,7 +61,6 @@ namespace EDOverwatch_Web.Models
     {
         Clear,
         ClearNew,
-        Alert,
         AlertNew,
         Invasion,
         InvasionNew,

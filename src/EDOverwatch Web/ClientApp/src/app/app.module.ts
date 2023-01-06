@@ -60,6 +60,7 @@ import { MapComponent } from './components/map/map.component';
 import { SystemHistoryComponent } from './components/system-history/system-history.component';
 import { SystemStateAnalysisComponent } from './components/system-state-analysis/system-state-analysis.component';
 import { ContributeDataComponent } from './components/contribute-data/contribute-data.component';
+import { MapHistoricalComponent } from './components/map-historical/map-historical.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -97,6 +98,7 @@ export const httpInterceptorProviders = [
     SystemHistoryComponent,
     SystemStateAnalysisComponent,
     ContributeDataComponent,
+    MapHistoricalComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -159,6 +161,10 @@ export const httpInterceptorProviders = [
       {
         path: 'maelstroms',
         component: MaelstromsComponent,
+      },
+      {
+        path: 'map/:date',
+        component: MapHistoricalComponent,
       },
       {
         path: 'map',

@@ -30,10 +30,13 @@ namespace EDOverwatch_Web.Controllers.V1
         }
 
         [HttpGet("{cycle}")]
-        public Task<OverwatchStarSystemsHistorical> Systems(string cycle, CancellationToken cancellationToken)
+        public async Task<OverwatchStarSystemsHistorical> Systems(DateOnly cycle, CancellationToken cancellationToken)
         {
-            DateOnly date = DateOnly.FromDateTime(DateTime.Today);
-            return OverwatchStarSystemsHistorical.Create(date, DbContext, cancellationToken);
+            if (cycle > DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date) || !await DbContext.ThargoidCycleExists(cycle, cancellationToken))
+            {
+                cycle = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
+            }
+            return await OverwatchStarSystemsHistorical.Create(cycle, DbContext, cancellationToken);
         }
 
         [HttpGet("{systemAddress}")]
@@ -46,6 +49,12 @@ namespace EDOverwatch_Web.Controllers.V1
         public Task<OverwatchMaelstroms> Maelstroms(CancellationToken cancellationToken)
         {
             return OverwatchMaelstroms.Create(DbContext, cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<List<OverwatchThargoidCycle>> ThargoidCycles(CancellationToken cancellationToken)
+        {
+            return OverwatchThargoidCycle.GetThargoidCycles(DbContext, cancellationToken);
         }
     }
 }

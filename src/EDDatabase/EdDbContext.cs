@@ -3,6 +3,8 @@ global using System.ComponentModel.DataAnnotations.Schema;
 using EDUtils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Net.Http.Headers;
 
 namespace EDDatabase
 {
@@ -92,6 +94,12 @@ namespace EDDatabase
                 await SaveChangesAsync(cancellationToken);
             }
             return thargoidCycle;
+        }
+
+        public Task<bool> ThargoidCycleExists(DateOnly date, CancellationToken cancellationToken)
+        {
+            DateTimeOffset cycleTime = WeeklyTick.GetTickTime(date);
+            return ThargoidCycles.AnyAsync(t => t.Start == cycleTime, cancellationToken);
         }
     }
 }

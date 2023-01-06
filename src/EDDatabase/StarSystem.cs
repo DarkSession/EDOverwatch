@@ -53,7 +53,7 @@ namespace EDDatabase
         [Column]
         public DateTimeOffset Updated { get; set; }
 
-        public IEnumerable<StarSystemThargoidLevel>? ThargoidLevelHistory { get; set; }
+        public List<StarSystemThargoidLevel>? ThargoidLevelHistory { get; set; }
 
         public IEnumerable<DcohFactionOperation>? FactionOperations { get; set; }
 

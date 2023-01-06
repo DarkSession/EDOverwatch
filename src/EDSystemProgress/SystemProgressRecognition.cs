@@ -440,6 +440,11 @@ namespace EDSystemProgress
                 }
             }
 
+            if (!success)
+            {
+                log.LogWarning("Failed!");
+            }
+
             if (SystemNameCorrections.TryGetValue(systemName, out string? newSystemName))
             {
                 systemName = newSystemName;
