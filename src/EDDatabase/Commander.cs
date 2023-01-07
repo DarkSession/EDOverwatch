@@ -22,8 +22,8 @@
         [ForeignKey("StationId")]
         public Station? Station { get; set; }
 
-        //[ForeignKey("ApiKeyId")]
-        //public CommanderApiKey? ApiKey { get; set; }
+        [ForeignKey("ApiKeyId")]
+        public CommanderApiKey? ApiKey { get; set; }
 
         [Column]
         public bool IsInLiveVersion { get; set; }
@@ -58,10 +58,7 @@
         [NotMapped]
         public bool CanProcessCApiJournal => OAuthStatus == CommanderOAuthStatus.Active && JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-5);
 
-        //[ForeignKey("MainCommanderId")]
-        //public Commander? MainCommander { get; set; }
-
-        //public IEnumerable<Commander>? AdditionalCommanders { get; set; }
+        public IEnumerable<CommanderApiKeyClaim>? ApiKeyClaims { get; set; }
 
         public Commander(int id, string name, long fDevCustomerId, bool isInLiveVersion, DateTimeOffset journalLastProcessed, DateOnly journalDay, int journalLastLine, DateTimeOffset journalLastActivity, DateTimeOffset oAuthCreated, CommanderOAuthStatus oAuthStatus, string oAuthAccessToken, string oAuthRefreshToken, string oAuthTokenType)
         {

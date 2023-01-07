@@ -3,8 +3,6 @@ global using System.ComponentModel.DataAnnotations.Schema;
 using EDUtils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Net.Http.Headers;
 
 namespace EDDatabase
 {
@@ -13,7 +11,10 @@ namespace EDDatabase
         public DbSet<ApiKey> ApiKeys { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Commander> Commanders { get; set; }
+        public DbSet<CommanderApiKey> CommanderApiKeys { get; set; }
+        public DbSet<CommanderApiKeyClaim> CommanderApiKeyClaims { get; set; }
         public DbSet<CommanderDeferredJournalEvent> CommanderDeferredJournalEvents { get; set; }
+        public DbSet<CommanderJournalProcessedEvent> CommanderJournalProcessedEvents { get; set; }
         public DbSet<CommanderMission> CommanderMissions { get; set; }
 
         public DbSet<DcohDiscordUser> DcohDiscordUsers { get; set; }

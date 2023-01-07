@@ -30,7 +30,8 @@ namespace DCoHTrackerDiscordBot.Module
         }
 
         [SlashCommand("squadron", "As a representative create a new or join an existing squadron on this Discord.")]
-        public async Task Squadron([Summary("Squadron", "Squadron Id (4 letter) of your squadron"), Autocomplete(typeof(SquadronIdAutocompleteHandler))] string squadronId)
+        public async Task Squadron(
+            [Summary("Squadron", "Squadron Id (4 letter) of your squadron"), Autocomplete(typeof(SquadronIdAutocompleteHandler))] string squadronId)
         {
             if (!await CheckElevatedGuild())
             {

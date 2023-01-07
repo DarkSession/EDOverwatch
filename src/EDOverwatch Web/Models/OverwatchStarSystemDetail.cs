@@ -66,9 +66,9 @@
                     Dictionary<WarEffortTypeGroup, long> systemEffortSums = new();
                     var systemEfforts = await dbContext.WarEfforts
                         .AsNoTracking()
-                        .Where(w => 
-                                w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) && 
-                                w.StarSystem == starSystem && 
+                        .Where(w =>
+                                w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) &&
+                                w.StarSystem == starSystem &&
                                 w.Side == WarEffortSide.Humans)
                         .GroupBy(w => new
                         {
@@ -115,9 +115,9 @@
 
                 List<OverwatchStarSystemWarEffort> warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
-                    .Where(w => 
-                            w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)) && 
-                            w.StarSystem == starSystem && 
+                    .Where(w =>
+                            w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)) &&
+                            w.StarSystem == starSystem &&
                             w.Side == WarEffortSide.Humans)
                     .OrderByDescending(w => w.Date)
                     .GroupBy(w => new

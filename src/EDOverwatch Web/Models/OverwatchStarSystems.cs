@@ -61,9 +61,9 @@
 
             var efforts = await dbContext.WarEfforts
                 .AsNoTracking()
-                .Where(w => 
-                        w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) && 
-                        w.StarSystem!.WarRelevantSystem && 
+                .Where(w =>
+                        w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) &&
+                        w.StarSystem!.WarRelevantSystem &&
                         w.Side == WarEffortSide.Humans)
                 .GroupBy(w => new
                 {

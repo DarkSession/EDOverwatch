@@ -36,7 +36,8 @@ namespace EDOverwatch_Web
 
 
             builder.Services.AddAuthentication()
-                .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKeyAuthentication", null);
+                .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKeyAuthentication", null)
+                .AddScheme<AuthenticationSchemeOptions, CommanderApiKeyAuthenticationHandler>("CommanderApiKeyAuthenticationHandler", null);
 
             // Add services to the container.
             builder.Services.AddControllers()
@@ -104,7 +105,7 @@ namespace EDOverwatch_Web
 
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'self' https://darksession.github.io;");
+                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self' https://darksession.github.io; style-src 'self' 'unsafe-inline';");
                 // trusted-types angular angular#bundler; require-trusted-types-for 'script';
                 context.Response.Headers.Add("X-Frame-Options", "deny");
                 context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");

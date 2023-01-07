@@ -58,10 +58,10 @@
                     DateOnly progressCompletedDate = DateOnly.FromDateTime(progressCompleted.DateTime);
                     List<OverwatchStarSystemCycleAnalysisWarEffort> warEfforts = await dbContext.WarEfforts
                         .AsNoTracking()
-                        .Where(w => 
-                                w.Date >= cycleStartDate && 
-                                w.Date <= progressCompletedDate && 
-                                w.StarSystem == starSystem && 
+                        .Where(w =>
+                                w.Date >= cycleStartDate &&
+                                w.Date <= progressCompletedDate &&
+                                w.StarSystem == starSystem &&
                                 w.Side == WarEffortSide.Humans)
                         .GroupBy(w => new
                         {

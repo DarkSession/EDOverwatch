@@ -11,12 +11,16 @@
         public Guid Key { get; set; }
 
         [Column]
+        public DateTimeOffset Created { get; set; }
+
+        [Column]
         public CommanderApiKeyStatus Status { get; set; }
 
-        public CommanderApiKey(int id, Guid key, CommanderApiKeyStatus status)
+        public CommanderApiKey(int id, Guid key, DateTimeOffset created, CommanderApiKeyStatus status)
         {
             Id = id;
             Key = key;
+            Created = created;
             Status = status;
         }
     }

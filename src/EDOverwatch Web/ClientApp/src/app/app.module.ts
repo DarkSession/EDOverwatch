@@ -61,6 +61,7 @@ import { SystemHistoryComponent } from './components/system-history/system-histo
 import { SystemStateAnalysisComponent } from './components/system-state-analysis/system-state-analysis.component';
 import { ContributeDataComponent } from './components/contribute-data/contribute-data.component';
 import { MapHistoricalComponent } from './components/map-historical/map-historical.component';
+import { CommanderApiKeysComponent } from './components/commander-api-keys/commander-api-keys.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -99,6 +100,7 @@ export const httpInterceptorProviders = [
     SystemStateAnalysisComponent,
     ContributeDataComponent,
     MapHistoricalComponent,
+    CommanderApiKeysComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -132,6 +134,11 @@ export const httpInterceptorProviders = [
       {
         path: 'auth',
         component: AuthComponent
+      },
+      {
+        path: 'commander/api-keys',
+        component: CommanderApiKeysComponent,
+        canActivate: [AuthenticationGuard],
       },
       {
         path: 'consumer-api',

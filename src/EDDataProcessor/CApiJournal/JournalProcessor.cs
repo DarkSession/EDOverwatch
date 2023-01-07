@@ -91,7 +91,7 @@ namespace EDDataProcessor.CApiJournal
                      .ToListAsync(cancellationToken);
                 foreach (CommanderDeferredJournalEvent commanderDeferredJournalEvent in commanderDeferredJournalEvents)
                 {
-                    JournalParameters journalParameters = new(true, WarEffortSource.OverwatchCAPI, commander, commanderDeferredJournalEvent.System, activeMqProducer, activeMqTransaction);
+                    JournalParameters journalParameters = new(true, WarEffortSource.OverwatchCAPI, commander, commanderDeferredJournalEvent.System, activeMqProducer, activeMqTransaction, 0);
                     await ProcessCommanderCApiMessageEvent(journalParameters, commanderDeferredJournalEvent.Journal, dbContext, cancellationToken);
                     if (!journalParameters.DeferRequested)
                     {
@@ -158,7 +158,7 @@ namespace EDDataProcessor.CApiJournal
                                 {
                                     continue;
                                 }
-                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System, activeMqProducer, activeMqTransaction);
+                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System, activeMqProducer, activeMqTransaction, line);
                                 DateTimeOffset? timestamp = await ProcessCommanderCApiMessageEvent(journalParameters, journalLine, dbContext, cancellationToken);
                                 if (timestamp is DateTimeOffset t)
                                 {

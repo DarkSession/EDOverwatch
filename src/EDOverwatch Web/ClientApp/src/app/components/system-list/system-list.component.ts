@@ -37,7 +37,8 @@ export class SystemListComponent implements OnInit, OnChanges {
   public constructor(
     private readonly appService: AppService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly matSnackBar: MatSnackBar) {
+    private readonly matSnackBar: MatSnackBar
+    ) {
     this.initDataSource([]);
   }
 

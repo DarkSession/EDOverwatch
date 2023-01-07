@@ -1,0 +1,72 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-small">
+        <div class="title">
+            API Keys
+        </div>
+        <div class="content-box">
+            API keys allow 3rd party applications to submit data to your profile.<br>
+            You should not share your API key.
+            <br>
+            <br>
+            <div *ngIf="apiKey" class="api-key-container">
+                <mat-form-field appearance="outline" floatLabel="always" style="width: 400px">
+                    <mat-label>API Key</mat-label>
+                    <input matInput [(ngModel)]="apiKey" [disabled]="true">
+                </mat-form-field>
+                <div class="icon">
+                    <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                        (click)="copyApiKey()"></fa-icon>
+                </div>
+            </div>
+            <div *ngIf="!apiKey">
+                You do not have an API key yet.
+                <br>
+                <br>
+                <button mat-raised-button color="primary" [disabled]="loading" (click)="generateApiKey()">
+                    Generate API key
+                </button>
+            </div>
+            <hr>
+            <div class="subtitle">
+                Additional API Keys
+            </div>
+            <div>
+                <table mat-table [dataSource]="additionalKeys">
+                    <ng-container matColumnDef="APIKey">
+                        <th mat-header-cell *matHeaderCellDef>API Key</th>
+                        <td mat-cell *matCellDef="let row">
+                            {{ row }}
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+                <div *ngIf="additionalKeys.length === 0" class="empty-table">
+                    No records found.
+                </div>
+            </div>
+            <br>
+            <div class="subtitle">
+                Claim additional API key
+            </div>
+            <div class="claim-additiona-container">
+                <mat-form-field appearance="outline" style="width: 400px">
+                    <mat-label>API Key</mat-label>
+                    <input matInput [(ngModel)]="claimAdditionalApiKey" (ngModelChange)="claimAdditionalApiKeyChanged()"
+                        [disabled]="loading" required>
+                </mat-form-field>
+                <div class="error-msg" *ngIf="claimAdditionalApiKey">
+                    {{ claimError }}
+                </div>
+                <br>
+                <div>
+                    <button mat-raised-button color="primary" [disabled]="loading || !claimAdditionalApiKey"
+                        (click)="claimApiKey()">
+                        Claim
+                    </button>
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+</div>

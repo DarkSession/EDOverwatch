@@ -208,7 +208,7 @@ export class WebsocketService {
         this.sendMessageInternal(message, isUnique);
     }
 
-    public sendMessageAndWaitForResponse<T>(name: string, data: any, isUnique: boolean = false): Promise<WebSocketResponseMessage<T> | null> {
+    public sendMessageAndWaitForResponse<T>(name: string, data: any): Promise<WebSocketResponseMessage<T> | null> {
         const message: WebSocketRequestMessage = {
             Name: name,
             Data: data,
@@ -216,7 +216,7 @@ export class WebsocketService {
         };
         let messageResolve;
         const result: Promise<WebSocketResponseMessage<T> | null> = new Promise((resolve) => { messageResolve = resolve; });
-        this.sendMessageInternal(message, isUnique, messageResolve);
+        this.sendMessageInternal(message, true, messageResolve);
         return result;
     }
 

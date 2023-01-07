@@ -74,7 +74,8 @@
                 {
                     historicalThargoidLevel.CycleEnd ??= new(0, WeeklyTick.GetLastTick(), WeeklyTick.GetLastTick().AddDays(7));
                 }
-                if (system.ThargoidLevelHistory.Any(t => t.State != StarSystemThargoidLevelState.None)) {
+                if (system.ThargoidLevelHistory.Any(t => t.State != StarSystemThargoidLevelState.None))
+                {
                     OverwatchStarSystemsHistoricalSystem overwatchStarSystemsHistoricalSystem = new(system, thargoidCycle, previousThargoidCycle);
                     result.Systems.Add(overwatchStarSystemsHistoricalSystem);
                 }

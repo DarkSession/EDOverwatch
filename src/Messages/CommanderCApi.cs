@@ -8,6 +8,7 @@ namespace Messages
         public const string QueueName = "Commander.CApi";
         public const RoutingType Routing = RoutingType.Anycast;
 
+        public int CommanderId { get; set; }
         public long FDevCustomerId { get; set; }
         public CommanderCApi(long fDevCustomerId)
         {

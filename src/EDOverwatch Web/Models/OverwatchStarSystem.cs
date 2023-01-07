@@ -16,11 +16,11 @@
         public OverwatchStarSystemStateProgress StateProgress { get; }
 
         public OverwatchStarSystem(
-                    StarSystem starSystem, 
-                    decimal effortFocus, 
-                    int factionOperations, 
-                    List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations, 
-                    int stationsUnderRepair, 
+                    StarSystem starSystem,
+                    decimal effortFocus,
+                    int factionOperations,
+                    List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations,
+                    int stationsUnderRepair,
                     int stationsDamaged,
                     int stationsUnderAttack)
             : base(starSystem)

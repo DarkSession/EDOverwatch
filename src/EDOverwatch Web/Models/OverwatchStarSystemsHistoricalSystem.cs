@@ -1,6 +1,4 @@
-﻿using EDUtils;
-
-namespace EDOverwatch_Web.Models
+﻿namespace EDOverwatch_Web.Models
 {
     public class OverwatchStarSystemsHistoricalSystem : OverwatchStarSystemBase
     {
@@ -31,7 +29,7 @@ namespace EDOverwatch_Web.Models
             {
                 state = thargoidLevel.State switch
                 {
-                    StarSystemThargoidLevelState.None =>    OverwatchStarSystemsHistoricalSystemState.ClearNew,
+                    StarSystemThargoidLevelState.None => OverwatchStarSystemsHistoricalSystemState.ClearNew,
                     StarSystemThargoidLevelState.Alert => OverwatchStarSystemsHistoricalSystemState.AlertNew,
                     StarSystemThargoidLevelState.Invasion => OverwatchStarSystemsHistoricalSystemState.InvasionNew,
                     StarSystemThargoidLevelState.Controlled => OverwatchStarSystemsHistoricalSystemState.ControlledNew,

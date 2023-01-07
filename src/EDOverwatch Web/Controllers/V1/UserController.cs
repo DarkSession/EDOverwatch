@@ -70,8 +70,8 @@ namespace EDOverwatch_Web.Controllers.V1
             {
                 await SignInManager.SignInAsync(user, true);
                 user.Commander = new(
-                            id: 0,
-                            name: string.Empty,
+                            0,
+                            string.Empty,
                             0,
                             false,
                             DateTimeOffset.UtcNow.AddYears(-1),
@@ -107,7 +107,7 @@ namespace EDOverwatch_Web.Controllers.V1
                 OAuthenticationResult? oAuthenticationResult = await FDevOAuth.AuthenticateUser(requestData.Code, oAuthCode.Code, cancellationToken);
                 if (oAuthenticationResult != null && oAuthenticationResult.CustomerId > 0)
                 {
-                    Commander? commander = await DbContext.Commanders
+                    EDDatabase.Commander? commander = await DbContext.Commanders
                         .Include(c => c.User)
                         .FirstOrDefaultAsync(u => u.FDevCustomerId == oAuthenticationResult.CustomerId, cancellationToken);
                     bool isCommanderNew = false;
@@ -132,8 +132,8 @@ namespace EDOverwatch_Web.Controllers.V1
                         }
                         await DbContext.SaveChangesAsync(cancellationToken);
                         commander = new(
-                            id: 0,
-                            name: profile!.Commander!.Name,
+                            0,
+                            profile!.Commander!.Name,
                             oAuthenticationResult.CustomerId,
                             false,
                             DateTimeOffset.UtcNow.AddYears(-1),

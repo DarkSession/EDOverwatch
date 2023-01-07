@@ -4,6 +4,7 @@ using EDUtils;
 using Messages;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.Serialization;
+using static DCoHTrackerDiscordBot.Module.SquadronModule;
 
 namespace DCoHTrackerDiscordBot.Module
 {
@@ -163,7 +164,8 @@ namespace DCoHTrackerDiscordBot.Module
         [SlashCommand("view", "View operation by type")]
         public async Task View(
             [Summary("Operation", "Operation Type")] OperationType? operation = null,
-            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null)
+            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null,
+            [Summary("Squadron", "Squadron Name"), Autocomplete(typeof(SquadronIdAutocompleteHandler))] string? squadronId = null)
         {
             await DeferAsync(true);
 
@@ -181,6 +183,7 @@ namespace DCoHTrackerDiscordBot.Module
 
             string operationTypeString = string.Empty;
             string maelstromNameString = string.Empty;
+            string squadronNameString = string.Empty;
             if (operation is OperationType operationType)
             {
                 DcohFactionOperationType type = OperationTypeToDcohFactionOperationType(operationType);
@@ -201,9 +204,25 @@ namespace DCoHTrackerDiscordBot.Module
                 dcohFactionsQuery = dcohFactionsQuery.Where(d => d.StarSystem!.ThargoidLevel!.Maelstrom == maelstrom);
                 maelstromNameString = maelstrom.Name;
             }
-            if (string.IsNullOrEmpty(operationTypeString) && string.IsNullOrEmpty(maelstromNameString))
+            if (!string.IsNullOrEmpty(squadronId))
             {
-                await FollowupAsync($"You need to either provide the maelstrom or the operation.", ephemeral: true);
+                DcohFaction? dcohFaction = await DbContext.DcohFactions
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.Short == squadronId);
+                if (dcohFaction == null)
+                {
+                    await FollowupAsync($"Could not find squadron.", ephemeral: true);
+                    return;
+                }
+                dcohFactionsQuery = dcohFactionsQuery.Where(d => d.Faction == dcohFaction);
+                squadronNameString = dcohFaction.Name;
+            }
+            if (
+                string.IsNullOrEmpty(operationTypeString) &&
+                string.IsNullOrEmpty(maelstromNameString) &&
+                string.IsNullOrEmpty(squadronNameString))
+            {
+                await FollowupAsync($"You need to either provide the maelstrom, the operation or the squadron.", ephemeral: true);
                 return;
             }
 
@@ -215,18 +234,36 @@ namespace DCoHTrackerDiscordBot.Module
                            .WithTitle("Operations / Activities");
             if (factionOperations.Any())
             {
-                string description = $"{operationTypeString} activities".Trim();
-                description += (!string.IsNullOrEmpty(maelstromNameString) ? " around " + maelstromNameString : "") + ":";
-                embedMain.Description = description;
+                List<string> description = new();
+                if (!string.IsNullOrEmpty(operationTypeString))
+                {
+                    description.Add($"{operationTypeString} activities");
+                }
+                else
+                {
+                    description.Add("Activities");
+                }
+                if (!string.IsNullOrEmpty(maelstromNameString))
+                {
+                    description.Add("around " + maelstromNameString);
+                }
+                if (!string.IsNullOrEmpty(squadronNameString))
+                {
+                    description.Add("by " + Format.Sanitize(squadronNameString));
+                }
+                embedMain.Description = string.Join(" ", description) + ":";
                 if (string.IsNullOrEmpty(maelstromNameString))
                 {
                     embedMain.AddField("Maelstrom", string.Join("\r\n", factionOperations.Select(c => c.StarSystem?.ThargoidLevel?.Maelstrom?.Name ?? "-")), true);
                 }
                 embedMain.AddField("System", string.Join("\r\n", factionOperations.Select(c => c.StarSystem?.Name ?? "-")), true);
-                embedMain.AddField("Squadron", string.Join("\r\n", factionOperations.Select(c => c.Faction?.Name ?? "-")), true);
+                if (string.IsNullOrEmpty(squadronNameString))
+                {
+                    embedMain.AddField("Squadron", string.Join("\r\n", factionOperations.Select(c => c.Faction?.Name ?? "-")), true);
+                }
                 if (string.IsNullOrEmpty(operationTypeString))
                 {
-                    embedMain.AddField("Operation", string.Join("\r\n", factionOperations.Select(c => c.Type.GetEnumMemberValue() ?? "-")), true);
+                    embedMain.AddField("Activity", string.Join("\r\n", factionOperations.Select(c => c.Type.GetEnumMemberValue() ?? "-")), true);
                 }
             }
             else

@@ -27,11 +27,12 @@
                         s.WarRelevantSystem &&
                         s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
                     .CountAsync(cancellationToken);
+
                 var warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
                     .Where(w =>
-                            w.Side == WarEffortSide.Thargoids && 
-                            w.StarSystem!.WarRelevantSystem && 
+                            w.Side == WarEffortSide.Thargoids &&
+                            w.StarSystem!.WarRelevantSystem &&
                             w.StarSystem!.ThargoidLevel != null)
                     .GroupBy(w => w.Type)
                     .Select(w => new
@@ -40,9 +41,11 @@
                         amount = w.Sum(s => s.Amount)
                     })
                     .ToListAsync(cancellationToken);
+
+                int maelstroms = await dbContext.ThargoidMaelstroms.CountAsync(cancellationToken);
                 result.Thargoids = new(
-                    Math.Round((double)thargoidsSystemsControlling / (double)relevantSystemCount, 4),
-                    await dbContext.ThargoidMaelstroms.CountAsync(cancellationToken),
+                    Math.Round((double)(thargoidsSystemsControlling + maelstroms) / (double)relevantSystemCount, 4),
+                    maelstroms,
                     thargoidsSystemsControlling,
                     warEfforts.FirstOrDefault(w => w.type == WarEffortType.KillGeneric)?.amount
                 );
@@ -58,9 +61,9 @@
 
                 var warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
-                    .Where(w => 
-                            w.Side == WarEffortSide.Humans && 
-                            w.StarSystem!.WarRelevantSystem && 
+                    .Where(w =>
+                            w.Side == WarEffortSide.Humans &&
+                            w.StarSystem!.WarRelevantSystem &&
                             w.StarSystem!.ThargoidLevel != null)
                     .GroupBy(w => w.Type)
                     .Select(w => new

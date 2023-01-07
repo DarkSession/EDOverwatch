@@ -33,7 +33,7 @@ namespace EDOverwatch_Web.Controllers.V1
                 {
                     continue;
                 }
-                decimal distance = maelstrom.InfluenceSphere + 5m;
+                decimal distance = maelstrom.InfluenceSphere + 8m;
                 List<StarSystem> starSystems = await DbContext.StarSystems
                     .AsNoTracking()
                     .Where(s =>

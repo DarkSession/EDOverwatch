@@ -21,6 +21,16 @@
 
         protected async Task AddOrUpdateWarEffort(JournalParameters journalParameters, StarSystem? starSystem, WarEffortType type, long amount, WarEffortSide side, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            string eventHash = CommanderJournalProcessedEvent.GetEventHash(journalParameters.Commander, Timestamp, Event, journalParameters.Line);
+            if (await dbContext.CommanderJournalProcessedEvents.AnyAsync(c => c.Hash == eventHash, cancellationToken))
+            {
+                return;
+            }
+            dbContext.CommanderJournalProcessedEvents.Add(new(0, Timestamp, eventHash)
+            {
+                Commander = journalParameters.Commander,
+            });
+
             WarEffort? warEffort = await dbContext.WarEfforts
                 .FirstOrDefaultAsync(w =>
                         w.Commander == journalParameters.Commander &&
@@ -32,16 +42,17 @@
             {
                 warEffort = new(0, type, Day, amount, side, WarEffortSource.OverwatchCAPI)
                 {
-                    Commander = (side == WarEffortSide.Humans) ? journalParameters.Commander : null,
+                    Commander = journalParameters.Commander,
                     StarSystem = starSystem,
                 };
                 dbContext.WarEfforts.Add(warEffort);
-                await dbContext.SaveChangesAsync(cancellationToken);
             }
             else
             {
                 warEffort.Amount += amount;
             }
+
+            await dbContext.SaveChangesAsync(cancellationToken);
             journalParameters.AddWarEffortSystemAddress(starSystem?.SystemAddress ?? 0);
         }
 
@@ -72,8 +83,9 @@
         public IAnonymousProducer ActiveMqProducer { get; }
         public Transaction ActiveMqTransaction { get; }
         public List<long>? WarEffortsUpdatedSystemAddresses { get; set; }
+        public int Line { get; set; }
 
-        public JournalParameters(bool isDeferred, WarEffortSource source, Commander commander, StarSystem? commanderCurrentStarSystem, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction)
+        public JournalParameters(bool isDeferred, WarEffortSource source, Commander commander, StarSystem? commanderCurrentStarSystem, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, int line)
         {
             IsDeferred = isDeferred;
             Source = source;
@@ -81,6 +93,7 @@
             CommanderCurrentStarSystem = commanderCurrentStarSystem;
             ActiveMqProducer = activeMqProducer;
             ActiveMqTransaction = activeMqTransaction;
+            Line = line;
         }
 
         public void AddWarEffortSystemAddress(long systemAddress)

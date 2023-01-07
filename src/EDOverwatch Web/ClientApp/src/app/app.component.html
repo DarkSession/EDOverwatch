@@ -33,6 +33,10 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
+          <button mat-menu-item [routerLink]="['commander', 'api-keys']">
+            <mat-icon>key</mat-icon>
+            <span>API keys</span>
+          </button>
           <button mat-menu-item (click)="appService.oAuthStart()" [disabled]="appService.user.HasActiveToken">
             <mat-icon>refresh</mat-icon>
             <span>Refresh journal import</span>
