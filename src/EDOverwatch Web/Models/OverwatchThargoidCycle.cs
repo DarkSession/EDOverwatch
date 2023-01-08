@@ -19,7 +19,7 @@
         {
             List<ThargoidCycle> thargoidCycles = await dbContext.ThargoidCycles
                 .AsNoTracking()
-                .Where(t => t.Start <= DateTimeOffset.UtcNow && t.Start >= new DateTimeOffset(2022, 11, 24, 7, 0, 0, TimeSpan.Zero))
+                .Where(t => t.Start <= DateTimeOffset.UtcNow && t.Start >= new DateTimeOffset(2022, 12, 1, 7, 0, 0, TimeSpan.Zero))
                 .OrderBy(t => t.Start)
                 .ToListAsync(cancellationToken);
             return thargoidCycles.Select(t => new OverwatchThargoidCycle(t)).ToList();

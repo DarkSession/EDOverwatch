@@ -43,6 +43,9 @@ namespace EDOverwatch_Web
             builder.Services.AddControllers()
                     .AddNewtonsoftJson();
 
+            // builder.Services.AddEndpointsApiExplorer();
+            // builder.Services.AddSwaggerGen();
+
             List<string> origins = (builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty).Split(",").ToList();
 
             ActiveMQ.Artemis.Client.Endpoint activeMqEndpont = ActiveMQ.Artemis.Client.Endpoint.Create(
@@ -83,6 +86,9 @@ namespace EDOverwatch_Web
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+
+                // app.UseSwagger();
+                // app.UseSwaggerUI();
             }
 
             WebSocketOptions webSocketOptions = new()
@@ -105,7 +111,7 @@ namespace EDOverwatch_Web
 
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self' https://darksession.github.io; style-src 'self' 'unsafe-inline';");
+                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src https://darksession.github.io; sandbox allow-scripts;");
                 // trusted-types angular angular#bundler; require-trusted-types-for 'script';
                 context.Response.Headers.Add("X-Frame-Options", "deny");
                 context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");

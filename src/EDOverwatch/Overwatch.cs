@@ -488,22 +488,21 @@ namespace EDOverwatch
                         StateExpires = stateExpires,
                     };
                     starSystem.ThargoidLevel = thargoidLevel;
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
-                else
+                if (progress != null && (isManualUpdate || thargoidLevel.Progress == null || progress > thargoidLevel.Progress))
                 {
-                    if (progress != null)
+                    StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, progress)
                     {
-                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, progress)
-                        {
-                            ThargoidLevel = starSystem.ThargoidLevel,
-                        };
-                        dbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
-                        thargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
-                    }
-                    if (stateExpires != null)
-                    {
-                        thargoidLevel.StateExpires = stateExpires;
-                    }
+                        ThargoidLevel = starSystem.ThargoidLevel,
+                    };
+                    dbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
+                    thargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                    thargoidLevel.Progress = progress;
+                }
+                if (stateExpires != null)
+                {
+                    thargoidLevel.StateExpires = stateExpires;
                 }
                 if (newThargoidLevel == StarSystemThargoidLevelState.Alert)
                 {
