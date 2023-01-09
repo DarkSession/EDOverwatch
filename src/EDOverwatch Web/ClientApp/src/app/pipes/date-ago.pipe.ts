@@ -13,6 +13,13 @@ export class DateAgoPipe implements PipeTransform {
       if (seconds < 29) {
         return 'Just now';
       }
+      let units = 2;
+      if (args) {
+        const arg = parseInt(args);
+        if (!isNaN(arg)) {
+          units = arg;
+        }
+      }
       const intervals: { [key: string]: number } = {
         'year': 31536000,
         'month': 2592000,
@@ -24,25 +31,25 @@ export class DateAgoPipe implements PipeTransform {
       };
       let unitResults = [];
       for (const i in intervals) {
-        const counter = Math.floor(seconds / intervals[i]);
+        let counter = Math.floor(seconds / intervals[i]);
         if (counter > 0) {
+          const isLastUnit = (unitResults.length + 1 === units);
+          if (isLastUnit) {
+            counter = Math.round(seconds / intervals[i]);
+          }
           seconds -= (counter * intervals[i]);
           if (counter === 1) {
             unitResults.push(counter + ' ' + i);
           } else {
             unitResults.push(counter + ' ' + i + 's');
           }
+          if (isLastUnit) {
+            break;
+          }
         }
       }
       if (unitResults.length === 0) {
         return "";
-      }
-      let units = 2;
-      if (args) {
-        const arg = parseInt(args);
-        if (!isNaN(arg)) {
-          units = arg;
-        }
       }
       const unitResult = unitResults.slice(0, units).join(", ");
       if (future) {

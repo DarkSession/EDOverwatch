@@ -26,6 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatMultiSortModule } from 'ngx-mat-multi-sort';
 
 import { AuthenticationGuard } from './guards/authentication.guard';
 
@@ -110,6 +111,7 @@ export const httpInterceptorProviders = [
     BrowserAnimationsModule,
     MatTableModule,
     MatSortModule,
+    MatMultiSortModule,
     MatSelectModule,
     MatTooltipModule,
     MatSnackBarModule,

@@ -185,7 +185,6 @@ export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   Stations: OverwatchStation[];
   LastTickTime: string;
   LastTickDate: string;
-  DistanceToMaelstrom: number;
   WarEffortSources: OverwatchStarSystemWarEffortType[];
   StateHistory: OverwatchStarSystemThargoidLevelHistory[];
 }

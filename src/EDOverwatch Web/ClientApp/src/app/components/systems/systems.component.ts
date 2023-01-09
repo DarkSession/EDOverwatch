@@ -21,9 +21,22 @@ export class SystemsComponent implements OnInit {
   public hideUnpopulated: boolean = false;
   public hideCompleted: boolean = false;
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
-
   public systemNameFilter: string = "";
+  public optionalColumns: string[] = [];
 
+  public availableOptionalColumns: {
+    key: string;
+    value: string;
+  }[] = [
+      {
+        key: "EffortFocus",
+        value: "Focus",
+      }, {
+        key: "DistanceToMaelstrom",
+        value: "Distance to maelstrom",
+      },
+    ];
+    
   public maelstroms: OverwatchMaelstrom[] = [];
   public maelstromsSelected: OverwatchMaelstrom[] = [];
 
@@ -76,6 +89,10 @@ export class SystemsComponent implements OnInit {
     }
     this.hideUnpopulated = (await this.appService.getSetting("SystemListHideUnpopulated")) == "1";
     this.hideCompleted = (await this.appService.getSetting("SystemListHideCompleted")) == "1";
+    const optionalColumnsSetting = await this.appService.getSetting("SystemListOptionalColumns");
+    if (optionalColumnsSetting) {
+      this.optionalColumns = optionalColumnsSetting.split(",");
+    }
     this.changeDetectorRef.markForCheck();
   }
 
@@ -95,6 +112,12 @@ export class SystemsComponent implements OnInit {
       else {
         await this.appService.saveSetting("ThargoidLevels", this.thargoidLevelsSelected.map(m => m.Name).join(","));
       }
+    }
+    if (this.optionalColumns && this.optionalColumns.length > 0) {
+      await this.appService.saveSetting("SystemListOptionalColumns", this.optionalColumns.join(","));
+    }
+    else {
+      this.appService.deleteSetting("SystemListOptionalColumns");
     }
     await this.appService.saveSetting("SystemListHideUnpopulated", this.hideUnpopulated ? "1" : "0");
     await this.appService.saveSetting("SystemListHideCompleted", this.hideCompleted ? "1" : "0");

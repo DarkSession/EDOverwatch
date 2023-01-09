@@ -9,7 +9,6 @@
         public List<OverwatchStarSystemDetailProgress> ProgressDetails { get; }
         public List<FactionOperation> FactionOperationDetails { get; }
         public List<OverwatchStation> Stations { get; }
-        public double DistanceToMaelstrom { get; }
         public List<OverwatchStarSystemWarEffortType> WarEffortTypes => Enum.GetValues<WarEffortType>()
             .Select(w => new OverwatchStarSystemWarEffortType(w))
             .ToList();
@@ -34,10 +33,6 @@
             FactionOperations = factionOperationDetails.Count;
             FactionOperationDetails = factionOperationDetails;
             Stations = stations.Select(s => new OverwatchStation(s)).ToList();
-            if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem != null)
-            {
-                DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 2);
-            }
             StationsUnderRepair = stations.Where(s => s.State == StationState.UnderRepairs).Count();
             StationsDamaged = stations.Where(s => s.State == StationState.Damaged).Count();
             StationsUnderAttack = stations.Where(s => s.State == StationState.UnderAttack).Count();

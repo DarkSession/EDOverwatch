@@ -18,7 +18,8 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
 export class SystemListComponent implements OnInit, OnChanges {
   public readonly faClipboard = faClipboard;
   public readonly faCircleCheck = faCircleCheck;
-  public readonly displayedColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
+  private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'FactionOperations', 'StateExpiration'];
+  public displayedColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
   @Input() systems: OverwatchStarSystem[] = [];
@@ -28,6 +29,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   @Input() maxHeight: number | null = null;
   @Input() hideUnpopulated: boolean = false;
   @Input() hideCompleted: boolean = false;
+  @Input() optionalColumns: string[] = [];
   public pageSize: number = 50;
   public dataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
   public sortColumn: string = "FactionOperations";
@@ -38,7 +40,7 @@ export class SystemListComponent implements OnInit, OnChanges {
     private readonly appService: AppService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly matSnackBar: MatSnackBar
-    ) {
+  ) {
     this.initDataSource([]);
   }
 
@@ -67,6 +69,7 @@ export class SystemListComponent implements OnInit, OnChanges {
 
   public ngOnChanges(): void {
     this.updateDataSource();
+    this.displayedColumns = [...this.baseColumns, ...this.optionalColumns];
   }
 
   public async handlePageEvent(e: PageEvent): Promise<void> {
@@ -146,6 +149,7 @@ export interface OverwatchStarSystem {
   StateExpiration: OverwatchStarSystemStateExpires | null;
   StateProgress: StateProgress;
   Population: number;
+  DistanceToMaelstrom: number;
 }
 
 interface OverwatchStarSystemSpecialFactionOperation {
