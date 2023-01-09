@@ -7,6 +7,7 @@ global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Newtonsoft.Json;
+using Amqp.Framing;
 using EDCApi;
 using EDDataProcessor.CApiJournal;
 using EDDataProcessor.EDDN;
@@ -133,7 +134,9 @@ namespace EDDataProcessor
                         log.LogError(e, "Inara update exception");
                     }
                 }
-                await Task.Delay(TimeSpan.FromHours(1), cancellationToken);
+                Random rnd = new();
+                int d = rnd.Next(60, 90);
+                await Task.Delay(TimeSpan.FromMinutes(d), cancellationToken);
             }
         }
 

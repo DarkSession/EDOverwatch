@@ -41,6 +41,12 @@
                     <app-maelstrom-name [maelstrom]="row.Maelstrom"></app-maelstrom-name>
                 </td>
             </ng-container>
+            <ng-container matColumnDef="DistanceToMaelstrom">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance to maelstrom</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.DistanceToMaelstrom }} Ly
+                </td>
+            </ng-container>
             <ng-container matColumnDef="Progress">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
                 <td mat-cell *matCellDef="let row">
@@ -57,7 +63,10 @@
                     </div>
                     <div *ngIf="row.Progress !== null && !row.StateProgress?.IsCompleted && row.StateExpiration?.CurrentCycleEnds"
                         class="small">
-                        Resets in {{ row.StateExpiration?.CurrentCycleEnds | dateAgo:1 }}
+                        Resets in
+                        <span [matTooltip]="row.StateExpiration?.CurrentCycleEnds | dateAgo:2">
+                            {{ row.StateExpiration?.CurrentCycleEnds | dateAgo:1 }}
+                        </span>
                     </div>
                 </td>
             </ng-container>

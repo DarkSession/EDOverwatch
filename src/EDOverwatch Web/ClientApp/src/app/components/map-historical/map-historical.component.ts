@@ -40,7 +40,6 @@ export class MapHistoricalComponent {
     this.websocketService.on<OverwatchThargoidCycle[]>("OverwatchThargoidCycles")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
-        console.log(message);
         if (message && message.Data) {
           this.thargoidCycles = message.Data;
         }

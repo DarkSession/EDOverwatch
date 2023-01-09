@@ -37,6 +37,15 @@
                     <mat-checkbox [(ngModel)]="hideCompleted" (ngModelChange)="settingChanged()">Hide completed
                         systems</mat-checkbox>
                 </div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Optional columns</mat-label>
+                    <mat-select [(ngModel)]="optionalColumns" (ngModelChange)="settingChanged()" multiple>
+                        <mat-option *ngFor="let availableOptionalColumn of availableOptionalColumns"
+                            [value]="availableOptionalColumn.key">
+                            {{ availableOptionalColumn.value }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
             <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length || hideUnpopulated || hideCompleted"
                 class="filtered-view">
@@ -51,7 +60,8 @@
             </div>
             <app-system-list [systems]="dataRaw" [maelstromsSelected]="maelstromsSelected"
                 [thargoidLevelsSelected]="thargoidLevelsSelected" [hideUnpopulated]="hideUnpopulated"
-                [hideCompleted]="hideCompleted" [systemNameFilter]="systemNameFilter"></app-system-list>
+                [hideCompleted]="hideCompleted" [systemNameFilter]="systemNameFilter"
+                [optionalColumns]="optionalColumns"></app-system-list>
         </div>
     </div>
 </div>

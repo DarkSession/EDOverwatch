@@ -14,6 +14,7 @@
         public DateTimeOffset StateStartCycle { get; }
         public OverwatchStarSystemStateExpires? StateExpiration { get; }
         public OverwatchStarSystemStateProgress StateProgress { get; }
+        public double DistanceToMaelstrom { get; }
 
         public OverwatchStarSystem(
                     StarSystem starSystem,
@@ -28,6 +29,10 @@
             ThargoidLevel = new(starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
             Progress = starSystem.ThargoidLevel?.Progress;
             ProgressPercent = (Progress != null) ? (decimal)Progress / 100m : null;
+            if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem != null)
+            {
+                DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 2);
+            }
             EffortFocus = effortFocus;
             FactionOperations = factionOperations;
             SpecialFactionOperations = specialFactionOperations;

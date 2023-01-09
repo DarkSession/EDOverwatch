@@ -1,6 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using AngleSharp.Io;
 using System.Text.RegularExpressions;
 
 namespace EDDataProcessor.Inara
@@ -15,7 +16,9 @@ namespace EDDataProcessor.Inara
 
         public InaraClient(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<InaraClient> log)
         {
-            AngleSharp.IConfiguration config = Configuration.Default;
+            // AngleSharp.IConfiguration config = Configuration.Default;
+            DefaultHttpRequester requester = new("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.3");
+            AngleSharp.IConfiguration config = Configuration.Default.With(requester).WithDefaultLoader().WithDefaultCookies();
             IBrowsingContext = BrowsingContext.New(config);
             BaseUrl = configuration.GetValue<string>("Inara:BaseUrl") ?? throw new Exception("Inara:BaseUrl is not configured");
             Log = log;
@@ -130,7 +133,9 @@ namespace EDDataProcessor.Inara
 
         private async Task<IDocument?> Get(string path)
         {
-            TimeSpan nextRequestWait = LastRequest.AddSeconds(10) - DateTimeOffset.Now;
+            Random rnd = new();
+            int d = rnd.Next(30, 60);
+            TimeSpan nextRequestWait = LastRequest.AddSeconds(d) - DateTimeOffset.Now;
             if (nextRequestWait.TotalMilliseconds > 0)
             {
                 await Task.Delay(nextRequestWait);
