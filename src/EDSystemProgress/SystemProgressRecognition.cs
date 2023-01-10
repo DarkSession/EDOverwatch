@@ -26,7 +26,8 @@ namespace EDSystemProgress
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
             new ColorRange(15, 30, 20, 50, 0, 15),
-            new ColorRange(23, 67, 34, 100, 0, 32),
+            new ColorRange(50, 70, 60, 100, 0, 35),
+            new ColorRange(20, 60, 40, 100, 0, 35),
         };
 
         private static List<ColorRange> AlertProgressColors { get; } = new()

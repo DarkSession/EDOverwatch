@@ -172,6 +172,12 @@
 		<None Update="test\image53.png">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="test\image54.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="test\image55.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="test\image6.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
