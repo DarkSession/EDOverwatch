@@ -141,6 +141,7 @@ namespace EDDataProcessor.Inara
                 await Task.Delay(nextRequestWait);
             }
             using HttpClient httpClient = new();
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36");
             using HttpResponseMessage response = await httpClient.GetAsync(BaseUrl + path);
             LastRequest = DateTimeOffset.Now;
             if (response.IsSuccessStatusCode)

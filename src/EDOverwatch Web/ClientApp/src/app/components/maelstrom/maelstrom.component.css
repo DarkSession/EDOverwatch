@@ -7,3 +7,8 @@ table.system-information {
 .thead {
     background-color: #272727;
 }
+
+.table {
+    height: 35vh;
+    min-height: 300px;
+}
