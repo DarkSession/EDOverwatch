@@ -30,9 +30,9 @@
             <br>
             <div class="subtitle">Unaffected systems at risk</div>
             <div class="table-container">
-                <div class="table" style="max-height: 35vh">
-                    <table mat-table [dataSource]="systemsAtRisk" matSort matSortActive="Distance" matSortDirection="asc"
-                        matSortDisableClear>
+                <div class="table">
+                    <table mat-table [dataSource]="systemsAtRisk" matSort matSortActive="Distance"
+                        matSortDirection="asc" matSortDisableClear>
                         <ng-container matColumnDef="Name">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
                             <td mat-cell *matCellDef="let row">
@@ -41,21 +41,18 @@
                                     (click)="copySystemName(row)"></fa-icon>
                             </td>
                         </ng-container>
-
                         <ng-container matColumnDef="Population">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Population</th>
                             <td mat-cell *matCellDef="let row">
                                 {{ row.Population | numberSuffix:1 }}
                             </td>
                         </ng-container>
-
                         <ng-container matColumnDef="Distance">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
                             <td mat-cell *matCellDef="let row">
                                 {{ row.Distance }} Ly
                             </td>
                         </ng-container>
-
                         <tr mat-header-row *matHeaderRowDef="systemsAtRiskColumns; sticky: true" class="thead"></tr>
                         <tr mat-row *matRowDef="let row; columns: systemsAtRiskColumns;"></tr>
                     </table>
