@@ -4,10 +4,12 @@
     {
         private EdDbContext DbContext { get; }
         private InaraClient InaraClient { get; }
-        public UpdateFromInara(EdDbContext dbContext, InaraClient inaraClient)
+        private ILogger Log { get; }
+        public UpdateFromInara(EdDbContext dbContext, InaraClient inaraClient, ILogger<UpdateFromInara> log)
         {
             DbContext = dbContext;
             InaraClient = inaraClient;
+            Log = log;
         }
 
         public async IAsyncEnumerable<long> Update()
@@ -177,6 +179,9 @@
                     await DbContext.SaveChangesAsync();
                 }
             }
+
+            int requests = InaraClient.ResetRequestCount();
+            Log.LogInformation("Requests sent: {requests}", requests);
         }
     }
 }

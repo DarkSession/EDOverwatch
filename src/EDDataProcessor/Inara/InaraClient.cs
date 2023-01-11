@@ -12,6 +12,7 @@ namespace EDDataProcessor.Inara
         private IBrowsingContext IBrowsingContext { get; }
         private Regex PathRegex { get; } = PathRegexGen();
         private DateTimeOffset LastRequest { get; set; } = DateTimeOffset.Now;
+        private int RequestsSent { get; set; }
         private ILogger Log { get; }
 
         public InaraClient(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<InaraClient> log)
@@ -131,6 +132,13 @@ namespace EDDataProcessor.Inara
             return result;
         }
 
+        public int ResetRequestCount()
+        {
+            int result = RequestsSent;
+            RequestsSent = 0;
+            return result;
+        }
+
         private async Task<IDocument?> Get(string path)
         {
             Random rnd = new();
@@ -140,6 +148,7 @@ namespace EDDataProcessor.Inara
             {
                 await Task.Delay(nextRequestWait);
             }
+            RequestsSent++;
             using HttpClient httpClient = new();
             httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36");
             using HttpResponseMessage response = await httpClient.GetAsync(BaseUrl + path);
