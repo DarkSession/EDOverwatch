@@ -13,6 +13,8 @@ namespace EDSystemProgress
         private static List<ColorRange> InvasionProgressColors { get; } = new()
         {
             // Bar
+            new ColorRange(25, 45, 25, 45, 25, 45),
+            new ColorRange(35, 50, 35, 50, 35, 50),
             new ColorRange(45, 50, 20, 25, 30, 40),
             new ColorRange(50, 100, 0, 50, 75, 130),
             new ColorRange(70, 190, 11, 95, 98, 255),

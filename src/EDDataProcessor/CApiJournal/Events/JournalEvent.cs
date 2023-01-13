@@ -21,7 +21,7 @@
 
         protected async Task AddOrUpdateWarEffort(JournalParameters journalParameters, StarSystem? starSystem, WarEffortType type, long amount, WarEffortSide side, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            string eventHash = CommanderJournalProcessedEvent.GetEventHash(journalParameters.Commander, Timestamp, Event, journalParameters.Line);
+            string eventHash = CommanderJournalProcessedEvent.GetEventHash(journalParameters.Commander, Timestamp, Event, type, journalParameters.Line);
             if (await dbContext.CommanderJournalProcessedEvents.AnyAsync(c => c.Hash == eventHash, cancellationToken))
             {
                 return;

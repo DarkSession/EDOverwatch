@@ -16,7 +16,7 @@
                 CommanderMission? commanderMission = await dbContext.CommanderMissions
                     .Include(c => c.System)
                     .FirstOrDefaultAsync(c => c.MissionId == MissionID && c.Commander == journalParameters.Commander && c.Status == CommanderMissionStatus.Accepted, cancellationToken);
-                if (commanderMission != null)
+                if (commanderMission != null && commanderMission.Status != CommanderMissionStatus.Completed)
                 {
                     commanderMission.Status = CommanderMissionStatus.Completed;
                     WarEffortType missionWarEffortType;

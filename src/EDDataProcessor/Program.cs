@@ -7,7 +7,6 @@ global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Newtonsoft.Json;
-using Amqp.Framing;
 using EDCApi;
 using EDDataProcessor.CApiJournal;
 using EDDataProcessor.EDDN;
@@ -135,8 +134,8 @@ namespace EDDataProcessor
                     }
                 }
                 Random rnd = new();
-                int d = rnd.Next(120, 180);
-                await Task.Delay(TimeSpan.FromMinutes(d), cancellationToken);
+                int d = rnd.Next(3, 6);
+                await Task.Delay(TimeSpan.FromHours(d), cancellationToken);
             }
         }
 
