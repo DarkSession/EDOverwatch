@@ -124,29 +124,95 @@ namespace EDDataProcessor.Inara
             }
 
             IHtmlTableElement? table = document?.GetElementsByTagName("table").FirstOrDefault() as IHtmlTableElement;
-            if (table?.GetElementsByTagName("tbody").FirstOrDefault() is IHtmlTableSectionElement tbody)
+            if (table?.GetElementsByTagName("thead").FirstOrDefault() is IHtmlTableSectionElement thead)
             {
-                foreach (IHtmlTableRowElement row in tbody.Rows)
+                int dateCellNumber = -1;
+                int killsCellNumber = -1;
+                int rescueCellNumber = -1;
+                int suppliesCellNumber = -1;
                 {
-                    if (row.Cells.Length == 5)
+                    if (thead.Rows.Any() && thead.Rows.First() is IHtmlTableRowElement row)
                     {
-                        if (// Date
-                            !(row.Cells.ElementAt(0) is IHtmlTableDataCellElement dateCell && DateOnly.TryParseExact(dateCell.TextContent, "dd MMM yyyy", out DateOnly date)) ||
-                            // Scout kills
-                            !(row.Cells.ElementAt(1) is IHtmlTableDataCellElement killsCell && int.TryParse(killsCell.TextContent.Replace(",", string.Empty), out int kills)) ||
-                            // Rescues
-                            !(row.Cells.ElementAt(2) is IHtmlTableDataCellElement rescueCell &&
-                            rescueCell.FirstChild is IText rescueCellText &&
-                            int.TryParse(rescueCellText.TextContent.Replace(",", string.Empty), out int rescues)) ||
-                            // Supplies
-                            !(row.Cells.ElementAt(3) is IHtmlTableDataCellElement suppliesCell &&
-                            suppliesCell.FirstChild is IText suppliesCellText &&
-                            int.TryParse(suppliesCellText.TextContent.Replace(",", string.Empty), out int supplies))
-                            )
+                        if (row.Cells.Length == 5)
                         {
-                            continue;
+                            int cellNumber = 0;
+                            foreach (IHtmlTableCellElement cell in row.Cells)
+                            {
+                                switch (cell.TextContent)
+                                {
+                                    case "Date":
+                                        {
+                                            dateCellNumber = cellNumber;
+                                            break;
+                                        }
+                                    case "Kills":
+                                        {
+                                            killsCellNumber = cellNumber;
+                                            break;
+                                        }
+                                    case "Rescues":
+                                        {
+                                            rescueCellNumber = cellNumber;
+                                            break;
+                                        }
+                                    case "Supplies":
+                                        {
+                                            suppliesCellNumber = cellNumber;
+                                            break;
+                                        }
+                                }
+                                cellNumber++;
+                            }
                         }
-                        result.Details.Add((date, kills, rescues, supplies));
+                    }
+                }
+                bool failed = false;
+                if (dateCellNumber == -1)
+                {
+                    Log.LogWarning("Date cell could not be located");
+                    failed = true;
+                }
+                if (killsCellNumber == -1)
+                {
+                    Log.LogWarning("Kills cell could not be located");
+                    failed = true;
+                }
+                if (rescueCellNumber == -1)
+                {
+                    Log.LogWarning("Rescues cell could not be located");
+                    failed = true;
+                }
+                if (suppliesCellNumber == -1)
+                {
+                    Log.LogWarning("Supplies cell could not be located");
+                    failed = true;
+                }
+                if (!failed && table?.GetElementsByTagName("tbody").FirstOrDefault() is IHtmlTableSectionElement tbody)
+                {
+                    foreach (IHtmlTableRowElement row in tbody.Rows)
+                    {
+                        if (row.Cells.Length == 5)
+                        {
+                            if (// Date
+                                !(row.Cells.ElementAt(dateCellNumber) is IHtmlTableDataCellElement dateCell &&
+                                DateOnly.TryParseExact(dateCell.TextContent, "dd MMM yyyy", out DateOnly date)) ||
+                                // Kills
+                                !(row.Cells.ElementAt(killsCellNumber) is IHtmlTableDataCellElement killsCell &&
+                                int.TryParse(killsCell.TextContent.Replace(",", string.Empty), out int kills)) ||
+                                // Rescues
+                                !(row.Cells.ElementAt(rescueCellNumber) is IHtmlTableDataCellElement rescueCell &&
+                                rescueCell.FirstChild is IText rescueCellText &&
+                                int.TryParse(rescueCellText.TextContent.Replace(",", string.Empty), out int rescues)) ||
+                                // Supplies
+                                !(row.Cells.ElementAt(suppliesCellNumber) is IHtmlTableDataCellElement suppliesCell &&
+                                suppliesCell.FirstChild is IText suppliesCellText &&
+                                int.TryParse(suppliesCellText.TextContent.Replace(",", string.Empty), out int supplies))
+                                )
+                            {
+                                continue;
+                            }
+                            result.Details.Add((date, kills, rescues, supplies));
+                        }
                     }
                 }
             }

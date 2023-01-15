@@ -2,6 +2,7 @@
 {
     public class OverwatchStarSystem : OverwatchStarSystemBase
     {
+        public long PopulationOriginal { get; }
         public OverwatchThargoidLevel ThargoidLevel { get; }
         public short? Progress { get; }
         public decimal? ProgressPercent { get; }
@@ -26,6 +27,7 @@
                     int stationsUnderAttack)
             : base(starSystem)
         {
+            PopulationOriginal = starSystem.OriginalPopulation;
             ThargoidLevel = new(starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
             Progress = starSystem.ThargoidLevel?.Progress;
             ProgressPercent = (Progress != null) ? (decimal)Progress / 100m : null;

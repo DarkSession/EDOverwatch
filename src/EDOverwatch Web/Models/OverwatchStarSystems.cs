@@ -58,11 +58,12 @@
                 .ToListAsync(cancellationToken);
 
             Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
+            DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
 
             var efforts = await dbContext.WarEfforts
                 .AsNoTracking()
                 .Where(w =>
-                        w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) &&
+                        w.Date >= startDate &&
                         w.StarSystem!.WarRelevantSystem &&
                         w.Side == WarEffortSide.Humans)
                 .GroupBy(w => new

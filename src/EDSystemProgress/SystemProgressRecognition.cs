@@ -16,6 +16,7 @@ namespace EDSystemProgress
             new ColorRange(25, 45, 25, 45, 25, 45),
             new ColorRange(35, 50, 35, 50, 35, 50),
             new ColorRange(45, 50, 20, 25, 30, 40),
+            new ColorRange(45, 55, 45, 55, 45, 55),
             new ColorRange(50, 100, 0, 50, 75, 130),
             new ColorRange(70, 190, 11, 95, 98, 255),
 
@@ -497,6 +498,7 @@ namespace EDSystemProgress
             { "GLIESE 8035", "GLIESE 9035" },
             { "HIP 20418", "HIP 20419" },
             { "HIP 18138", "HIP 19198" },
+            { "HYADES SECTOR EG-O B6-3", "HYADES SECTOR EQ-O B6-3" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

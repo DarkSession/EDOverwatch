@@ -178,7 +178,6 @@ export class SystemComponent implements OnInit {
 }
 
 export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
-  PopulationOriginal: number;
   WarEfforts: OverwatchStarSystemWarEffort[];
   ProgressDetails: OverwatchStarSystemDetailProgress[];
   FactionOperationDetails: FactionOperation[];

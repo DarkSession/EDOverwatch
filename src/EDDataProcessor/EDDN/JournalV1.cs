@@ -87,6 +87,11 @@ namespace EDDataProcessor.EDDN
                                 starSystem.Population = population;
                                 changed = true;
                             }
+                            if (starSystem.OriginalPopulation < population)
+                            {
+                                starSystem.OriginalPopulation = population;
+                                changed = true;
+                            }
                             await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
                             {

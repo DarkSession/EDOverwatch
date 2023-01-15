@@ -35,6 +35,10 @@ export class SystemsComponent implements OnInit {
         key: "DistanceToMaelstrom",
         value: "Distance to maelstrom",
       },
+      {
+        key: "PopulationOriginal",
+        value: "Population (Original)",
+      },
     ];
     
   public maelstroms: OverwatchMaelstrom[] = [];

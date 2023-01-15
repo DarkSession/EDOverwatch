@@ -209,6 +209,7 @@ namespace DCoHTrackerDiscordBot
                         }
                         starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.Completed;
                         await dbContext.SaveChangesAsync();
+                        await Task.Delay(TimeSpan.FromSeconds(1));
                     }
                 }
                 catch (Exception e)

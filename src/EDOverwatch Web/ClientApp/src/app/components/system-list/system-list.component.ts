@@ -134,6 +134,7 @@ export class SystemListComponent implements OnInit, OnChanges {
 }
 
 export interface OverwatchStarSystem {
+  PopulationOriginal: number;
   SystemAddress: number;
   Name: string;
   Maelstrom: OverwatchMaelstrom;

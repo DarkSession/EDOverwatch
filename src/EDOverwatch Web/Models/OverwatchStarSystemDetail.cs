@@ -2,7 +2,6 @@
 {
     public class OverwatchStarSystemDetail : OverwatchStarSystem
     {
-        public long PopulationOriginal { get; }
         public DateTimeOffset LastTickTime { get; }
         public DateOnly LastTickDate { get; }
         public List<OverwatchStarSystemWarEffort> WarEfforts { get; }
@@ -28,7 +27,6 @@
             ) :
             base(starSystem, effortFocus, 0, new(), 0, 0, 0)
         {
-            PopulationOriginal = starSystem.OriginalPopulation;
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;
             FactionOperationDetails = factionOperationDetails;
@@ -55,6 +53,8 @@
             if (starSystem?.ThargoidLevel != null)
             {
                 Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
+                DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
+
                 decimal effortFocus = 0;
                 if (totalEffortSums.Any())
                 {
@@ -62,7 +62,7 @@
                     var systemEfforts = await dbContext.WarEfforts
                         .AsNoTracking()
                         .Where(w =>
-                                w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) &&
+                                w.Date >= startDate &&
                                 w.StarSystem == starSystem &&
                                 w.Side == WarEffortSide.Humans)
                         .GroupBy(w => new

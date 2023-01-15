@@ -2,12 +2,23 @@
 {
     public static class WarEffort
     {
+        public static DateOnly GetWarEffortFocusStartDate()
+        {
+            DateTimeOffset time = WeeklyTick.GetLastTick();
+            if (DateTimeOffset.UtcNow.AddDays(-2) > time)
+            {
+                time = DateTimeOffset.UtcNow.AddDays(-2);
+            }
+            return DateOnly.FromDateTime(time.DateTime);
+        }
+
         public static async Task<Dictionary<WarEffortTypeGroup, long>> GetTotalWarEfforts(EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            DateOnly startDate = GetWarEffortFocusStartDate();
             var totalEfforts = await dbContext.WarEfforts
                 .AsNoTracking()
                 .Where(w =>
-                        w.Date >= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)) &&
+                        w.Date >= startDate &&
                         w.StarSystem!.WarRelevantSystem &&
                         w.Side == WarEffortSide.Humans)
                 .GroupBy(w => new
