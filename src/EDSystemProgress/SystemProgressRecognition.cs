@@ -19,7 +19,7 @@ namespace EDSystemProgress
             new ColorRange(45, 55, 45, 55, 45, 55),
             new ColorRange(50, 100, 0, 50, 75, 130),
             new ColorRange(70, 190, 11, 95, 98, 255),
-
+            new ColorRange(80, 110, 5, 15, 135, 190),
             // Arrow
             new ColorRange(120, 140, 120, 140, 120, 140),
             new ColorRange(140, 160, 140, 160, 140, 160),
