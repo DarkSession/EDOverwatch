@@ -221,6 +221,11 @@ namespace EDSystemProgress
                                             systemStatus = SystemStatus.RecoveryComplete;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
+                                        else if (text.Contains("HUMAN CONTROL REGAINED"))
+                                        {
+                                            systemStatus = SystemStatus.ThargoidControlledRegainedUnpopulated;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
                                         else if (text.Contains("system is currently populated"))
                                         {
                                             systemStatus = SystemStatus.HumanControlled;
@@ -267,6 +272,15 @@ namespace EDSystemProgress
                                         case SystemStatus.RecoveryComplete:
                                             {
                                                 match = text.Contains("ACTIVE IN");
+                                                if (match)
+                                                {
+                                                    remainingTime = text;
+                                                }
+                                                break;
+                                            }
+                                        case SystemStatus.ThargoidControlledRegainedUnpopulated:
+                                            {
+                                                match = text.Contains("BEGINS IN");
                                                 if (match)
                                                 {
                                                     remainingTime = text;
@@ -320,6 +334,11 @@ namespace EDSystemProgress
                                                 match = text.Contains("DELIVER") || text.Contains("ELVER SUPPLES");
                                                 break;
                                             }
+                                        case SystemStatus.ThargoidControlledRegainedUnpopulated:
+                                            {
+                                                match = text.Contains("UNPOPULATED");
+                                                break;
+                                            }
                                     }
                                     if (match)
                                     {
@@ -355,7 +374,7 @@ namespace EDSystemProgress
                 {
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionProgressColors,
                     SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated or SystemStatus.AlertInProgressUnpopulated => AlertProgressColors,
-                    SystemStatus.ThargoidControlled => InvasionProgressColors,
+                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated => InvasionProgressColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => AlertProgressColors,
                     _ => throw new NotImplementedException(),
                 };
@@ -363,7 +382,7 @@ namespace EDSystemProgress
                 {
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented or SystemStatus.AlertInProgressUnpopulated => InvasionRemainingColors,
                     SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated => AlertRemainingColors,
-                    SystemStatus.ThargoidControlled => InvasionRemainingColors,
+                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated => InvasionRemainingColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => InvasionProgressColors,
                     _ => throw new NotImplementedException(),
                 };
@@ -568,6 +587,8 @@ namespace EDSystemProgress
         [EnumMember(Value = "Human controlled")]
         HumanControlled,
         Unpopulated,
+        [EnumMember(Value = "Thargoid controlled, regained")]
+        ThargoidControlledRegainedUnpopulated,
     }
 
     public readonly struct ExtractSystemProgressResult

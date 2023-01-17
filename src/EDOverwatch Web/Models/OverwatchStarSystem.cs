@@ -62,7 +62,7 @@
                 }
                 StateExpiration = new(stateExpires, currentCycleEnds, cyclesLeft);
             }
-            StateProgress = new(ProgressPercent, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
+            StateProgress = new(starSystem, ProgressPercent, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
         }
     }
 }

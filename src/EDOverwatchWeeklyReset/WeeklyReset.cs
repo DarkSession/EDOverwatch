@@ -96,7 +96,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.None,
                         StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Recovery,
                         StarSystemThargoidLevelState.Recovery => StarSystemThargoidLevelState.None,
-                        StarSystemThargoidLevelState.Controlled => StarSystemThargoidLevelState.Recapture,
+                        StarSystemThargoidLevelState.Controlled when starSystem.Population > 0 => StarSystemThargoidLevelState.Recovery,
                         _ => StarSystemThargoidLevelState.None,
                     };
                     StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow)

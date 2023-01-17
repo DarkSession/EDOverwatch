@@ -6,7 +6,7 @@
         public bool IsCompleted { get; }
         public OverwatchThargoidLevel? NextSystemState { get; }
         public DateTimeOffset? SystemStateChanges { get; }
-        public OverwatchStarSystemStateProgress(decimal? progressPercent, StarSystemThargoidLevelState currentSystemState)
+        public OverwatchStarSystemStateProgress(StarSystem starSystem, decimal? progressPercent, StarSystemThargoidLevelState currentSystemState)
         {
             ProgressPercent = progressPercent;
             IsCompleted = (ProgressPercent >= 1);
@@ -16,7 +16,7 @@
                 {
                     StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.None,
                     StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Recovery,
-                    StarSystemThargoidLevelState.Controlled => StarSystemThargoidLevelState.Recapture,
+                    StarSystemThargoidLevelState.Controlled when starSystem.Population > 0 => StarSystemThargoidLevelState.Recovery,
                     StarSystemThargoidLevelState.Recapture => StarSystemThargoidLevelState.Recovery,
                     StarSystemThargoidLevelState.Recovery => StarSystemThargoidLevelState.None,
                     _ => StarSystemThargoidLevelState.None,
