@@ -5,7 +5,7 @@ import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-list.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { AppService } from 'src/app/services/app.service';
-import { faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpRightFromSquare, faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -15,6 +15,7 @@ import { faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemsComponent implements OnInit {
+  public readonly faArrowUpRightFromSquare = faArrowUpRightFromSquare;
   public readonly faFilter = faFilter;
   public readonly faCircleXmark = faCircleXmark;
   public dataRaw: OverwatchStarSystem[] = [];

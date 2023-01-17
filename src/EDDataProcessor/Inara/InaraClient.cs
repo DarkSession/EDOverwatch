@@ -31,12 +31,12 @@ namespace EDDataProcessor.Inara
                 UseCookies = true,
             };
             HttpClient = new(ClientHandler);
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36");
+            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36");
             HttpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
             HttpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
             HttpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
             HttpClient.DefaultRequestHeaders.Add("Cache-Control", "max-age=0");
-            HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-CH-UA", @"""Not?A_Brand"";v=""8"", ""Chromium"";v=""108"", ""Google Chrome"";v=""108""");
+            HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-CH-UA", @"""Not_A Brand"";v=""99"", ""Google Chrome"";v=""109"", ""Chromium"";v=""109""");
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-CH-UA-Platform", @"""Windows""");
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Dest", "document");
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Mode", "navigate");

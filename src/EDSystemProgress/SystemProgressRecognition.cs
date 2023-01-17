@@ -49,7 +49,8 @@ namespace EDSystemProgress
 
         private static List<ColorRange> AlertRemainingColors { get; } = new()
         {
-            new ColorRange(113, 180, 44, 102, 0, 47),
+            new ColorRange(120, 180, 45, 102, 0, 47),
+            new ColorRange(100, 130, 30, 50, 0, 20),
         };
 
         public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent, ILogger log)
