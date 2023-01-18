@@ -5,34 +5,61 @@
         </div>
         <div class="content-box">
             Work in progress, no documentation available at this point.<br>
-            Check out the following REST endpoints:
+            Check out the following REST endpoints.
+            <br>
+            Please note that you need to add <b>?ngsw-bypass=true</b> at the end of the endpoint
+            if you are calling these endpoints in your browser. This is to bypass the site service worker in your
+            browser.
             <br>
             <br>
-            <b>Overview</b>
-            <br>
+            <div class="subtitle">
+                Overview
+            </div>
             <a href="/api/v1/overwatch/overview?ngsw-bypass=true" target="_blank">
                 GET /api/v1/overwatch/overview
             </a>
             <br>
             <br>
-            <b>List systems</b>
-            <br>
+            <div class="subtitle">
+                List systems
+            </div>
             <a href="/api/v1/overwatch/systems?ngsw-bypass=true" target="_blank">
                 GET /api/v1/overwatch/systems
             </a>
             <br>
             <br>
-            <b>Get system by system address</b>
-            <br>
+            <div class="subtitle">
+                Get system details by system address
+            </div>
             <a href="/api/v1/overwatch/system/1694104537435?ngsw-bypass=true" target="_blank">
                 GET /api/v1/overwatch/system/1694104537435
             </a>
             <br>
             <br>
-            <b>List maelstroms</b>
-            <br>
+            <div class="subtitle">
+                List maelstroms
+            </div>
             <a href="/api/v1/overwatch/maelstroms?ngsw-bypass=true" target="_blank">
                 GET /api/v1/overwatch/maelstroms
+            </a>
+            <br>
+            <br>
+            <div class="subtitle">
+                List weekly cycles
+            </div>
+            <a href="/api/v1/overwatch/thargoidcycles?ngsw-bypass=true" target="_blank">
+                GET /api/v1/overwatch/thargoidcycles
+            </a>
+            <br>
+            <br>
+            <div class="subtitle">
+                List system states by weekly cycle (start date)
+            </div>
+            <div>
+                Invalid dates or dates in the future return the current cycle.
+            </div>
+            <a href="/api/v1/overwatch/systems/2023-01-05?ngsw-bypass=true" target="_blank">
+                GET /api/v1/overwatch/systems/2023-01-05
             </a>
         </div>
     </div>

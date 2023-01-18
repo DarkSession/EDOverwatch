@@ -178,6 +178,10 @@ export const httpInterceptorProviders = [
         component: MapComponent,
       },
       {
+        path: 'edmap',
+        loadChildren: () => import('./edmap/edmap.module').then(m => m.EdmapModule)
+      },
+      {
         path: 'my-efforts',
         component: MyEffortsComponent,
         canActivate: [AuthenticationGuard],

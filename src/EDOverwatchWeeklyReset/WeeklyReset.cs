@@ -210,6 +210,13 @@ namespace EDDataProcessor
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
+
+            dbContext.ChangeTracker.Clear();
+
+            await dbContext.StarSystems
+                .Where(s => !s.WarRelevantSystem && !s.Stations!.Any() && s.ThargoidLevel == null && !s.ThargoidLevelHistory!.Any())
+                .Take(10000)
+                .ExecuteDeleteAsync();
         }
     }
 }

@@ -59,6 +59,8 @@ namespace EDDatabase
 
         public IEnumerable<Station>? Stations { get; set; }
 
+        public IEnumerable<StarSystemFssSignal>? FssSignals { get; set; }
+
         public StarSystem(
             long id,
             long systemAddress,

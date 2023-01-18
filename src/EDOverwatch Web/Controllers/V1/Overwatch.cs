@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EDOverwatch_Web.Controllers.V1
 {
@@ -12,49 +13,95 @@ namespace EDOverwatch_Web.Controllers.V1
     public class Overwatch : ControllerBase
     {
         private EdDbContext DbContext { get; }
-        public Overwatch(EdDbContext dbContext)
+        private IMemoryCache MemoryCache { get; }
+        public Overwatch(EdDbContext dbContext, IMemoryCache memoryCache)
         {
             DbContext = dbContext;
+            MemoryCache = memoryCache;
         }
 
+        private const string OverviewCacheKey = "OverwatchOverview";
         [HttpGet]
-        public Task<OverwatchOverview> Overview(CancellationToken cancellationToken)
+        public async Task<OverwatchOverview> Overview(CancellationToken cancellationToken)
         {
-            return OverwatchOverview.LoadOverwatchOverview(DbContext, cancellationToken);
+            if (!MemoryCache.TryGetValue(OverviewCacheKey, out OverwatchOverview? result))
+            {
+                result = await OverwatchOverview.LoadOverwatchOverview(DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+                MemoryCache.Set(OverviewCacheKey, result, cacheEntryOptions);
+            }
+            return result!;
         }
 
+        private const string SystemsCacheKey = "OverwatchSystems";
         [HttpGet]
-        public Task<OverwatchStarSystems> Systems(CancellationToken cancellationToken)
+        public async Task<OverwatchStarSystems> Systems(CancellationToken cancellationToken)
         {
-            return OverwatchStarSystems.Create(DbContext, cancellationToken);
+            if (!MemoryCache.TryGetValue(SystemsCacheKey, out OverwatchStarSystems? result))
+            {
+                result = await OverwatchStarSystems.Create(DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+                MemoryCache.Set(SystemsCacheKey, result, cacheEntryOptions);
+            }
+            return result!;
         }
 
+        private const string SystemsCycleCacheKey = "OverwatchSystemsCycle";
         [HttpGet("{cycle}")]
         public async Task<OverwatchStarSystemsHistorical> Systems(DateOnly cycle, CancellationToken cancellationToken)
         {
-            if (cycle > DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date) || !await DbContext.ThargoidCycleExists(cycle, cancellationToken))
+            string cacheKey = SystemsCycleCacheKey + cycle.ToString();
+            if (!MemoryCache.TryGetValue(cacheKey, out OverwatchStarSystemsHistorical? result))
             {
-                cycle = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
+                if (cycle > DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date) || !await DbContext.ThargoidCycleExists(cycle, cancellationToken))
+                {
+                    cycle = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
+                }
+                result = await OverwatchStarSystemsHistorical.Create(cycle, DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                MemoryCache.Set(cacheKey, result, cacheEntryOptions);
             }
-            return await OverwatchStarSystemsHistorical.Create(cycle, DbContext, cancellationToken);
+            return result!;
         }
 
+        private const string SystemCacheKey = "OverwatchSystem";
         [HttpGet("{systemAddress}")]
-        public Task<OverwatchStarSystemDetail?> System(long systemAddress, CancellationToken cancellationToken)
+        public async Task<OverwatchStarSystemDetail?> System(long systemAddress, CancellationToken cancellationToken)
         {
-            return OverwatchStarSystemDetail.Create(systemAddress, DbContext, cancellationToken);
+            string cacheKey = SystemCacheKey + systemAddress.ToString();
+            if (!MemoryCache.TryGetValue(cacheKey, out OverwatchStarSystemDetail? result))
+            {
+                result = await OverwatchStarSystemDetail.Create(systemAddress, DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
+                MemoryCache.Set(cacheKey, result, cacheEntryOptions);
+            }
+            return result!;
         }
 
+        private const string MaelstromsCacheKey = "OverwatchMaelstroms";
         [HttpGet]
-        public Task<OverwatchMaelstroms> Maelstroms(CancellationToken cancellationToken)
+        public async Task<OverwatchMaelstroms> Maelstroms(CancellationToken cancellationToken)
         {
-            return OverwatchMaelstroms.Create(DbContext, cancellationToken);
+            if (!MemoryCache.TryGetValue(MaelstromsCacheKey, out OverwatchMaelstroms? result))
+            {
+                result = await OverwatchMaelstroms.Create(DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                MemoryCache.Set(MaelstromsCacheKey, result, cacheEntryOptions);
+            }
+            return result!;
         }
 
+        private const string ThargoidCyclesCacheKey = "OverwatchThargoidCycles";
         [HttpGet]
-        public Task<List<OverwatchThargoidCycle>> ThargoidCycles(CancellationToken cancellationToken)
+        public async Task<List<OverwatchThargoidCycle>> ThargoidCycles(CancellationToken cancellationToken)
         {
-            return OverwatchThargoidCycle.GetThargoidCycles(DbContext, cancellationToken);
+            if (!MemoryCache.TryGetValue(ThargoidCyclesCacheKey, out List<OverwatchThargoidCycle>? result))
+            {
+                result = await OverwatchThargoidCycle.GetThargoidCycles(DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                MemoryCache.Set(ThargoidCyclesCacheKey, result, cacheEntryOptions);
+            }
+            return result!;
         }
     }
 }
