@@ -5,11 +5,13 @@ import { MapHistoricalComponent } from './components/map-historical/map-historic
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { CurrentComponent } from './components/current/current.component';
 
 
 @NgModule({
   declarations: [
-    MapHistoricalComponent
+    MapHistoricalComponent,
+    CurrentComponent
   ],
   imports: [
     CommonModule,
@@ -24,6 +26,10 @@ import { FormsModule } from '@angular/forms';
       {
         path: 'historical',
         component: MapHistoricalComponent,
+      },
+      {
+        path: 'current',
+        component: CurrentComponent,
       },
     ])
   ]

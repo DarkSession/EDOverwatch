@@ -4,11 +4,18 @@
     {
         public StarSystemThargoidLevelState Level { get; }
         public string Name { get; }
+        public bool IsInvisibleState { get; }
 
         public OverwatchThargoidLevel(StarSystemThargoidLevelState level)
         {
             Level = level;
-            Name = level.GetEnumMemberValue();
+            Name = Level.GetEnumMemberValue();
+        }
+
+        public OverwatchThargoidLevel(StarSystemThargoidLevel? starSystemThargoidLevel) :
+            this(starSystemThargoidLevel?.State ?? StarSystemThargoidLevelState.None)
+        {
+            IsInvisibleState = starSystemThargoidLevel?.IsInvisibleState ?? false;
         }
     }
 }

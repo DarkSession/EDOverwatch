@@ -18,7 +18,7 @@
                 thargoidCycle.Start;
             ProgressCompleted = progressCompleted;
             CycleWarEffortsUntilCompleted = cycleWarEffortsUntilCompleted;
-            ThargoidState = new(starSystemThargoidLevel.State);
+            ThargoidState = new(starSystemThargoidLevel);
         }
 
         public static async Task<OverwatchStarSystemCycleAnalysis?> Create(long systemAddress, DateOnly cycle, EdDbContext dbContext, CancellationToken cancellationToken)

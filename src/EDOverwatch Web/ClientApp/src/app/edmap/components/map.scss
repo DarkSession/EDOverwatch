@@ -1,0 +1,203 @@
+@font-face {
+    font-family: 'Oxygen Mono';
+    src: url("/assets/fonts/OxygenMono-Regular.ttf");
+}
+
+a {
+    color: rgb(252, 134, 0);
+}
+
+a:hover {
+    color: #00b3f7;
+}
+
+header,
+h1,
+h2,
+th,
+.item-gal strong,
+.cat-box .lbl,
+.mini-title,
+.def>span {
+    font-family: "Oswald", Verdana;
+}
+
+button {
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.map-container {
+    position: relative;
+    font-family: 'Oxygen Mono', Tahoma, Arial, sans-serif, Helvetica, Sans-serif;
+    color: #444;
+    margin: 0;
+}
+
+.hud {
+    transition: width 2s;
+    font-weight: normal;
+    font-size: 10pt;
+    font-family: 'Oxygen Mono', Tahoma, Arial, sans-serif, Helvetica, Sans-serif;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 315px;
+    height: 100%;
+    padding: 15px;
+    color: #fff;
+    z-index: 999;
+    background: rgba(3, 3, 6, 0.8);
+    border-right: solid 1px #111;
+    box-sizing: border-box;
+}
+
+.hud h2 {
+    font-weight: bold;
+    color: #eee;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #eee;
+    margin: 0 0 5px;
+    text-shadow: 1px 1px 2px rgb(0, 0, 0);
+}
+
+.hud input {
+    box-sizing: border-box;
+}
+
+.hud input[type=text] {
+    border: solid 1px #fff;
+    padding: 4px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+}
+
+.hud input[type=range] {
+    margin: 3px 0;
+    padding: 0;
+    width: 100%;
+}
+
+.coords {
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    border-bottom: solid 1px #444;
+    font-family: 'Oxygen Mono', Tahoma, Arial, sans-serif, "Courier New";
+}
+
+.coords>span {
+    display: block;
+    font-size: 1rem;
+    float: left;
+    width: 33%;
+    text-align: center;
+    background: rgba(30, 30, 30, 0.5);
+    padding: 5px 0;
+    line-height: 100%;
+    border: solid 3px #000;
+    box-sizing: border-box;
+}
+
+.coords:after {
+    content: ' ';
+    display: block;
+    clear: both;
+}
+
+.controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.controls>div {
+    width: 26px;
+    height: 26px;
+    margin: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(100, 100, 100, 0.2);
+    border: solid 1px #ddd;
+    border-color: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.controls>div.selected {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.map_filter,
+.map_link {
+    display: block;
+    margin: 0 0 3px;
+    cursor: pointer;
+}
+
+.map_filter:hover,
+.map_link:hover {
+    color: #FF7207;
+}
+
+.check.disabled {
+    background-color: #333 !important;
+}
+
+.map_filter.hidden {
+    display: none;
+}
+
+.map_filter.hidden {
+    display: inline-block;
+}
+
+.check {
+    width: 14px;
+    height: 14px;
+    line-height: 1;
+    float: right;
+    text-align: center;
+}
+
+.check:after {
+    content: ' ';
+    display: block;
+    width: 10px;
+    height: 10px;
+    margin: 2px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.nav {
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.nav>a {
+    cursor: pointer;
+    display: inline-block;
+    width: 22%;
+    margin: 2%;
+    padding: 10px;
+    border: solid 1px #222;
+    background: rgb(10, 10, 10);
+    background: rgba(10, 10, 10, 0.8);
+    box-shadow: 1px 1px 3px #000;
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+    box-sizing: border-box;
+    text-decoration: none;
+}

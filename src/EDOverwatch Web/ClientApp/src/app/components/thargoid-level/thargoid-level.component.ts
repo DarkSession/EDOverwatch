@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
+import { faEyeLowVision } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-thargoid-level',
@@ -6,6 +7,7 @@ import { Component, Input, OnChanges } from '@angular/core';
   styleUrls: ['./thargoid-level.component.css']
 })
 export class ThargoidLevelComponent implements OnChanges {
+  public readonly faEyeLowVision = faEyeLowVision;
   @Input() thargoidLevel!: OverwatchThargoidLevel;
 
   public dotClass = "";
@@ -28,9 +30,6 @@ export class ThargoidLevelComponent implements OnChanges {
         this.dotClass = "thargoid-maelstrom";
         break;
       }
-      case StarSystemThargoidLevelState.Recapture: {
-        break;
-      }
       case StarSystemThargoidLevelState.Recovery: {
         this.dotClass = "thargoid-recovery";
         break;
@@ -42,6 +41,7 @@ export class ThargoidLevelComponent implements OnChanges {
 export interface OverwatchThargoidLevel {
   Level: number;
   Name: string;
+  IsInvisibleState: boolean;
 }
 
 enum StarSystemThargoidLevelState {
@@ -50,6 +50,5 @@ enum StarSystemThargoidLevelState {
   Invasion = 30,
   Controlled = 40,
   Maelstrom = 50,
-  Recapture = 60,
   Recovery = 70,
 }

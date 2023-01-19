@@ -41,14 +41,18 @@ namespace EDDatabase
         [Column]
         public DateTimeOffset Created { get; set; }
 
+        [Column]
+        public bool IsInvisibleState { get; set; }
+
         public IEnumerable<StarSystemThargoidLevelProgress>? ProgressHistory { get; set; }
 
-        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progress, DateTimeOffset created)
+        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progress, DateTimeOffset created, bool isInvisibleState)
         {
             Id = id;
             State = state;
             Progress = progress;
             Created = created;
+            IsInvisibleState = isInvisibleState;
         }
 
         public StarSystemThargoidLevel(short? progress, StarSystemThargoidLevelProgress? currentProgress)
@@ -66,7 +70,7 @@ namespace EDDatabase
         Invasion = 30,
         Controlled = 40,
         Maelstrom = 50,
-        Recapture = 60,
+        // Recapture = 60,
         Recovery = 70,
     }
 }

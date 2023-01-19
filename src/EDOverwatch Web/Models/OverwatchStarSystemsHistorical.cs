@@ -1,6 +1,4 @@
-﻿using Amqp.Framing;
-
-namespace EDOverwatch_Web.Models
+﻿namespace EDOverwatch_Web.Models
 {
     public class OverwatchStarSystemsHistorical
     {

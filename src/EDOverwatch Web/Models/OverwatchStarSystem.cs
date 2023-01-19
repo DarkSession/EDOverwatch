@@ -28,7 +28,7 @@
             : base(starSystem)
         {
             PopulationOriginal = starSystem.OriginalPopulation;
-            ThargoidLevel = new(starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
+            ThargoidLevel = new(starSystem.ThargoidLevel);
             Progress = starSystem.ThargoidLevel?.Progress;
             ProgressPercent = (Progress != null) ? (decimal)Progress / 100m : null;
             if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem != null)

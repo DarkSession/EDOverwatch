@@ -29,7 +29,7 @@ export class DateAgoPipe implements PipeTransform {
         'minute': 60,
         'second': 1,
       };
-      let unitResults = [];
+      const unitResults = [];
       for (const i in intervals) {
         let counter = Math.floor(seconds / intervals[i]);
         if (counter > 0) {

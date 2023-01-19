@@ -150,7 +150,7 @@ export class SystemsComponent implements OnInit {
   }
 }
 
-interface OverwatchSystems {
+export interface OverwatchSystems {
   Maelstroms: OverwatchMaelstrom[];
   Levels: OverwatchThargoidLevel[];
   Systems: OverwatchStarSystem[];

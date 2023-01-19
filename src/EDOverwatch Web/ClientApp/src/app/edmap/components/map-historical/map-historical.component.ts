@@ -6,12 +6,14 @@ import { ammoniaWorlds } from '../../data/ammonia-worlds';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from 'src/app/components/maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from 'src/app/components/thargoid-level/thargoid-level.component';
+import { solSite } from '../../data/sol';
+import { OverwatchStarSystemCoordinates } from 'src/app/components/system-list/system-list.component';
 
 @UntilDestroy()
 @Component({
   selector: 'app-map-historical',
   templateUrl: './map-historical.component.html',
-  styleUrls: ['./map-historical.component.scss'],
+  styleUrls: ['./map-historical.component.scss', '../map.scss'],
   encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class MapHistoricalComponent implements OnInit, AfterViewInit {
@@ -69,24 +71,15 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
     },
     "Thargoid POI": {
       "Ammonia": {
-        name: 'Ammonia world',
+        name: 'Near ammonia worlds (< 30 Ly)',
         color: "4e290a",
       }
     },
   };
-  private readonly solSite = {
-    categories: ["00"],
-    name: "Sol",
-    description: "Cradle of Mankind<br>",
-    coordinates: {
-      x: 0,
-      y: 0,
-      z: 0,
-    }
-  };
   private defaultActiveCategories = ["ClearNew", "AlertNew", "Invasion", "InvasionNew", "Controlled", "ControlledNew", "Maelstrom", "Recovery", "RecoveryNew"];
   public date: string = "";
   public dateSelectionDisabled = true;
+  private paraLoaded = false;
 
   public constructor(
     private readonly route: ActivatedRoute,
@@ -102,13 +95,11 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       .subscribe((message) => {
         if (message && message.Data) {
           this.thargoidCycles = message.Data;
-          if (!this.date) {
+          if (this.paraLoaded && !this.date) {
             const thargoidCycle = this.thargoidCycles.find(t => t.IsCurrent);
             if (thargoidCycle) {
               this.date = thargoidCycle.Cycle;
-              if (this.ed3dMap) {
-                this.dateChanged();
-              }
+              this.dateChanged();
             }
           }
         }
@@ -118,7 +109,9 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
   }
 
   public dateChanged(): void {
-    this.requestCycleData(this.date);
+    if (this.date) {
+      this.router.navigate(['/', 'edmap', 'historical', this.date]);
+    }
   }
 
   private async requestCycleData(cycle: string): Promise<void> {
@@ -129,7 +122,7 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       Cycle: cycle,
     });
     if (response && response.Data && this.ed3dMap) {
-      const systems = [this.solSite];
+      const systems = [solSite];
       for (const data of response.Data.Systems) {
         const description =
           `<b>State</b>: ${data.ThargoidLevel.Name}<br>` +
@@ -143,7 +136,11 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
         }
         systems.push(poiSite);
       }
-      systems.push(...ammoniaWorlds);
+      for (const ammoniaWorld of ammoniaWorlds) {
+        if (response.Data.Systems.some(s => Math.sqrt(Math.pow(Math.abs(s.Coordinates.X - ammoniaWorld.coordinates.x), 2) + Math.pow(Math.abs(s.Coordinates.Y - ammoniaWorld.coordinates.y), 2) + Math.pow(Math.abs(s.Coordinates.Z - ammoniaWorld.coordinates.z), 2)) <= 30)) {
+          systems.push(ammoniaWorld);
+        }
+      }
       await this.ed3dMap.updateSystems(systems, this.categories);
     }
     this.dateSelectionDisabled = false;
@@ -155,7 +152,7 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       this.ed3dMap = new ED3DMap(this.container.nativeElement, {
         showGalaxyInfos: true,
         startAnimation: true,
-        systems: [this.solSite],
+        systems: [solSite],
         categories: this.categories,
         activeCategories: this.defaultActiveCategories,
         withOptionsPanel: true,
@@ -170,14 +167,14 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
         .pipe(untilDestroyed(this))
         .subscribe((p: ParamMap) => {
           let date = p.get("date");
+          this.paraLoaded = true;
           if (!date) {
             const thargoidCycle = this.thargoidCycles.find(t => t.IsCurrent);
             if (thargoidCycle) {
-              date = thargoidCycle.Cycle;
+              this.date = thargoidCycle.Cycle;
+              this.dateChanged();
             }
-            else {
-              return;
-            }
+            return;
           }
           this.requestCycleData(date);
         });
@@ -207,10 +204,4 @@ interface OverwatchStarSystemsHistoricalSystem {
   ThargoidLevel: OverwatchThargoidLevel;
   PreviousThargoidLevel: OverwatchThargoidLevel;
   State: string;
-}
-
-interface OverwatchStarSystemCoordinates {
-  X: number;
-  Y: number;
-  Z: number;
 }

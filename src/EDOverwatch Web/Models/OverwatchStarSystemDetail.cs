@@ -211,7 +211,7 @@
         public decimal ProgressPercentage { get; }
         public OverwatchStarSystemDetailProgress(StarSystemThargoidLevelProgress starSystemThargoidLevelProgress)
         {
-            State = new(starSystemThargoidLevelProgress.ThargoidLevel?.State ?? throw new Exception("ThargoidLevel cannot be null"));
+            State = new(starSystemThargoidLevelProgress.ThargoidLevel);
             Date = DateOnly.FromDateTime(starSystemThargoidLevelProgress.Updated.DateTime);
             DateTime = starSystemThargoidLevelProgress.Updated;
             Progress = starSystemThargoidLevelProgress.Progress ?? 0;
@@ -237,7 +237,7 @@
                 (starSystemThargoidLevel.CycleEnd == null ||
                 starSystemThargoidLevel.CycleEnd.Start >= new DateTimeOffset(2022, 12, 22, 7, 0, 0, TimeSpan.Zero)));
             AnalysisCycle = DateOnly.FromDateTime((starSystemThargoidLevel.CycleEnd?.Start ?? WeeklyTick.GetLastTick()).DateTime);
-            ThargoidLevel = new(starSystemThargoidLevel.State);
+            ThargoidLevel = new(starSystemThargoidLevel);
             StateStart = starSystemThargoidLevel.CycleStart!.Start;
             StateEnds = starSystemThargoidLevel.CycleEnd?.End;
             StateIngameTimerExpires = starSystemThargoidLevel.StateExpires?.End;

@@ -4,9 +4,10 @@
     <span>
         Thargoid Cycle
     </span>
-    <select [(ngModel)]="date" (ngModelChange)="dateChanged()" [disabled]="dateSelectionDisabled">
-        <option *ngFor="let thargoidCycle of thargoidCycles" [value]="thargoidCycle.Cycle" [selected]="date == thargoidCycle.Cycle">
-            {{ thargoidCycle.Start | date }}- {{ thargoidCycle.End | date }}
+    <select [(ngModel)]="date" (ngModelChange)="dateChanged()" [disabled]="dateSelectionDisabled" *ngIf="date && thargoidCycles">
+        <option *ngFor="let thargoidCycle of thargoidCycles" [value]="thargoidCycle.Cycle"
+            [selected]="date == thargoidCycle.Cycle">
+            {{ thargoidCycle.Start | date }} - {{ thargoidCycle.End | date }}
         </option>
     </select>
 </div>

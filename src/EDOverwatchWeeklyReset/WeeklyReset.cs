@@ -28,7 +28,7 @@ namespace EDDataProcessor
                         (s.ThargoidLevel!.StateExpires!.End <= newThargoidCycle.Start ||
                         (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
                         s.ThargoidLevel.Progress != 100 &&
-                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Maelstrom && // Or systems with a maelstrom
+                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Maelstrom && // Systems with a maelstrom
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // We do not yet know what happens if we fail to complete systems in recovery
                         )
                     .ToListAsync(cancellationToken);
@@ -51,7 +51,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Controlled,
                         _ => StarSystemThargoidLevelState.None,
                     };
-                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow)
+                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,
@@ -83,7 +83,7 @@ namespace EDDataProcessor
 
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>
-                        s.ThargoidLevel!.Progress == 100)
+                        s.ThargoidLevel!.Progress == 100 || (s.ThargoidLevel!.Progress == 98 && s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recovery))
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
@@ -99,7 +99,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Controlled when starSystem.Population > 0 => StarSystemThargoidLevelState.Recovery,
                         _ => StarSystemThargoidLevelState.None,
                     };
-                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow)
+                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,
@@ -216,7 +216,7 @@ namespace EDDataProcessor
             await dbContext.StarSystems
                 .Where(s => !s.WarRelevantSystem && !s.Stations!.Any() && s.ThargoidLevel == null && !s.ThargoidLevelHistory!.Any())
                 .Take(10000)
-                .ExecuteDeleteAsync();
+                .ExecuteDeleteAsync(cancellationToken);
         }
     }
 }

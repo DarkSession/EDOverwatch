@@ -137,6 +137,7 @@ export interface OverwatchStarSystem {
   PopulationOriginal: number;
   SystemAddress: number;
   Name: string;
+  Coordinates: OverwatchStarSystemCoordinates;
   Maelstrom: OverwatchMaelstrom;
   ThargoidLevel: OverwatchThargoidLevel;
   Progress: number | null;
@@ -151,6 +152,12 @@ export interface OverwatchStarSystem {
   StateProgress: StateProgress;
   Population: number;
   DistanceToMaelstrom: number;
+}
+
+export interface OverwatchStarSystemCoordinates {
+  X: number;
+  Y: number;
+  Z: number;
 }
 
 interface OverwatchStarSystemSpecialFactionOperation {

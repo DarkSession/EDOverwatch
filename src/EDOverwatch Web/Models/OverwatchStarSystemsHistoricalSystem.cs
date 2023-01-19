@@ -21,8 +21,8 @@
                 .OrderBy(t => t.CycleStart!.Start)
                 .FirstOrDefault(t => t.CycleStart!.Start < thargoidCycle.Start);
 
-            ThargoidLevel = new(thargoidLevel.State);
-            PreviousThargoidLevel = new(previousThargoidLevel?.State ?? thargoidLevel.State);
+            ThargoidLevel = new(thargoidLevel);
+            PreviousThargoidLevel = new(previousThargoidLevel ?? thargoidLevel);
 
             OverwatchStarSystemsHistoricalSystemState state;
             if (previousThargoidLevel != null && thargoidLevel.State != previousThargoidLevel.State)
