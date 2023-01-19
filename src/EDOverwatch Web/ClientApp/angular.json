@@ -28,7 +28,12 @@
             ],
             "assets": [
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/canonned3d-map/lib/assets",
+                "output": "assets/"
+              }
             ],
             "styles": [
               "@angular/material/prebuilt-themes/purple-green.css",
@@ -108,7 +113,12 @@
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/canonned3d-map/lib/assets",
+                "output": "assets/"
+              }
             ],
             "styles": [
               "@angular/material/prebuilt-themes/purple-green.css",

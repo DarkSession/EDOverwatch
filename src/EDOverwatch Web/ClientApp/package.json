@@ -34,6 +34,7 @@
     "@tweenjs/tween.js": "^18.6.4",
     "@types/three": "^0.148.0",
     "bootstrap": "^5.2.0",
+    "canonned3d-map": "^0.1.0",
     "chart.js": "^3.6.0",
     "chartjs-plugin-annotation": "^2.1.0",
     "dayjs": "^1.11.6",

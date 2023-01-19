@@ -53,10 +53,6 @@ namespace EDOverwatch_Web.Controllers.V1
             string cacheKey = SystemsCycleCacheKey + cycle.ToString();
             if (!MemoryCache.TryGetValue(cacheKey, out OverwatchStarSystemsHistorical? result))
             {
-                if (cycle > DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date) || !await DbContext.ThargoidCycleExists(cycle, cancellationToken))
-                {
-                    cycle = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
-                }
                 result = await OverwatchStarSystemsHistorical.Create(cycle, DbContext, cancellationToken);
                 MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
                 MemoryCache.Set(cacheKey, result, cacheEntryOptions);

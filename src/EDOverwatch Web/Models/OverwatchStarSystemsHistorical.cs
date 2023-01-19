@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Amqp.Framing;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchStarSystemsHistorical
     {
@@ -14,8 +16,18 @@
             Maelstroms = thargoidMaelstroms.Select(t => new OverwatchMaelstrom(t)).ToList();
         }
 
-        public static async Task<OverwatchStarSystemsHistorical> Create(DateOnly date, EdDbContext dbContext, CancellationToken cancellationToken)
+        public static async Task<OverwatchStarSystemsHistorical> Create(DateOnly? cycle, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            DateOnly date;
+            if (cycle == null || cycle >= DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date) || !await dbContext.ThargoidCycleExists((DateOnly)cycle, cancellationToken))
+            {
+                date = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
+            }
+            else
+            {
+                date = (DateOnly)cycle;
+            }
+
             DateTimeOffset tickTime = WeeklyTick.GetTickTime(date);
             ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken, 0);
             ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken, -1);
