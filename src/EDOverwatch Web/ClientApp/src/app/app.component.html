@@ -6,7 +6,7 @@
     <div class="top-bar-left">
       <div style="margin-right: 32px">
         <button mat-icon-button aria-label="Menu" (click)="toggleMenu()">
-          <mat-icon [ngClass]="{'menu-open': isMenuOpen, 'menu-closed': !isMenuOpen}">menu</mat-icon>
+          <mat-icon [ngClass]="{'menu-open': appService.isMenuOpen, 'menu-closed': !appService.isMenuOpen}">menu</mat-icon>
         </button>
       </div>
       <div class="header clickable" routerLink="/">
@@ -50,7 +50,7 @@
     </div>
   </mat-toolbar>
   <mat-sidenav-container style="min-height: calc(100vh - 80px)">
-    <mat-sidenav #sidenav mode="side" [opened]="isMenuOpen" class="side-nav">
+    <mat-sidenav #sidenav mode="side" [opened]="appService.isMenuOpen" class="side-nav">
       <div>
         <div routerLink="/" class="clickable">Overview</div>
       </div>
@@ -68,7 +68,10 @@
       </div>
       <hr>
       <div>
-        <div routerLink="map" class="clickable">Map</div>
+        <div routerLink="edmap/current" class="clickable">Map (current situation)</div>
+      </div>
+      <div>
+        <div routerLink="edmap/historical" class="clickable">Map (historical)</div>
       </div>
       <hr>
       <div>

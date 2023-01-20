@@ -186,6 +186,7 @@ export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   LastTickDate: string;
   WarEffortSources: OverwatchStarSystemWarEffortType[];
   StateHistory: OverwatchStarSystemThargoidLevelHistory[];
+  WarEffortSummaries: OverwatchStarSystemWarEffortCycle[];
 }
 
 export interface OverwatchStarSystemWarEffort {
@@ -228,4 +229,19 @@ export interface OverwatchStarSystemThargoidLevelHistory {
   StateIngameTimerExpires: string | null;
   Progress: number | null;
   ProgressPercentage: number | null;
+}
+
+export interface OverwatchStarSystemWarEffortCycle {
+  CycleStart: string;
+  CycleEnd: string;
+  EffortTotals: OverwatchStarSystemWarEffortCycleEntry[];
+}
+
+interface OverwatchStarSystemWarEffortCycleEntry {
+  Type: string;
+  TypeId: number;
+  Source: string;
+  SourceId: number;
+  TypeGroup: string;
+  Amount: number;
 }

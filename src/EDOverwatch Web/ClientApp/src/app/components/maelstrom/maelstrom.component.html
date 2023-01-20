@@ -3,64 +3,65 @@
         <div class="title" *ngIf="maelstrom">
             Maelstrom {{ maelstrom.Name }}
         </div>
-        <div class="content-box">
-            <ng-container *ngIf="maelstrom">
-                <div class="content-flex">
-                    <table class="system-information">
-                        <tbody>
-                            <tr>
-                                <td><b>System</b></td>
-                                <td>
-                                    {{ maelstrom.SystemName }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><b>In-game number</b></td>
-                                <td>
-                                    {{ maelstrom.IngameNumber }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <br>
-                <div class="subtitle">Affected systems</div>
-                <app-system-list [systems]="maelstrom.Systems" [maxHeight]="35"></app-system-list>
-            </ng-container>
-            <br>
-            <div class="subtitle">Unaffected systems at risk</div>
-            <div class="table-container">
-                <div class="table">
-                    <table mat-table [dataSource]="systemsAtRisk" matSort matSortActive="Distance"
-                        matSortDirection="asc" matSortDisableClear>
-                        <ng-container matColumnDef="Name">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
-                            <td mat-cell *matCellDef="let row">
-                                {{ row.Name }}
-                                <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
-                                    (click)="copySystemName(row)"></fa-icon>
+        <div class="content-box" *ngIf="maelstrom">
+            <div class="content-flex">
+                <table class="system-information">
+                    <tbody>
+                        <tr>
+                            <td><b>System</b></td>
+                            <td>
+                                {{ maelstrom.SystemName }}
                             </td>
-                        </ng-container>
-                        <ng-container matColumnDef="Population">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Population</th>
-                            <td mat-cell *matCellDef="let row">
-                                {{ row.Population | numberSuffix:1 }}
+                        </tr>
+                        <tr>
+                            <td><b>In-game number</b></td>
+                            <td>
+                                {{ maelstrom.IngameNumber }}
                             </td>
-                        </ng-container>
-                        <ng-container matColumnDef="Distance">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
-                            <td mat-cell *matCellDef="let row">
-                                {{ row.Distance }} Ly
-                            </td>
-                        </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="systemsAtRiskColumns; sticky: true" class="thead"></tr>
-                        <tr mat-row *matRowDef="let row; columns: systemsAtRiskColumns;"></tr>
-                    </table>
-                    <div *ngIf="systemsAtRisk.data.length === 0" class="empty-table">
-                        No records found.
-                    </div>
-                </div>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            <mat-tab-group>
+                <mat-tab label="Affected systems">
+                    <app-system-list [systems]="maelstrom.Systems"></app-system-list>
+                </mat-tab>
+                <mat-tab label="Unaffected systems at risk">
+                    <div class="table-container">
+                        <div class="table">
+                            <table mat-table [dataSource]="systemsAtRisk" matSort matSortActive="Distance"
+                                matSortDirection="asc" matSortDisableClear>
+                                <ng-container matColumnDef="Name">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{ row.Name }}
+                                        <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                                            (click)="copySystemName(row)"></fa-icon>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="Population">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Population</th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{ row.Population | numberSuffix:1 }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="Distance">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{ row.Distance }} Ly
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="systemsAtRiskColumns; sticky: true" class="thead">
+                                </tr>
+                                <tr mat-row *matRowDef="let row; columns: systemsAtRiskColumns;"></tr>
+                            </table>
+                            <div *ngIf="systemsAtRisk.data.length === 0" class="empty-table">
+                                No records found.
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
         </div>
     </div>
 </div>

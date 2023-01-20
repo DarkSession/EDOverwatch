@@ -1,0 +1,26 @@
+<div class="subtitle">
+    Contribution summary from {{ summary.CycleStart | date }} to {{ summary.CycleEnd | date }}
+</div>
+<div class="table" style="max-height: 40vh">
+    <table mat-table [dataSource]="contributions" matSort matSortActive="Date" matSortDirection="desc"
+        matSortDisableClear>
+        <ng-container matColumnDef="Type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+            <td mat-cell *matCellDef="let row">
+                {{ row.Type }}
+            </td>
+        </ng-container>
+        <ng-container *ngFor="let source of sources" [matColumnDef]="source">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ source }}</th>
+            <td mat-cell *matCellDef="let row" class="number">
+                {{ getSourceAmount(source, row) | number }}
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="warEffortsSummeriesDisplayedColumns; sticky: true" class="thead">
+        </tr>
+        <tr mat-row *matRowDef="let row; columns: warEffortsSummeriesDisplayedColumns;"></tr>
+    </table>
+    <div *ngIf="contributions.data.length === 0" class="empty-table">
+        No records found.
+    </div>
+</div>

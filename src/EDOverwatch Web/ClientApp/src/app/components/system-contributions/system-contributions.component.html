@@ -1,4 +1,11 @@
 <div class="table-container">
+    <div *ngIf="starSystem.WarEffortSummaries">
+        <app-system-contribution-summary *ngFor="let summary of starSystem.WarEffortSummaries" [starSystem]="starSystem"
+            [summary]="summary"></app-system-contribution-summary>
+    </div>
+    <div class="subtitle">
+        Contribution details
+    </div>
     <div class="table" style="max-height: 40vh">
         <table mat-table [dataSource]="contributions" matSort matSortActive="Date" matSortDirection="desc"
             matSortDisableClear>
@@ -20,9 +27,9 @@
                     {{ getSourceAmount(source, row) | number }}
                 </td>
             </ng-container>
-            <tr mat-header-row *matHeaderRowDef="warEffortsDisplayedColumns; sticky: true" class="thead">
+            <tr mat-header-row *matHeaderRowDef="warEffortsDetailsDisplayedColumns; sticky: true" class="thead">
             </tr>
-            <tr mat-row *matRowDef="let row; columns: warEffortsDisplayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: warEffortsDetailsDisplayedColumns;"></tr>
         </table>
         <div *ngIf="contributions.data.length === 0" class="empty-table">
             No records found.

@@ -7,6 +7,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchStarSystem } from 'src/app/components/system-list/system-list.component';
 import { ammoniaWorlds } from '../../data/ammonia-worlds';
 import { DateAgoPipe } from 'src/app/pipes/date-ago.pipe';
+import { AppService } from 'src/app/services/app.service';
 
 @UntilDestroy()
 @Component({
@@ -50,7 +51,7 @@ export class CurrentComponent implements OnInit, AfterViewInit {
     },
     "Thargoid POI": {
       "Ammonia": {
-        name: 'Near ammonia worlds (< 30 Ly)',
+        name: 'Nearby ammonia worlds (< 30 Ly)',
         color: "4e290a",
       }
     },
@@ -60,7 +61,8 @@ export class CurrentComponent implements OnInit, AfterViewInit {
 
   public constructor(
     private readonly websocketService: WebsocketService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly appService: AppService
   ) {
   }
 
@@ -73,7 +75,16 @@ export class CurrentComponent implements OnInit, AfterViewInit {
           this.systems = message.Data.Systems;
           this.update();
         }
-      })
+      });
+    this.appService.isMenuOpenChanged
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        setTimeout(() => {
+          if (this.ed3dMap) {
+            this.ed3dMap.windowResize();
+          }
+        }, 500);
+      });
     this.websocketService.sendMessage("OverwatchSystems", {});;
   }
 

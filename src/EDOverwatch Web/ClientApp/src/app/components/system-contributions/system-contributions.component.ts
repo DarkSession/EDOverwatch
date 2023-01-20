@@ -10,10 +10,11 @@ import { OverwatchStarSystemDetail } from '../system/system.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemContributionsComponent implements OnChanges, AfterViewInit {
-  public contributions: MatTableDataSource<Contribution> = new MatTableDataSource<Contribution>();
-  public warEffortsDisplayedColumns = ['Date', 'Type'];
+  public contributions: MatTableDataSource<ContributionDetail> = new MatTableDataSource<ContributionDetail>();
+  public warEffortsDetailsDisplayedColumns = ['Date', 'Type'];
+
   public sources: string[] = [];
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort) detailsSort!: MatSort;
 
   @Input() starSystem!: OverwatchStarSystemDetail;
 
@@ -30,9 +31,9 @@ export class SystemContributionsComponent implements OnChanges, AfterViewInit {
         this.sources.push(source.Name);
       }
     }
-    this.warEffortsDisplayedColumns = ['Date', 'Type', ...this.sources];
+    this.warEffortsDetailsDisplayedColumns = ['Date', 'Type', ...this.sources];
 
-    const contributions: Contribution[] = [];
+    const contributions: ContributionDetail[] = [];
     for (const warEffort of this.starSystem.WarEfforts) {
       let contribution = contributions.find(c => c.Date === warEffort.Date && c.Type === warEffort.Type);
       if (!contribution) {
@@ -51,16 +52,16 @@ export class SystemContributionsComponent implements OnChanges, AfterViewInit {
         sourceAmount.Amount += warEffort.Amount;
       }
     }
-    this.contributions = new MatTableDataSource<Contribution>(contributions);
-    this.contributions.sort = this.sort;
+    this.contributions = new MatTableDataSource<ContributionDetail>(contributions);
+    this.contributions.sort = this.detailsSort;
     this.changeDetectorRef.markForCheck();
   }
 
   public ngAfterViewInit(): void {
-    this.contributions.sort = this.sort;
+    this.contributions.sort = this.detailsSort;
   }
 
-  public getSourceAmount(source: string, row: Contribution): number | null {
+  public getSourceAmount(source: string, row: ContributionDetail): number | null {
     const sourceAmount = row.SourceAmounts.find(s => s.Source === source);
     if (sourceAmount) {
       return sourceAmount.Amount;
@@ -70,10 +71,13 @@ export class SystemContributionsComponent implements OnChanges, AfterViewInit {
 }
 
 interface Contribution {
-  Date: string;
   Type: string;
   SourceAmounts: {
     Source: string;
     Amount: number;
   }[];
+}
+
+interface ContributionDetail extends Contribution {
+  Date: string;
 }

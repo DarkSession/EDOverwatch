@@ -25,6 +25,9 @@ export class AppService {
   private settingsDb: IDBPDatabase<SettingsDb> | null = null;
   private settingsDbReady: Promise<void> | null = null;
 
+  public isMenuOpen = false;
+  public isMenuOpenChanged: EventEmitter<void> = new EventEmitter<void>();
+
   public constructor(
     private readonly httpClient: HttpClient,
     @Inject('API_URL') private readonly apiUrl: string,
@@ -52,6 +55,9 @@ export class AppService {
       this.updateNetworkLoading();
     });
     this.initDb();
+    if (localStorage.getItem("menuOpen") === "1") {
+      this.isMenuOpen = true;
+    }
   }
 
   private async initDb(): Promise<void> {
@@ -75,6 +81,12 @@ export class AppService {
       readyResolve();
       this.settingsDbReady = null;
     }
+  }
+
+  public toggleIsMenuOpen(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+    localStorage.setItem("menuOpen", this.isMenuOpen ? "1" : "0");
+    this.isMenuOpenChanged.emit();
   }
 
   public async getTableSort(name: string, defaultColumn: string, defaultDirection: SortDirection = "asc"): Promise<TableSortSetting> {

@@ -28,7 +28,7 @@ import { CurrentComponent } from './components/current/current.component';
         component: MapHistoricalComponent,
       },
       {
-        path: 'current',
+        path: '**',
         component: CurrentComponent,
       },
     ])

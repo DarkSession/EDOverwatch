@@ -62,6 +62,7 @@ import { SystemStateAnalysisComponent } from './components/system-state-analysis
 import { ContributeDataComponent } from './components/contribute-data/contribute-data.component';
 import { MapHistoricalComponent } from './components/map-historical/map-historical.component';
 import { CommanderApiKeysComponent } from './components/commander-api-keys/commander-api-keys.component';
+import { SystemContributionSummaryComponent } from './components/system-contribution-summary/system-contribution-summary.component';
 
 
 /** Http interceptor providers in outside-in order */
@@ -101,6 +102,7 @@ export const httpInterceptorProviders = [
     ContributeDataComponent,
     MapHistoricalComponent,
     CommanderApiKeysComponent,
+    SystemContributionSummaryComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -170,15 +172,11 @@ export const httpInterceptorProviders = [
         component: MaelstromsComponent,
       },
       {
-        path: 'map/:date',
-        component: MapHistoricalComponent,
+        path: 'edmap',
+        loadChildren: () => import('./edmap/edmap.module').then(m => m.EdmapModule)
       },
       {
         path: 'map',
-        component: MapComponent,
-      },
-      {
-        path: 'edmap',
         loadChildren: () => import('./edmap/edmap.module').then(m => m.EdmapModule)
       },
       {

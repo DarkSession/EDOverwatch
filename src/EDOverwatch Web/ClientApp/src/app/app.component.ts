@@ -11,7 +11,6 @@ import { AppService } from './services/app.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
-  public isMenuOpen = false;
   public loading = false;
 
   public constructor(
@@ -56,14 +55,10 @@ export class AppComponent implements OnInit {
           }
         });
     }
-    if (localStorage.getItem("menuOpen") === "1") {
-      this.isMenuOpen = true;
-    }
   }
 
   public toggleMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
-    localStorage.setItem("menuOpen", this.isMenuOpen ? "1" : "0");
+    this.appService.toggleIsMenuOpen();
     this.changeDetectorRef.markForCheck();
   }
 }
