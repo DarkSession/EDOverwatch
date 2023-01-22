@@ -44,6 +44,7 @@
                 {
                     Commander = journalParameters.Commander,
                     StarSystem = starSystem,
+                    Cycle = await dbContext.GetThargoidCycle(Day, cancellationToken),
                 };
                 dbContext.WarEfforts.Add(warEffort);
             }

@@ -9,6 +9,7 @@ import { OverwatchThargoidLevel } from 'src/app/components/thargoid-level/thargo
 import { solSite } from '../../data/sol';
 import { OverwatchStarSystemCoordinates } from 'src/app/components/system-list/system-list.component';
 import { AppService } from 'src/app/services/app.service';
+import { OverwatchThargoidCycle } from 'src/app/components/home/home.component';
 
 @UntilDestroy()
 @Component({
@@ -191,13 +192,6 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
         });
     }
   }
-}
-
-interface OverwatchThargoidCycle {
-  Cycle: string;
-  Start: string;
-  End: string;
-  IsCurrent: boolean;
 }
 
 interface OverwatchStarSystemsHistorical {

@@ -325,6 +325,12 @@ namespace EDOverwatch
                                     changed = await UpdateStarSystemThargoidLevel(starSystem, true, starSystemThargoidManualUpdate.Progress, timeLeft, starSystemThargoidManualUpdate.State, maelstrom, dbContext, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
                                 }
 
+                                if (!starSystem.WarRelevantSystem && (starSystem.RefreshedWarRelevantSystem || starSystemThargoidManualUpdate.State != StarSystemThargoidLevelState.None))
+                                {
+                                    starSystem.WarRelevantSystem = true;
+                                    await dbContext.SaveChangesAsync(cancellationToken);
+                                }
+
                                 List<StarSystemUpdateQueueItem> starSystemUpdateQueueItems = await dbContext.StarSystemUpdateQueueItems
                                     .Where(s => s.StarSystem == starSystem && s.Status == StarSystemUpdateQueueItemStatus.PendingAutomaticReview)
                                     .ToListAsync(cancellationToken);

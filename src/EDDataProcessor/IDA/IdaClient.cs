@@ -76,6 +76,7 @@ namespace EDDataProcessor.IDA
                                         supplyDeliveries = new(0, WarEffortType.SupplyDelivery, today, (newTotalHauled - currentTotalHauled), WarEffortSide.Humans, WarEffortSource.IDA)
                                         {
                                             StarSystem = starSystem,
+                                            Cycle = await DbContext.GetThargoidCycle(today, CancellationToken.None),
                                         };
                                         DbContext.WarEfforts.Add(supplyDeliveries);
                                     }
@@ -114,6 +115,7 @@ namespace EDDataProcessor.IDA
                                         supplyDeliveries = new(0, WarEffortType.MissionCompletionDelivery, today, (newTotalMissions - currentTotalMissions), WarEffortSide.Humans, WarEffortSource.IDA)
                                         {
                                             StarSystem = starSystem,
+                                            Cycle = await DbContext.GetThargoidCycle(today, CancellationToken.None),
                                         };
                                         DbContext.WarEfforts.Add(supplyDeliveries);
                                     }
@@ -129,7 +131,7 @@ namespace EDDataProcessor.IDA
 
         [GeneratedRegex("^Thargoid War - (.*?)$", RegexOptions.IgnoreCase, "en-CH")]
         private static partial Regex SystemNameRegex1();
-        [GeneratedRegex("^(.*?) Recovery$", RegexOptions.IgnoreCase, "en-CH")]
+        [GeneratedRegex("^(.*?) (Alert|Defense|Recovery)$", RegexOptions.IgnoreCase, "en-CH")]
         private static partial Regex SystemNameRegex2();
     }
 }

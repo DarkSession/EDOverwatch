@@ -3,6 +3,7 @@ using System;
 using EDDatabase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDDatabase.Migrations
 {
     [DbContext(typeof(EdDbContext))]
-    partial class EdDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230122134727_AddMaelstromHistoricalSummary")]
+    partial class AddMaelstromHistoricalSummary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -885,9 +888,6 @@ namespace EDDatabase.Migrations
                     b.Property<int?>("CommanderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CycleId")
-                        .HasColumnType("int");
-
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
@@ -906,8 +906,6 @@ namespace EDDatabase.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CommanderId");
-
-                    b.HasIndex("CycleId");
 
                     b.HasIndex("Side");
 
@@ -1227,17 +1225,11 @@ namespace EDDatabase.Migrations
                         .WithMany()
                         .HasForeignKey("CommanderId");
 
-                    b.HasOne("EDDatabase.ThargoidCycle", "Cycle")
-                        .WithMany()
-                        .HasForeignKey("CycleId");
-
                     b.HasOne("EDDatabase.StarSystem", "StarSystem")
                         .WithMany()
                         .HasForeignKey("StarSystemId");
 
                     b.Navigation("Commander");
-
-                    b.Navigation("Cycle");
 
                     b.Navigation("StarSystem");
                 });

@@ -44,6 +44,7 @@
                                 warEffortKills = new(0, WarEffortType.KillGeneric, date, kills, WarEffortSide.Humans, WarEffortSource.Inara)
                                 {
                                     StarSystem = starSystem,
+                                    Cycle = await DbContext.GetThargoidCycle(date, CancellationToken.None),
                                 };
                                 DbContext.WarEfforts.Add(warEffortKills);
                                 yield return starSystem.SystemAddress;
@@ -65,6 +66,7 @@
                                 warEffortRescues = new(0, WarEffortType.Rescue, date, rescues, WarEffortSide.Humans, WarEffortSource.Inara)
                                 {
                                     StarSystem = starSystem,
+                                    Cycle = await DbContext.GetThargoidCycle(date, CancellationToken.None),
                                 };
                                 DbContext.WarEfforts.Add(warEffortRescues);
                                 yield return starSystem.SystemAddress;
@@ -86,6 +88,7 @@
                                 warEffortSupplies = new(0, WarEffortType.SupplyDelivery, date, supplies, WarEffortSide.Humans, WarEffortSource.Inara)
                                 {
                                     StarSystem = starSystem,
+                                    Cycle = await DbContext.GetThargoidCycle(date, CancellationToken.None),
                                 };
                                 DbContext.WarEfforts.Add(warEffortSupplies);
                                 yield return starSystem.SystemAddress;
@@ -136,6 +139,7 @@
                                 warEffort = new(0, warEffortType, date, (newTotal - currentTotal), side, WarEffortSource.Inara)
                                 {
                                     StarSystem = starSystem,
+                                    Cycle = await DbContext.GetThargoidCycle(date, CancellationToken.None),
                                 };
                                 DbContext.WarEfforts.Add(warEffort);
                             }
@@ -170,6 +174,7 @@
                                 shipKills = new(0, WarEffortType.KillGeneric, today, (conflictDetails.TotalShipsLost - currentTotalShipsLost), WarEffortSide.Thargoids, WarEffortSource.Inara)
                                 {
                                     StarSystem = starSystem,
+                                    Cycle = await DbContext.GetThargoidCycle(today, CancellationToken.None),
                                 };
                                 DbContext.WarEfforts.Add(shipKills);
                             }

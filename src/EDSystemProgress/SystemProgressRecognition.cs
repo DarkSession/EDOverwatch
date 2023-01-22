@@ -14,12 +14,14 @@ namespace EDSystemProgress
         {
             // Bar
             new ColorRange(25, 45, 25, 45, 25, 45),
+            new ColorRange(30, 40, 10, 25, 20, 25),
             new ColorRange(35, 50, 35, 50, 35, 50),
             new ColorRange(45, 50, 20, 25, 30, 40),
             new ColorRange(45, 55, 45, 55, 45, 55),
             new ColorRange(50, 100, 0, 50, 75, 130),
-            new ColorRange(70, 190, 11, 95, 98, 255),
+            new ColorRange(70, 190, 0, 95, 98, 255),
             new ColorRange(80, 110, 5, 15, 135, 190),
+            new ColorRange(100, 125, 5, 15, 200, 230),
             // Arrow
             new ColorRange(120, 140, 120, 140, 120, 140),
             new ColorRange(140, 160, 140, 160, 140, 160),
@@ -28,7 +30,9 @@ namespace EDSystemProgress
 
         private static List<ColorRange> InvasionRemainingColors { get; } = new()
         {
-            new ColorRange(15, 30, 20, 50, 0, 15),
+            new ColorRange(10, 20, 18, 30, 0, 5),
+            new ColorRange(15, 30, 24, 50, 0, 15),
+            new ColorRange(20, 25, 20, 25, 0, 0),
             new ColorRange(50, 70, 60, 100, 0, 35),
             new ColorRange(20, 60, 40, 100, 0, 35),
         };
@@ -247,7 +251,7 @@ namespace EDSystemProgress
                                     {
                                         case SystemStatus.InvasionInProgress:
                                             {
-                                                match = text.Contains("PORTS REMAININ");
+                                                match = text.Contains("PORTS REMAININ") || text.Contains("PORTS REMAINI");
                                                 break;
                                             }
                                         case SystemStatus.InvasionPrevented:

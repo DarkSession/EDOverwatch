@@ -3,6 +3,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
+import { OverwatchThargoidCycle } from '../home/home.component';
 
 @UntilDestroy()
 @Component({
@@ -51,11 +52,4 @@ export class MapHistoricalComponent {
   public dateChanged(): void {
     this.router.navigate(["map", this.date]);
   }
-}
-
-interface OverwatchThargoidCycle {
-  Cycle: string;
-  Start: string;
-  End: string;
-  IsCurrent: boolean;
 }

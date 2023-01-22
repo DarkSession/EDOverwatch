@@ -42,6 +42,7 @@ namespace EDDatabase
 
         public DbSet<ThargoidCycle> ThargoidCycles { get; set; }
         public DbSet<ThargoidMaelstrom> ThargoidMaelstroms { get; set; }
+        public DbSet<ThargoidMaelstromHistoricalSummary> ThargoidMaelstromHistoricalSummaries { get; set; }
 
         public DbSet<WarEffort> WarEfforts { get; set; }
 
@@ -82,6 +83,12 @@ namespace EDDatabase
             modelBuilder.Entity<StarSystemThargoidLevel>()
                 .HasMany(s => s.ProgressHistory)
                 .WithOne(s => s.ThargoidLevel);
+        }
+
+        public Task<ThargoidCycle> GetThargoidCycle(DateOnly date, CancellationToken cancellationToken, int weekOffset = 0)
+        {
+            DateTimeOffset cycleTime = WeeklyTick.GetTickTime(date);
+            return GetThargoidCycle(cycleTime, cancellationToken, weekOffset);
         }
 
         public async Task<ThargoidCycle> GetThargoidCycle(DateTimeOffset dateTimeOffset, CancellationToken cancellationToken, int weekOffset = 0)

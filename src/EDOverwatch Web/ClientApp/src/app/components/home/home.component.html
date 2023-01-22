@@ -1,3 +1,15 @@
+<div class="content-mobile">
+  <div class="item">
+    <span>Humanity is in the Aftermath War</span>
+    <span>with the Thargoids for</span>
+    <h1>{{ timeSince }}</h1>
+    <br>
+    <button mat-raised-button color="primary" routerLink="get-involved">
+      <b>Get involved</b>
+    </button>
+    <br>
+  </div>
+</div>
 <div class="main-container">
   <div class="container-center">
     <div style="height: calc(100vh - 80px); width: calc(50vh - 40px);">
@@ -28,7 +40,7 @@
           <div class="highlight">
             {{ overview.Humans.SystemsControlling | number }}
           </div>
-          systems of the human 'bubble'
+          systems of the main human bubble
         </div>
         <div class="text-item">
           <div class="highlight">
@@ -109,14 +121,12 @@
             </div>
             systems in recovery
           </div>
-          <!--
-          <div class="text-item clickable" routerLink="systems">
+          <div class="text-item clickable" routerLink="systems" *ngIf="overview.Contested.SystemsBeingRecaptured">
             <div class="highlight">
               {{ overview.Contested.SystemsBeingRecaptured | number }}
             </div>
             systems being recaptured
           </div>
-          -->
         </ng-container>
       </div>
     </div>
@@ -128,7 +138,7 @@
           <div class="highlight">
             {{ overview.Thargoids.SystemsControlling | number }}
           </div>
-          systems of the human 'bubble'
+          systems of the main human bubble
         </div>
         <div class="text-item clickable" routerLink="maelstroms">
           <div class="highlight">
@@ -147,7 +157,47 @@
           </div>
           confirmed Commander kills
         </div>
+        <div class="text-item">
+          <div class="highlight">
+            {{ overview.Thargoids.RefugeePopulation | number }}
+          </div>
+          humans killed or expelled
+        </div>
       </div>
     </div>
   </div>
+</div>
+<div class="content-mobile hide-on-desktop">
+  <div class="item item-bottom">
+    <ng-container *ngIf="overview && overview.Contested">
+      <div class="text-item clickable" routerLink="systems">
+        <div class="highlight">
+          {{ overview.Contested.SystemsInInvasion | number }}
+        </div>
+        systems under Thargoid invasion
+      </div>
+      <div class="text-item clickable" routerLink="systems">
+        <div class="highlight">
+          {{ overview.Contested.SystemsWithAlerts | number }}
+        </div>
+        systems reporting Thargoid alerts
+      </div>
+      <div class="text-item clickable" routerLink="systems">
+        <div class="highlight">
+          {{ overview.Contested.SystemsInRecovery | number }}
+        </div>
+        systems in recovery
+      </div>
+      <div class="text-item clickable" routerLink="systems" *ngIf="overview.Contested.SystemsBeingRecaptured">
+        <div class="highlight">
+          {{ overview.Contested.SystemsBeingRecaptured | number }}
+        </div>
+        systems being recaptured
+      </div>
+    </ng-container>
+  </div>
+</div>
+<div class="maelstrom-summary-container hide-on-small-mobile" *ngIf="overview?.MaelstromHistory">
+  <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options" [type]="chartConfig.type"
+    width="200" height="100"></canvas>
 </div>

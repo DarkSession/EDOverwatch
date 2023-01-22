@@ -1,6 +1,5 @@
 .main-container {
   position: relative;
-  background-color: aliceblue;
   display: flex;
   justify-content: center;
 }
@@ -118,6 +117,7 @@
     width: 30%;
     justify-content: space-between;
     height: 100%;
+    visibility: hidden;
 
     .item-center {
       display: flex;
@@ -128,9 +128,48 @@
     }
   }
 
+  @media (min-width: 992px) {
+    .content-middle {
+      visibility: visible;
+    }
+  }
+
   .content-thargoid {
     width: 35%;
     text-align: right;
+  }
+}
+
+.content-mobile {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  .item {
+    flex-grow: 1;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .item-bottom {
+    flex-direction: row;
+  }
+
+  .text-item {
+    padding: 8px;
+  }
+
+  .highlight {
+    font-weight: bold;
+    font-size: 16pt;
+    font-family: 'Trebuchet MS', sans-serif;
   }
 }
 
@@ -139,4 +178,24 @@
   margin-top: 12px;
   line-height: 1;
   font-size: 10pt;
+}
+
+.maelstrom-summary-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 100px;
+}
+
+@media (min-width: 992px) {
+  .content-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .hide-on-small-mobile {
+    display: none;
+  }
 }

@@ -6,7 +6,8 @@
     <div class="top-bar-left">
       <div style="margin-right: 32px">
         <button mat-icon-button aria-label="Menu" (click)="toggleMenu()">
-          <mat-icon [ngClass]="{'menu-open': appService.isMenuOpen, 'menu-closed': !appService.isMenuOpen}">menu</mat-icon>
+          <mat-icon
+            [ngClass]="{'menu-open': appService.isMenuOpen, 'menu-closed': !appService.isMenuOpen}">menu</mat-icon>
         </button>
       </div>
       <div class="header clickable" routerLink="/">
@@ -67,13 +68,15 @@
         <div routerLink="contribute" class="clickable">Contribute</div>
       </div>
       <hr>
-      <div>
-        <div routerLink="edmap/current" class="clickable">Map (current situation)</div>
+      <div class="hide-on-mobile">
+        <div>
+          <div routerLink="edmap/current" class="clickable">Map (current situation)</div>
+        </div>
+        <div>
+          <div routerLink="edmap/historical" class="clickable">Map (historical)</div>
+        </div>
+        <hr>
       </div>
-      <div>
-        <div routerLink="edmap/historical" class="clickable">Map (historical)</div>
-      </div>
-      <hr>
       <div>
         <div routerLink="consumer-api" class="clickable">API</div>
       </div>
