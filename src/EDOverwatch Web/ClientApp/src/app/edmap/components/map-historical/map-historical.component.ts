@@ -10,6 +10,11 @@ import { solSite } from '../../data/sol';
 import { OverwatchStarSystemCoordinates } from 'src/app/components/system-list/system-list.component';
 import { AppService } from 'src/app/services/app.service';
 import { OverwatchThargoidCycle } from 'src/app/components/home/home.component';
+import { SystemConfiguration } from 'canonned3d-map/lib/System';
+import { barnacleBarbs } from '../../data/barnacle-barbs';
+import { abandonedBases } from '../../data/abandoned-bases';
+import { thargoidSites } from '../../data/thargoid-sites';
+import { unknownBarnacleSites } from '../../data/unknown-barnacle-sites';
 
 @UntilDestroy()
 @Component({
@@ -75,7 +80,25 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       "Ammonia": {
         name: 'Nearby ammonia worlds (< 30 Ly)',
         color: "4e290a",
-      }
+      },
+      "Barnacle Barbs": {
+        name: "Barnacle Barbs",
+        color: "0B5345"
+      },
+      "Thargoid Structure": {
+        name: "Thargoid Structure",
+        color: "512B60"
+      },
+      "Unknown Site": {
+        name: "Unknown Site",
+        color: "2E4840"
+      },
+    },
+    "Various POI": {
+      "Abandoned Base": {
+        name: "Abandoned Base",
+        color: "283747",
+      },
     },
   };
   private defaultActiveCategories = ["ClearNew", "AlertNew", "Invasion", "InvasionNew", "Controlled", "ControlledNew", "Maelstrom", "Recovery", "RecoveryNew"];
@@ -134,7 +157,7 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       Cycle: cycle,
     });
     if (response && response.Data && this.ed3dMap) {
-      const systems = [solSite];
+      const systems: SystemConfiguration[] = [solSite];
       for (const data of response.Data.Systems) {
         const description =
           `<b>State</b>: ${data.ThargoidLevel.Name}<br>` +
@@ -153,6 +176,12 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
           systems.push(ammoniaWorld);
         }
       }
+
+      systems.push(...barnacleBarbs);
+      systems.push(...abandonedBases);
+      systems.push(...thargoidSites);
+      systems.push(...unknownBarnacleSites);
+
       await this.ed3dMap.updateSystems(systems, this.categories);
     }
     this.dateSelectionDisabled = false;

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ED3DMap } from 'canonned3d-map/lib/ED3DMap';
 import { OverwatchSystems } from 'src/app/components/systems/systems.component';
 import { WebsocketService } from 'src/app/services/websocket.service';
@@ -8,6 +8,11 @@ import { OverwatchStarSystem } from 'src/app/components/system-list/system-list.
 import { ammoniaWorlds } from '../../data/ammonia-worlds';
 import { DateAgoPipe } from 'src/app/pipes/date-ago.pipe';
 import { AppService } from 'src/app/services/app.service';
+import { SystemConfiguration } from 'canonned3d-map/lib/System';
+import { barnacleBarbs } from '../../data/barnacle-barbs';
+import { abandonedBases } from '../../data/abandoned-bases';
+import { thargoidSites } from '../../data/thargoid-sites';
+import { unknownBarnacleSites } from '../../data/unknown-barnacle-sites';
 
 @UntilDestroy()
 @Component({
@@ -53,15 +58,32 @@ export class CurrentComponent implements OnInit, AfterViewInit {
       "Ammonia": {
         name: 'Nearby ammonia worlds (< 30 Ly)',
         color: "4e290a",
-      }
+      },
+      "Barnacle Barbs": {
+        name: "Barnacle Barbs",
+        color: "0B5345"
+      },
+      "Thargoid Structure": {
+        name: "Thargoid Structure",
+        color: "512B60"
+      },
+      "Unknown Site": {
+        name: "Unknown Site",
+        color: "2E4840"
+      },
     },
+    "Various POI": {
+      "Abandoned Base": {
+        name: "Abandoned Base",
+        color: "283747",
+      },
+    }
   }
   private readonly defaultActiveCategories = ["20", "30", "40", "50", "70"];
   private systems: OverwatchStarSystem[] = [];
 
   public constructor(
     private readonly websocketService: WebsocketService,
-    private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly appService: AppService
   ) {
   }
@@ -91,7 +113,7 @@ export class CurrentComponent implements OnInit, AfterViewInit {
   private async update() {
     if (this.ed3dMap && this.mapLoaded && this.systems.length) {
       const dateAgoPipe = new DateAgoPipe();
-      const systems = [solSite];
+      const systems: SystemConfiguration[] = [solSite];
       for (const data of this.systems) {
         let description =
           `<b>State</b>: ${data.ThargoidLevel.Name}<br>` +
@@ -124,6 +146,11 @@ export class CurrentComponent implements OnInit, AfterViewInit {
           systems.push(ammoniaWorld);
         }
       }
+      systems.push(...barnacleBarbs);
+      systems.push(...abandonedBases);
+      systems.push(...thargoidSites);
+      systems.push(...unknownBarnacleSites);
+
       await this.ed3dMap.updateSystems(systems, this.categories);
     }
   }

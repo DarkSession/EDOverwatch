@@ -1,5 +1,6 @@
+import { SystemConfiguration } from "canonned3d-map/lib/System";
 
-export const ammoniaWorlds = [
+export const ammoniaWorlds: SystemConfiguration[] = [
     { name: "Kruger 60", description: "Contains ammonia world", categories: ["Ammonia"], coordinates: { x: -12.625, y: 0, z: -3.40625 } },
     { name: "36 Ophiuchi", description: "Contains ammonia world", categories: ["Ammonia"], coordinates: { x: 0.4375, y: 2.09375, z: 19.21875 } },
     { name: "Agastani", description: "Contains ammonia world", categories: ["Ammonia"], coordinates: { x: 22.375, y: -17.6875, z: -7.78125 } },

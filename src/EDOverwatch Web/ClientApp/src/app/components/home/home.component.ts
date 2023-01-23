@@ -100,6 +100,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               type: 'line',
               yAxisID: 'y1',
               order: 0,
+              borderWidth: 8,
             };
             this.updateDatasetColor(dataset);
             datasets.push(dataset);
@@ -117,6 +118,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               data: this.overview.ThargoidCycles.map(t => 0),
               yAxisID: 'y',
               order: 1,
+              stack: 'stack',
             };
             this.updateDatasetColor(dataset);
             datasets.push(dataset);
@@ -148,25 +150,13 @@ export class HomeComponent implements OnInit, OnDestroy {
           scales: {
             y1: {
               type: 'linear',
-              display: true,
               position: 'right',
-
-              // grid line settings
-              grid: {
-                drawOnChartArea: false, // only want the grid lines for one axis to show up
-              },
             },
             y: {
               position: 'left',
+              stacked: true,
             },
-          }
-          /*
-          scales: {
-            y: {
-              stacked: true
-            }
-          }
-          */
+          },
         },
       };
     }
