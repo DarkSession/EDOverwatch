@@ -49,6 +49,8 @@ namespace EDDataProcessor.Inara
         public void Dispose()
         {
             IBrowsingContext.Dispose();
+            HttpClient.Dispose();
+            ClientHandler.Dispose();
         }
 
         public async Task<int?> GetSystemId(string systemName)

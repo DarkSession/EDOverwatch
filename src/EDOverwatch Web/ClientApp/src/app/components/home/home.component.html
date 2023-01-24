@@ -105,27 +105,27 @@
         <ng-container *ngIf="overview && overview.Contested">
           <div class="text-item clickable" routerLink="systems">
             <div class="highlight">
-              {{ overview.Contested.SystemsInInvasion | number }}
-            </div>
-            systems under Thargoid invasion
-          </div>
-          <div class="text-item clickable" routerLink="systems">
-            <div class="highlight">
               {{ overview.Contested.SystemsWithAlerts | number }}
             </div>
             systems reporting Thargoid alerts
           </div>
           <div class="text-item clickable" routerLink="systems">
             <div class="highlight">
-              {{ overview.Contested.SystemsInRecovery | number }}
+              {{ overview.Contested.SystemsInInvasion | number }}
             </div>
-            systems in recovery
+            systems under Thargoid invasion
           </div>
           <div class="text-item clickable" routerLink="systems" *ngIf="overview.Contested.SystemsBeingRecaptured">
             <div class="highlight">
               {{ overview.Contested.SystemsBeingRecaptured | number }}
             </div>
-            systems being recaptured
+            systems being recaptured by Humanity
+          </div>
+          <div class="text-item clickable" routerLink="systems">
+            <div class="highlight">
+              {{ overview.Contested.SystemsInRecovery | number }}
+            </div>
+            systems in recovery
           </div>
         </ng-container>
       </div>
@@ -172,15 +172,21 @@
     <ng-container *ngIf="overview && overview.Contested">
       <div class="text-item clickable" routerLink="systems">
         <div class="highlight">
+          {{ overview.Contested.SystemsWithAlerts | number }}
+        </div>
+        systems reporting Thargoid alerts
+      </div>
+      <div class="text-item clickable" routerLink="systems">
+        <div class="highlight">
           {{ overview.Contested.SystemsInInvasion | number }}
         </div>
         systems under Thargoid invasion
       </div>
-      <div class="text-item clickable" routerLink="systems">
+      <div class="text-item clickable" routerLink="systems" *ngIf="overview.Contested.SystemsBeingRecaptured">
         <div class="highlight">
-          {{ overview.Contested.SystemsWithAlerts | number }}
+          {{ overview.Contested.SystemsBeingRecaptured | number }}
         </div>
-        systems reporting Thargoid alerts
+        systems being recaptured by Humanity
       </div>
       <div class="text-item clickable" routerLink="systems">
         <div class="highlight">
@@ -188,17 +194,11 @@
         </div>
         systems in recovery
       </div>
-      <div class="text-item clickable" routerLink="systems" *ngIf="overview.Contested.SystemsBeingRecaptured">
-        <div class="highlight">
-          {{ overview.Contested.SystemsBeingRecaptured | number }}
-        </div>
-        systems being recaptured
-      </div>
     </ng-container>
   </div>
 </div>
 <div class="maelstrom-summary-container hide-on-small-mobile" *ngIf="overview?.MaelstromHistory">
-  <h2>War Development</h2>
+  <h2>Development Overview</h2>
   <p>Development of the war starting in November 3308 with the arrival of the maelstrom Taranis.</p>
   <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options" [type]="chartConfig.type"
     width="200" height="100"></canvas>

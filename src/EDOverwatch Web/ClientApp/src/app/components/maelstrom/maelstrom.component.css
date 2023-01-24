@@ -11,3 +11,12 @@ table.system-information {
 .table {
     min-height: 300px;
 }
+
+.maelstrom-summary-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 100px;
+}

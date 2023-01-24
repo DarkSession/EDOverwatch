@@ -4,12 +4,20 @@
     {
         public List<OverwatchStarSystem> Systems { get; }
         public List<OverwatchMaelstromDetailSystemAtRisk> SystemsAtRisk { get; }
+        public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
+        public List<OverwatchThargoidCycle> ThargoidCycles { get; }
 
-        protected OverwatchMaelstromDetail(ThargoidMaelstrom thargoidMaelstrom, List<OverwatchStarSystem> systems, List<OverwatchMaelstromDetailSystemAtRisk> systemAtRisks) :
+        protected OverwatchMaelstromDetail(
+            ThargoidMaelstrom thargoidMaelstrom, List<OverwatchStarSystem> systems, 
+            List<OverwatchMaelstromDetailSystemAtRisk> systemAtRisks,
+            List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory,
+            List<OverwatchThargoidCycle> thargoidCycles) :
             base(thargoidMaelstrom)
         {
             Systems = systems;
             SystemsAtRisk = systemAtRisks;
+            MaelstromHistory = maelstromHistory;
+            ThargoidCycles = thargoidCycles;
         }
 
         public static async Task<OverwatchMaelstromDetail> Create(ThargoidMaelstrom maelstrom, EdDbContext dbContext, CancellationToken cancellationToken)
@@ -139,7 +147,18 @@
                 systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population));
             }
 
-            return new OverwatchMaelstromDetail(maelstrom, resultStarSystems, systemsAtRiskResult);
+            List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
+                .AsNoTracking()
+                .Where(t => t.State != StarSystemThargoidLevelState.Maelstrom && t.Maelstrom == maelstrom)
+                .Include(t => t.Cycle)
+                .Include(t => t.Maelstrom)
+                .ThenInclude(m => m!.StarSystem)
+                .ToListAsync(cancellationToken);
+            List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory = maelstromHistoricalSummaries.Select(m => new OverwatchOverviewMaelstromHistoricalSummary(m)).ToList();
+
+            List< OverwatchThargoidCycle> thargoidCycles = await OverwatchThargoidCycle.GetThargoidCycles(dbContext, cancellationToken);
+
+            return new OverwatchMaelstromDetail(maelstrom, resultStarSystems, systemsAtRiskResult, maelstromHistory, thargoidCycles);
         }
     }
 }

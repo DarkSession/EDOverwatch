@@ -100,7 +100,10 @@ export class HomeComponent implements OnInit, OnDestroy {
               type: 'line',
               yAxisID: 'y1',
               order: 0,
-              borderWidth: 8,
+              // borderWidth: 8,
+              segment: {
+                borderWidth: 8,
+              }
             };
             this.updateDatasetColor(dataset);
             datasets.push(dataset);
@@ -267,7 +270,7 @@ export interface OverwatchThargoidCycle {
   IsCurrent: boolean;
 }
 
-interface OverwatchOverviewMaelstromHistoricalSummary {
+export interface OverwatchOverviewMaelstromHistoricalSummary {
   Cycle: OverwatchThargoidCycle;
   Maelstrom: OverwatchMaelstrom;
   State: OverwatchThargoidLevel;

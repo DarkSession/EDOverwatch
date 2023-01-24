@@ -29,7 +29,7 @@
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
-                    <mat-label>Thargoid Level</mat-label>
+                    <mat-label>Thargoid State</mat-label>
                     <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="settingChanged()" multiple>
                         <mat-option *ngFor="let thargoidLevel of thargoidLevels" [value]="thargoidLevel">
                             {{ thargoidLevel.Name }}
@@ -39,12 +39,14 @@
             </div>
             <div class="systems-filter">
                 <div>
-                    <mat-checkbox [(ngModel)]="hideUnpopulated" (ngModelChange)="settingChanged()">Hide unpopulated
-                        systems</mat-checkbox>
+                    <mat-checkbox [(ngModel)]="hideUnpopulated" (ngModelChange)="settingChanged()">
+                        Hide unpopulated systems (original)
+                    </mat-checkbox>
                 </div>
                 <div>
-                    <mat-checkbox [(ngModel)]="hideCompleted" (ngModelChange)="settingChanged()">Hide completed
-                        systems</mat-checkbox>
+                    <mat-checkbox [(ngModel)]="hideCompleted" (ngModelChange)="settingChanged()">
+                        Hide completed systems
+                    </mat-checkbox>
                 </div>
                 <mat-form-field appearance="outline">
                     <mat-label>Optional columns</mat-label>

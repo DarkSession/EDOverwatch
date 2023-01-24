@@ -51,7 +51,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Controlled,
                         _ => StarSystemThargoidLevelState.None,
                     };
-                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false)
+                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, oldThargoidLevel.IsInvisibleState)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,
@@ -62,9 +62,10 @@ namespace EDDataProcessor
 
                     if (newState == StarSystemThargoidLevelState.Controlled)
                     {
+                        StationType fleetCarrierStationType = await StationType.GetFleetCarrier(dbContext, cancellationToken);
                         starSystem.Population = 0;
                         await dbContext.Stations
-                            .Where(s => s.StarSystem == starSystem && s.State != StationState.Abandoned)
+                            .Where(s => s.StarSystem == starSystem && s.State != StationState.Abandoned && s.Type != fleetCarrierStationType)
                             .ForEachAsync((s) =>
                             {
                                 s.State = StationState.Abandoned;

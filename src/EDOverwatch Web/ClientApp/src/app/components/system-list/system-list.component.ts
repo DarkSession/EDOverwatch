@@ -85,7 +85,7 @@ export class SystemListComponent implements OnInit, OnChanges {
       (this.maelstromsSelected === null || typeof this.maelstromsSelected.find(m => m.Name === d.Maelstrom.Name) !== 'undefined') &&
       (this.thargoidLevelsSelected === null || typeof this.thargoidLevelsSelected.find(t => t.Level === d.ThargoidLevel.Level) !== 'undefined') &&
       (systemNameFilter === "" || d.Name.toUpperCase().includes(systemNameFilter)) &&
-      (d.Population > 0 || !this.hideUnpopulated) &&
+      (d.PopulationOriginal > 0 || !this.hideUnpopulated) &&
       (d.Progress !== 100 || !this.hideCompleted));
     if (this.sort?.active) {
       data = this.dataSource.sortData(data, this.sort);
