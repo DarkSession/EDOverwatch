@@ -15,6 +15,7 @@ import { barnacleBarbs } from '../../data/barnacle-barbs';
 import { abandonedBases } from '../../data/abandoned-bases';
 import { thargoidSites } from '../../data/thargoid-sites';
 import { unknownBarnacleSites } from '../../data/unknown-barnacle-sites';
+import { horizonEngineers, odysseyEngineers } from '../../data/engineers';
 
 @UntilDestroy()
 @Component({
@@ -81,13 +82,13 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
         name: 'Nearby ammonia worlds (< 30 Ly)',
         color: "4e290a",
       },
-      "Barnacle Barbs": {
-        name: "Barnacle Barbs",
-        color: "0B5345"
-      },
       "Thargoid Structure": {
         name: "Thargoid Structure",
         color: "512B60"
+      },
+      "Barnacle Barbs": {
+        name: "Barnacle Barbs",
+        color: "0B5345"
       },
       "Unknown Site": {
         name: "Unknown Site",
@@ -98,6 +99,14 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       "Abandoned Base": {
         name: "Abandoned Base",
         color: "283747",
+      },
+      "Horizons Engineer": {
+        name: "Engineer (Horizons)",
+        color: "541425",
+      },
+      "Odyssey Engineer": {
+        name: "Engineer (Odyssey)",
+        color: "8A2652",
       },
     },
   };
@@ -181,6 +190,8 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       systems.push(...abandonedBases);
       systems.push(...thargoidSites);
       systems.push(...unknownBarnacleSites);
+      systems.push(...horizonEngineers);
+      systems.push(...odysseyEngineers);
 
       await this.ed3dMap.updateSystems(systems, this.categories);
     }

@@ -284,6 +284,7 @@ namespace EDSystemProgress
                                                 break;
                                             }
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
+                                        case SystemStatus.ThargoidControlledRegainedPopulated:
                                             {
                                                 match = text.Contains("BEGINS IN");
                                                 if (match)
@@ -340,8 +341,17 @@ namespace EDSystemProgress
                                                 break;
                                             }
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
-                                            {
-                                                match = text.Contains("UNPOPULATED");
+                                        case SystemStatus.ThargoidControlledRegainedPopulated:
+                                        {
+                                                match = text.Contains("POST-THARGOID RECOVER") || text.Contains("POST THARGOID RECOVER");
+                                                if (match)
+                                                {
+                                                    systemStatus = SystemStatus.ThargoidControlledRegainedPopulated;
+                                                }
+                                                else
+                                                {
+                                                    match = text.Contains("UNPOPULATED");
+                                                }
                                                 break;
                                             }
                                     }
@@ -379,7 +389,7 @@ namespace EDSystemProgress
                 {
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionProgressColors,
                     SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated or SystemStatus.AlertInProgressUnpopulated => AlertProgressColors,
-                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated => InvasionProgressColors,
+                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated or SystemStatus.ThargoidControlledRegainedPopulated => InvasionProgressColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => AlertProgressColors,
                     _ => throw new NotImplementedException(),
                 };
@@ -387,7 +397,7 @@ namespace EDSystemProgress
                 {
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented or SystemStatus.AlertInProgressUnpopulated => InvasionRemainingColors,
                     SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated => AlertRemainingColors,
-                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated => InvasionRemainingColors,
+                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated or SystemStatus.ThargoidControlledRegainedPopulated => InvasionRemainingColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => InvasionProgressColors,
                     _ => throw new NotImplementedException(),
                 };
@@ -594,6 +604,8 @@ namespace EDSystemProgress
         Unpopulated,
         [EnumMember(Value = "Thargoid controlled, regained")]
         ThargoidControlledRegainedUnpopulated,
+        [EnumMember(Value = "Thargoid controlled, regained")]
+        ThargoidControlledRegainedPopulated,
     }
 
     public readonly struct ExtractSystemProgressResult

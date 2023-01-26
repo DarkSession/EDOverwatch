@@ -23,7 +23,7 @@ export class MaelstromComponent implements OnInit {
   public maelstrom: OverwatchMaelstromDetail | null = null;
   public systemsAtRisk: MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk> = new MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk>();
   public readonly systemsAtRiskColumns = ['Name', 'Population', 'Distance'];
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  @ViewChild(MatSort) sort!: MatSort;
   public chartConfig: ChartConfiguration = {
     type: 'bar',
     data: {

@@ -260,7 +260,6 @@ interface OverwatchOverview {
   };
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];
-  // WarEffortSums: WarEffortSummary[];
 }
 
 export interface OverwatchThargoidCycle {
@@ -274,12 +273,5 @@ export interface OverwatchOverviewMaelstromHistoricalSummary {
   Cycle: OverwatchThargoidCycle;
   Maelstrom: OverwatchMaelstrom;
   State: OverwatchThargoidLevel;
-  Amount: number;
-}
-
-interface WarEffortSummary {
-  Cycle: string;
-  TypeId: number;
-  Type: string;
   Amount: number;
 }

@@ -99,5 +99,14 @@ namespace EDOverwatch_Web.Controllers.V1
             }
             return result!;
         }
+
+        /*
+        [HttpGet]
+        public async Task<OverwatchWarStats?> Stats(CancellationToken cancellationToken)
+        {
+            await OverwatchWarStats.Create(DbContext, cancellationToken);
+            return null;
+        }
+        */
     }
 }

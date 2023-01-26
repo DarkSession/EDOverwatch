@@ -97,7 +97,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.None,
                         StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Recovery,
                         StarSystemThargoidLevelState.Recovery => StarSystemThargoidLevelState.None,
-                        StarSystemThargoidLevelState.Controlled when starSystem.Population > 0 => StarSystemThargoidLevelState.Recovery,
+                        StarSystemThargoidLevelState.Controlled when starSystem.OriginalPopulation > 0 => StarSystemThargoidLevelState.Recovery,
                         _ => StarSystemThargoidLevelState.None,
                     };
                     StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false)
@@ -144,6 +144,8 @@ namespace EDDataProcessor
                                     station.State = StationState.Normal;
                                     station.Updated = newThargoidCycle.Start;
                                 }
+
+                                starSystem.Population = starSystem.OriginalPopulation;
 
                                 List<DcohFactionOperation> factionOperations = await dbContext.DcohFactionOperations
                                     .Where(s =>
@@ -213,11 +215,6 @@ namespace EDDataProcessor
             }
 
             dbContext.ChangeTracker.Clear();
-
-            await dbContext.StarSystems
-                .Where(s => !s.WarRelevantSystem && !s.Stations!.Any() && s.ThargoidLevel == null && !s.ThargoidLevelHistory!.Any())
-                .Take(10000)
-                .ExecuteDeleteAsync(cancellationToken);
         }
     }
 }

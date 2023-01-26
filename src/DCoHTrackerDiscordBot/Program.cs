@@ -86,10 +86,10 @@ namespace DCoHTrackerDiscordBot
             await client.StartAsync();
 
             TaskCompletionSource t = new();
-            client.Ready += () =>
+            client.Ready += async () =>
             {
                 t.TrySetResult();
-                return Task.CompletedTask;
+                await client.SetGameAsync("the galaxy", type: ActivityType.Watching);
             };
 
             await t.Task;

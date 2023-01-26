@@ -7,9 +7,8 @@
         public OverwatchOverviewContested? Contested { get; set; }
         public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }
-        public List<WarEffortSummary>? WarEffortSums { get; set; }
 
-        public OverwatchOverview(List<OverwatchThargoidCycle> thargoidCycles)
+        protected OverwatchOverview(List<OverwatchThargoidCycle> thargoidCycles)
         {
             ThargoidCycles = thargoidCycles;
         }
@@ -116,7 +115,6 @@
                     warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && warEffortTypeMissions.Contains(w.type))?.amount);
             }
 
-            // A group by query might be more efficient...
             result.Contested = new(
                 systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Invasion)?.Count ?? 0,
                 systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Alert)?.Count ?? 0,
@@ -132,15 +130,6 @@
                 .ThenInclude(m => m!.StarSystem)
                 .ToListAsync(cancellationToken);
             result.MaelstromHistory.AddRange(maelstromHistoricalSummaries.Select(m => new OverwatchOverviewMaelstromHistoricalSummary(m)));
-
-            /*
-            result.WarEffortSums = await dbContext.WarEfforts
-                .AsNoTracking()
-                .Where(w => w.Cycle != null && w.Side == WarEffortSide.Humans)
-                .GroupBy(w => new { w.Cycle!.Start, w.Type })
-                .Select(w => new WarEffortSummary(DateOnly.FromDateTime(w.Key.Start.DateTime), w.Key.Type, w.Sum(x => x.Amount)))
-                .ToListAsync(cancellationToken);
-            */
 
             return result;
         }
@@ -159,21 +148,6 @@
             Maelstrom = new(historicalSummary.Maelstrom ?? throw new Exception("Maelstrom cannot be null"));
             State = new(historicalSummary.State);
             Amount = historicalSummary.Amount;
-        }
-    }
-
-    public class WarEffortSummary
-    {
-        public DateOnly Cycle { get; }
-        public WarEffortType TypeId { get; }
-        public string Type => EnumUtil.GetEnumMemberValue(TypeId);
-        public long Amount { get; }
-
-        public WarEffortSummary(DateOnly cycle, WarEffortType typeId, long amount)
-        {
-            Cycle = cycle;
-            TypeId = typeId;
-            Amount = amount;
         }
     }
 }
