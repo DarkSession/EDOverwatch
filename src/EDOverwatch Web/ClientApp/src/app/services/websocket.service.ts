@@ -8,7 +8,6 @@ import { DBSchema, IDBPDatabase } from 'idb/with-async-ittr';
     providedIn: 'root'
 })
 export class WebsocketService {
-    public connectionStatus: ConnectionStatus = ConnectionStatus.Connecting;
     private initalizeTimeout: any | null = null;
     private webSocket: WebSocket | null = null;
     private messageQueue: WebSocketMessageQueueItem[] = [];
@@ -21,19 +20,32 @@ export class WebsocketService {
     public authenticationResolved!: Promise<void>;
     private authenticationResolve!: ((connectionStatus: void) => void);
     public onConnectionStatusChanged: EventEmitter<ConnectionStatus> = new EventEmitter<ConnectionStatus>();
-    public onReconnected: EventEmitter<void> = new EventEmitter<void>();
+    public onReady: EventEmitter<boolean> = new EventEmitter<boolean>();
     private eventSubscribers: {
         [key: string]: EventEmitter<WebSocketMessage<any>>;
     } = {};
     public connectionIsAuthenticated = false;
+    public connectionIsAuthenticatedChanged: EventEmitter<void> = new EventEmitter<void>();
     public messageBacklogChanged: EventEmitter<number> = new EventEmitter<number>();
     private connectionAttempt = 0;
     private cacheDb: IDBPDatabase<CacheDb> | null = null;
     private wasConnected = false;
-
     public constructor() {
         this.initDb();
         this.initalize();
+    }
+
+    public ensureConnected(): void {
+        if (!environment.production) {
+            console.log("ensureConnected");
+        }
+        if (this.connectionStatus === ConnectionStatus.Closed) {
+            this.initalizeConnection();
+        }
+    }
+
+    public get connectionStatus(): ConnectionStatus {
+        return this.webSocket?.readyState ?? ConnectionStatus.Closed;
     }
 
     private async initDb(): Promise<void> {
@@ -43,6 +55,11 @@ export class WebsocketService {
                     db.createObjectStore('ws');
                 },
             });
+            if (this.cacheDb) {
+                for (const queueItem of this.messageQueue) {
+                    await this.checkMessageCache(queueItem.message, !!queueItem.callback);
+                }
+            }
         }
         catch (e) {
             console.error(e);
@@ -59,8 +76,7 @@ export class WebsocketService {
     }
 
     public disconnect(): void {
-        if (this.webSocket?.readyState === 1) {
-            this.setConnectionStatus(ConnectionStatus.Disconnected);
+        if (this.connectionStatus === ConnectionStatus.Open) {
             this.authenticationResolved = new Promise((resolve) => {
                 this.authenticationResolve = resolve;
             });
@@ -70,16 +86,20 @@ export class WebsocketService {
         }
     }
 
-    private setConnectionStatus(connectionStatus: ConnectionStatus): void {
-        this.connectionStatus = connectionStatus;
-        this.onConnectionStatusChanged.emit(connectionStatus);
-        if (this.connectionStatus === ConnectionStatus.Connected) {
-            if (this.wasConnected) {
-                this.onReconnected.emit();
-            }
-            else {
-                this.wasConnected = true;
-            }
+    private connectionStatusChanged(): void {
+        this.onConnectionStatusChanged.emit(this.connectionStatus);
+    }
+
+    private initalizeConnection(delayed: boolean = true): void {
+        this.connectionStatusChanged();
+        if (delayed) {
+            const timeout = this.connectionAttempt > 5 ? 30000 : 5000;
+            this.initalizeTimeout = setTimeout(() => {
+                this.initalize();
+            }, timeout);
+        }
+        else {
+            this.initalize();
         }
     }
 
@@ -88,17 +108,19 @@ export class WebsocketService {
             this.authenticationResolve = resolve;
         });
         this.failCallbacks();
-        this.setConnectionStatus(ConnectionStatus.Connecting);
+        this.connectionAttempt++;
         let webSocketUrl = ((window.location.protocol === "http:") ? "ws://" : "wss://") + window.location.hostname;
         if (environment.websocketPort) {
             webSocketUrl += ":" + environment.websocketPort;
         }
         webSocketUrl += "/ws";
         this.webSocket = new WebSocket(webSocketUrl);
+        this.connectionStatusChanged();
         this.webSocket.onopen = () => {
             if (!environment.production) {
                 console.log("WebSocket.onopen");
             }
+            this.connectionStatusChanged();
         };
         this.webSocket.onclose = (event: CloseEvent) => {
             if (!environment.production) {
@@ -112,18 +134,14 @@ export class WebsocketService {
             if (this.initalizeTimeout !== null) {
                 clearTimeout(this.initalizeTimeout);
             }
-            const timeout = this.connectionAttempt > 5 ? 30000 : 5000;
-            this.initalizeTimeout = setTimeout(() => {
-                this.initalize();
-            }, timeout);
-            this.connectionAttempt++;
-            this.setConnectionStatus(ConnectionStatus.Disconnected);
+            this.initalizeConnection();
             this.failCallbacks();
         };
         this.webSocket.onerror = (event: Event) => {
             if (!environment.production) {
                 console.log("WebSocket.onerror", event);
             }
+            this.connectionStatusChanged();
         };
         this.webSocket.onmessage = (event: MessageEvent) => {
             if (!environment.production) {
@@ -145,8 +163,14 @@ export class WebsocketService {
     private async processMessage(message: WebSocketResponseMessage, isCached: boolean): Promise<void> {
         if (message.Name === "Authentication") {
             const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
-            this.connectionIsAuthenticated = authenticationData.IsAuthenticated;
-            this.setConnectionStatus(ConnectionStatus.Connected);
+            if (this.connectionIsAuthenticated !== authenticationData.IsAuthenticated) {
+                this.connectionIsAuthenticated = authenticationData.IsAuthenticated;
+                this.connectionIsAuthenticatedChanged.emit();
+            }
+            if (this.connectionStatus === ConnectionStatus.Open) {
+                this.onReady.emit(this.wasConnected);
+                this.wasConnected = true;
+            }
             this.connectionAttempt = 0;
             for (const queueItem of this.messageQueue) {
                 this.sendMessageInternal(queueItem.message, !queueItem.message.CacheId, queueItem.callback);
@@ -224,7 +248,7 @@ export class WebsocketService {
         if (!isUnique && !message.CacheId) {
             message.CacheId = await this.hash(message.Name + JSON.stringify(message.Data));
         }
-        if (this.connectionStatus === ConnectionStatus.Connected && this.webSocket !== null) {
+        if (this.webSocket !== null && this.connectionStatus === ConnectionStatus.Open) {
             if (callback && message.MessageId) {
                 this.responseCallbacks[message.MessageId] = callback;
             }
@@ -239,9 +263,14 @@ export class WebsocketService {
                 callback: callback,
             });
         }
+        await this.checkMessageCache(message, !!callback);
+        this.triggerMessageBacklogEvent();
+    }
+
+    private async checkMessageCache(message: WebSocketRequestMessage, hasCallback: boolean): Promise<void> {
         if (message.CacheId) {
             this.wsRequests[message.MessageId] = message.CacheId;
-            if (!callback && this.cacheDb) {
+            if (!hasCallback && this.cacheDb) {
                 const cachedMessage: WebSocketResponseMessage | undefined = await this.cacheDb.get('ws', message.CacheId);
                 if (cachedMessage) {
                     if (!environment.production) {
@@ -252,7 +281,6 @@ export class WebsocketService {
                 }
             }
         }
-        this.triggerMessageBacklogEvent();
     }
 
     private triggerMessageBacklogEvent(): void {
@@ -269,9 +297,10 @@ export class WebsocketService {
 }
 
 export enum ConnectionStatus {
-    Connecting,
-    Connected,
-    Disconnected,
+    Connecting = 0,
+    Open,
+    Closing,
+    Closed,
 }
 
 export interface WebSocketMessage<T = unknown> {

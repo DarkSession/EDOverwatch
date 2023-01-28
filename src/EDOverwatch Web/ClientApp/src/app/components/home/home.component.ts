@@ -76,10 +76,12 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       });
     this.webSocketService
-      .onReconnected
+      .onReady
       .pipe(untilDestroyed(this))
-      .subscribe(() => {
-        this.webSocketService.sendMessage("OverwatchHome", {});
+      .subscribe((isReconnect: boolean) => {
+        if (isReconnect) {
+          this.webSocketService.sendMessage("OverwatchHome", {});
+        }
       });
     this.updateTimeSince();
     this.webSocketService.sendMessage("OverwatchHome", {});
@@ -265,7 +267,9 @@ interface OverwatchOverview {
 export interface OverwatchThargoidCycle {
   Cycle: string;
   Start: string;
+  StartDate: string;
   End: string;
+  EndDate: string;
   IsCurrent: boolean;
 }
 

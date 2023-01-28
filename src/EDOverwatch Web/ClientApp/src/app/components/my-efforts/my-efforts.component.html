@@ -4,6 +4,12 @@
             My contributions
         </div>
         <div class="content-box">
+            <div class="chart-container">
+                <div style="width: 90vh; height: 30vh;">
+                    <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options"
+                        [type]="chartConfig.type" width="300" height="100"></canvas>
+                </div>
+            </div>
             <table mat-table [dataSource]="dataSource" matSort matSortActive="Date" matSortDirection="desc"
                 matSortDisableClear>
                 <ng-container matColumnDef="Date">
@@ -37,6 +43,14 @@
             </table>
             <div *ngIf="dataSource.data.length === 0" class="empty-table">
                 No records found.
+            </div>
+            <mat-paginator [pageSizeOptions]="[25, 50, 100]" [pageSize]="pageSize" [showFirstLastButtons]="true"
+                aria-label="Select page of systems"></mat-paginator>
+            <div class="options-bottom">
+                <span (click)="exportToCsv()" class="clickable">
+                    <fa-icon [icon]="faFileCsv"></fa-icon>
+                    Export as CSV
+                </span>
             </div>
         </div>
     </div>

@@ -2,11 +2,11 @@
 
 namespace EDOverwatch_Web.WebSockets.Handler
 {
-    public class CommanderWarEfforts : WebSocketHandler
+    public class CommanderWarEffortsV2 : WebSocketHandler
     {
         protected override Type? MessageDataType => null;
 
-        public CommanderWarEfforts()
+        public CommanderWarEffortsV2()
         {
         }
 
@@ -23,7 +23,12 @@ namespace EDOverwatch_Web.WebSockets.Handler
             {
                 throw new Exception("commander is null");
             }
-            return new WebSocketHandlerResultSuccess(await Models.CommanderWarEffort.Create(dbContext, user, cancellationToken), new CommanderWarEffortsObject(user.Commander.Id));
+            Models.CommanderWarEfforts? commanderWarEfforts = await Models.CommanderWarEfforts.Create(dbContext, user, cancellationToken);
+            if (commanderWarEfforts != null)
+            {
+                return new WebSocketHandlerResultSuccess(commanderWarEfforts, new CommanderWarEffortsObject(user.Commander.Id));
+            }
+            throw new Exception("commanderWarEfforts is null");
         }
     }
 }

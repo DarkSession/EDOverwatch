@@ -26,10 +26,10 @@
           <a class="link clickable" (click)="appService.oAuthStart()">Refresh</a>
         </div>
       </span>
-      <span *ngIf="!appService.user">
+      <span *ngIf="!appService.user" class="hide-on-small-mobile">
         <button mat-raised-button color="primary" routerLink="contribute">Contribute</button>
       </span>
-      <div *ngIf="appService.user">
+      <div *ngIf="appService.user" class="hide-on-small-mobile">
         <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Menu">
           <mat-icon>more_vert</mat-icon>
         </button>

@@ -30,7 +30,9 @@
                     </div>
                 </mat-tab>
                 <mat-tab label="Affected systems">
-                    <app-system-list [systems]="maelstrom.Systems"></app-system-list>
+                    <ng-template matTabContent>
+                        <app-system-list [systems]="maelstrom.Systems"></app-system-list>
+                    </ng-template>
                 </mat-tab>
                 <mat-tab label="Unaffected systems at risk">
                     <div class="table-container">
@@ -39,7 +41,7 @@
                                 matSortDirection="asc" matSortDisableClear>
                                 <ng-container matColumnDef="Name">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
-                                    <td mat-cell *matCellDef="let row">
+                                    <td mat-cell *matCellDef="let row" class="nowrap">
                                         {{ row.Name }}
                                         <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
                                             (click)="copySystemName(row)"></fa-icon>

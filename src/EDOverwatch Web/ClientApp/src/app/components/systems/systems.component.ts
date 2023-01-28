@@ -41,7 +41,7 @@ export class SystemsComponent implements OnInit {
         value: "Population (Original)",
       },
     ];
-    
+
   public maelstroms: OverwatchMaelstrom[] = [];
   public maelstromsSelected: OverwatchMaelstrom[] = [];
 
@@ -63,10 +63,12 @@ export class SystemsComponent implements OnInit {
         this.update(message.Data);
       });
     this.webSocketService
-      .onReconnected
+      .onReady
       .pipe(untilDestroyed(this))
-      .subscribe(() => {
-        this.webSocketService.sendMessage("OverwatchSystems", {});
+      .subscribe((isReconnect: boolean) => {
+        if (isReconnect) {
+          this.webSocketService.sendMessage("OverwatchSystems", {});
+        }
       });
     this.webSocketService.sendMessage("OverwatchSystems", {});
   }

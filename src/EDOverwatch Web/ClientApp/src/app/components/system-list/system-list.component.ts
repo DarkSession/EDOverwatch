@@ -4,10 +4,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faFileCsv } from '@fortawesome/free-solid-svg-icons';
 import { AppService } from 'src/app/services/app.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
+import { ExportToCsv, Options } from 'export-to-csv';
 
 @Component({
   selector: 'app-system-list',
@@ -18,6 +19,7 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
 export class SystemListComponent implements OnInit, OnChanges {
   public readonly faClipboard = faClipboard;
   public readonly faCircleCheck = faCircleCheck;
+  public readonly faFileCsv = faFileCsv;
   private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'FactionOperations', 'StateExpiration'];
   public displayedColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
@@ -54,16 +56,21 @@ export class SystemListComponent implements OnInit, OnChanges {
 
   private async updateSettings(): Promise<void> {
     const sort = await this.appService.getTableSort("SystemList", this.sortColumn, this.sortDirection);
+    const pageSizeSetting = await this.appService.getSetting("SystemListPageSize");
+    this.progressShowPercentage = (await this.appService.getSetting("SystemListProgressShowPercentage") === "1");
     this.sortColumn = sort.Column;
     this.sortDirection = sort.Direction;
-    const pageSizeSetting = await this.appService.getSetting("SystemListPageSize");
     if (pageSizeSetting) {
       const pageSize = parseInt(pageSizeSetting);
       if (!isNaN(pageSize) && pageSize >= 10) {
         this.pageSize = pageSize;
       }
     }
-    this.progressShowPercentage = (await this.appService.getSetting("SystemListProgressShowPercentage") === "1");
+    if (this.sort?.active) {
+      this.sort.active = sort.Column;
+      this.sort.direction = sort.Direction;
+      this.dataSource.data = this.dataSource.sortData(this.dataSource.data, this.sort);
+    }
     this.changeDetectorRef.markForCheck();
   }
 
@@ -130,6 +137,51 @@ export class SystemListComponent implements OnInit, OnChanges {
   public toggleProgressShowPercentage(): void {
     this.progressShowPercentage = !this.progressShowPercentage;
     this.appService.saveSetting("SystemListProgressShowPercentage", this.progressShowPercentage ? "1" : "0");
+  }
+
+  public exportToCsv(): void {
+    const data = [];
+    for (const system of this.systems) {
+      data.push({
+        Name: system.Name,
+        SystemAddress: system.SystemAddress,
+        X: system.Coordinates.X,
+        Y: system.Coordinates.Y,
+        Z: system.Coordinates.Z,
+        Maelstrom: system.Maelstrom.Name,
+        DistanceToMaelstrom: system.DistanceToMaelstrom,
+        Population: system.Population,
+        PopulationOriginal: system.PopulationOriginal,
+        State: system.ThargoidLevel.Name,
+        StateInvisible: system.ThargoidLevel.IsInvisibleState,
+        StateExpires: system.StateExpiration?.StateExpires ?? "",
+        Progress: system.Progress ?? 0,
+        ProgressIsCompleted: system.StateProgress.IsCompleted,
+        NextSystemState: system.StateProgress.NextSystemState?.Name ?? "",
+        NextSystemStateChanges: system.StateProgress.SystemStateChanges ?? "",
+        Focus: system.EffortFocus,
+        FactionOperations: system.FactionOperations,
+        SpecialFactionOperations: system.SpecialFactionOperations.map(s => s.Tag).join(","),
+        StationsUnderRepair: system.StationsUnderRepair,
+        StationsDamaged: system.StationsDamaged,
+        StationsUnderAttack: system.StationsUnderAttack,
+      });
+    }
+
+    const options: Options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      showTitle: false,
+      filename: "Overwatch System List Export.csv",
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
   }
 }
 

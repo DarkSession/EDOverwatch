@@ -39,6 +39,7 @@
     "chartjs-plugin-annotation": "^2.1.0",
     "dayjs": "^1.11.6",
     "emittery": "^1.0.1",
+    "export-to-csv": "^0.2.1",
     "guid-typescript": "^1.0.9",
     "idb": "^7.1.1",
     "jquery": "^3.6.0",

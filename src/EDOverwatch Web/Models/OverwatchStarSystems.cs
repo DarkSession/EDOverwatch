@@ -86,37 +86,7 @@
                 decimal effortFocus = 0;
                 if (totalEffortSums.Any())
                 {
-                    Dictionary<WarEffortTypeGroup, long> systemEffortSums = new();
-                    foreach (var systemEfforts in efforts
-                        .Where(e => e.StarSystemId == starSystem.Id)
-                        .GroupBy(e => e.Type)
-                        .Select(e => new
-                        {
-                            e.Key,
-                            Amount = e.Sum(g => g.Amount),
-                        }))
-                    {
-                        if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(systemEfforts.Key, out WarEffortTypeGroup group))
-                        {
-                            if (!systemEffortSums.ContainsKey(group))
-                            {
-                                systemEffortSums[group] = systemEfforts.Amount;
-                                continue;
-                            }
-                            systemEffortSums[group] += systemEfforts.Amount;
-                        }
-                    }
-                    if (systemEffortSums.Any())
-                    {
-                        foreach (KeyValuePair<WarEffortTypeGroup, long> effort in systemEffortSums)
-                        {
-                            if (totalEffortSums.TryGetValue(effort.Key, out long totalAmount) && totalAmount > 0)
-                            {
-                                effortFocus += ((decimal)effort.Value / (decimal)totalAmount / (decimal)totalEffortSums.Count);
-                            }
-                        }
-                        effortFocus = Math.Round(effortFocus, 2);
-                    }
+                    effortFocus = WarEffort.CalculateSystemFocus(efforts.Where(e => e.StarSystemId == starSystem.Id).Select(e => new WarEffortTypeSum(e.Type, e.Amount)), totalEffortSums);
                 }
                 List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
                     .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))

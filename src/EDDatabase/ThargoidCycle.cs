@@ -21,5 +21,8 @@
 
         [NotMapped]
         public bool IsCurrent => Start <= DateTimeOffset.UtcNow && End >= DateTimeOffset.UtcNow;
+
+        [NotMapped]
+        public DateOnly Cycle => DateOnly.FromDateTime(Start.DateTime);
     }
 }

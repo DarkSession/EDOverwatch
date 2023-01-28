@@ -342,7 +342,7 @@ namespace EDSystemProgress
                                             }
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
                                         case SystemStatus.ThargoidControlledRegainedPopulated:
-                                        {
+                                            {
                                                 match = text.Contains("POST-THARGOID RECOVER") || text.Contains("POST THARGOID RECOVER");
                                                 if (match)
                                                 {

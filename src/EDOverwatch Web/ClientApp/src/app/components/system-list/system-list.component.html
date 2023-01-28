@@ -4,7 +4,7 @@
             [matSortActive]="sortColumn" [matSortDirection]="sortDirection" matSortDisableClear>
             <ng-container matColumnDef="Name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
                         {{ row.Name }}
                     </span>
@@ -14,7 +14,7 @@
             </ng-container>
             <ng-container matColumnDef="ThargoidLevel">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
                     <div *ngIf="row.StateProgress?.IsCompleted && row.StateProgress.NextSystemState"
                         class="state-change">
@@ -55,7 +55,7 @@
             </ng-container>
             <ng-container matColumnDef="Progress">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     <div class="progress-cell" *ngIf="row.Progress !== null" (click)="toggleProgressShowPercentage()">
                         <mat-progress-bar mode="determinate" [value]="row.Progress" [matTooltip]="row.Progress + '%'"
                             color="red" *ngIf="!progressShowPercentage"></mat-progress-bar>
@@ -108,5 +108,11 @@
         </div>
         <mat-paginator [pageSizeOptions]="[25, 50, 100]" [pageSize]="pageSize" [showFirstLastButtons]="true"
             (page)="handlePageEvent($event)" aria-label="Select page of systems"></mat-paginator>
+    </div>
+    <div class="options-bottom">
+        <span (click)="exportToCsv()" class="clickable">
+            <fa-icon [icon]="faFileCsv"></fa-icon>
+            Export as CSV
+        </span>
     </div>
 </div>

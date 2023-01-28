@@ -24,7 +24,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.CommanderWarEfforts
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(commanderWarEffortsObject)).ToList();
             if (sessions.Any())
             {
-                WebSocketMessage webSocketMessage = new(nameof(Handler.CommanderWarEfforts), await Models.CommanderWarEffort.Create(dbContext, commander, cancellationToken));
+                WebSocketMessage webSocketMessage = new(nameof(Handler.CommanderWarEffortsV2), await Models.CommanderWarEfforts.Create(dbContext, commander, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

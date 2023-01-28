@@ -61,7 +61,11 @@ import { SystemStateAnalysisComponent } from './components/system-state-analysis
 import { ContributeDataComponent } from './components/contribute-data/contribute-data.component';
 import { CommanderApiKeysComponent } from './components/commander-api-keys/commander-api-keys.component';
 import { SystemContributionSummaryComponent } from './components/system-contribution-summary/system-contribution-summary.component';
+import { Chart } from 'chart.js';
 
+
+Chart.defaults.color = "#cccccc";
+Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
 
 /** Http interceptor providers in outside-in order */
 export const httpInterceptorProviders = [

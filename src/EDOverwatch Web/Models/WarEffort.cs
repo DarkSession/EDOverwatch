@@ -33,17 +33,13 @@
                 .ToListAsync(cancellationToken);
 
             Dictionary<WarEffortTypeGroup, long> totalEffortSums = new();
-            foreach (var total in totalEfforts.GroupBy(e => e.Type).Select(e => new
-            {
-                e.Key,
-                Amount = e.Sum(g => g.Amount),
-            }))
+            foreach (var total in totalEfforts)
             {
                 if (total.Amount == 0)
                 {
                     continue;
                 }
-                if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(total.Key, out WarEffortTypeGroup group))
+                if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(total.Type, out WarEffortTypeGroup group))
                 {
                     if (!totalEffortSums.ContainsKey(group))
                     {
@@ -54,6 +50,50 @@
                 }
             }
             return totalEffortSums;
+        }
+
+        public static decimal CalculateSystemFocus(IEnumerable<WarEffortTypeSum> systemEfforts, Dictionary<WarEffortTypeGroup, long> totalEffortSums)
+        {
+            if (systemEfforts.Any())
+            {
+                Dictionary<WarEffortTypeGroup, long> systemEffortSums = new();
+                foreach (var systemEffort in systemEfforts)
+                {
+                    if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(systemEffort.Type, out WarEffortTypeGroup group))
+                    {
+                        if (!systemEffortSums.ContainsKey(group))
+                        {
+                            systemEffortSums[group] = systemEffort.Amount;
+                            continue;
+                        }
+                        systemEffortSums[group] += systemEffort.Amount;
+                    }
+                }
+                if (systemEffortSums.Any())
+                {
+                    decimal effortFocus = 0;
+                    foreach (KeyValuePair<WarEffortTypeGroup, long> effort in totalEffortSums)
+                    {
+                        if (systemEffortSums.TryGetValue(effort.Key, out long amount) && amount > 0)
+                        {
+                            effortFocus += ((decimal)amount / (decimal)effort.Value / (decimal)totalEffortSums.Count);
+                        }
+                    }
+                    return Math.Round(effortFocus, 2);
+                }
+            }
+            return 0;
+        }
+    }
+
+    public class WarEffortTypeSum
+    {
+        public WarEffortType Type { get; }
+        public long Amount { get; }
+        public WarEffortTypeSum(WarEffortType type, long amount)
+        {
+            Type = type;
+            Amount = amount;
         }
     }
 }

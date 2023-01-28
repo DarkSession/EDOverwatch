@@ -33,7 +33,7 @@ export class SystemComponent implements OnInit {
         tension: 0.5
       }
     },
-    responsive: true,
+    // responsive: true,
     maintainAspectRatio: false,
     scales: {
       y: {

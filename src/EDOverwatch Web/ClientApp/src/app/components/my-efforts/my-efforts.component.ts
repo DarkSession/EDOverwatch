@@ -3,6 +3,11 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import { faFileCsv } from '@fortawesome/free-solid-svg-icons';
+import { ExportToCsv, Options } from 'export-to-csv';
+import { OverwatchThargoidCycle } from '../home/home.component';
+import { ChartConfiguration, ChartDataset } from 'chart.js';
 
 @UntilDestroy()
 @Component({
@@ -12,8 +17,21 @@ import { MatSort } from '@angular/material/sort';
 })
 export class MyEffortsComponent implements OnInit {
   public readonly displayedColumns = ['Date', 'SystemName', 'Type', 'Amount'];
+  public readonly faFileCsv = faFileCsv;
   public dataSource: MatTableDataSource<CommanderWarEffort> = new MatTableDataSource<CommanderWarEffort>();
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
+  public pageSize: number = 50;
+  public chartConfig: ChartConfiguration = {
+    type: 'bar',
+    data: {
+      datasets: [],
+      labels: [],
+    },
+    options: {
+      responsive: true,
+    },
+  };
 
   public constructor(
     private readonly webSocketService: WebsocketService,
@@ -23,27 +41,99 @@ export class MyEffortsComponent implements OnInit {
 
   public ngOnInit(): void {
     this.webSocketService
-      .on<CommanderWarEffort[]>("CommanderWarEfforts")
+      .on<CommanderWarEfforts>("CommanderWarEffortsV2")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
-        this.initEfforts(message.Data);
+        this.updateEfforts(message.Data);
       });
-    this.webSocketService.sendMessage("CommanderWarEfforts", {});
+    this.webSocketService.sendMessage("CommanderWarEffortsV2", {});
   }
 
-  private initEfforts(data: CommanderWarEffort[]): void {
-    this.dataSource = new MatTableDataSource<CommanderWarEffort>(data);
+  private updateEfforts(data: CommanderWarEfforts): void {
+    this.dataSource = new MatTableDataSource<CommanderWarEffort>(data.WarEfforts);
+    this.dataSource.paginator = this.paginator;
     this.dataSource.sortingDataAccessor = (warEffort: CommanderWarEffort, columnName: string): string => {
       return warEffort[columnName as keyof CommanderWarEffort] as string;
     }
     this.dataSource.sort = this.sort;
+
+    const labels = [];
+    for (const thargoidCycle of data.RecentThargoidCycles) {
+      labels.push(thargoidCycle.StartDate + " to " + thargoidCycle.EndDate);
+    }
+
+    console.log(data);
+
+    const datasets: ChartDataset<'bar', number[]>[] = [];
+    for (const warEffortTypeGroup of data.WarEffortTypeGroups) {
+      const dataset = {
+        label: warEffortTypeGroup,
+        data: labels.map(t => 0),
+      };
+      datasets.push(dataset);
+      for (const warEffort of data.WarEfforts.filter(w => w.TypeGroup === warEffortTypeGroup)) {
+        const index = data.RecentThargoidCycles.findIndex(t => t.Cycle === warEffort.Cycle);
+        if (index !== -1) {
+          dataset.data[index] += warEffort.Amount;
+        }
+      }
+    }
+
+    console.log(datasets);
+
+    this.chartConfig = {
+      type: 'bar',
+      data: {
+        datasets: [...datasets],
+        labels: labels,
+      },
+      options: {
+        responsive: true,
+      },
+    };
+
     this.changeDetectorRef.detectChanges();
   }
+
+  public exportToCsv(): void {
+    const data = [];
+    for (const warEffort of this.dataSource.data) {
+      data.push({
+        Date: warEffort.Date,
+        Type: warEffort.Type,
+        System: warEffort.SystemName,
+        Amount: warEffort.Amount,
+      });
+    }
+
+    const options: Options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      showTitle: false,
+      filename: "Overwatch War Contributions Export.csv",
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
+  }
+}
+
+interface CommanderWarEfforts {
+  WarEfforts: CommanderWarEffort[];
+  WarEffortTypeGroups: string[];
+  RecentThargoidCycles: OverwatchThargoidCycle[];
 }
 
 interface CommanderWarEffort {
   Date: string;
   Type: string;
+  TypeGroup: string;
   SystemName: string;
   Amount: number;
+  Cycle: string;
 }

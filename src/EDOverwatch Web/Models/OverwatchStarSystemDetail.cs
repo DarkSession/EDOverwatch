@@ -61,8 +61,7 @@
                 decimal effortFocus = 0;
                 if (totalEffortSums.Any())
                 {
-                    Dictionary<WarEffortTypeGroup, long> systemEffortSums = new();
-                    var systemEfforts = await dbContext.WarEfforts
+                    List<WarEffortTypeSum> systemEfforts = await dbContext.WarEfforts
                         .AsNoTracking()
                         .Where(w =>
                                 w.Date >= startDate &&
@@ -71,44 +70,10 @@
                         .GroupBy(w => new
                         {
                             w.Type,
-                            w.Source,
                         })
-                        .Select(w => new
-                        {
-                            w.Key.Type,
-                            w.Key.Source,
-                            Amount = w.Sum(g => g.Amount),
-                        })
+                        .Select(w => new WarEffortTypeSum(w.Key.Type, w.Sum(g => g.Amount)))
                         .ToListAsync(cancellationToken);
-                    foreach (var systemEffort in systemEfforts
-                        .GroupBy(e => e.Type)
-                        .Select(e => new
-                        {
-                            e.Key,
-                            Amount = e.Sum(g => g.Amount),
-                        }))
-                    {
-                        if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(systemEffort.Key, out WarEffortTypeGroup group))
-                        {
-                            if (!systemEffortSums.ContainsKey(group))
-                            {
-                                systemEffortSums[group] = systemEffort.Amount;
-                                continue;
-                            }
-                            systemEffortSums[group] += systemEffort.Amount;
-                        }
-                    }
-                    if (systemEffortSums.Any())
-                    {
-                        foreach (KeyValuePair<WarEffortTypeGroup, long> effort in totalEffortSums)
-                        {
-                            if (systemEffortSums.TryGetValue(effort.Key, out long amount) && amount > 0)
-                            {
-                                effortFocus += ((decimal)amount / (decimal)effort.Value / (decimal)systemEffortSums.Count);
-                            }
-                        }
-                        effortFocus = Math.Round(effortFocus, 2);
-                    }
+                    effortFocus = WarEffort.CalculateSystemFocus(systemEfforts, totalEffortSums);
                 }
 
                 DateOnly previousTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1).DateTime);

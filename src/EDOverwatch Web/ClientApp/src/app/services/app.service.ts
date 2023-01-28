@@ -35,11 +35,20 @@ export class AppService {
     private readonly webSocketService: WebsocketService,
     private readonly httpInterceptorService: HttpInterceptorService) {
     this.webSocketService.onConnectionStatusChanged.subscribe((connectionStatus: ConnectionStatus) => {
-      if (connectionStatus === ConnectionStatus.Connected && this.webSocketService.connectionIsAuthenticated) {
+      if (connectionStatus === ConnectionStatus.Open && this.webSocketService.connectionIsAuthenticated) {
         this.webSocketService.sendMessage("CommanderMe", {});
       }
-      else if (connectionStatus !== ConnectionStatus.Connected) {
+      else if (connectionStatus !== ConnectionStatus.Open) {
         this.webSocketLoading = true;
+      }
+    });
+    this.webSocketService.connectionIsAuthenticatedChanged.subscribe((connectionStatus: ConnectionStatus) => {
+      if (this.webSocketService.connectionIsAuthenticated) {
+        this.webSocketService.sendMessage("CommanderMe", {});
+      }
+      else if (this.user) {
+        this.user = null;
+        this.onUserChanged.emit();
       }
     });
     this.webSocketService.on<User>("CommanderMe").subscribe((message: WebSocketMessage<User>) => {
