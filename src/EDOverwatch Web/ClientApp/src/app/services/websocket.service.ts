@@ -40,7 +40,7 @@ export class WebsocketService {
             console.log("ensureConnected");
         }
         if (this.connectionStatus === ConnectionStatus.Closed) {
-            this.initalizeConnection();
+            this.initalizeConnection(false);
         }
     }
 

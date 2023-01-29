@@ -2,83 +2,247 @@
 {
     public class OverwatchWarStats
     {
-        public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
-        public List<WarEffortSummary>? WarEffortSums { get; set; }
+        public OverwatchOverviewHuman Humans { get; set; }
+        public OverwatchWarStatsThargoids Thargoids { get; set; }
+        public OverwatchOverviewContested Contested { get; set; }
+        public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; }
+        public List<WarEffortSummary> WarEffortSums { get; }
+        public List<StatsCompletdSystemsPerCycle> CompletdSystemsPerCycles { get; }
+        public List<OverwatchThargoidCycle> ThargoidCycles { get; }
 
-        public static async Task Create(EdDbContext dbContext, CancellationToken cancellationToken)
+        protected OverwatchWarStats(
+            OverwatchOverviewHuman statsHumans,
+            OverwatchWarStatsThargoids statsThargoids,
+            OverwatchOverviewContested statsContested,
+            List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory,
+            List<WarEffortSummary> warEffortSummaries,
+            List<StatsCompletdSystemsPerCycle> completdSystemsPerCycles,
+            List<OverwatchThargoidCycle> thargoidCycles)
         {
-            List<WarEffortSummary> warEffortSums = await dbContext.WarEfforts
-                .AsNoTracking()
-                .Where(w => w.Cycle != null && w.Side == WarEffortSide.Humans)
-                .GroupBy(w => new { w.Cycle!.Start, w.Type })
-                .Select(w => new WarEffortSummary(DateOnly.FromDateTime(w.Key.Start.DateTime), w.Key.Type, w.Sum(x => x.Amount)))
-                .ToListAsync(cancellationToken);
+            Humans = statsHumans;
+            Thargoids = statsThargoids;
+            Contested = statsContested;
+            MaelstromHistory = maelstromHistory;
+            WarEffortSums = warEffortSummaries;
+            CompletdSystemsPerCycles = completdSystemsPerCycles;
+            ThargoidCycles = thargoidCycles;
+        }
 
-            List<StarSystemThargoidLevel> completed = await dbContext.StarSystemThargoidLevels
+        public static async Task<OverwatchWarStats> Create(EdDbContext dbContext, CancellationToken cancellationToken)
+        {
+            List<OverwatchThargoidCycle> thargoidCycles = await OverwatchThargoidCycle.GetThargoidCycles(dbContext, cancellationToken);
+
+            List<WarEffortSummary> warEffortSums;
+            {
+                var warEffortCycleSums = await dbContext.WarEfforts
+                    .AsNoTracking()
+                    .Include(w => w.Cycle)
+                    .Where(w => w.Cycle != null && w.Side == WarEffortSide.Humans && w.Date > new DateOnly(2022, 11, 15))
+                    .GroupBy(w => new { w.CycleId, w.Type })
+                    .Select(w => new
+                    {
+                        w.Key.CycleId,
+                        w.Key.Type,
+                        Sum = w.Sum(x => x.Amount)
+                    })
+                    .ToListAsync(cancellationToken);
+
+                warEffortSums = warEffortCycleSums
+                    .Select(w =>
+                    {
+                        OverwatchThargoidCycle thargoidCycle = thargoidCycles.First(t => t.Id == w.CycleId);
+                        return new WarEffortSummary(thargoidCycle.StartDate, w.Type, w.Sum);
+                    })
+                    .ToList();
+            }
+
+            List<StatsCompletdSystemsPerCycle> completedSystemsPerCycle = await dbContext.StarSystemThargoidLevels
                 .AsNoTracking()
                 .Include(s => s.CycleEnd)
-                .Include(s => s.StarSystem)
                 .Where(s =>
                     s.Progress == 100 &&
                     (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled) &&
-                    s.ProgressHistory!.Any() &&
-                    s.CycleEnd != null &&
-                    s.CycleEnd.Start >= new DateTimeOffset(2022, 12, 22, 7, 0, 0, TimeSpan.Zero))
+                    (s.CycleEnd == null || s.CycleEnd.Start >= new DateTimeOffset(2022, 12, 22, 7, 0, 0, TimeSpan.Zero)))
+                .GroupBy(s => s.CycleEnd)
+                .Select(s => new StatsCompletdSystemsPerCycle(s.Key, s.Count()))
                 .ToListAsync(cancellationToken);
 
-            var result = await dbContext.WarEfforts
-                .Where(w => completed.Any(c => c.StarSystem == w.StarSystem && c.CycleEnd == w.Cycle) && w.Side == WarEffortSide.Humans)
-                .GroupBy(w => w.Type)
-                .Select(x => new
-                {
-                    type = x.Key,
-                    // amount = x.Sum(g => g.Amount),
-                })
-                .ToListAsync(cancellationToken);
-
-
-            /*
-            var result = await dbContext.StarSystemThargoidLevels
+            List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
                 .AsNoTracking()
+                .Where(t => t.State != StarSystemThargoidLevelState.Maelstrom)
+                .Include(t => t.Cycle)
+                .Include(t => t.Maelstrom)
+                .ThenInclude(m => m!.StarSystem)
+                .ToListAsync(cancellationToken);
+            List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory = maelstromHistoricalSummaries.Select(m => new OverwatchOverviewMaelstromHistoricalSummary(m)).ToList();
+
+            var systemThargoidLevelCount = await dbContext.StarSystems
                 .Where(s =>
-                    s.Progress == 100 &&
-                    (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled) &&
-                    s.ProgressHistory!.Any() &&
-                    s.CycleEnd != null &&
-                    s.CycleEnd.Start >= new DateTimeOffset(2022, 12, 22, 7, 0, 0, TimeSpan.Zero))
+                    s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion ||
+                    s.ThargoidLevel!.State == StarSystemThargoidLevelState.Alert ||
+                    s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled ||
+                    s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom ||
+                    s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recovery)
+                .GroupBy(s => s.ThargoidLevel!.State)
                 .Select(s => new
                 {
-                    thargoidLevel = s,
-                    warEfforts = s.EndCycleWarEfforts!
-                        .Where(w =>
-                            w.StarSystem == s.StarSystem &&
-                            w.Cycle == s.CycleEnd &&
-                            w.Side == WarEffortSide.Humans)
-                        .GroupBy(w => w.Type)
-                        .Select(x => new
-                        {
-                            type = x.Key,
-                            // amount = x.Sum(g => g.Amount),
-                        })
-                        .ToList(),
+                    s.Key,
+                    Count = s.Count(),
                 })
                 .ToListAsync(cancellationToken);
-            */
+
+            int relevantSystemCount = await dbContext.StarSystems
+                .Where(s =>
+                    s.WarRelevantSystem &&
+                    (s.Population > 0 ||
+                        (s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled ||
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)))
+                .CountAsync(cancellationToken);
+            if (relevantSystemCount == 0)
+            {
+                relevantSystemCount = 1;
+            }
+
+            OverwatchOverviewHuman statsHumans;
+            OverwatchWarStatsThargoids statsThargoids;
+
+            var warEfforts = await dbContext.WarEfforts
+                .AsNoTracking()
+                .Where(w =>
+                        w.StarSystem!.WarRelevantSystem &&
+                        w.StarSystem!.ThargoidLevel != null)
+                .GroupBy(w => new { w.Type, w.Side })
+                .Select(w => new
+                {
+                    side = w.Key.Side,
+                    type = w.Key.Type,
+                    amount = w.Sum(s => s.Amount)
+                })
+                .ToListAsync(cancellationToken);
+
+            {
+                int thargoidsSystemsControlling = systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Controlled)?.Count ?? 0;
+
+                long refugeePopulation = await dbContext.StarSystems
+                    .AsNoTracking()
+                    .Where(s => s.WarRelevantSystem && s.Population < s.OriginalPopulation)
+                    .Select(s => s.OriginalPopulation - s.Population)
+                    .SumAsync(cancellationToken);
+
+                int systemsControllingPreviouslyPopulated = await dbContext.StarSystems
+                    .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && s.OriginalPopulation > 0)
+                    .CountAsync(cancellationToken);
+
+                int maelstroms = await dbContext.ThargoidMaelstroms.CountAsync(cancellationToken);
+                statsThargoids = new(
+                    Math.Round((double)(thargoidsSystemsControlling + maelstroms) / (double)relevantSystemCount, 4),
+                    maelstroms,
+                    thargoidsSystemsControlling,
+                    systemsControllingPreviouslyPopulated,
+                    warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Thargoids && w.type == WarEffortType.KillGeneric)?.amount ?? 0,
+                    refugeePopulation
+                );
+            }
+            {
+                int humansSystemsControlling = await dbContext.StarSystems
+                    .Where(s =>
+                        s.WarRelevantSystem &&
+                        s.ThargoidLevel!.State != StarSystemThargoidLevelState.Controlled &&
+                        s.ThargoidLevel!.State != StarSystemThargoidLevelState.Maelstrom &&
+                        s.Population > 0)
+                    .CountAsync(cancellationToken);
+
+                List<WarEffortType> warEffortTypeKills = new()
+                {
+                    WarEffortType.KillGeneric,
+                    WarEffortType.KillThargoidScout,
+                    WarEffortType.KillThargoidCyclops,
+                    WarEffortType.KillThargoidBasilisk,
+                    WarEffortType.KillThargoidMedusa,
+                    WarEffortType.KillThargoidHydra,
+                    WarEffortType.KillThargoidOrthrus,
+                };
+
+                List<WarEffortType> warEffortTypeMissions = new()
+                {
+                    WarEffortType.MissionCompletionGeneric,
+                    WarEffortType.MissionCompletionDelivery,
+                    WarEffortType.MissionCompletionRescue,
+                    WarEffortType.MissionCompletionThargoidKill,
+                    WarEffortType.MissionCompletionPassengerEvacuation,
+                };
+
+                statsHumans = new(
+                    Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),
+                    humansSystemsControlling,
+                    0,
+                    warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && warEffortTypeKills.Contains(w.type))?.amount,
+                    warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.Rescue)?.amount,
+                    warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.SupplyDelivery)?.amount,
+                    warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && warEffortTypeMissions.Contains(w.type))?.amount);
+            }
+
+            OverwatchOverviewContested statsContested = new(
+                systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Invasion)?.Count ?? 0,
+                systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Alert)?.Count ?? 0,
+                await dbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && s.ThargoidLevel!.Progress > 0).CountAsync(cancellationToken),
+                systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Recovery)?.Count ?? 0
+            );
+
+            OverwatchWarStats result = new(statsHumans, statsThargoids, statsContested, maelstromHistory, warEffortSums, completedSystemsPerCycle, thargoidCycles);
+            return result;
+        }
+    }
+
+    public class OverwatchWarStatsThargoids : OverwatchOverviewThargoids
+    {
+        public int SystemsControllingPreviouslyPopulated { get; }
+        public OverwatchWarStatsThargoids(
+            double controllingPercentage, int activeMaelstroms, int systemsControlling, int systemsControllingPreviouslyPopulated, long commanderKills, long refugeePopulation) :
+            base(controllingPercentage, activeMaelstroms, systemsControlling, commanderKills, refugeePopulation)
+        {
+            SystemsControllingPreviouslyPopulated = systemsControllingPreviouslyPopulated;
         }
     }
 
     public class WarEffortSummary
     {
-        public DateOnly Cycle { get; }
+        public DateOnly Date { get; }
         public WarEffortType TypeId { get; }
         public string Type => EnumUtil.GetEnumMemberValue(TypeId);
+        public string TypeGroup { get; }
         public long Amount { get; }
 
-        public WarEffortSummary(DateOnly cycle, WarEffortType typeId, long amount)
+        public WarEffortSummary(DateTimeOffset dateTimeOffset, WarEffortType typeId, long amount) :
+            this(DateOnly.FromDateTime(dateTimeOffset.DateTime), typeId, amount)
         {
-            Cycle = cycle;
+        }
+
+        public WarEffortSummary(DateOnly date, WarEffortType typeId, long amount)
+        {
+            Date = date;
             TypeId = typeId;
             Amount = amount;
+            if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(typeId, out WarEffortTypeGroup group))
+            {
+                TypeGroup = group.GetEnumMemberValue();
+            }
+            else
+            {
+                TypeGroup = string.Empty;
+            }
+        }
+    }
+
+    public class StatsCompletdSystemsPerCycle
+    {
+        public DateOnly Cycle { get; }
+        public int Completed { get; }
+
+        public StatsCompletdSystemsPerCycle(ThargoidCycle? thargoidCycle, int completed)
+        {
+            Cycle = DateOnly.FromDateTime((thargoidCycle?.Start ?? WeeklyTick.GetLastTick()).DateTime);
+            Completed = completed;
         }
     }
 }

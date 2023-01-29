@@ -26,3 +26,16 @@
         color: #ccc;
     }
 }
+
+.cycle-list {
+    display: flex;
+    align-items: center;
+
+    .btn {
+        width: 24px;
+    }
+}
+
+.clickable {
+    cursor: pointer;
+}

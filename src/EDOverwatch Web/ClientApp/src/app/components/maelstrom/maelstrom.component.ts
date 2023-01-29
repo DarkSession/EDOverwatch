@@ -5,7 +5,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { ChartConfiguration, ChartDataset } from 'chart.js';
+import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
+import { Context } from 'chartjs-plugin-datalabels';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchOverviewMaelstromHistoricalSummary, OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
@@ -23,7 +24,7 @@ export class MaelstromComponent implements OnInit {
   public maelstrom: OverwatchMaelstromDetail | null = null;
   public systemsAtRisk: MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk> = new MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk>();
   public readonly systemsAtRiskColumns = ['Name', 'Population', 'Distance'];
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort, { static: false }) sort!: MatSort;
   public chartConfig: ChartConfiguration = {
     type: 'bar',
     data: {
@@ -157,6 +158,18 @@ export class MaelstromComponent implements OnInit {
           plugins: {
             legend: {
               position: 'bottom',
+            },
+            datalabels: {
+              align: 'center',
+              anchor: 'center',
+              color: 'black',
+              backgroundColor: (context: Context) => {
+                return context.dataset.backgroundColor as Color;
+              },
+              display: (context) => {
+                return !!context.dataset.data[context.dataIndex];
+              },
+              borderRadius: 4,
             }
           },
           interaction: {

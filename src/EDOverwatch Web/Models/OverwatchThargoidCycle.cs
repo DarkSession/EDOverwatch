@@ -1,7 +1,11 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Newtonsoft.Json;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchThargoidCycle
     {
+        [JsonIgnore]
+        public int Id { get; set; }
         public DateOnly Cycle { get; }
         public DateTimeOffset Start { get; }
         public DateOnly StartDate { get; }
@@ -11,6 +15,7 @@
 
         public OverwatchThargoidCycle(ThargoidCycle thargoidCycle)
         {
+            Id = thargoidCycle.Id;
             Cycle = DateOnly.FromDateTime(thargoidCycle.Start.DateTime);
             Start = thargoidCycle.Start;
             StartDate = DateOnly.FromDateTime(Start.DateTime);

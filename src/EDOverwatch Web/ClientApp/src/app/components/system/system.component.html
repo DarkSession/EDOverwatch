@@ -24,6 +24,14 @@
                                 <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
                             </td>
                         </tr>
+                        <tr>
+                            <td class="t">Remaining time</td>
+                            <td>
+                                <div *ngIf="starSystem.StateExpiration?.StateExpires">
+                                    {{ starSystem.StateExpiration?.StateExpires | dateAgo }}
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <table class="information">
@@ -57,6 +65,19 @@
                         </tr>
                     </tbody>
                 </table>
+                <div class="information hide-on-mobile">
+                    <b>External links</b>
+                    <br>
+                    <a href="https://inara.cz/elite/starsystem/?search={{ encodeUrlPart(starSystem.Name) }}"
+                        target="_blank" rel="noreferrer">
+                        Inara
+                    </a>
+                    <br>
+                    <a href="https://www.edsm.net/en/system?systemID64={{ starSystem.SystemAddress }}" target="_blank"
+                        rel="noreferrer">
+                        EDSM
+                    </a>
+                </div>
             </div>
             <br>
             <div *ngIf="lineChartData && lineChartData.labels && lineChartData.labels.length">

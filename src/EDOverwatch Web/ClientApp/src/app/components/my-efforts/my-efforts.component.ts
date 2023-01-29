@@ -7,7 +7,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons';
 import { ExportToCsv, Options } from 'export-to-csv';
 import { OverwatchThargoidCycle } from '../home/home.component';
-import { ChartConfiguration, ChartDataset } from 'chart.js';
+import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
+import { Context } from 'chartjs-plugin-datalabels';
 
 @UntilDestroy()
 @Component({
@@ -89,6 +90,20 @@ export class MyEffortsComponent implements OnInit {
       },
       options: {
         responsive: true,
+        plugins: {
+          datalabels: {
+            align: 'center',
+            anchor: 'center',
+            color: 'black',
+            backgroundColor: (context: Context) => {
+              return context.dataset.backgroundColor as Color;
+            },
+            display: (context) => {
+              return !!context.dataset.data[context.dataIndex];
+            },
+            borderRadius: 4,
+          }
+        }
       },
     };
 

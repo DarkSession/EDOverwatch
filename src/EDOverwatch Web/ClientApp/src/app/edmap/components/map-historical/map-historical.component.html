@@ -4,10 +4,19 @@
     <span>
         Thargoid Cycle
     </span>
-    <select [(ngModel)]="date" (ngModelChange)="dateChanged()" [disabled]="dateSelectionDisabled" *ngIf="date && thargoidCycles">
-        <option *ngFor="let thargoidCycle of thargoidCycles" [value]="thargoidCycle.Cycle"
-            [selected]="date == thargoidCycle.Cycle">
-            {{ thargoidCycle.Start | date }} - {{ thargoidCycle.End | date }}
-        </option>
-    </select>
+    <div class="cycle-list">
+        <div matTooltip="Previous cycle" class="btn clickable" (click)="previousCycle()">
+            <fa-icon [icon]="faAngleLeft"></fa-icon>
+        </div>
+        <select [(ngModel)]="date" (ngModelChange)="dateChanged()" [disabled]="dateSelectionDisabled"
+            *ngIf="date && thargoidCycles">
+            <option *ngFor="let thargoidCycle of thargoidCycles" [value]="thargoidCycle.Cycle"
+                [selected]="date == thargoidCycle.Cycle">
+                {{ thargoidCycle.Start | date }} - {{ thargoidCycle.End | date }}
+            </option>
+        </select>
+        <div matTooltip="Next cycle" class="btn clickable" (click)="nextCycle()">
+            <fa-icon [icon]="faAngleRight"></fa-icon>
+        </div>
+    </div>
 </div>

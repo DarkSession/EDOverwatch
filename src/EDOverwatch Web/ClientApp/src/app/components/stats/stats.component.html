@@ -1,0 +1,175 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-large">
+        <div class="title">
+            War Stats
+        </div>
+        <div class="content-box">
+            <div class="subtitle">
+                Systems and numbers
+            </div>
+            <div class="table-container" *ngIf="stats">
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="2">Humanity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Controlling Systems
+                            </td>
+                            <td class="number">
+                                {{ stats.Humans.SystemsControlling | number }}
+                                ({{ stats.Humans.ControllingPercentage | percent:'0.2-2' }})
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Confirmed Thargoid Kills
+                            </td>
+                            <td class="number">
+                                {{ stats.Humans.ThargoidKills | number }} +
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Completed rescues
+                            </td>
+                            <td class="number">
+                                {{ stats.Humans.Rescues | number }} +
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Supplies delivered
+                            </td>
+                            <td class="number">
+                                {{ stats.Humans.RescueSupplies | number }} +
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Missions completed
+                            </td>
+                            <td class="number">
+                                {{ stats.Humans.Missions | number }} +
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table>
+                    <tbody>
+                        <thead>
+                            <tr>
+                                <th colspan="2">Contested</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>
+                                Systems Reporting Alerts
+                            </td>
+                            <td class="number">
+                                {{ stats.Contested.SystemsWithAlerts | number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Systems being invaded by the Thargoids
+                            </td>
+                            <td class="number">
+                                {{ stats.Contested.SystemsInInvasion | number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Systems being recaptured by Humanity
+                            </td>
+                            <td class="number">
+                                {{ stats.Contested.SystemsBeingRecaptured | number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Systems in recovery
+                            </td>
+                            <td class="number">
+                                {{ stats.Contested.SystemsInRecovery | number }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table>
+                    <tbody>
+                        <thead>
+                            <tr>
+                                <th colspan="2">Thargoids</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>
+                                Controlling Systems
+                            </td>
+                            <td class="number">
+                                {{ stats.Thargoids.SystemsControlling | number }}
+                                ({{ stats.Thargoids.ControllingPercentage | percent:'0.2-2' }})
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Controlling Systems previously populated
+                            </td>
+                            <td class="number">
+                                {{ stats.Thargoids.SystemsControllingPreviouslyPopulated | number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Active Maelstroms
+                            </td>
+                            <td class="number">
+                                {{ stats.Thargoids.ActiveMaelstroms | number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Commanders killed
+                            </td>
+                            <td class="number">
+                                {{ stats.Thargoids.CommanderKills | number }} +
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Humans killed or expelled
+                            </td>
+                            <td class="number">
+                                {{ stats.Thargoids.RefugeePopulation | number }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="subtitle">
+                War Development Overview
+            </div>
+            <p>Development of the war starting in November 3308 with the arrival of the maelstrom Taranis.</p>
+            <p>Cleared systems number are only available as of the 22 December 2022.</p>
+            <canvas baseChart class="chart hide-on-small-mobile" [data]="maelstromHistoryChart.data"
+                [options]="maelstromHistoryChart.options" [type]="maelstromHistoryChart.type" width="200"
+                height="100"></canvas>
+            <div class="subtitle">
+                War efforts over time
+            </div>
+            <p>
+                The numbers below are not complete while some numbers might even be counted twice from different
+                sources.<br>
+                Use the numbers as what they are: a high level overview.
+            </p>
+            <canvas baseChart class="chart hide-on-small-mobile" [data]="contributionSummaryChart.data"
+                [options]="contributionSummaryChart.options" [type]="contributionSummaryChart.type" width="200"
+                height="100"></canvas>
+        </div>
+    </div>
+</div>

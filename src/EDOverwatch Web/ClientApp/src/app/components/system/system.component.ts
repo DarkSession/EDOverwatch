@@ -7,10 +7,11 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
 import { OverwatchStation } from '../station-name/station-name.component';
-import { Chart, ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartDataset, ChartType, Color } from 'chart.js';
 
-import { AnnotationOptions, default as Annotation } from 'chartjs-plugin-annotation';
+import { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
+import { Context } from 'chartjs-plugin-datalabels';
 
 @UntilDestroy()
 @Component({
@@ -30,8 +31,8 @@ export class SystemComponent implements OnInit {
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
       line: {
-        tension: 0.5
-      }
+        tension: 0.1,
+      },
     },
     // responsive: true,
     maintainAspectRatio: false,
@@ -43,18 +44,32 @@ export class SystemComponent implements OnInit {
         min: 0,
         max: 100,
         position: 'right',
-        grid: {
-          color: 'rgba(233, 94, 3, 0.3)',
-        },
+        display: false,
         ticks: {
           color: '#e95e03'
         }
       }
     },
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
     plugins: {
       legend: { display: true },
       annotation: {
         annotations: [],
+      },
+      datalabels: {
+        align: 'center',
+        anchor: 'center',
+        color: 'black',
+        backgroundColor: (context: Context) => {
+          return '#e95e03';
+        },
+        display: (context) => {
+          return context.dataset.label === "Progress";
+        },
+        borderRadius: 4,
       }
     }
   };
@@ -70,7 +85,6 @@ export class SystemComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    Chart.register(Annotation);
     this.route.paramMap
       .pipe(untilDestroyed(this))
       .subscribe((p: ParamMap) => {
@@ -174,6 +188,10 @@ export class SystemComponent implements OnInit {
     this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
       duration: 2000,
     });
+  }
+
+  public encodeUrlPart(part: string): string {
+    return encodeURIComponent(part);
   }
 }
 

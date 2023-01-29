@@ -359,10 +359,12 @@ hr {
   width: 100%;
   flex-wrap: wrap;
 
-  table.information {
+  table.information,
+  div.information {
     min-width: 300px;
-    width: 25%;
-    margin-right: 8px;
+    max-width: 600px;
+    width: 30%;
+    margin-right: 24px;
   }
 
   .t {
@@ -377,6 +379,10 @@ hr {
   margin-bottom: 4px;
   background-color: #393939;
   border-radius: 4px;
+}
+
+.chart {
+  max-width: 1900px;
 }
 
 @media (max-width: 992px) {

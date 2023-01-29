@@ -5,7 +5,8 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
-import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartDataset, ChartType, Color } from 'chart.js';
+import { Context } from 'chartjs-plugin-datalabels';
 
 dayjs.extend(duration)
 
@@ -47,13 +48,6 @@ export class HomeComponent implements OnInit, OnDestroy {
           position: 'left',
         },
       }
-      /*
-      scales: {
-        y: {
-          stacked: true
-        }
-      }
-      */
     },
   };
 
@@ -146,6 +140,18 @@ export class HomeComponent implements OnInit, OnDestroy {
           plugins: {
             legend: {
               position: 'bottom',
+            },
+            datalabels: {
+              align: 'center',
+              anchor: 'center',
+              color: 'white',
+              backgroundColor: (context: Context) => {
+                return context.dataset.backgroundColor as Color;
+              },
+              display: (context) => {
+                return context.dataset.label === "Controlled";
+              },
+              borderRadius: 4,
             }
           },
           interaction: {
@@ -156,6 +162,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             y1: {
               type: 'linear',
               position: 'right',
+              display: false,
             },
             y: {
               position: 'left',
@@ -238,30 +245,36 @@ export class HomeComponent implements OnInit, OnDestroy {
 }
 
 interface OverwatchOverview {
-  Humans: {
-    ControllingPercentage: number;
-    SystemsControlling: number;
-    SystemsRecaptured: number;
-    ThargoidKills: number | null;
-    Rescues: number | null;
-    RescueSupplies: number | null;
-    Missions: number | null;
-  };
-  Thargoids: {
-    ControllingPercentage: number;
-    ActiveMaelstroms: number;
-    SystemsControlling: number;
-    CommanderKills: number;
-    RefugeePopulation: number;
-  };
-  Contested: {
-    SystemsInInvasion: number;
-    SystemsWithAlerts: number;
-    SystemsBeingRecaptured: number;
-    SystemsInRecovery: number;
-  };
+  Humans: OverwatchOverviewHuman;
+  Thargoids: OverwatchOverviewThargoids;
+  Contested: OverwatchOverviewContested;
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];
+}
+
+export interface OverwatchOverviewHuman {
+  ControllingPercentage: number;
+  SystemsControlling: number;
+  SystemsRecaptured: number;
+  ThargoidKills: number | null;
+  Rescues: number | null;
+  RescueSupplies: number | null;
+  Missions: number | null;
+}
+
+export interface OverwatchOverviewThargoids {
+  ControllingPercentage: number;
+  ActiveMaelstroms: number;
+  SystemsControlling: number;
+  CommanderKills: number;
+  RefugeePopulation: number;
+}
+
+export interface OverwatchOverviewContested {
+  SystemsInInvasion: number;
+  SystemsWithAlerts: number;
+  SystemsBeingRecaptured: number;
+  SystemsInRecovery: number;
 }
 
 export interface OverwatchThargoidCycle {

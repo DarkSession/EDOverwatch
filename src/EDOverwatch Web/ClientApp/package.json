@@ -37,6 +37,7 @@
     "canonned3d-map": "^0.1.0",
     "chart.js": "^3.6.0",
     "chartjs-plugin-annotation": "^2.1.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "dayjs": "^1.11.6",
     "emittery": "^1.0.1",
     "export-to-csv": "^0.2.1",

@@ -27,6 +27,9 @@ namespace EDDatabase
         [ForeignKey("CycleId")]
         public ThargoidCycle? Cycle { get; set; }
 
+        [ForeignKey("CycleId")]
+        public int? CycleId { get; set; }
+
         [Column]
         public DateOnly Date { get; set; }
 

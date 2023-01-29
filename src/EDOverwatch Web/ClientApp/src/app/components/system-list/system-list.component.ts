@@ -107,7 +107,7 @@ export class SystemListComponent implements OnInit, OnChanges {
     this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string | number => {
       switch (columnName) {
         case "ThargoidLevel": {
-          return system.ThargoidLevel.Name;
+          return system.ThargoidLevel.Level;
         }
         case "Maelstrom": {
           return system.Maelstrom.Name;

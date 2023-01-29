@@ -62,10 +62,14 @@ import { ContributeDataComponent } from './components/contribute-data/contribute
 import { CommanderApiKeysComponent } from './components/commander-api-keys/commander-api-keys.component';
 import { SystemContributionSummaryComponent } from './components/system-contribution-summary/system-contribution-summary.component';
 import { Chart } from 'chart.js';
-
+import { StatsComponent } from './components/stats/stats.component';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import Annotation from 'chartjs-plugin-annotation';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
+Chart.register(Annotation);
+Chart.register(ChartDataLabels);
 
 /** Http interceptor providers in outside-in order */
 export const httpInterceptorProviders = [
@@ -103,6 +107,7 @@ export const httpInterceptorProviders = [
     ContributeDataComponent,
     CommanderApiKeysComponent,
     SystemContributionSummaryComponent,
+    StatsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -187,6 +192,10 @@ export const httpInterceptorProviders = [
       {
         path: 'operation-search',
         component: OperationSearchComponent,
+      },
+      {
+        path: 'stats',
+        component: StatsComponent,
       },
       {
         path: 'system/:id/analyze/:cycle',

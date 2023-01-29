@@ -16,6 +16,7 @@ import { abandonedBases } from '../../data/abandoned-bases';
 import { thargoidSites } from '../../data/thargoid-sites';
 import { unknownBarnacleSites } from '../../data/unknown-barnacle-sites';
 import { horizonEngineers, odysseyEngineers } from '../../data/engineers';
+import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -25,6 +26,8 @@ import { horizonEngineers, odysseyEngineers } from '../../data/engineers';
   encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class MapHistoricalComponent implements OnInit, AfterViewInit {
+  public readonly faAngleRight = faAngleRight;
+  public readonly faAngleLeft = faAngleLeft;
   @ViewChild('container', { static: true }) container?: ElementRef;
   private ed3dMap: ED3DMap | null = null;
   public thargoidCycles: OverwatchThargoidCycle[] = [];
@@ -230,6 +233,25 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
           }
           this.requestCycleData(date);
         });
+    }
+  }
+
+  public previousCycle(): void {
+    const currentIndex = this.thargoidCycles.findIndex(t => t.Cycle === this.date);
+    if (currentIndex > 0) {
+      this.date = this.thargoidCycles[(currentIndex - 1)].Cycle;
+      this.dateChanged();
+    }
+  }
+
+  public nextCycle(): void {
+    const currentIndex = this.thargoidCycles.findIndex(t => t.Cycle === this.date);
+    if (currentIndex !== -1) {
+      const index = currentIndex + 1;
+      if (index < this.thargoidCycles.length) {
+        this.date = this.thargoidCycles[index].Cycle;
+        this.dateChanged();
+      }
     }
   }
 }
