@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { faEyeLowVision } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-thargoid-level',
@@ -7,7 +6,6 @@ import { faEyeLowVision } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./thargoid-level.component.css']
 })
 export class ThargoidLevelComponent implements OnChanges {
-  public readonly faEyeLowVision = faEyeLowVision;
   @Input() thargoidLevel!: OverwatchThargoidLevel;
 
   public dotClass = "";

@@ -40,7 +40,8 @@ namespace DCoHTrackerDiscordBot.Module
 #pragma warning disable IDE0060 // Remove unused parameter
             [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
 #pragma warning restore IDE0060 // Remove unused parameter
-            [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName)
+            [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName,
+            [Summary("MeetingPoint", "Meeting Point (optional)"), Autocomplete(typeof(MeetingPointAutocompleteHandler))] string? meetingPoint = null)
         {
             if (!await CheckElevatedGuild())
             {
@@ -78,18 +79,42 @@ namespace DCoHTrackerDiscordBot.Module
                 return;
             }
 
+            if (!string.IsNullOrWhiteSpace(meetingPoint) &&
+                !await DbContext.Stations.AnyAsync(s => s.StarSystem == starSystem && s.Name == meetingPoint && s.Type!.Name != StationType.FleetCarrierStationType) &&
+                !await DbContext.StarSystemFssSignals.AnyAsync(s => s.StarSystem == starSystem && s.Name == meetingPoint))
+            {
+                meetingPoint = null;
+            }
+
             DcohFactionOperationType type = OperationTypeToDcohFactionOperationType(operation);
-            if (await DbContext.DcohFactionOperations.AnyAsync(d =>
+            DcohFactionOperation? existingOperation = await DbContext.DcohFactionOperations.FirstOrDefaultAsync(d =>
                         d.StarSystem == starSystem &&
                         d.Status == DcohFactionOperationStatus.Active &&
                         d.Faction == user.Faction &&
-                        d.Type == type))
+                        d.Type == type);
+            if (existingOperation != null)
             {
-                await FollowupAsync($"This operation already exists in {starSystem.Name} for your squadron.", ephemeral: true);
+                if (existingOperation.MeetingPoint != meetingPoint)
+                {
+                    existingOperation.MeetingPoint = meetingPoint;
+                    await DbContext.SaveChangesAsync();
+                    await FollowupAsync($"Updated meeting point for your squadrons **{type.GetEnumMemberValue()}** activity in **{starSystem.Name}**.", ephemeral: true);
+                    return;
+                }
+                await FollowupAsync($"**{type.GetEnumMemberValue()}** activity already exists in **{starSystem.Name}** for your squadron.", ephemeral: true);
                 return;
             }
 
-            DcohFactionOperation factionOperation = new(0, type, DcohFactionOperationStatus.Active, DateTimeOffset.Now)
+            if (await DbContext.DcohFactionOperations.CountAsync(d =>
+                d.StarSystem == starSystem &&
+                d.Status == DcohFactionOperationStatus.Active &&
+                d.Faction == user.Faction) >= 2)
+            {
+                await FollowupAsync($"Your squadron already reached the limit of 2 activities in **{starSystem.Name}**.", ephemeral: true);
+                return;
+            }
+
+            DcohFactionOperation factionOperation = new(0, type, DcohFactionOperationStatus.Active, DateTimeOffset.Now, meetingPoint)
             {
                 CreatedBy = user,
                 StarSystem = starSystem,
@@ -97,12 +122,12 @@ namespace DCoHTrackerDiscordBot.Module
             };
             DbContext.DcohFactionOperations.Add(factionOperation);
             await DbContext.SaveChangesAsync();
-            await FollowupAsync($"Registered {type.GetEnumMemberValue()} activities by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
+            await FollowupAsync($"Registered **{type.GetEnumMemberValue()}** activities by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
         }
 
-        [SlashCommand("remove", "Remove a registered operation")]
+        [SlashCommand("remove", "Remove a registered activity")]
         public async Task Remove(
-            [Summary("Operation", "Operation Type")] OperationType operation,
+            [Summary("Activity", "Activity Type")] OperationType operation,
 #pragma warning disable IDE0060 // Remove unused parameter
             [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
 #pragma warning restore IDE0060 // Remove unused parameter
@@ -158,12 +183,12 @@ namespace DCoHTrackerDiscordBot.Module
             dcohFactionOperation.Status = DcohFactionOperationStatus.Inactive;
             await DbContext.SaveChangesAsync();
 
-            await FollowupAsync($"Removed {type.GetEnumMemberValue()} activities by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
+            await FollowupAsync($"Removed {type.GetEnumMemberValue()} activity by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
         }
 
-        [SlashCommand("view", "View operation by type")]
+        [SlashCommand("view", "View activities by type")]
         public async Task View(
-            [Summary("Operation", "Operation Type")] OperationType? operation = null,
+            [Summary("Activity", "Operation/Activity Type")] OperationType? operation = null,
             [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null,
             [Summary("Squadron", "Squadron Name"), Autocomplete(typeof(SquadronIdAutocompleteHandler))] string? squadronId = null)
         {
@@ -222,7 +247,7 @@ namespace DCoHTrackerDiscordBot.Module
                 string.IsNullOrEmpty(maelstromNameString) &&
                 string.IsNullOrEmpty(squadronNameString))
             {
-                await FollowupAsync($"You need to either provide the maelstrom, the operation or the squadron.", ephemeral: true);
+                await FollowupAsync($"You need to either provide the maelstrom, the activity or the squadron.", ephemeral: true);
                 return;
             }
 
@@ -428,6 +453,46 @@ namespace DCoHTrackerDiscordBot.Module
                 systemList ??= new();
                 // max - 25 suggestions at a time (API limit)
                 return AutocompletionResult.FromSuccess(systemList.Select(s => new AutocompleteResult(s, s)).Take(25));
+            }
+        }
+
+        public class MeetingPointAutocompleteHandler : AutocompleteHandler
+        {
+            public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+            {
+                List<string> result = new();
+                string? systemName = autocompleteInteraction.Data.Options.FirstOrDefault(o => o.Name == "system")?.Value as string;
+                if (!string.IsNullOrWhiteSpace(systemName) && systemName.Length > 2 && autocompleteInteraction.Data.Current.Value is string value && value.Length > 0)
+                {
+                    value = value.Replace("%", string.Empty).Trim();
+                    if (!string.IsNullOrEmpty(value) && !value.Contains('$'))
+                    {
+                        await using AsyncServiceScope scope = services.CreateAsyncScope();
+                        EdDbContext dbContext = scope.ServiceProvider.GetRequiredService<EdDbContext>();
+                        StarSystem? starSystem = await dbContext.StarSystems
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(s => s.Name == systemName);
+                        if (starSystem != null)
+                        {
+                            result.AddRange(await dbContext.Stations
+                                .AsNoTracking()
+                                .Where(s => s.StarSystem == starSystem && EF.Functions.Like(s.Name, $"{value}%") && s.Type!.Name != StationType.FleetCarrierStationType)
+                                .Take(10)
+                                .Select(s => s.Name)
+                                .ToListAsync());
+
+                            result.AddRange(await dbContext.StarSystemFssSignals
+                                .AsNoTracking()
+                                .Where(s => s.StarSystem == starSystem && EF.Functions.Like(s.Name, $"{value}%") && s.Type != StarSystemFssSignalType.FleetCarrier)
+                                .Take(10)
+                                .Select(s => s.Name)
+                                .ToListAsync());
+                        }
+                    }
+                }
+
+                // max - 25 suggestions at a time (API limit)
+                return AutocompletionResult.FromSuccess(result.Distinct().Select(s => new AutocompleteResult(s, s)).Take(25));
             }
         }
 

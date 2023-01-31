@@ -42,7 +42,7 @@ namespace EDDataProcessor.AXI
                                 .FirstOrDefaultAsync(d => d.StarSystem == starSystem && d.Faction == faction && d.Status == DcohFactionOperationStatus.Active, cancellationToken);
                             if (factionOperation == null)
                             {
-                                factionOperation = new(0, DcohFactionOperationType.AXCombat, DcohFactionOperationStatus.Active, DateTimeOffset.UtcNow)
+                                factionOperation = new(0, DcohFactionOperationType.AXCombat, DcohFactionOperationStatus.Active, DateTimeOffset.UtcNow, null)
                                 {
                                     Faction = faction,
                                     StarSystem = starSystem,

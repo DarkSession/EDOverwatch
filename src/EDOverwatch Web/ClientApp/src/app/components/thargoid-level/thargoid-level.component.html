@@ -1,9 +1,4 @@
 <div class="thargoid-level" *ngIf="thargoidLevel">
     <span class="dot" [ngClass]="dotClass"></span>
     {{ thargoidLevel.Name }}
-    <span *ngIf="thargoidLevel.IsInvisibleState"
-        matTooltip="This system state does not appear correctly in-game. For more details see the FAQ.">
-        &nbsp;
-        <fa-icon [icon]="faEyeLowVision"></fa-icon>
-    </span>
 </div>

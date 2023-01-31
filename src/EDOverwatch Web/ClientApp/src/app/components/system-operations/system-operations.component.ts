@@ -10,9 +10,8 @@ import { FactionOperation, OverwatchStarSystemDetail } from '../system/system.co
 })
 export class SystemOperationsComponent implements OnChanges, AfterViewInit {
   public factionOperations: MatTableDataSource<FactionOperation> = new MatTableDataSource<FactionOperation>();
-  public readonly factionOperationsDisplayedColumns = ['Faction', 'Type', 'Started'];
+  public readonly factionOperationsDisplayedColumns = ['Faction', 'Type', 'MeetingPoint', 'Started'];
   @ViewChild(MatSort) sort!: MatSort;
-
   @Input() starSystem!: OverwatchStarSystemDetail;
 
   public ngOnChanges(): void {

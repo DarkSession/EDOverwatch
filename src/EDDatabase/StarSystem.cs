@@ -4,6 +4,7 @@ namespace EDDatabase
 {
     [Table("StarSystem")]
     [Index(nameof(SystemAddress), IsUnique = true)]
+    [Index(nameof(Name))]
     [Index(nameof(LocationX), nameof(LocationY), nameof(LocationZ))]
     [Index(nameof(WarRelevantSystem))]
     public class StarSystem

@@ -32,12 +32,14 @@
             return stationType;
         }
 
-        public static Task<StationType> GetFleetCarrier(EdDbContext dbContext, CancellationToken cancellationToken = default) => GetByName("FleetCarrier", dbContext, cancellationToken);
+        public const string FleetCarrierStationType = "FleetCarrier";
+
+        public static Task<StationType> GetFleetCarrier(EdDbContext dbContext, CancellationToken cancellationToken = default) => GetByName(FleetCarrierStationType, dbContext, cancellationToken);
 
         [NotMapped]
         public string NameFull => !string.IsNullOrEmpty(NameEnglish) ? NameEnglish : Name;
 
         [NotMapped]
-        public bool IsFleetCarrier => Name == "FleetCarrier";
+        public bool IsFleetCarrier => Name == FleetCarrierStationType;
     }
 }

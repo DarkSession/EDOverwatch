@@ -23,6 +23,8 @@ namespace EDSystemProgress
             new ColorRange(80, 110, 5, 15, 135, 190),
             new ColorRange(100, 125, 5, 15, 200, 230),
             // Arrow
+            new ColorRange(45, 65, 45, 65, 45, 65),
+            new ColorRange(55, 75, 55, 75, 55, 75),
             new ColorRange(120, 140, 120, 140, 120, 140),
             new ColorRange(140, 160, 140, 160, 140, 160),
             new ColorRange(230, 255, 230, 255, 230, 255),
@@ -170,65 +172,21 @@ namespace EDSystemProgress
                                 }
                             case ImageProcessingStep.NextStep:
                                 {
-                                    if (paragraphNumber >= 2)
+                                    if (paragraphNumber >= 1)
                                     {
-                                        if (text.Contains("THARGOID INFESTATION IN"))
+                                        if (text.Contains("Thargoids are attempting"))
                                         {
-                                            remainingTime = text;
                                             systemStatus = SystemStatus.InvasionInProgress;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
-                                        else if (text.Contains("THARGOID CONTROL PREVENTED"))
+                                        else if (text.Contains("have established"))
                                         {
-                                            systemStatus = SystemStatus.InvasionPrevented;
-                                            processingStep = ImageProcessingStep.AboveProgressBar;
-                                        }
-                                        else if (text.Contains("INCURSION THREAT IN") || text.Contains("THARGOID CONTROL IN"))
-                                        {
-                                            remainingTime = text;
-                                            if (text.Contains("INCURSION THREAT IN"))
-                                            {
-                                                systemStatus = SystemStatus.AlertInProgressPopulated;
-                                            }
-                                            else
-                                            {
-                                                systemStatus = SystemStatus.AlertInProgressUnpopulated;
-                                            }
-                                            processingStep = ImageProcessingStep.BelowProgressBar;
-                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
-                                            {
-                                                progressBarUpperY = bounds.Y2;
-                                            }
-                                        }
-                                        else if (text.Contains("HUMAN CONTROL MAINTAINED"))
-                                        {
-                                            systemStatus = SystemStatus.AlertPrevented;
-                                            processingStep = ImageProcessingStep.AboveProgressBar;
-                                        }
-                                        else if (text.Contains("RECAPTURE ATTEMPT"))
-                                        {
-                                            remainingTime = text;
                                             systemStatus = SystemStatus.ThargoidControlled;
-                                            processingStep = ImageProcessingStep.BelowProgressBar;
-                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
-                                            {
-                                                progressBarUpperY = bounds.Y2;
-                                            }
-                                        }
-                                        else if (text.Contains("RECOVERY COMPLETE IN"))
-                                        {
-                                            remainingTime = text;
-                                            systemStatus = SystemStatus.Recovery;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
-                                        else if (text.Contains("RECOVERY WORK COMPLETE"))
+                                        else if (text.Contains("Thargoid vessels"))
                                         {
-                                            systemStatus = SystemStatus.RecoveryComplete;
-                                            processingStep = ImageProcessingStep.AboveProgressBar;
-                                        }
-                                        else if (text.Contains("HUMAN CONTROL REGAINED"))
-                                        {
-                                            systemStatus = SystemStatus.ThargoidControlledRegainedUnpopulated;
+                                            systemStatus = SystemStatus.AlertInProgressPopulated;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
                                         else if (text.Contains("system is currently populated"))
@@ -241,6 +199,17 @@ namespace EDSystemProgress
                                             systemStatus = SystemStatus.Unpopulated;
                                             processingStep = ImageProcessingStep.Completed;
                                         }
+                                        else if (text.Contains("RECOVERY COMPLETE IN"))
+                                        {
+                                            systemStatus = SystemStatus.Recovery;
+                                            remainingTime = text;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
+                                        else if (text.Contains("RECOVERY WORK COMPLETE"))
+                                        {
+                                            systemStatus = SystemStatus.RecoveryComplete;
+                                            processingStep = ImageProcessingStep.AboveProgressBar;
+                                        }
                                     }
                                     break;
                                 }
@@ -250,16 +219,57 @@ namespace EDSystemProgress
                                     switch (systemStatus)
                                     {
                                         case SystemStatus.InvasionInProgress:
-                                            {
-                                                match = text.Contains("PORTS REMAININ") || text.Contains("PORTS REMAINI");
-                                                break;
-                                            }
                                         case SystemStatus.InvasionPrevented:
                                             {
-                                                match = text.Contains("PORTS REMAININ");
-                                                if (!match && text.Contains("BEGINS"))
+                                                if (text.Contains("DEFENSIVE WINDOW") || (text.Contains("DEFENSIVE") && text.Contains("ENDS")))
+                                                {
+                                                    systemStatus = SystemStatus.InvasionInProgress;
+                                                    match = true;
+                                                }
+                                                else if (text.Contains("PREVENTED"))
+                                                {
+                                                    systemStatus = SystemStatus.InvasionPrevented;
+                                                }
+                                                else if (systemStatus == SystemStatus.InvasionPrevented && text.Contains("BEGINS"))
                                                 {
                                                     remainingTime = text;
+                                                    match = true;
+                                                }
+                                                break;
+                                            }
+                                        case SystemStatus.RecoveryComplete:
+                                            {
+                                                match = text.Contains("ACTIVE IN");
+                                                if (match)
+                                                {
+                                                    remainingTime = text;
+                                                }
+                                                break;
+                                            }
+                                        case SystemStatus.ThargoidControlledRegainedPopulated:
+                                        case SystemStatus.ThargoidControlledRegainedUnpopulated:
+                                        case SystemStatus.ThargoidControlled:
+                                            {
+                                                match = text.Contains("COUNTER-ATTACK");
+                                                if (match)
+                                                {
+                                                    remainingTime = text;
+                                                }
+                                                else if (text.Contains("WILL RETREAT"))
+                                                {
+                                                    match = true;
+                                                    systemStatus = SystemStatus.ThargoidControlledRegainedUnpopulated;
+                                                    remainingTime = text;
+                                                }
+                                                break;
+                                            }
+                                        case SystemStatus.AlertInProgressPopulated:
+                                        case SystemStatus.AlertInProgressUnpopulated:
+                                            {
+                                                if (text.Contains("DEFENSIVE WINDOW") || (text.Contains("DEFENSIVE") && text.Contains("ENDS")))
+                                                {
+                                                    remainingTime = text;
+                                                    match = true;
                                                 }
                                                 break;
                                             }
@@ -272,25 +282,6 @@ namespace EDSystemProgress
                                         case SystemStatus.Recovery:
                                             {
                                                 match = text.Contains("INACTIVE PORTS") || text.Contains("PORTS REMAINING");
-                                                break;
-                                            }
-                                        case SystemStatus.RecoveryComplete:
-                                            {
-                                                match = text.Contains("ACTIVE IN");
-                                                if (match)
-                                                {
-                                                    remainingTime = text;
-                                                }
-                                                break;
-                                            }
-                                        case SystemStatus.ThargoidControlledRegainedUnpopulated:
-                                        case SystemStatus.ThargoidControlledRegainedPopulated:
-                                            {
-                                                match = text.Contains("BEGINS IN");
-                                                if (match)
-                                                {
-                                                    remainingTime = text;
-                                                }
                                                 break;
                                             }
                                     }
@@ -310,12 +301,29 @@ namespace EDSystemProgress
                                     switch (systemStatus)
                                     {
                                         case SystemStatus.InvasionInProgress:
-                                        case SystemStatus.AlertInProgressPopulated:
                                             {
                                                 match = text.Contains("DELIVER SUPPLIES") ||
                                                         text.Contains("ELVER SUPPLES") ||
                                                         text.Contains("JLENVETCNE") ||
                                                         text.Contains("JENVENNE");
+                                                break;
+                                            }
+                                        case SystemStatus.AlertInProgressPopulated:
+                                        case SystemStatus.AlertInProgressUnpopulated:
+                                            {
+                                                match = text.Contains("DELIVER SUPPLIES") ||
+                                                        text.Contains("ELVER SUPPLES") ||
+                                                        text.Contains("JLENVETCNE") ||
+                                                        text.Contains("JENVENNE");
+                                                if (match)
+                                                {
+                                                    systemStatus = SystemStatus.AlertInProgressPopulated;
+                                                }
+                                                else if (text.Contains("DESTROY"))
+                                                {
+                                                    match = true;
+                                                    systemStatus = SystemStatus.AlertInProgressUnpopulated;
+                                                }
                                                 break;
                                             }
                                         case SystemStatus.InvasionPrevented:
@@ -324,34 +332,29 @@ namespace EDSystemProgress
                                                 break;
                                             }
                                         case SystemStatus.AlertPrevented:
-                                        case SystemStatus.RecoveryComplete:
                                             {
                                                 match = text.Contains("HUMAN CONTROLLED");
                                                 break;
                                             }
-                                        case SystemStatus.ThargoidControlled:
-                                        case SystemStatus.AlertInProgressUnpopulated:
+                                        case SystemStatus.RecoveryComplete:
                                             {
-                                                match = text.Contains("DESTROY THARGOID");
-                                                break;
-                                            }
-                                        case SystemStatus.Recovery:
-                                            {
-                                                match = text.Contains("DELIVER") || text.Contains("ELVER SUPPLES");
+                                                match = text.Contains("COMPLETION STATE");
                                                 break;
                                             }
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
                                         case SystemStatus.ThargoidControlledRegainedPopulated:
                                             {
-                                                match = text.Contains("POST-THARGOID RECOVER") || text.Contains("POST THARGOID RECOVER");
-                                                if (match)
-                                                {
-                                                    systemStatus = SystemStatus.ThargoidControlledRegainedPopulated;
-                                                }
-                                                else
-                                                {
-                                                    match = text.Contains("UNPOPULATED");
-                                                }
+                                                match = text.Contains("VICTORY STATE");
+                                                break;
+                                            }
+                                        case SystemStatus.ThargoidControlled:
+                                            {
+                                                match = text.Contains("DESTROY");
+                                                break;
+                                            }
+                                        case SystemStatus.Recovery:
+                                            {
+                                                match = text.Contains("REBOOT");
                                                 break;
                                             }
                                     }
@@ -362,6 +365,25 @@ namespace EDSystemProgress
                                             progressBarLowerY = bounds.Y1;
                                         }
                                         processingStep = ImageProcessingStep.Completed;
+                                    }
+                                    break;
+                                }
+                            case ImageProcessingStep.Completed:
+                                {
+                                    switch (systemStatus)
+                                    {
+                                        case SystemStatus.InvasionInProgress:
+                                            {
+                                                if (text.Contains("THARGOID CONTROL IN"))
+                                                {
+                                                    remainingTime = text;
+                                                }
+                                                break;
+                                            }
+                                        case SystemStatus.ThargoidControlledRegainedPopulated:
+                                            {
+                                                break;
+                                            }
                                     }
                                     break;
                                 }
@@ -533,6 +555,9 @@ namespace EDSystemProgress
             { "HIP 20418", "HIP 20419" },
             { "HIP 18138", "HIP 19198" },
             { "HYADES SECTOR EG-O B6-3", "HYADES SECTOR EQ-O B6-3" },
+            { "HIP 208389", "HIP 20899" },
+            { "HIP 22436", "HIP 22496" },
+            { "TRIANGULI SECTOR EG-Y B1", "TRIANGULI SECTOR EQ-Y B1" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

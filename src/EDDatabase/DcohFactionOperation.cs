@@ -26,12 +26,16 @@ namespace EDDatabase
         [ForeignKey("CreatedById")]
         public DcohDiscordUser? CreatedBy { get; set; }
 
-        public DcohFactionOperation(int id, DcohFactionOperationType type, DcohFactionOperationStatus status, DateTimeOffset created)
+        [Column(TypeName = "varchar(512)")]
+        public string? MeetingPoint { get; set; }
+
+        public DcohFactionOperation(int id, DcohFactionOperationType type, DcohFactionOperationStatus status, DateTimeOffset created, string? meetingPoint)
         {
             Id = id;
             Type = type;
             Status = status;
             Created = created;
+            MeetingPoint = meetingPoint;
         }
     }
 

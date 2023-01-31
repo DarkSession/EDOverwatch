@@ -223,6 +223,7 @@ export interface FactionOperation {
   Started: string;
   SystemName: string;
   SystemAddress: number;
+  MeetingPoint: string | null;
 }
 
 interface OverwatchStarSystemDetailProgress {

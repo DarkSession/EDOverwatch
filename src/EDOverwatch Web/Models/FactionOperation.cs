@@ -7,6 +7,7 @@
         public DateTimeOffset Started { get; set; }
         public string SystemName { get; set; }
         public long SystemAddress { get; set; }
+        public string? MeetingPoint { get; set; }
 
         public FactionOperation(DcohFactionOperation factionOperation)
         {
@@ -23,6 +24,7 @@
             Started = factionOperation.Created;
             SystemName = factionOperation.StarSystem.Name;
             SystemAddress = factionOperation.StarSystem.SystemAddress;
+            MeetingPoint = factionOperation.MeetingPoint;
         }
     }
 }
