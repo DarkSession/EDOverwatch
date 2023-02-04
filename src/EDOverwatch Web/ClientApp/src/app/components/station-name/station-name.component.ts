@@ -15,9 +15,9 @@ export interface OverwatchStation {
   DistanceFromStarLS: number;
   Type: string;
   LandingPads: {
-    Small: string;
-    Medium: string;
-    Large: string;
+    Small: number;
+    Medium: number;
+    Large: number;
   }
   State: string;
 }

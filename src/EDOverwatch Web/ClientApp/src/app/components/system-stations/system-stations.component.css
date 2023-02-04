@@ -10,6 +10,21 @@
     text-align: right;
 }
 
-.thead {
+.thead,
+.header-align-right {
     background-color: #272727;
+}
+
+.distance-warning {
+    font-weight: bold;
+    color: #b03a2e;
+}
+
+.state-container {
+    display: flex;
+    align-items: center;
+}
+
+.state-container img {
+    margin-right: 2px;
 }

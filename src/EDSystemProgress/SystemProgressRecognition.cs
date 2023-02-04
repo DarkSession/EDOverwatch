@@ -34,6 +34,7 @@ namespace EDSystemProgress
         {
             new ColorRange(10, 20, 18, 30, 0, 5),
             new ColorRange(15, 30, 24, 50, 0, 15),
+            new ColorRange(15, 25, 40, 60, 0, 15),
             new ColorRange(20, 25, 20, 25, 0, 0),
             new ColorRange(50, 70, 60, 100, 0, 35),
             new ColorRange(20, 60, 40, 100, 0, 35),

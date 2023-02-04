@@ -18,7 +18,6 @@
                     .FirstOrDefaultAsync(c => c.MissionId == MissionID && c.Commander == journalParameters.Commander && c.Status == CommanderMissionStatus.Accepted, cancellationToken);
                 if (commanderMission != null && commanderMission.Status != CommanderMissionStatus.Completed)
                 {
-                    commanderMission.Status = CommanderMissionStatus.Completed;
                     WarEffortType missionWarEffortType;
                     WarEffortType? countWarEffortType = null;
                     if (Name.StartsWith("Mission_TW_Collect"))
@@ -54,6 +53,7 @@
                         await DeferEvent(journalParameters, dbContext, cancellationToken);
                         return;
                     }
+                    commanderMission.Status = CommanderMissionStatus.Completed;
                     await AddOrUpdateWarEffort(journalParameters, commanderMission.System, missionWarEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
                     if (commanderMission.Count > 0 && countWarEffortType != null)
                     {

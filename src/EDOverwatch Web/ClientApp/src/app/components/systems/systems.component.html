@@ -5,49 +5,56 @@
         </div>
         <div class="content-box systems-container">
             <div style="height: 24px;"></div>
-            <div class="systems-filter">
-                <mat-form-field appearance="outline" floatLabel="always">
-                    <mat-label>System Name</mat-label>
-                    <input matInput [(ngModel)]="systemNameFilter" (ngModelChange)="updateDataSource()"
-                        placeholder="Filter by system name">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Maelstroms</mat-label>
-                    <mat-select [(ngModel)]="maelstromsSelected" (ngModelChange)="settingChanged()" multiple>
-                        <mat-option *ngFor="let maelstrom of maelstroms" [value]="maelstrom">
-                            {{ maelstrom.Name }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Thargoid State</mat-label>
-                    <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="settingChanged()" multiple>
-                        <mat-option *ngFor="let thargoidLevel of thargoidLevels" [value]="thargoidLevel">
-                            {{ thargoidLevel.Name }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <div class="systems-filter">
+            <div class="content-top-container">
                 <div>
-                    <mat-checkbox [(ngModel)]="hideUnpopulated" (ngModelChange)="settingChanged()">
-                        Hide unpopulated systems (original)
-                    </mat-checkbox>
+                    Cycle ends in XXX
                 </div>
                 <div>
-                    <mat-checkbox [(ngModel)]="hideCompleted" (ngModelChange)="settingChanged()">
-                        Hide completed systems
-                    </mat-checkbox>
+                    <div class="systems-filter">
+                        <mat-form-field appearance="outline" floatLabel="always">
+                            <mat-label>System Name</mat-label>
+                            <input matInput [(ngModel)]="systemNameFilter" (ngModelChange)="updateDataSource()"
+                                placeholder="Filter by system name">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Maelstroms</mat-label>
+                            <mat-select [(ngModel)]="maelstromsSelected" (ngModelChange)="settingChanged()" multiple>
+                                <mat-option *ngFor="let maelstrom of maelstroms" [value]="maelstrom">
+                                    {{ maelstrom.Name }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Thargoid State</mat-label>
+                            <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="settingChanged()" multiple>
+                                <mat-option *ngFor="let thargoidLevel of thargoidLevels" [value]="thargoidLevel">
+                                    {{ thargoidLevel.Name }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="systems-filter">
+                        <div>
+                            <mat-checkbox [(ngModel)]="hideUnpopulated" (ngModelChange)="settingChanged()">
+                                Hide unpopulated systems (original)
+                            </mat-checkbox>
+                        </div>
+                        <div>
+                            <mat-checkbox [(ngModel)]="hideCompleted" (ngModelChange)="settingChanged()">
+                                Hide completed systems
+                            </mat-checkbox>
+                        </div>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Optional columns</mat-label>
+                            <mat-select [(ngModel)]="optionalColumns" (ngModelChange)="settingChanged()" multiple>
+                                <mat-option *ngFor="let availableOptionalColumn of availableOptionalColumns"
+                                    [value]="availableOptionalColumn.key">
+                                    {{ availableOptionalColumn.value }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
                 </div>
-                <mat-form-field appearance="outline">
-                    <mat-label>Optional columns</mat-label>
-                    <mat-select [(ngModel)]="optionalColumns" (ngModelChange)="settingChanged()" multiple>
-                        <mat-option *ngFor="let availableOptionalColumn of availableOptionalColumns"
-                            [value]="availableOptionalColumn.key">
-                            {{ availableOptionalColumn.value }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
             </div>
             <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length || hideUnpopulated || hideCompleted"
                 class="filtered-view">

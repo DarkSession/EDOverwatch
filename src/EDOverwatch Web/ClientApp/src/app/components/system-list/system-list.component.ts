@@ -116,7 +116,7 @@ export class SystemListComponent implements OnInit, OnChanges {
           return (system.StationsUnderAttack + system.StationsDamaged + system.StationsUnderRepair);
         }
         case "FactionOperations": {
-          return (system.FactionOperations + system.SpecialFactionOperations.length * 10);
+          return (system.FactionOperations + system.SpecialFactionOperations.length * 9);
         }
         case "StateExpiration": {
           return (system.StateExpiration?.StateExpires ?? "");

@@ -4,17 +4,16 @@
     {
         public string Vessel { get; set; }
 
-        public List<CargoInventory> Inventory { get; set; }
+        public List<CargoInventory>? Inventory { get; set; }
 
-        public Cargo(string vessel, List<CargoInventory> inventory)
+        public Cargo(string vessel)
         {
             Vessel = vessel;
-            Inventory = inventory;
         }
 
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            if (Vessel == "Ship")
+            if (Vessel == "Ship" && Inventory != null)
             {
                 List<CommanderCargoItem> commanderCargoItems = await dbContext.CommanderCargoItems
                    .Include(i => i.Commodity)
@@ -28,7 +27,10 @@
                     int amountInInventory = Inventory.Where(i => i.Name == commodityName).Sum(i => i.Count);
                     if (amountInInventory == 0)
                     {
-                        dbContext.CommanderCargoItems.RemoveRange(commanderCargoItems.Where(c => c.Commodity!.Name == commodityName));
+                        if (commanderCargoItems.Any(c => c.Commodity!.Name == commodityName))
+                        {
+                            dbContext.CommanderCargoItems.RemoveRange(commanderCargoItems.Where(c => c.Commodity!.Name == commodityName));
+                        }
                     }
                     else if (amountInInventory < inDbInventory)
                     {

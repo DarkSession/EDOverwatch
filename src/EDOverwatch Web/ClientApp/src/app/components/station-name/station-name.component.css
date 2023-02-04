@@ -7,3 +7,8 @@
 .station-name {
     display: flex;
 }
+
+.badge {
+    background-color: #e95e03;
+    margin-left: 4px;
+}
