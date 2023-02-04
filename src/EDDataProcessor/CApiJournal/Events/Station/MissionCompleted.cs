@@ -47,7 +47,7 @@
                     }
                     else if (Name.StartsWith("Mission_TW_OnFoot_Reboot_NR"))
                     {
-                        missionWarEffortType = WarEffortType.SettlementRebootMission;
+                        missionWarEffortType = WarEffortType.MissionCompletionSettlementReboot;
                     }
                     else
                     {

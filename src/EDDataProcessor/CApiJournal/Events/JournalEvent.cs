@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Threading;
-
-namespace EDDataProcessor.CApiJournal.Events
+﻿namespace EDDataProcessor.CApiJournal.Events
 {
     internal abstract class JournalEvent
     {

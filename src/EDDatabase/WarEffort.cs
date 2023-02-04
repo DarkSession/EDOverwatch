@@ -68,7 +68,9 @@ namespace EDDatabase
             { WarEffortType.MissionCompletionPassengerEvacuation, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionDelivery, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionRescue, WarEffortTypeGroup.Mission },
-            { WarEffortType.ThargoidProbeCollection, WarEffortTypeGroup.Mission }, // Here in mission for now
+            { WarEffortType.MissionCompletionSettlementReboot, WarEffortTypeGroup.Mission },
+            { WarEffortType.ThargoidProbeCollection, WarEffortTypeGroup.Recovery },
+            { WarEffortType.Recovery, WarEffortTypeGroup.Recovery },
         };
     }
 
@@ -123,7 +125,7 @@ namespace EDDatabase
         Recovery,
 
         [EnumMember(Value = "Settlement reboot mission completed")]
-        SettlementRebootMission,
+        MissionCompletionSettlementReboot,
     }
 
     public enum WarEffortTypeGroup : byte
@@ -135,7 +137,8 @@ namespace EDDatabase
         Supply,
         [EnumMember(Value = "Missions")]
         Mission,
-        // Disruption,
+        [EnumMember(Value = "Recovery")]
+        Recovery,
     }
 
     public enum WarEffortSide : byte

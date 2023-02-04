@@ -50,6 +50,14 @@
                         </tr>
                         <tr>
                             <td>
+                                Items recovered
+                            </td>
+                            <td class="number">
+                                {{ stats.Humans.ItemsRecovered | number }} +
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Missions completed
                             </td>
                             <td class="number">
@@ -154,8 +162,8 @@
             <div class="subtitle">
                 War Development Overview
             </div>
-            <p>Development of the war starting in November 3308 with the arrival of the maelstrom Taranis.</p>
-            <p>Cleared systems numbers are only available as of the 22 December 2022.</p>
+            <p>Development of the war starting in November 3308 with the arrival of the Taranis maelstrom.</p>
+            <p>Cleared systems numbers are only available as of 22 December 2022.</p>
             <canvas baseChart class="chart hide-on-small-mobile" [data]="maelstromHistoryChart.data"
                 [options]="maelstromHistoryChart.options" [type]="maelstromHistoryChart.type" width="200"
                 height="100"></canvas>

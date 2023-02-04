@@ -144,7 +144,7 @@
                     stationQuery = stationQuery.Where(s => s.State != StationState.Normal || (s.State == StationState.Normal && s.Updated >= WeeklyTick.GetLastTick()));
                 }
 
-                List <Station> stations = await stationQuery
+                List<Station> stations = await stationQuery
                     .ToListAsync(cancellationToken);
 
                 List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress = await dbContext.StarSystemThargoidLevelProgress

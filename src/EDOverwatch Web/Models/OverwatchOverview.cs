@@ -103,6 +103,7 @@
                     WarEffortType.MissionCompletionRescue,
                     WarEffortType.MissionCompletionThargoidKill,
                     WarEffortType.MissionCompletionPassengerEvacuation,
+                    WarEffortType.MissionCompletionSettlementReboot,
                 };
 
                 result.Humans = new(

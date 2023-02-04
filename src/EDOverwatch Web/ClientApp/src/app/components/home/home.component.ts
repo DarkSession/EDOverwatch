@@ -260,6 +260,7 @@ export interface OverwatchOverviewHuman {
   Rescues: number | null;
   RescueSupplies: number | null;
   Missions: number | null;
+  ItemsRecovered: number | null;
 }
 
 export interface OverwatchOverviewThargoids {
