@@ -214,6 +214,46 @@ namespace EDDataProcessor
             }
 
             dbContext.ChangeTracker.Clear();
+
+            {
+                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                var maelstromTotals = await dbContext.StarSystemThargoidLevels
+                    .Where(s => s.State > StarSystemThargoidLevelState.None &&
+                        (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start) &&
+                        (
+                            (s.CycleStart!.Start <= newThargoidCycle.Start && s.CycleEnd == null) ||
+                            (s.CycleStart!.Start <= newThargoidCycle.Start && s.CycleEnd!.Start >= newThargoidCycle.Start) ||
+                            (s.CycleStart!.Start >= newThargoidCycle.Start && s.CycleEnd!.Start <= newThargoidCycle.Start)
+                        ))
+                    .GroupBy(s => new { s.MaelstromId, s.State })
+                    .Select(s => new
+                    {
+                        s.Key.MaelstromId,
+                        s.Key.State,
+                        Count = s.Count(),
+                    })
+                    .ToListAsync(cancellationToken);
+                foreach (var maelstromTotal in maelstromTotals)
+                {
+                    ThargoidMaelstrom maelstrom = await dbContext.ThargoidMaelstroms.FirstAsync(t => t.Id == maelstromTotal.MaelstromId, cancellationToken);
+                    ThargoidMaelstromHistoricalSummary? thargoidMaelstromHistoricalSummary = await dbContext.ThargoidMaelstromHistoricalSummaries
+                        .FirstOrDefaultAsync(t => t.Maelstrom == maelstrom && t.State == maelstromTotal.State && t.Cycle == newThargoidCycle, cancellationToken);
+                    if (thargoidMaelstromHistoricalSummary == null)
+                    {
+                        thargoidMaelstromHistoricalSummary = new(0, maelstromTotal.State, maelstromTotal.Count)
+                        {
+                            Maelstrom = maelstrom,
+                            Cycle = newThargoidCycle,
+                        };
+                        dbContext.ThargoidMaelstromHistoricalSummaries.Add(thargoidMaelstromHistoricalSummary);
+                    }
+                    else
+                    {
+                        thargoidMaelstromHistoricalSummary.Amount = maelstromTotal.Count;
+                    }
+                    await dbContext.SaveChangesAsync(cancellationToken);
+                }
+            }
         }
     }
 }

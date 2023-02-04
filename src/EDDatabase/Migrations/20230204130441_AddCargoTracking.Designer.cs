@@ -3,6 +3,7 @@ using System;
 using EDDatabase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDDatabase.Migrations
 {
     [DbContext(typeof(EdDbContext))]
-    partial class EdDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230204130441_AddCargoTracking")]
+    partial class AddCargoTracking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

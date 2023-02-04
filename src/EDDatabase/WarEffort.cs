@@ -118,6 +118,12 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid probe collected")]
         ThargoidProbeCollection,
+
+        [EnumMember(Value = "Recovery")]
+        Recovery,
+
+        [EnumMember(Value = "Settlement reboot mission completed")]
+        SettlementRebootMission,
     }
 
     public enum WarEffortTypeGroup : byte

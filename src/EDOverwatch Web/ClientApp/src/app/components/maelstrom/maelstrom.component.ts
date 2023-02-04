@@ -41,7 +41,7 @@ export class MaelstromComponent implements OnInit {
       scales: {
         y1: {
           type: 'linear',
-          display: true,
+          display: false,
           position: 'right',
           // grid line settings
           grid: {
@@ -180,6 +180,7 @@ export class MaelstromComponent implements OnInit {
             y1: {
               type: 'linear',
               position: 'right',
+              display: false,
             },
             y: {
               position: 'left',

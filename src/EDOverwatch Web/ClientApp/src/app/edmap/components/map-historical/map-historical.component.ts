@@ -105,11 +105,11 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       },
       "Horizons Engineer": {
         name: "Engineer (Horizons)",
-        color: "541425",
+        color: "206694",
       },
       "Odyssey Engineer": {
         name: "Engineer (Odyssey)",
-        color: "8A2652",
+        color: "3498db",
       },
     },
   };

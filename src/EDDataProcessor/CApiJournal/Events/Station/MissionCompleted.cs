@@ -45,6 +45,10 @@
                         // Mission_TW_Massacre_Hydra_Plural
                         missionWarEffortType = WarEffortType.MissionCompletionThargoidKill;
                     }
+                    else if (Name.StartsWith("Mission_TW_OnFoot_Reboot_NR"))
+                    {
+                        missionWarEffortType = WarEffortType.SettlementRebootMission;
+                    }
                     else
                     {
                         await DeferEvent(journalParameters, dbContext, cancellationToken);

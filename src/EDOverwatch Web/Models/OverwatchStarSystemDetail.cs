@@ -133,14 +133,18 @@
                     factionOperations = dcohFactionOperation.Select(d => new FactionOperation(d)).ToList();
                 }
 
-                List<Station> stations = await dbContext.Stations
+                IQueryable<Station> stationQuery = dbContext.Stations
                     .AsNoTracking()
                     .Include(s => s.Type)
                     .Where(s =>
                         s.StarSystem == starSystem &&
-                        StationTypes.Contains(s.Type!.Name) &&
-                        (s.State != StationState.Normal ||
-                        (s.State == StationState.Normal && s.Updated > WeeklyTick.GetLastTick())))
+                        StationTypes.Contains(s.Type!.Name));
+                if (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Invasion)
+                {
+                    stationQuery = stationQuery.Where(s => s.State != StationState.Normal || (s.State == StationState.Normal && s.Updated >= WeeklyTick.GetLastTick()));
+                }
+
+                List <Station> stations = await stationQuery
                     .ToListAsync(cancellationToken);
 
                 List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress = await dbContext.StarSystemThargoidLevelProgress

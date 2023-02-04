@@ -1,4 +1,7 @@
-﻿namespace EDDataProcessor.CApiJournal.Events
+﻿using Microsoft.EntityFrameworkCore;
+using System.Threading;
+
+namespace EDDataProcessor.CApiJournal.Events
 {
     internal abstract class JournalEvent
     {
@@ -21,7 +24,7 @@
 
         protected async Task AddOrUpdateWarEffort(JournalParameters journalParameters, StarSystem? starSystem, WarEffortType type, long amount, WarEffortSide side, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            string eventHash = CommanderJournalProcessedEvent.GetEventHash(journalParameters.Commander, Timestamp, Event, type, journalParameters.Line);
+            string eventHash = CommanderJournalProcessedEvent.GetEventHash(journalParameters.Commander, starSystem, Timestamp, Event, type);
             if (await dbContext.CommanderJournalProcessedEvents.AnyAsync(c => c.Hash == eventHash, cancellationToken))
             {
                 return;
@@ -29,6 +32,7 @@
             dbContext.CommanderJournalProcessedEvents.Add(new(0, Timestamp, eventHash)
             {
                 Commander = journalParameters.Commander,
+                // journalParameters.Line
             });
 
             WarEffort? warEffort = await dbContext.WarEfforts

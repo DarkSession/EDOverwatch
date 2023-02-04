@@ -65,6 +65,7 @@ import { Chart } from 'chart.js';
 import { StatsComponent } from './components/stats/stats.component';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Annotation from 'chartjs-plugin-annotation';
+import { SystemsDefenceScoreComponent } from './components/systems-defence-score/systems-defence-score.component';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
@@ -108,6 +109,7 @@ export const httpInterceptorProviders = [
     CommanderApiKeysComponent,
     SystemContributionSummaryComponent,
     StatsComponent,
+    SystemsDefenceScoreComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -208,6 +210,10 @@ export const httpInterceptorProviders = [
       {
         path: 'systems',
         component: SystemsComponent
+      },
+      {
+        path: 'sdc',
+        component: SystemsDefenceScoreComponent,
       },
       {
         path: '**',

@@ -30,8 +30,38 @@
                             {
 
                                 await AddOrUpdateWarEffort(journalParameters, WarEffortType.ThargoidProbeCollection, 1, WarEffortSide.Humans, dbContext, cancellationToken);
-
                             }
+                            break;
+                        }
+                    case "ThargoidTissueSampleType1":
+                    case "ThargoidTissueSampleType2":
+                    case "ThargoidTissueSampleType3":
+                    case "ThargoidScoutTissueSample":
+                    case "USSCargoBlackBox":
+                    case "OccupiedCryoPod":
+                    case "DamagedEscapePod":
+                        {
+                            Commodity commodity = await Commodity.GetCommodity(Type, dbContext, cancellationToken);
+                            CommanderCargoItem? commanderCargoItem = await dbContext.CommanderCargoItems
+                                .FirstOrDefaultAsync(c =>
+                                    c.Commander == journalParameters.Commander &&
+                                    c.SourceStarSystem == journalParameters.CommanderCurrentStarSystem &&
+                                    c.Commodity == commodity, cancellationToken);
+                            if (commanderCargoItem == null)
+                            {
+                                commanderCargoItem = new(0, 1)
+                                {
+                                    Commodity = commodity,
+                                    Commander = journalParameters.Commander,
+                                    SourceStarSystem = journalParameters.CommanderCurrentStarSystem,
+                                };
+                                dbContext.CommanderCargoItems.Add(commanderCargoItem);
+                            }
+                            else
+                            {
+                                commanderCargoItem.Amount += 1;
+                            }
+                            await dbContext.SaveChangesAsync(cancellationToken);
                             break;
                         }
                 }

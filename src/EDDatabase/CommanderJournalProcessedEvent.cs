@@ -23,9 +23,9 @@
             Hash = hash;
         }
 
-        public static string GetEventHash(Commander commander, DateTimeOffset date, string eventName, WarEffortType warEffortType, int line)
+        public static string GetEventHash(Commander commander, StarSystem? starSystem, DateTimeOffset date, string eventName, WarEffortType warEffortType)
         {
-            return EDUtils.HashUtil.SHA256Hex($"{commander.Name.ToUpper()}:{date}:{eventName}:{warEffortType}:{line}");
+            return EDUtils.HashUtil.SHA256Hex($"{commander.Name.ToUpper()}:{starSystem?.Id ?? 0}:{date}:{eventName}:{warEffortType}");
         }
     }
 }

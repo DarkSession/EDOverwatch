@@ -13,9 +13,11 @@ namespace EDDatabase
         public DbSet<Commander> Commanders { get; set; }
         public DbSet<CommanderApiKey> CommanderApiKeys { get; set; }
         public DbSet<CommanderApiKeyClaim> CommanderApiKeyClaims { get; set; }
+        public DbSet<CommanderCargoItem> CommanderCargoItems { get; set; }
         public DbSet<CommanderDeferredJournalEvent> CommanderDeferredJournalEvents { get; set; }
         public DbSet<CommanderJournalProcessedEvent> CommanderJournalProcessedEvents { get; set; }
         public DbSet<CommanderMission> CommanderMissions { get; set; }
+        public DbSet<Commodity> Commodities { get; set; }
 
         public DbSet<DcohDiscordUser> DcohDiscordUsers { get; set; }
         public DbSet<DcohFaction> DcohFactions { get; set; }

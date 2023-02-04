@@ -13,7 +13,8 @@
                 <td mat-cell *matCellDef="let row">
                     <ng-container [ngSwitch]="row.State">
                         <span *ngSwitchCase="'Normal'">
-                            <fa-icon [icon]="faSquareCheck"></fa-icon> Operational
+                            <img src="assets/station-operational.png" style="width: 16px; height: 16px;"
+                                matTooltip="Operational" /> Operational
                         </span>
                         <span *ngSwitchCase="'UnderAttack'">
                             <img src="assets/station-attacked.png" style="width: 16px; height: 16px;"

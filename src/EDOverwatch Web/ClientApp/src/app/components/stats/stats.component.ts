@@ -222,6 +222,7 @@ export class StatsComponent implements OnInit {
               y1: {
                 type: 'linear',
                 position: 'right',
+                display: false,
               },
               y: {
                 position: 'left',

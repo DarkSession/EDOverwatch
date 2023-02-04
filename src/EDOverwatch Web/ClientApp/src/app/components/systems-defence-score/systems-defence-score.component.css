@@ -1,0 +1,9 @@
+.thead {
+    background-color: #272727;
+}
+
+.options-bottom {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}

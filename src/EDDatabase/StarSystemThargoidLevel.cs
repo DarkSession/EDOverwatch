@@ -32,6 +32,9 @@ namespace EDDatabase
         [ForeignKey("MaelstromId")]
         public ThargoidMaelstrom? Maelstrom { get; set; }
 
+        [ForeignKey("MaelstromId")]
+        public int? MaelstromId { get; set; }
+
         [Column]
         public short? Progress { get; set; }
 

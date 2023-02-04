@@ -184,7 +184,7 @@ namespace EDSystemProgress
                                             systemStatus = SystemStatus.ThargoidControlled;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
-                                        else if (text.Contains("Thargoid vessels"))
+                                        else if (text.Contains("Thargoid vessels") || text.Contains("are present in"))
                                         {
                                             systemStatus = SystemStatus.AlertInProgressPopulated;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
