@@ -23,9 +23,9 @@ namespace EDDataProcessor.EDDN
             }
             switch (Message.Event)
             {
-                case MessageEvent.FSDJump:
-                case MessageEvent.CarrierJump:
-                case MessageEvent.Location:
+                case JournalMessageEvent.FSDJump:
+                case JournalMessageEvent.CarrierJump:
+                case JournalMessageEvent.Location:
                     {
                         List<double> starPos = Message.StarPos?.ToList() ?? new();
                         if (starPos.Count != 3)
@@ -101,14 +101,28 @@ namespace EDDataProcessor.EDDN
                         }
                         break;
                     }
+                case JournalMessageEvent.Scan:
+                    {
+                        if (Message.SurfaceGravity > 0m)
+                        {
+                            StarSystemBody? starSystemBody = await dbContext.StarSystemBodies
+                                .FirstOrDefaultAsync(s => s.StarSystem!.SystemAddress == Message.SystemAddress && s.BodyId == Message.BodyID, cancellationToken);
+                            if (starSystemBody != null && starSystemBody.Gravity != Message.SurfaceGravity)
+                            {
+                                starSystemBody.Gravity = Message.SurfaceGravity;
+                                await dbContext.SaveChangesAsync(cancellationToken);
+                            }
+                        }
+                        break;
+                    }
             }
             switch (Message.Event)
             {
-                case MessageEvent.Docked:
-                case MessageEvent.CarrierJump:
-                case MessageEvent.Location:
+                case JournalMessageEvent.Docked:
+                case JournalMessageEvent.CarrierJump:
+                case JournalMessageEvent.Location:
                     {
-                        if (Message.MarketID == 0 || Message.Event == MessageEvent.Location && !Message.Docked)
+                        if (Message.MarketID == 0 || Message.Event == JournalMessageEvent.Location && !Message.Docked)
                         {
                             break;
                         }
@@ -130,6 +144,7 @@ namespace EDDataProcessor.EDDN
                                 .Include(s => s.StarSystem)
                                 .Include(s => s.Government)
                                 .Include(s => s.PrimaryEconomy)
+                                .Include(s => s.Body)
                                 .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID || (s.MarketId == 0 && s.Name == Message.StationName), cancellationToken);
                         }
                         else
@@ -138,6 +153,7 @@ namespace EDDataProcessor.EDDN
                                 .Include(s => s.StarSystem)
                                 .Include(s => s.Government)
                                 .Include(s => s.PrimaryEconomy)
+                                .Include(s => s.Body)
                                 .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
                         }
                         if (station == null)
@@ -168,7 +184,7 @@ namespace EDDataProcessor.EDDN
                                 station.MarketId = Message.MarketID;
                                 changed = true;
                             }
-                            if (Message.Event != MessageEvent.Location && Message.LandingPads != null)
+                            if (Message.Event != JournalMessageEvent.Location && Message.LandingPads != null)
                             {
                                 if (station.LandingPadLarge != Message.LandingPads.Large)
                                 {
@@ -183,7 +199,7 @@ namespace EDDataProcessor.EDDN
                                     station.LandingPadSmall = Message.LandingPads.Small;
                                 }
                             }
-                            if (Message.Event != MessageEvent.Location)
+                            if (Message.Event != JournalMessageEvent.Location)
                             {
                                 StationState stationState = StationState.Normal;
                                 if (!string.IsNullOrEmpty(Message.StationState) && !Enum.TryParse(Message.StationState, out stationState))
@@ -252,7 +268,7 @@ namespace EDDataProcessor.EDDN
         public DateTimeOffset Timestamp { get; set; }
 
         [JsonProperty("event", Required = Required.Always)]
-        public MessageEvent Event { get; set; }
+        public JournalMessageEvent Event { get; set; }
 
         /// <summary>Must be added by the sender if not present in the journal event</summary>
         [JsonProperty("StarSystem", Required = Required.Always)]
@@ -307,6 +323,15 @@ namespace EDDataProcessor.EDDN
 
         [JsonProperty("LandingPads")]
         public DockedLandingPads? LandingPads { get; set; }
+
+        [JsonProperty("BodyName")]
+        public string? BodyName { get; set; }
+
+        [JsonProperty("BodyID")]
+        public int BodyID { get; set; }
+
+        [JsonProperty("SurfaceGravity")]
+        public decimal SurfaceGravity { get; set; }
     }
 
     public class DockedLandingPads
@@ -336,7 +361,7 @@ namespace EDDataProcessor.EDDN
         public string Name { get; set; } = string.Empty;
     }
 
-    public enum MessageEvent
+    public enum JournalMessageEvent
     {
         [EnumMember(Value = @"Docked")]
         Docked = 0,

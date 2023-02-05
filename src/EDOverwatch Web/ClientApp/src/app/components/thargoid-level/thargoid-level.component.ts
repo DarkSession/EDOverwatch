@@ -7,7 +7,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 })
 export class ThargoidLevelComponent implements OnChanges {
   @Input() thargoidLevel!: OverwatchThargoidLevel;
-
+  @Input() size?: number = 12;
   public dotClass = "";
 
   public ngOnChanges(): void {

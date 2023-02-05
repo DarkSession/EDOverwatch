@@ -1,4 +1,7 @@
 <div class="thargoid-level" *ngIf="thargoidLevel">
-    <span class="dot" [ngClass]="dotClass"></span>
+    <span class="dot" [ngClass]="dotClass" [ngStyle]="{
+        'width.px': size,
+        'height.px': size
+    }"></span>
     {{ thargoidLevel.Name }}
 </div>

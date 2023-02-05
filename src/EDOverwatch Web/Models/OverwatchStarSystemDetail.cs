@@ -136,6 +136,7 @@
                 IQueryable<Station> stationQuery = dbContext.Stations
                     .AsNoTracking()
                     .Include(s => s.Type)
+                    .Include(s => s.Body)
                     .Where(s =>
                         s.StarSystem == starSystem &&
                         StationTypes.Contains(s.Type!.Name));
@@ -247,5 +248,4 @@
             ProgressPercentage = starSystemThargoidLevel.Progress != null ? (decimal)starSystemThargoidLevel.Progress / 100m : null;
         }
     }
-
 }

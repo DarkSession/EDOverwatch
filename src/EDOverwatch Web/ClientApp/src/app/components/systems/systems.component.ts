@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
@@ -6,6 +6,8 @@ import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { AppService } from 'src/app/services/app.service';
 import { faArrowUpRightFromSquare, faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy } from '@angular/core';
 
 @UntilDestroy()
 @Component({
@@ -14,7 +16,7 @@ import { faArrowUpRightFromSquare, faCircleXmark, faFilter } from '@fortawesome/
   styleUrls: ['./systems.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SystemsComponent implements OnInit {
+export class SystemsComponent implements OnInit, OnDestroy {
   public readonly faArrowUpRightFromSquare = faArrowUpRightFromSquare;
   public readonly faFilter = faFilter;
   public readonly faCircleXmark = faCircleXmark;
@@ -24,6 +26,8 @@ export class SystemsComponent implements OnInit {
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
   public systemNameFilter: string = "";
   public optionalColumns: string[] = [];
+  public nextTick: string | null = null;
+  private refreshTimer: any | null = null;
 
   public availableOptionalColumns: {
     key: string;
@@ -70,10 +74,21 @@ export class SystemsComponent implements OnInit {
           this.webSocketService.sendMessage("OverwatchSystems", {});
         }
       });
+    this.refreshTimer = setInterval(() => {
+      this.changeDetectorRef.markForCheck();
+    }, 1000);
     this.webSocketService.sendMessage("OverwatchSystems", {});
   }
 
+  public ngOnDestroy(): void {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
+    }
+  }
+
   private async update(data: OverwatchSystems) {
+    this.nextTick = data.NextTick;
     this.dataRaw = data.Systems;
     this.maelstroms = data.Maelstroms;
     const maelstromsSelectedSetting = await this.appService.getSetting("Maelstroms");
@@ -156,5 +171,6 @@ export interface OverwatchSystems {
   Maelstroms: OverwatchMaelstrom[];
   Levels: OverwatchThargoidLevel[];
   Systems: OverwatchStarSystem[];
+  NextTick: string;
 }
 

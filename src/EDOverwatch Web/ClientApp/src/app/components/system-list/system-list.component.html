@@ -18,7 +18,8 @@
                     <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
                     <div *ngIf="row.StateProgress?.IsCompleted && row.StateProgress.NextSystemState"
                         class="state-change">
-                        <app-thargoid-level [thargoidLevel]="row.StateProgress.NextSystemState"></app-thargoid-level>
+                        <app-thargoid-level [thargoidLevel]="row.StateProgress.NextSystemState"
+                            [size]="9"></app-thargoid-level>
                         &nbsp;in {{ row.StateProgress.SystemStateChanges | dateAgo:1 }}
                     </div>
                 </td>
@@ -77,7 +78,11 @@
                 </td>
             </ng-container>
             <ng-container matColumnDef="EffortFocus">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Focus</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    matTooltip="Effort focus since the last tick or the last 24 hours if the tick happened more than 24 hours ago">
+                    Focus&nbsp;
+                    <fa-icon [icon]="faCircleQuestion"></fa-icon>
+                </th>
                 <td mat-cell *matCellDef="let row">
                     {{ row.EffortFocus | percent }}
                 </td>

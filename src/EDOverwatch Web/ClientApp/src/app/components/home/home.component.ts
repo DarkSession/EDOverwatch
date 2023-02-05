@@ -1,14 +1,11 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import * as dayjs from 'dayjs';
-import * as duration from 'dayjs/plugin/duration';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
-import { ChartConfiguration, ChartDataset, ChartType, Color } from 'chart.js';
+import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
-
-dayjs.extend(duration)
 
 @UntilDestroy()
 @Component({
@@ -207,7 +204,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private updateTimeSince(): void {
     const results: string[] = [];
-    const now = dayjs();
+    const now = dayjs.utc();
     const duration = dayjs.duration(now.diff(this.start));
 
     if (duration.years() === 1) {

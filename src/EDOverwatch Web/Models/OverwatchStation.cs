@@ -8,6 +8,7 @@
         public string Type { get; }
         public OverwatchStationLandingPads LandingPads { get; }
         public string State { get; }
+        public decimal? Gravity { get; }
 
         public OverwatchStation(Station station)
         {
@@ -17,6 +18,7 @@
             Type = station.Type?.Name ?? throw new Exception("station.Type cannot be null");
             LandingPads = new(station.LandingPadSmall, station.LandingPadMedium, station.LandingPadLarge);
             State = station.State.GetEnumMemberValue();
+            Gravity = station.Body?.Gravity;
         }
     }
 

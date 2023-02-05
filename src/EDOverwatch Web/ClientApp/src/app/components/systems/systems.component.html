@@ -6,10 +6,23 @@
         <div class="content-box systems-container">
             <div style="height: 24px;"></div>
             <div class="content-top-container">
-                <div>
-                    Cycle ends in XXX
+                <div class="container-item">
+                    <div *ngIf="nextTick">
+                        <div class="subtitle">
+                            Current cycle ends in {{ nextTick | dateAgo }}
+                        </div>
+                        <ul>
+                            <li>Systems with 100% progress will move to their next state.</li>
+                            <li>Systems not progressed to 100% will <b>reset</b> to 0% except for systems in recovery.</li>
+                            <li>Systems in alert will move to invasion (if populated) or to Thargoid controlled (if
+                                unpopulated).</li>
+                            <li>Systems under Thargoid invasion will move to be Thargoid controlled if no time is
+                                remaining.</li>
+                        </ul>
+                        <br>
+                    </div>
                 </div>
-                <div>
+                <div class="container-item">
                     <div class="systems-filter">
                         <mat-form-field appearance="outline" floatLabel="always">
                             <mat-label>System Name</mat-label>
@@ -26,9 +39,19 @@
                         </mat-form-field>
                         <mat-form-field appearance="outline">
                             <mat-label>Thargoid State</mat-label>
-                            <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="settingChanged()" multiple>
+                            <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="settingChanged()"
+                                multiple>
                                 <mat-option *ngFor="let thargoidLevel of thargoidLevels" [value]="thargoidLevel">
                                     {{ thargoidLevel.Name }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Optional columns</mat-label>
+                            <mat-select [(ngModel)]="optionalColumns" (ngModelChange)="settingChanged()" multiple>
+                                <mat-option *ngFor="let availableOptionalColumn of availableOptionalColumns"
+                                    [value]="availableOptionalColumn.key">
+                                    {{ availableOptionalColumn.value }}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
@@ -44,15 +67,6 @@
                                 Hide completed systems
                             </mat-checkbox>
                         </div>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Optional columns</mat-label>
-                            <mat-select [(ngModel)]="optionalColumns" (ngModelChange)="settingChanged()" multiple>
-                                <mat-option *ngFor="let availableOptionalColumn of availableOptionalColumns"
-                                    [value]="availableOptionalColumn.key">
-                                    {{ availableOptionalColumn.value }}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
                     </div>
                 </div>
             </div>

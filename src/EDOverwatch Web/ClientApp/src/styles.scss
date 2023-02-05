@@ -354,6 +354,11 @@ hr {
   border-top: 1px solid #fbd7b4;
 }
 
+ul {
+  list-style: square;
+  list-style-position: outside;
+}
+
 .content-flex {
   display: flex;
   width: 100%;

@@ -66,11 +66,17 @@ import { StatsComponent } from './components/stats/stats.component';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Annotation from 'chartjs-plugin-annotation';
 import { SystemsDefenceScoreComponent } from './components/systems-defence-score/systems-defence-score.component';
+import * as duration from 'dayjs/plugin/duration';
+import * as utc from 'dayjs/plugin/utc';
+import * as dayjs from 'dayjs';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
 Chart.register(Annotation);
 Chart.register(ChartDataLabels);
+
+dayjs.extend(duration)
+dayjs.extend(utc);
 
 /** Http interceptor providers in outside-in order */
 export const httpInterceptorProviders = [

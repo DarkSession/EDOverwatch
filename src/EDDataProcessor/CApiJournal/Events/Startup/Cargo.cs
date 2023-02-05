@@ -17,12 +17,12 @@
             {
                 List<CommanderCargoItem> commanderCargoItems = await dbContext.CommanderCargoItems
                    .Include(i => i.Commodity)
-                   .Where(c => c.Commander == journalParameters.Commander)
+                   .Where(c => c.Commander == journalParameters.Commander && c.Commodity != null)
                    .ToListAsync(cancellationToken);
 
-                foreach (var commanderCargoItemGroup in commanderCargoItems.GroupBy(c => c.Commodity))
+                foreach (var commanderCargoItemGroup in commanderCargoItems.GroupBy(c => c.Commodity!.Name))
                 {
-                    string commodityName = commanderCargoItemGroup.Key!.Name;
+                    string commodityName = commanderCargoItemGroup.Key;
                     int inDbInventory = commanderCargoItemGroup.Sum(c => c.Amount);
                     int amountInInventory = Inventory.Where(i => i.Name == commodityName).Sum(i => i.Count);
                     if (amountInInventory == 0)

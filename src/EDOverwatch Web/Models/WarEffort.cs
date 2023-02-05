@@ -5,9 +5,9 @@
         public static DateOnly GetWarEffortFocusStartDate()
         {
             DateTimeOffset time = WeeklyTick.GetLastTick();
-            if (DateTimeOffset.UtcNow.AddDays(-2) > time)
+            if (DateTimeOffset.UtcNow.AddDays(-1) > time)
             {
-                time = DateTimeOffset.UtcNow.AddDays(-2);
+                time = DateTimeOffset.UtcNow.AddDays(-1);
             }
             return DateOnly.FromDateTime(time.DateTime);
         }

@@ -1,18 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'dateAgo'
+  name: 'dateAgo',
+  pure: false,
 })
 export class DateAgoPipe implements PipeTransform {
 
   public transform(value: any, args?: any): any {
     if (value) {
-      let seconds = Math.floor((+new Date() - +new Date(value)) / 1000);
-      const future = (seconds < 0);
-      seconds = Math.abs(seconds);
-      if (seconds < 29) {
-        return 'Just now';
-      }
       let units = 2;
       if (args) {
         const arg = parseInt(args);
@@ -20,9 +15,17 @@ export class DateAgoPipe implements PipeTransform {
           units = arg;
         }
       }
+      let seconds = Math.floor((+new Date() - +new Date(value)) / 1000);
+      const future = (seconds < 0);
+      seconds = Math.abs(seconds);
+      if (seconds < 29) {
+        return 'Just now';
+      }
       const intervals: { [key: string]: number } = {
+        /*
         'year': 31536000,
         'month': 2592000,
+        */
         'week': 604800,
         'day': 86400,
         'hour': 3600,

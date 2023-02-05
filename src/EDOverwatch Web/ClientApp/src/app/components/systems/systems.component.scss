@@ -39,4 +39,10 @@ mat-form-field {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    width: 100%;
+
+    .container-item {
+        max-width: 50%;
+        min-width: 300px;
+    }
 }

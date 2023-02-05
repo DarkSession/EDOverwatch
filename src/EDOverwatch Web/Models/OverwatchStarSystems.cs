@@ -8,6 +8,7 @@
             .Select(s => new OverwatchThargoidLevel(s))
             .ToList();
         public List<OverwatchStarSystem> Systems { get; } = new();
+        public DateTimeOffset NextTick => WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
 
         public OverwatchStarSystems(List<ThargoidMaelstrom> thargoidMaelstroms)
         {

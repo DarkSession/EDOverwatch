@@ -31,6 +31,9 @@
         [ForeignKey("SecondaryEconomyId")]
         public Economy? SecondaryEconomy { get; set; }
 
+        [ForeignKey("BodyId")]
+        public StarSystemBody? Body { get; set; }
+
         [Column]
         public short LandingPadSmall { get; set; }
 
