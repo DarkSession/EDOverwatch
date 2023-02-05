@@ -52,14 +52,24 @@
             return totalEffortSums;
         }
 
+        private static List<WarEffortTypeGroup> EffortGroupsForSystemFocusCalculation { get; } = new()
+        {
+            WarEffortTypeGroup.Rescue,
+            WarEffortTypeGroup.Kills,
+            WarEffortTypeGroup.Supply,
+            WarEffortTypeGroup.Mission,
+        };
+             
         public static decimal CalculateSystemFocus(IEnumerable<WarEffortTypeSum> systemEfforts, Dictionary<WarEffortTypeGroup, long> totalEffortSums)
         {
             if (systemEfforts.Any())
             {
+                int totalEffortTypesForCalculation = totalEffortSums.Count(t => EffortGroupsForSystemFocusCalculation.Contains(t.Key));
                 Dictionary<WarEffortTypeGroup, long> systemEffortSums = new();
                 foreach (var systemEffort in systemEfforts)
                 {
-                    if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(systemEffort.Type, out WarEffortTypeGroup group))
+                    if (EDDatabase.WarEffort.WarEffortGroups.TryGetValue(systemEffort.Type, out WarEffortTypeGroup group) &&
+                        EffortGroupsForSystemFocusCalculation.Contains(group))
                     {
                         if (!systemEffortSums.ContainsKey(group))
                         {
@@ -74,9 +84,10 @@
                     decimal effortFocus = 0;
                     foreach (KeyValuePair<WarEffortTypeGroup, long> effort in totalEffortSums)
                     {
-                        if (systemEffortSums.TryGetValue(effort.Key, out long amount) && amount > 0)
+                        if (systemEffortSums.TryGetValue(effort.Key, out long amount) && amount > 0 &&
+                            EffortGroupsForSystemFocusCalculation.Contains(effort.Key))
                         {
-                            effortFocus += ((decimal)amount / (decimal)effort.Value / (decimal)totalEffortSums.Count);
+                            effortFocus += ((decimal)amount / (decimal)effort.Value / (decimal)totalEffortTypesForCalculation);
                         }
                     }
                     return Math.Round(effortFocus, 2);
