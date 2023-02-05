@@ -35,7 +35,10 @@ namespace EDDataProcessor.EDDN
                     .FirstOrDefaultAsync(s => s.StarSystem == station.StarSystem && s.Name == Message.BodyName, cancellationToken);
                 if (systemBody == null)
                 {
-                    systemBody = new(0, Message.BodyID, Message.BodyName, null);
+                    systemBody = new(0, Message.BodyID, Message.BodyName, null)
+                    {
+                        StarSystem = station.StarSystem,
+                    };
                     dbContext.StarSystemBodies.Add(systemBody);
                 }
                 station.Body = systemBody;
