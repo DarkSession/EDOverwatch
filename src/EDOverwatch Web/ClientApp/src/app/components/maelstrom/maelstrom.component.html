@@ -18,9 +18,12 @@
             </div>
             <mat-tab-group>
                 <mat-tab label="War Development Overview">
-                    <div class="maelstrom-summary-container">
+                    <div class="maelstrom-summary-container hide-on-small-mobile">
                         <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options"
                             [type]="chartConfig.type" width="200" height="100"></canvas>
+                    </div>
+                    <div class="hide-not-on-small-mobile">
+                        This chart required a higher resolution.
                     </div>
                 </mat-tab>
                 <mat-tab label="Affected systems">

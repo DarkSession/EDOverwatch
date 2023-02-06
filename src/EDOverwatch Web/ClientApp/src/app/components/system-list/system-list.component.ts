@@ -175,7 +175,7 @@ export class SystemListComponent implements OnInit, OnChanges {
       decimalSeparator: '.',
       showLabels: true,
       showTitle: false,
-      filename: "Overwatch System List Export.csv",
+      filename: "Overwatch System List Export",
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: true,

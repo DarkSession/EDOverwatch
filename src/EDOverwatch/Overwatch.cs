@@ -475,7 +475,7 @@ namespace EDOverwatch
                     }
                 }
 
-                if (thargoidLevel?.State != newThargoidLevel)
+                if (isManualUpdate || thargoidLevel == null || thargoidLevel.State < newThargoidLevel)
                 {
                     if (thargoidLevel != null)
                     {

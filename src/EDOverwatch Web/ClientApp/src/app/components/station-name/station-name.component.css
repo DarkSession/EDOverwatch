@@ -4,11 +4,20 @@
     margin-right: 8px;
 }
 
-.station-name {
+.station-name-container {
     display: flex;
+    align-items: center;
 }
 
-.badge {
+.badge-orange {
     background-color: #e95e03;
     margin-left: 4px;
+    margin-right: 4px;
+}
+
+.badge-gray {
+    background-color: #d7d7d7;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #393939;
 }

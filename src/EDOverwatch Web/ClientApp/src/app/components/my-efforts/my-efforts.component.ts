@@ -127,7 +127,7 @@ export class MyEffortsComponent implements OnInit {
       decimalSeparator: '.',
       showLabels: true,
       showTitle: false,
-      filename: "Overwatch War Contributions Export.csv",
+      filename: "Overwatch War Contributions Export",
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: true,

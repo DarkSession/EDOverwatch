@@ -4,25 +4,25 @@
             matSortDisableClear>
             <ng-container matColumnDef="Faction">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Faction</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     {{ row.Faction }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="Type">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Operation</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     {{ row.Type }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="MeetingPoint">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Meeting Point</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     {{ row.MeetingPoint }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="Started">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Started</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     {{ row.Started | date }}
                 </td>
             </ng-container>

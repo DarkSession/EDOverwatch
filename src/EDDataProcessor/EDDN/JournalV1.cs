@@ -37,6 +37,7 @@ namespace EDDataProcessor.EDDN
                         StarSystem? starSystem = await dbContext.StarSystems
                                                                 .Include(s => s.Allegiance)
                                                                 .Include(s => s.Security)
+                                                                .Include(s => s.ThargoidLevel)
                                                                 .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
                         if (starSystem == null)
                         {
@@ -82,7 +83,9 @@ namespace EDDataProcessor.EDDN
                                     changed = true;
                                 }
                             }
-                            if (starSystem.Population != population)
+                            if (starSystem.Population != population &&
+                                starSystem.ThargoidLevel?.State != StarSystemThargoidLevelState.Controlled &&
+                                !(starSystem.ThargoidLevel?.State == StarSystemThargoidLevelState.Invasion && starSystem.Population > population))
                             {
                                 starSystem.Population = population;
                                 changed = true;

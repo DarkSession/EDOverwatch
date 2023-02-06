@@ -1,4 +1,4 @@
-<div class="station-name">
+<div class="station-name-container">
     <div [ngSwitch]="station.Type">
         <img *ngSwitchCase="'Bernal'" class="station-icon" src="assets/ocellus.svg" />
         <img *ngSwitchCase="'Orbis'" class="station-icon" src="assets/orbis.svg" matTooltip="Orbis station" />
@@ -14,11 +14,14 @@
             matTooltip="Asteroid Base" />
     </div>
     {{ station.Name }}
-    <span class="badge" *ngIf="station.LandingPads.Large > 0" matTooltip="Large landing pad">
+    <span class="badge badge-orange" *ngIf="station.LandingPads.Large > 0" matTooltip="Large landing pad available">
         Large
     </span>
-    <span class="badge" *ngIf="station.LandingPads.Large === 0 && station.LandingPads.Medium > 0"
-        matTooltip="Medium landing pad">
+    <span class="badge badge-orange" *ngIf="station.LandingPads.Large === 0 && station.LandingPads.Medium > 0"
+        matTooltip="Medium landing pad available">
         Medium
+    </span>
+    <span *ngIf="station.Gravity" class="badge badge-gray" matTooltip="Planet gravity">
+        {{ (station.Gravity / 10) | number:'0.0-2' }} G
     </span>
 </div>

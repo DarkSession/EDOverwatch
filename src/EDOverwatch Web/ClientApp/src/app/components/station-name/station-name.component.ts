@@ -20,4 +20,5 @@ export interface OverwatchStation {
     Large: number;
   }
   State: string;
+  Gravity: number | null;
 }

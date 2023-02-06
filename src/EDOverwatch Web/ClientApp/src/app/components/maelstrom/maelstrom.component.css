@@ -20,3 +20,15 @@ table.system-information {
     width: 100%;
     padding: 100px;
 }
+
+@media (max-width: 600px) {
+    .hide-on-small-mobile {
+        display: none;
+    }
+}
+
+@media (min-width: 601px) {
+    .hide-not-on-small-mobile {
+      display: none;
+    }
+  }

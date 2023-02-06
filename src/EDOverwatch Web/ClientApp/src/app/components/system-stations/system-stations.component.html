@@ -4,13 +4,13 @@
             matSortDisableClear>
             <ng-container matColumnDef="Name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     <app-station-name [station]="row"></app-station-name>
                 </td>
             </ng-container>
             <ng-container matColumnDef="State">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row"  class="nowrap">
                     <div [ngSwitch]="row.State" class="state-container">
                         <ng-container *ngSwitchCase="'Normal'">
                             <img src="assets/station-operational.png" style="width: 16px; height: 16px;"
@@ -36,7 +36,7 @@
                 </td>
             </ng-container>
             <ng-container matColumnDef="DistanceFromStarLS">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-align-right">Distance</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
                 <td mat-cell *matCellDef="let row" class="cell-right">
                     <span [ngClass]="{ 'distance-warning': row.DistanceFromStarLS >= 50000 }">
                         {{ row.DistanceFromStarLS | number: '1.0-0' }} Ls
