@@ -28,7 +28,6 @@
                             if (journalParameters.CommanderCurrentStarSystem.ThargoidLevel != null &&
                                 journalParameters.CommanderCurrentStarSystem.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert)
                             {
-
                                 await AddOrUpdateWarEffort(journalParameters, WarEffortType.ThargoidProbeCollection, 1, WarEffortSide.Humans, dbContext, cancellationToken);
                             }
                             break;
@@ -36,6 +35,8 @@
                     case "ThargoidTissueSampleType1":
                     case "ThargoidTissueSampleType2":
                     case "ThargoidTissueSampleType3":
+                    case "ThargoidTissueSampleType4":
+                    case "ThargoidTissueSampleType5":
                     case "ThargoidScoutTissueSample":
                     case "USSCargoBlackBox":
                     case "OccupiedCryoPod":

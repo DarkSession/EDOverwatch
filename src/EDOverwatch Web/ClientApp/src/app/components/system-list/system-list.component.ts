@@ -21,8 +21,8 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faCircleCheck = faCircleCheck;
   public readonly faFileCsv = faFileCsv;
   public readonly faCircleQuestion = faCircleQuestion;
-  private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'FactionOperations', 'StateExpiration'];
-  public displayedColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Maelstrom', 'Progress', 'EffortFocus', 'FactionOperations', 'StateExpiration'];
+  private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Progress', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
+  public displayedColumns: string[] = [];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
   @Input() systems: OverwatchStarSystem[] = [];

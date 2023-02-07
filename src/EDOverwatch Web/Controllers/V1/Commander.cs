@@ -16,6 +16,7 @@ namespace EDOverwatch_Web.Controllers.V1
             Producer = producer;
         }
 
+        /*
         [HttpGet]
         [AllowAnonymous]
         public async Task<CommanderTokenResponse> Token(CancellationToken cancellationToken)
@@ -25,26 +26,7 @@ namespace EDOverwatch_Web.Controllers.V1
             await DbContext.SaveChangesAsync(cancellationToken);
             return new CommanderTokenResponse(commanderApiKey.Key);
         }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public List<ApplicableJournalEvent> Events()
-        {
-            return new()
-            {
-                new ApplicableJournalEvent("MissionAccepted")
-                    .AddFilter("Name", "^Mission_TW"),
-                new ApplicableJournalEvent("MissionCompleted")
-                    .AddFilter("Name", "^Mission_TW"),
-                new ApplicableJournalEvent("Died")
-                    .AddFilter("KillerShip", "scout_hq|scout_nq|scout_q|scout|thargonswarm|thargon"),
-                new ApplicableJournalEvent("FactionKillBond")
-                    .AddFilter("AwardingFaction", @"^\$faction_PilotsFederation;$")
-                    .AddFilter("VictimFaction", @"^\$faction_Thargoid;$"),
-                new ApplicableJournalEvent("CollectCargo")
-                    .AddFilter("Type", "UnknownArtifact2"),
-            };
-        }
+        */
     }
 
     public class CommanderTokenResponse
@@ -54,23 +36,6 @@ namespace EDOverwatch_Web.Controllers.V1
         public CommanderTokenResponse(Guid apiKey)
         {
             ApiKey = apiKey;
-        }
-    }
-
-    public class ApplicableJournalEvent
-    {
-        public string Name { get; set; }
-        public Dictionary<string, string> Filter { get; set; } = new();
-
-        public ApplicableJournalEvent(string name)
-        {
-            Name = name;
-        }
-
-        public ApplicableJournalEvent AddFilter(string name, string regex)
-        {
-            Filter[name] = regex;
-            return this;
         }
     }
 }

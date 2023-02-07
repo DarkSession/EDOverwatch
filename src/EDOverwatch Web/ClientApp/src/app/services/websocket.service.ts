@@ -33,6 +33,9 @@ export class WebsocketService {
     public constructor() {
         this.initDb();
         this.initalize();
+        window.addEventListener("online", () => {
+            this.initalizeConnection(false);
+        });
     }
 
     public ensureConnected(): void {
@@ -104,6 +107,9 @@ export class WebsocketService {
     }
 
     private initalize(): void {
+        if (!navigator.onLine) {
+            return;
+        }
         this.authenticationResolved = new Promise((resolve) => {
             this.authenticationResolve = resolve;
         });

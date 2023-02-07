@@ -175,6 +175,7 @@ export class StatsComponent implements OnInit {
             type: 'line',
             order: 0,
             // borderWidth: 8,
+            yAxisID: 'y',
             segment: {
               borderWidth: 8,
             }

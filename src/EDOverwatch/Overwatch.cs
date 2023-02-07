@@ -535,7 +535,7 @@ namespace EDOverwatch
                 if (maelstrom.InfluenceSphere < distanceToMaelstrom)
                 {
                     maelstrom.InfluenceSphere = distanceToMaelstrom;
-                    Log.LogInformation("Maelstrom {name}'s sphere of influence is to {distanceToMaelstrom}", maelstrom.Name, distanceToMaelstrom);
+                    Log.LogInformation("Maelstrom {name}'s sphere of influence extended to {distanceToMaelstrom}", maelstrom.Name, distanceToMaelstrom);
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 distanceToMaelstrom += 10m;
