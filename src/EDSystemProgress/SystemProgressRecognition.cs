@@ -268,6 +268,11 @@ namespace EDSystemProgress
                                         case SystemStatus.AlertInProgressPopulated:
                                         case SystemStatus.AlertInProgressUnpopulated:
                                             {
+                                                if (text.Contains("HUMAN CONTROL MAINTAINED"))
+                                                {
+                                                    systemStatus = SystemStatus.AlertPrevented;
+                                                    break;
+                                                }
                                                 if (text.Contains("DEFENSIVE WINDOW") || (text.Contains("DEFENSIVE") && text.Contains("ENDS")))
                                                 {
                                                     remainingTime = text;
@@ -333,16 +338,12 @@ namespace EDSystemProgress
                                                 match = text.Contains("POST-THARGOID RECOVER") || text.Contains("POST THARGOID RECOVER");
                                                 break;
                                             }
-                                        case SystemStatus.AlertPrevented:
-                                            {
-                                                match = text.Contains("HUMAN CONTROLLED");
-                                                break;
-                                            }
                                         case SystemStatus.RecoveryComplete:
                                             {
                                                 match = text.Contains("COMPLETION STATE");
                                                 break;
                                             }
+                                        case SystemStatus.AlertPrevented:
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
                                         case SystemStatus.ThargoidControlledRegainedPopulated:
                                             {

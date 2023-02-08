@@ -68,13 +68,6 @@
                                 matTooltip="Completed"></fa-icon>
                         </div>
                     </div>
-                    <div *ngIf="row.Progress !== null && !row.StateProgress?.IsCompleted && row.StateExpiration?.CurrentCycleEnds"
-                        class="small">
-                        Resets in
-                        <span [matTooltip]="row.StateExpiration?.CurrentCycleEnds | dateAgo:2">
-                            {{ row.StateExpiration?.CurrentCycleEnds | dateAgo:1 }}
-                        </span>
-                    </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="EffortFocus">

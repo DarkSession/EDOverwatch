@@ -140,10 +140,14 @@ namespace DCoHTrackerDiscordBot.Module
                 await FollowupAsync($"No {type.GetEnumMemberValue()} activity was found in {starSystem.Name} for this squadron.", ephemeral: true);
                 return;
             }
+
+            await FollowupAsync("This command is not fully active yet.", ephemeral: true);
+            /*
             dcohFactionOperation.Status = DcohFactionOperationStatus.Inactive;
             await DbContext.SaveChangesAsync();
 
             await FollowupAsync($"Removed {type.GetEnumMemberValue()} activity by **{Format.Sanitize(faction.Name)} ({Format.Sanitize(faction.Short)})** in **{starSystem.Name}**.");
+            */
         }
     }
 }

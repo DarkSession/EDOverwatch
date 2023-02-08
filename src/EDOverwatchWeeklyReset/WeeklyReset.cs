@@ -83,7 +83,8 @@ namespace EDDataProcessor
 
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>
-                        s.ThargoidLevel!.Progress == 100 || (s.ThargoidLevel!.Progress == 98 && s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recovery))
+                        s.ThargoidLevel!.Progress == 100 || 
+                        (s.ThargoidLevel!.Progress == 98 && s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recovery))
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
@@ -194,7 +195,7 @@ namespace EDDataProcessor
 
             dbContext.ChangeTracker.Clear();
 
-            // Last we reset the progress for all systems except systems in recovery
+            // Last update the progress for all systems except systems in recovery
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
@@ -207,8 +208,20 @@ namespace EDDataProcessor
 
                 foreach (StarSystem starSystem in starSystems)
                 {
-                    starSystem.ThargoidLevel!.Progress = 0;
-                    starSystem.ThargoidLevel!.CurrentProgress = null;
+                    if (starSystem.ThargoidLevel!.Progress <= 33)
+                    {
+                        starSystem.ThargoidLevel!.Progress = 0;
+                    }
+                    else
+                    {
+                        short progress = (short)starSystem.ThargoidLevel!.Progress!;
+                        progress -= 33;
+                        starSystem.ThargoidLevel!.Progress = progress;
+                    }
+                    starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, starSystem.ThargoidLevel!.Progress)
+                    {
+                        ThargoidLevel = starSystem.ThargoidLevel,
+                    };
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
