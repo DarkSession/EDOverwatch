@@ -3,7 +3,7 @@
     internal class MarketSell : EjectCargo
     {
         public MarketSell(string type, int count) :
-            base (type, count)
+            base(type, count)
         {
         }
     }

@@ -55,6 +55,7 @@ namespace EDOverwatch
                 _ = StarSystemFssSignalsUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
                 _ = ThargoidMaelstromCreatedUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
                 _ = StarSystemThargoidManualUpdateConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
+                _ = UpdateMaelstromTotals(cancellationToken);
 
                 Log.LogInformation("Overwatch started");
 
@@ -312,7 +313,7 @@ namespace EDOverwatch
                             {
                                 bool changed = false;
                                 using AsyncLockInstance l = await Lock(cancellationToken);
-                                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
+                                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
                                 TimeSpan timeSinceLastTick = DateTimeOffset.UtcNow - currentThargoidCycle.Start;
                                 (_, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, timeSinceLastTick, dbContext, cancellationToken);
                                 if (maelstrom != null)
@@ -366,7 +367,7 @@ namespace EDOverwatch
         {
             await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
             StarSystem? starSystem = await dbContext.StarSystems
                 .Include(s => s.Allegiance)
                 .Include(s => s.ThargoidLevel)
@@ -374,9 +375,8 @@ namespace EDOverwatch
                 .Include(s => s.ThargoidLevel!.CycleStart)
                 .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
                 .SingleOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
-            if (starSystem != null)
+            if (starSystem != null && starSystem.Updated > currentThargoidCycle.Start)
             {
-                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(starSystem.Updated, cancellationToken);
                 TimeSpan timeSinceLastTick = DateTimeOffset.UtcNow - currentThargoidCycle.Start;
                 TimeSpan signalSourceMaxAge = (timeSinceLastTick > TimeSpan.FromDays(1)) ? timeSinceLastTick : TimeSpan.FromDays(1);
 
@@ -410,7 +410,7 @@ namespace EDOverwatch
                         t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken);
             if (maelstrom != null)
             {
-                DateTimeOffset signalsMaxAge = starSystem.Updated.Subtract(maxAge);
+                DateTimeOffset signalsMaxAge = DateTimeOffset.UtcNow.Subtract(maxAge);
                 IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
                 if (starSystem.Allegiance?.IsThargoid ?? false)
                 {
@@ -546,6 +546,60 @@ namespace EDOverwatch
                 }
             }
             return false;
+        }
+
+        private async Task UpdateMaelstromTotals(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
+                    EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+                    ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                    var maelstromTotals = await dbContext.StarSystemThargoidLevels
+                        .Where(s => s.State > StarSystemThargoidLevelState.None &&
+                            (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start) &&
+                            (
+                                (s.CycleStart!.Start <= thargoidCycle.Start && s.CycleEnd == null) ||
+                                (s.CycleStart!.Start <= thargoidCycle.Start && s.CycleEnd!.Start >= thargoidCycle.Start) ||
+                                (s.CycleStart!.Start >= thargoidCycle.Start && s.CycleEnd!.Start <= thargoidCycle.Start)
+                            ))
+                        .GroupBy(s => new { s.MaelstromId, s.State })
+                        .Select(s => new
+                        {
+                            s.Key.MaelstromId,
+                            s.Key.State,
+                            Count = s.Count(),
+                        })
+                        .ToListAsync(cancellationToken);
+                    foreach (var maelstromTotal in maelstromTotals)
+                    {
+                        ThargoidMaelstrom maelstrom = await dbContext.ThargoidMaelstroms.FirstAsync(t => t.Id == maelstromTotal.MaelstromId, cancellationToken);
+                        ThargoidMaelstromHistoricalSummary? thargoidMaelstromHistoricalSummary = await dbContext.ThargoidMaelstromHistoricalSummaries
+                            .FirstOrDefaultAsync(t => t.Maelstrom == maelstrom && t.State == maelstromTotal.State && t.Cycle == thargoidCycle, cancellationToken);
+                        if (thargoidMaelstromHistoricalSummary == null)
+                        {
+                            thargoidMaelstromHistoricalSummary = new(0, maelstromTotal.State, maelstromTotal.Count)
+                            {
+                                Maelstrom = maelstrom,
+                                Cycle = thargoidCycle,
+                            };
+                            dbContext.ThargoidMaelstromHistoricalSummaries.Add(thargoidMaelstromHistoricalSummary);
+                        }
+                        else
+                        {
+                            thargoidMaelstromHistoricalSummary.Amount = maelstromTotal.Count;
+                        }
+                        await dbContext.SaveChangesAsync(cancellationToken);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.LogError(e, "UpdateMaelstromTotals exception");
+                }
+                await Task.Delay(TimeSpan.FromHours(1), cancellationToken);
+            }
         }
     }
 }

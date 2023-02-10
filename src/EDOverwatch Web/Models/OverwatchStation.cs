@@ -18,7 +18,10 @@
             Type = station.Type?.Name ?? throw new Exception("station.Type cannot be null");
             LandingPads = new(station.LandingPadSmall, station.LandingPadMedium, station.LandingPadLarge);
             State = station.State.GetEnumMemberValue();
-            Gravity = station.Body?.Gravity;
+            if (station.Body?.Gravity != null)
+            {
+                Gravity = station.Body.Gravity / 0.980665m;
+            }
         }
     }
 

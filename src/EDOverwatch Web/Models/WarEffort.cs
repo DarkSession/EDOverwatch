@@ -59,7 +59,7 @@
             WarEffortTypeGroup.Supply,
             WarEffortTypeGroup.Mission,
         };
-             
+
         public static decimal CalculateSystemFocus(IEnumerable<WarEffortTypeSum> systemEfforts, Dictionary<WarEffortTypeGroup, long> totalEffortSums)
         {
             if (systemEfforts.Any())

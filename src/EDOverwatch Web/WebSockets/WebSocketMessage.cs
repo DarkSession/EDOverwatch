@@ -38,7 +38,7 @@ namespace EDOverwatch_Web.WebSockets
     {
         public bool Success { get; set; }
         public DateTimeOffset Time => DateTimeOffset.UtcNow;
-        public WebSocketResponseMessage(string name, bool success, object? data = null, string? messageId = null) : 
+        public WebSocketResponseMessage(string name, bool success, object? data = null, string? messageId = null) :
             base(name, data, messageId)
         {
             Success = success;
@@ -48,7 +48,7 @@ namespace EDOverwatch_Web.WebSockets
     public class WebSocketErrorMessage : WebSocketResponseMessage
     {
         public List<string> Errors { get; }
-        public WebSocketErrorMessage(string name, List<string> errors, string? messageId = null) : 
+        public WebSocketErrorMessage(string name, List<string> errors, string? messageId = null) :
             base(name, false, null, messageId)
         {
             Errors = errors;

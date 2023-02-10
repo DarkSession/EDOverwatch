@@ -191,12 +191,12 @@ namespace EDSystemProgress
                                             systemStatus = SystemStatus.AlertInProgressPopulated;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
                                         }
-                                        else if (text.Contains("system is currently populated"))
+                                        else if (text.Contains("currently populat") || text.Contains("populate"))
                                         {
                                             systemStatus = SystemStatus.HumanControlled;
                                             processingStep = ImageProcessingStep.Completed;
                                         }
-                                        else if (text.Contains("no human population present"))
+                                        else if (text.Contains("no human") || text.Contains("population present"))
                                         {
                                             systemStatus = SystemStatus.Unpopulated;
                                             processingStep = ImageProcessingStep.Completed;
@@ -529,7 +529,12 @@ namespace EDSystemProgress
                     }
                     if (!string.IsNullOrEmpty(daysStr))
                     {
-                        days += int.Parse(daysStr);
+                        int d = int.Parse(daysStr);
+                        if (d == 8)
+                        {
+                            d = 6;
+                        }
+                        days += d;
                     }
                     remTime = new(days, 0, 0, 0);
                 }

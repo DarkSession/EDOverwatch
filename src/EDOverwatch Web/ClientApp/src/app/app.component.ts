@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AppService } from './services/app.service';
@@ -14,10 +14,12 @@ import { WebsocketService } from './services/websocket.service';
 export class AppComponent implements OnInit {
   public loading = false;
 
+  /*
   @HostListener('window:focus', ['$event'])
   onFocus(event: any): void {
     this.websocketService.ensureConnected();
   }
+  */
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,

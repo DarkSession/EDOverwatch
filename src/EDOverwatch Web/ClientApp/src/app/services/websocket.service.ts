@@ -36,6 +36,12 @@ export class WebsocketService {
         window.addEventListener("online", () => {
             this.initalizeConnection(false);
         });
+        window.addEventListener("pageshow", () => {
+            if (!environment.production) {
+                console.log("pageshow event");
+            }
+            this.initalizeConnection(false);
+        });
     }
 
     public ensureConnected(): void {
@@ -108,6 +114,10 @@ export class WebsocketService {
 
     private initalize(): void {
         if (!navigator.onLine) {
+            return;
+        }
+        if (this.webSocket != null &&
+            (this.webSocket.readyState == ConnectionStatus.Connecting || this.webSocket.readyState == ConnectionStatus.Open)) {
             return;
         }
         this.authenticationResolved = new Promise((resolve) => {
