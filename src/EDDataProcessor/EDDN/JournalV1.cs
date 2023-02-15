@@ -110,10 +110,34 @@ namespace EDDataProcessor.EDDN
                         {
                             StarSystemBody? starSystemBody = await dbContext.StarSystemBodies
                                 .FirstOrDefaultAsync(s => s.StarSystem!.SystemAddress == Message.SystemAddress && s.BodyId == Message.BodyID, cancellationToken);
-                            if (starSystemBody != null && starSystemBody.Gravity != Message.SurfaceGravity)
+                            if (starSystemBody != null)
                             {
-                                starSystemBody.Gravity = Message.SurfaceGravity;
-                                await dbContext.SaveChangesAsync(cancellationToken);
+                                bool changed = false;
+                                if (Message.SurfaceGravity != null &&
+                                    starSystemBody.Gravity != Message.SurfaceGravity)
+                                {
+                                    starSystemBody.Gravity = Message.SurfaceGravity;
+                                    changed = true;
+                                }
+                                if (Message.SurfacePressure != null &&
+                                    starSystemBody.SurfacePressure != Message.SurfacePressure)
+                                {
+                                    starSystemBody.SurfacePressure = Message.SurfacePressure;
+                                    changed = true;
+                                }
+                                if (Message.Atmosphere != null)
+                                {
+                                    bool hasAtmosphere = !string.IsNullOrEmpty(Message.Atmosphere);
+                                    if (starSystemBody.HasAtmosphere != hasAtmosphere)
+                                    {
+                                        starSystemBody.HasAtmosphere = hasAtmosphere;
+                                        changed = true;
+                                    }
+                                }
+                                if (changed)
+                                {
+                                    await dbContext.SaveChangesAsync(cancellationToken);
+                                }
                             }
                         }
                         break;
@@ -334,7 +358,13 @@ namespace EDDataProcessor.EDDN
         public int BodyID { get; set; }
 
         [JsonProperty("SurfaceGravity")]
-        public decimal SurfaceGravity { get; set; }
+        public decimal? SurfaceGravity { get; set; }
+
+        [JsonProperty("Atmosphere")]
+        public string? Atmosphere { get; set; }
+
+        [JsonProperty("SurfacePressure")]
+        public decimal? SurfacePressure { get; set; }
     }
 
     public class DockedLandingPads

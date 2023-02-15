@@ -43,22 +43,28 @@ namespace EDSystemProgress
 
         private static List<ColorRange> AlertProgressColors { get; } = new()
         {
-            new ColorRange(140, 160, 140, 160, 140, 160),
-            new ColorRange(150, 170, 150, 180, 150, 170),
-            new ColorRange(160, 180, 160, 180, 160, 180),
-            new ColorRange(170, 190, 170, 190, 170, 190),
-            new ColorRange(180, 200, 180, 200, 180, 200),
-            new ColorRange(190, 210, 190, 210, 190, 210),
-            new ColorRange(200, 220, 200, 220, 200, 220),
-            new ColorRange(210, 230, 210, 230, 210, 230),
-            new ColorRange(220, 240, 220, 240, 220, 240),
-            new ColorRange(230, 255, 230, 255, 230, 255),
+            new ColorRange(140, 160, 140, 160, 110, 160),
+            new ColorRange(150, 170, 150, 180, 120, 170),
+            new ColorRange(160, 180, 160, 180, 130, 180),
+            new ColorRange(170, 190, 170, 190, 140, 190),
+            new ColorRange(180, 200, 180, 200, 150, 200),
+            new ColorRange(190, 210, 190, 210, 160, 210),
+            new ColorRange(200, 220, 200, 220, 170, 220),
+            new ColorRange(210, 230, 210, 230, 180, 230),
+            new ColorRange(220, 240, 220, 240, 190, 240),
+            new ColorRange(230, 255, 230, 255, 200, 255),
+
+            new ColorRange(160, 190, 140, 170, 130, 160),
+            new ColorRange(190, 205, 170, 195, 160, 240),
+            new ColorRange(210, 240, 190, 230, 180, 210),
+            new ColorRange(240, 255, 220, 235, 210, 225),
         };
 
         private static List<ColorRange> AlertRemainingColors { get; } = new()
         {
-            new ColorRange(120, 180, 45, 102, 0, 47),
             new ColorRange(100, 130, 30, 50, 0, 20),
+            new ColorRange(120, 180, 45, 102, 0, 47),
+            new ColorRange(220, 255, 100, 125, 0, 5),
         };
 
         public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent, ILogger log)
@@ -566,6 +572,7 @@ namespace EDSystemProgress
             { "HIP 208389", "HIP 20899" },
             { "HIP 22436", "HIP 22496" },
             { "TRIANGULI SECTOR EG-Y B1", "TRIANGULI SECTOR EQ-Y B1" },
+            { "HIP 21891", "HIP 21991" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

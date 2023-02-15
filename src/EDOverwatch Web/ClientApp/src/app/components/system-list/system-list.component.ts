@@ -154,7 +154,6 @@ export class SystemListComponent implements OnInit, OnChanges {
         Population: system.Population,
         PopulationOriginal: system.PopulationOriginal,
         State: system.ThargoidLevel.Name,
-        StateInvisible: system.ThargoidLevel.IsInvisibleState,
         StateExpires: system.StateExpiration?.StateExpires ?? "",
         Progress: system.Progress ?? 0,
         ProgressIsCompleted: system.StateProgress.IsCompleted,

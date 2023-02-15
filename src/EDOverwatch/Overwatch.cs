@@ -590,7 +590,7 @@ namespace EDOverwatch
                         else
                         {
                             thargoidMaelstromHistoricalSummary.Amount = maelstromTotal.Count;
-                        }
+                         }
                         await dbContext.SaveChangesAsync(cancellationToken);
                     }
                 }

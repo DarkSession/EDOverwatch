@@ -34,12 +34,19 @@ namespace EDOverwatchWeeklyReset
 
             ILogger log = Services.GetRequiredService<ILogger<Program>>();
             log.LogInformation("Started weekly reset");
+       
+            try
+            {
+                CancellationToken cancellationToken = default;
+                EdDbContext dbContext = Services.GetRequiredService<EdDbContext>();
+                await WeeklyReset.ProcessWeeklyReset(dbContext, cancellationToken);
 
-            CancellationToken cancellationToken = default;
-            EdDbContext dbContext = Services.GetRequiredService<EdDbContext>();
-            await WeeklyReset.ProcessWeeklyReset(dbContext, cancellationToken);
-
-            log.LogInformation("Weekly reset completed");
+                log.LogInformation("Weekly reset completed");
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, "Weekly reset failed");
+            }
         }
     }
 }
