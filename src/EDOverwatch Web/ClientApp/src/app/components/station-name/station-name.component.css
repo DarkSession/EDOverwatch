@@ -10,14 +10,22 @@
 }
 
 .badge-orange {
+    color: #1c1c1c;
     background-color: #e95e03;
     margin-left: 4px;
     margin-right: 4px;
 }
 
 .badge-gray {
+    color: #1c1c1c;
     background-color: #d7d7d7;
     margin-left: 4px;
     margin-right: 4px;
-    color: #393939;
+}
+
+.badge-blue {
+    color: #1c1c1c;
+    background-color: #9bb9cb;
+    margin-left: 4px;
+    margin-right: 4px;
 }

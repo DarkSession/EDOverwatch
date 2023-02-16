@@ -9,6 +9,7 @@
         public OverwatchStationLandingPads LandingPads { get; }
         public string State { get; }
         public decimal? Gravity { get; }
+        public bool OdysseyOnly { get; }
 
         public OverwatchStation(Station station)
         {
@@ -22,6 +23,7 @@
             {
                 Gravity = station.Body.Gravity / 0.980665m;
             }
+            OdysseyOnly = (station.Body?.OdysseyOnly == true);
         }
     }
 

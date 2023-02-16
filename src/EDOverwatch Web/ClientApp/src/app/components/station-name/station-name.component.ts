@@ -21,4 +21,5 @@ export interface OverwatchStation {
   }
   State: string;
   Gravity: number | null;
+  OdysseyOnly: boolean;
 }

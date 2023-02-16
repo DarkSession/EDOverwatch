@@ -48,6 +48,7 @@
                     .ToListAsync(cancellationToken);
 
                 warEffortSums = warEffortCycleSums
+                    .Where(w => thargoidCycles.Any(t => t.Id == w.CycleId))
                     .Select(w =>
                     {
                         OverwatchThargoidCycle thargoidCycle = thargoidCycles.First(t => t.Id == w.CycleId);
