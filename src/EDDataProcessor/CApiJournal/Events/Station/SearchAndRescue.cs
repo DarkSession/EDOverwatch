@@ -16,7 +16,7 @@
             List<CommanderCargoItem> commanderCargoItems = await dbContext.CommanderCargoItems
                    .Include(i => i.Commodity)
                    .Include(i => i.SourceStarSystem)
-                   .Where(c => c.Commander == journalParameters.Commander && c.Commodity!.Name == Name)
+                   .Where(c => c.Commander == journalParameters.Commander && c.Commodity!.Name == Name.ToLower())
                    .ToListAsync(cancellationToken);
 
             int remainingAmount = Count;

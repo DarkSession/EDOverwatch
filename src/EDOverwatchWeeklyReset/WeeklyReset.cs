@@ -82,9 +82,7 @@ namespace EDDataProcessor
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
-                    .Where(s =>
-                        s.ThargoidLevel!.Progress == 100 ||
-                        (s.ThargoidLevel!.Progress == 98 && s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recovery))
+                    .Where(s => s.ThargoidLevel!.Progress == 100)
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)

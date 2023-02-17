@@ -19,12 +19,24 @@ namespace EDOverwatch_Web.Authentication
         {
             if (Context.Request.Headers.TryGetValue("X-Auth-Key", out StringValues authKey) && Guid.TryParse(authKey.ToString(), out Guid key))
             {
-                if (await DbContext.ApiKeys.AnyAsync(a => a.Key == key))
+                if (await DbContext.ApiKeys.FirstOrDefaultAsync(a => a.Key == key) is ApiKey apiKey)
                 {
-                    Claim[] claims = new[]
+                    List<Claim> claims = new()
                     {
-                        new Claim(ClaimTypes.NameIdentifier, key.ToString()),
+                        new(ClaimTypes.NameIdentifier, key.ToString())
                     };
+                    if (apiKey.DataUpdate)
+                    {
+                        claims.Add(new("DataUpdate", "1"));
+                    }
+                    if (apiKey.FactionUpdate)
+                    {
+                        claims.Add(new("FactionUpdate", "1"));
+                        if (!string.IsNullOrEmpty(apiKey.Faction))
+                        {
+                            claims.Add(new("Faction", apiKey.Faction));
+                        }
+                    }
 
                     ClaimsIdentity claimsIdentity = new(claims, Scheme.Name);
                     ClaimsPrincipal claimsPrincipal = new(claimsIdentity);

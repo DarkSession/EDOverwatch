@@ -24,7 +24,9 @@
                 {
                     string commodityName = commanderCargoItemGroup.Key;
                     int inDbInventory = commanderCargoItemGroup.Sum(c => c.Amount);
-                    int amountInInventory = Inventory.Where(i => i.Name == commodityName).Sum(i => i.Count);
+                    int amountInInventory = Inventory
+                        .Where(i => i.Name.ToLower() == commodityName)
+                        .Sum(i => i.Count);
                     if (amountInInventory == 0)
                     {
                         if (commanderCargoItems.Any(c => c.Commodity!.Name == commodityName))

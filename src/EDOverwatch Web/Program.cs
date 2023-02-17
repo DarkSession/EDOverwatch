@@ -39,6 +39,12 @@ namespace EDOverwatch_Web
                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKeyAuthentication", null)
                 .AddScheme<AuthenticationSchemeOptions, CommanderApiKeyAuthenticationHandler>("CommanderApiKeyAuthenticationHandler", null);
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("DataUpdate", policy => policy.RequireClaim("DataUpdate"));
+                options.AddPolicy("FactionUpdate", policy => policy.RequireClaim("FactionUpdate"));
+            });
+
             // Add services to the container.
             builder.Services.AddControllers()
                     .AddNewtonsoftJson();
