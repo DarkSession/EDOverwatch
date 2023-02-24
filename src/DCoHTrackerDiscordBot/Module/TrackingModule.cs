@@ -48,7 +48,7 @@ namespace DCoHTrackerDiscordBot.Module
                 return;
             }
             starSystemName = starSystemName.Replace("%", string.Empty).Trim();
-            if (string.IsNullOrEmpty(starSystemName) || starSystemName.Length < 3 || starSystemName.Length > 64)
+            if (string.IsNullOrEmpty(starSystemName) || starSystemName.Length < 2 || starSystemName.Length > 64)
             {
                 await RespondAsync("The system name is invalid.", ephemeral: true);
                 return;
@@ -138,7 +138,7 @@ namespace DCoHTrackerDiscordBot.Module
                 return;
             }
             starSystemName = starSystemName.Replace("%", string.Empty).Trim();
-            if (string.IsNullOrEmpty(starSystemName) || starSystemName.Length < 3 || starSystemName.Length > 64)
+            if (string.IsNullOrEmpty(starSystemName) || starSystemName.Length < 2 || starSystemName.Length > 64)
             {
                 await RespondAsync("The system name is invalid.", ephemeral: true);
                 return;
