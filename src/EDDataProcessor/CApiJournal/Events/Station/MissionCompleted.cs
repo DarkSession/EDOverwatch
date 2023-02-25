@@ -4,10 +4,13 @@
     {
         public string Name { get; set; }
         public long MissionID { get; set; }
+        public int Count { get; set; }
+        public int PassengerCount { get; set; }
 
-        public MissionCompleted(string name)
+        public MissionCompleted(string name, long missionId)
         {
             Name = name;
+            MissionID = missionId;
         }
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
@@ -16,6 +19,25 @@
                 CommanderMission? commanderMission = await dbContext.CommanderMissions
                     .Include(c => c.System)
                     .FirstOrDefaultAsync(c => c.MissionId == MissionID && c.Commander == journalParameters.Commander && c.Status == CommanderMissionStatus.Accepted, cancellationToken);
+                if (commanderMission == null)
+                {
+                    // Sometimes the MissionAccepted event isn't written in the game journal
+                    // Then we simulate the mission accepted event
+                    // The current system parameter might be wrong for some mission types however, namely rescue and evac missions
+                    MissionAccepted missionAccepted = new(Name, MissionID)
+                    {
+                        Timestamp = Timestamp,
+                        Event = nameof(MissionAccepted),
+                        Count = Count,
+                        PassengerCount = PassengerCount,
+                    };
+                    await missionAccepted.ProcessEvent(journalParameters, dbContext, cancellationToken);
+
+                    commanderMission = await dbContext.CommanderMissions
+                        .Include(c => c.System)
+                        .FirstOrDefaultAsync(c => c.MissionId == MissionID && c.Commander == journalParameters.Commander && c.Status == CommanderMissionStatus.Accepted, cancellationToken);
+                }
+
                 if (commanderMission != null && commanderMission.Status != CommanderMissionStatus.Completed)
                 {
                     WarEffortType missionWarEffortType;

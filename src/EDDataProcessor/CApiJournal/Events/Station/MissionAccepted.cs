@@ -14,7 +14,8 @@
         }
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            if (Name.StartsWith("Mission_TW") && !await dbContext.CommanderMissions.AnyAsync(c => c.MissionId == MissionID, cancellationToken))
+            if (Name.StartsWith("Mission_TW") && 
+                !await dbContext.CommanderMissions.AnyAsync(c => c.MissionId == MissionID, cancellationToken))
             {
                 int count = Count;
                 if (Name.StartsWith("Mission_TW_PassengerEvacuation"))
