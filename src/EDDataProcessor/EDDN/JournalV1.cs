@@ -86,7 +86,7 @@ namespace EDDataProcessor.EDDN
                             }
                             if (starSystem.Population != population &&
                                 starSystem.ThargoidLevel?.State != StarSystemThargoidLevelState.Controlled &&
-                                !(starSystem.ThargoidLevel?.State == StarSystemThargoidLevelState.Invasion && starSystem.Population > population))
+                                !(starSystem.ThargoidLevel?.State == StarSystemThargoidLevelState.Invasion && starSystem.Population < population))
                             {
                                 starSystem.Population = population;
                                 changed = true;
