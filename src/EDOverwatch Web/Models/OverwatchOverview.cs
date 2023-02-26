@@ -63,8 +63,8 @@
 
                 long refugeePopulation = await dbContext.StarSystems
                     .AsNoTracking()
-                    .Where(s => s.WarRelevantSystem && s.Population < s.OriginalPopulation)
-                    .Select(s => s.OriginalPopulation - s.Population)
+                    .Where(s => s.WarRelevantSystem && s.PopulationMin < s.OriginalPopulation)
+                    .Select(s => s.OriginalPopulation - s.PopulationMin)
                     .SumAsync(cancellationToken);
 
                 int maelstroms = await dbContext.ThargoidMaelstroms.CountAsync(cancellationToken);

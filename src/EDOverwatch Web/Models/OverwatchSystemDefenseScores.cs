@@ -25,10 +25,6 @@
                 double maxPopSqrt = NthRoot(starSystems.Max(s => s.OriginalPopulation), 4);
                 foreach (StarSystem starSystem in starSystems)
                 {
-                    if (starSystem.Name == "Nu Guang")
-                    {
-
-                    }
                     double score = 200;
                     float dinstanceToMaelstrom = starSystem.DistanceTo(starSystem.ThargoidLevel!.Maelstrom!.StarSystem!);
                     score += (dinstanceToMaelstrom - 25d) * 5d;

@@ -43,6 +43,7 @@
                     (decimal)StarPos[2],
                     population,
                     population,
+                    population,
                     false,
                     Timestamp,
                     Timestamp);
@@ -86,6 +87,11 @@
                 if (starSystem.OriginalPopulation < population)
                 {
                     starSystem.OriginalPopulation = population;
+                    changed = true;
+                }
+                if (starSystem.PopulationMin > population)
+                {
+                    starSystem.PopulationMin = population;
                     changed = true;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);

@@ -50,6 +50,7 @@ namespace EDDataProcessor.EDDN
                                 (decimal)starPos[2],
                                 population,
                                 population,
+                                population,
                                 false,
                                 Message.Timestamp,
                                 Message.Timestamp);
@@ -93,6 +94,11 @@ namespace EDDataProcessor.EDDN
                             if (starSystem.OriginalPopulation < population)
                             {
                                 starSystem.OriginalPopulation = population;
+                                changed = true;
+                            }
+                            if (starSystem.PopulationMin > population)
+                            {
+                                starSystem.PopulationMin = population;
                                 changed = true;
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);

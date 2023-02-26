@@ -575,6 +575,7 @@ namespace EDSystemProgress
             { "HIP 22436", "HIP 22496" },
             { "TRIANGULI SECTOR EG-Y B1", "TRIANGULI SECTOR EQ-Y B1" },
             { "HIP 21891", "HIP 21991" },
+            { "HIP 204892", "HIP 20492" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

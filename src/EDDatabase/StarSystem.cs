@@ -33,6 +33,9 @@ namespace EDDatabase
         [Column]
         public long OriginalPopulation { get; set; }
 
+        [Column]
+        public long PopulationMin { get; set; }
+
         [ForeignKey("AllegianceId")]
         public FactionAllegiance? Allegiance { get; set; }
 
@@ -71,6 +74,7 @@ namespace EDDatabase
             decimal locationZ,
             long population,
             long originalPopulation,
+            long populationMin,
             bool warRelevantSystem,
             DateTimeOffset created,
             DateTimeOffset updated)
@@ -83,6 +87,7 @@ namespace EDDatabase
             LocationZ = locationZ;
             Population = population;
             OriginalPopulation = originalPopulation;
+            PopulationMin = populationMin;
             WarRelevantSystem = warRelevantSystem;
             Created = created;
             Updated = updated;

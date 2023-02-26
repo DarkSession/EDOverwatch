@@ -62,8 +62,7 @@
                 .Include(s => s.CycleEnd)
                 .Where(s =>
                     s.Progress == 100 &&
-                    (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled) &&
-                    (s.CycleEnd == null || s.CycleEnd.Start >= new DateTimeOffset(2022, 12, 22, 7, 0, 0, TimeSpan.Zero)))
+                    (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled))
                 .GroupBy(s => s.CycleEnd)
                 .Select(s => new StatsCompletdSystemsPerCycle(s.Key, s.Count()))
                 .ToListAsync(cancellationToken);
@@ -126,8 +125,8 @@
 
                 long refugeePopulation = await dbContext.StarSystems
                     .AsNoTracking()
-                    .Where(s => s.WarRelevantSystem && s.Population < s.OriginalPopulation)
-                    .Select(s => s.OriginalPopulation - s.Population)
+                    .Where(s => s.WarRelevantSystem && s.PopulationMin < s.OriginalPopulation)
+                    .Select(s => s.OriginalPopulation - s.PopulationMin)
                     .SumAsync(cancellationToken);
 
                 int systemsControllingPreviouslyPopulated = await dbContext.StarSystems
