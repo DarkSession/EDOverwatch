@@ -125,7 +125,7 @@
 
                 long refugeePopulation = await dbContext.StarSystems
                     .AsNoTracking()
-                    .Where(s => s.WarRelevantSystem && s.PopulationMin < s.OriginalPopulation)
+                    .Where(s => s.WarRelevantSystem && s.WarAffected && s.PopulationMin < s.OriginalPopulation)
                     .Select(s => s.OriginalPopulation - s.PopulationMin)
                     .SumAsync(cancellationToken);
 

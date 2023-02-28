@@ -494,6 +494,10 @@ namespace EDOverwatch
                         StateExpires = stateExpires,
                     };
                     starSystem.ThargoidLevel = thargoidLevel;
+                    if (thargoidLevel.State != StarSystemThargoidLevelState.None)
+                    {
+                        starSystem.WarAffected = true;
+                    }
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 if (progress != null && (isManualUpdate || thargoidLevel.Progress == null || progress > thargoidLevel.Progress))

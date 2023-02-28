@@ -45,6 +45,7 @@
                     population,
                     population,
                     false,
+                    false,
                     Timestamp,
                     Timestamp);
                 starSystem.UpdateWarRelevantSystem();

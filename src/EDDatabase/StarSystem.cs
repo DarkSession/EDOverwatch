@@ -7,6 +7,7 @@ namespace EDDatabase
     [Index(nameof(Name))]
     [Index(nameof(LocationX), nameof(LocationY), nameof(LocationZ))]
     [Index(nameof(WarRelevantSystem))]
+    [Index(nameof(WarAffected))]
     public class StarSystem
     {
         [Column]
@@ -49,6 +50,9 @@ namespace EDDatabase
         public StarSystemThargoidLevel? ThargoidLevel { get; set; }
 
         [Column]
+        public bool WarAffected { get; set; }
+
+        [Column]
         public bool WarRelevantSystem { get; set; }
 
         [Column]
@@ -75,6 +79,7 @@ namespace EDDatabase
             long population,
             long originalPopulation,
             long populationMin,
+            bool warAffected,
             bool warRelevantSystem,
             DateTimeOffset created,
             DateTimeOffset updated)
@@ -88,6 +93,7 @@ namespace EDDatabase
             Population = population;
             OriginalPopulation = originalPopulation;
             PopulationMin = populationMin;
+            WarAffected = warAffected;
             WarRelevantSystem = warRelevantSystem;
             Created = created;
             Updated = updated;

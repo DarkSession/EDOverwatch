@@ -52,6 +52,7 @@ namespace EDDataProcessor.EDDN
                                 population,
                                 population,
                                 false,
+                                false,
                                 Message.Timestamp,
                                 Message.Timestamp);
                             starSystem.UpdateWarRelevantSystem();
