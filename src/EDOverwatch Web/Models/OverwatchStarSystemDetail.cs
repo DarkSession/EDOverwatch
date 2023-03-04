@@ -83,7 +83,7 @@
                 DateOnly lastTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 0).DateTime);
                 DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
 
-                List<DateOnly> daysSincePreviousTick = Enumerable.Range(0, today.DayNumber - previousTickDay.DayNumber)
+                List<DateOnly> daysSincePreviousTick = Enumerable.Range(0, today.DayNumber - previousTickDay.DayNumber + 1)
                     .Select(previousTickDay.AddDays)
                     .ToList();
 
