@@ -5,7 +5,7 @@ import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
+import { faCircleQuestion, faClipboard } from '@fortawesome/free-regular-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -14,9 +14,10 @@ import { faClipboard } from '@fortawesome/free-regular-svg-icons';
   styleUrls: ['./maelstroms.component.css']
 })
 export class MaelstromsComponent implements OnInit {
-  public readonly displayedColumns = ['Name', 'SystemName', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery'];
+  public readonly displayedColumns = ['Name', 'SystemName', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery', 'DefenseRate'];
   @ViewChild(MatSort) sort!: MatSort;
   public readonly faClipboard = faClipboard;
+  public readonly faCircleQuestion = faCircleQuestion;
   public dataSource: MatTableDataSource<OverwatchMaelstromBasic> = new MatTableDataSource<OverwatchMaelstromBasic>();
 
   public constructor(
@@ -59,4 +60,5 @@ interface OverwatchMaelstromBasic extends OverwatchMaelstrom {
   SystemsInInvasion: number;
   SystemsThargoidControlled: number;
   SystemsInRecovery: number;
+  DefenseRate: number;
 }

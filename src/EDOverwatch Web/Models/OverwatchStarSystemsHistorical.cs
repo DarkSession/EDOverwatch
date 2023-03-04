@@ -27,7 +27,7 @@
             }
 
             DateTimeOffset tickTime = WeeklyTick.GetTickTime(date);
-            ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken, 0);
+            ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken);
             ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken, -1);
 
             List<StarSystem> systems = await dbContext.StarSystems

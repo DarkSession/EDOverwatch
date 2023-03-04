@@ -313,7 +313,7 @@ namespace EDOverwatch
                             {
                                 bool changed = false;
                                 using AsyncLockInstance l = await Lock(cancellationToken);
-                                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
                                 TimeSpan timeSinceLastTick = DateTimeOffset.UtcNow - currentThargoidCycle.Start;
                                 (_, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, timeSinceLastTick, dbContext, cancellationToken);
                                 if (maelstrom != null)
@@ -367,7 +367,7 @@ namespace EDOverwatch
         {
             await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
             StarSystem? starSystem = await dbContext.StarSystems
                 .Include(s => s.Allegiance)
                 .Include(s => s.ThargoidLevel)
@@ -560,7 +560,7 @@ namespace EDOverwatch
                 {
                     await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
                     EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                    ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                    ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
                     var maelstromTotals = await dbContext.StarSystemThargoidLevels
                         .Where(s => s.State > StarSystemThargoidLevelState.None &&
                             (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start) &&

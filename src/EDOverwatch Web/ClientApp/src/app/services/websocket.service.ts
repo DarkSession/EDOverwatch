@@ -77,10 +77,17 @@ export class WebsocketService {
     }
 
     public reconnect(): void {
+        if (!environment.production) {
+            console.log("reconnect");
+        }
+        if (this.webSocket?.readyState == ConnectionStatus.Open) {
+            this.disconnect();
+        }
         if (this.initalizeTimeout !== null) {
             clearTimeout(this.initalizeTimeout);
             this.initalizeTimeout = null;
         }
+        this.connectionIsAuthenticated = false;
         this.initalize();
     }
 

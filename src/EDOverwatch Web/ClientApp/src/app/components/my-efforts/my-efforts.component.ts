@@ -33,6 +33,7 @@ export class MyEffortsComponent implements OnInit {
       responsive: true,
     },
   };
+  private chartLoaded: boolean = false;
 
   public constructor(
     private readonly webSocketService: WebsocketService,
@@ -63,8 +64,6 @@ export class MyEffortsComponent implements OnInit {
       labels.push(thargoidCycle.StartDate + " to " + thargoidCycle.EndDate);
     }
 
-    console.log(data);
-
     const datasets: ChartDataset<'bar', number[]>[] = [];
     for (const warEffortTypeGroup of data.WarEffortTypeGroups) {
       const dataset = {
@@ -79,8 +78,6 @@ export class MyEffortsComponent implements OnInit {
         }
       }
     }
-
-    console.log(datasets);
 
     this.chartConfig = {
       type: 'bar',
@@ -106,6 +103,10 @@ export class MyEffortsComponent implements OnInit {
         }
       },
     };
+    if (this.chartLoaded) {
+      this.chartConfig.options!.animation = false;
+    }
+    this.chartLoaded = true;
 
     this.changeDetectorRef.detectChanges();
   }

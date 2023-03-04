@@ -6,13 +6,28 @@
         public int SystemsInInvasion { get; }
         public int SystemsThargoidControlled { get; }
         public int SystemsInRecovery { get; }
+        public decimal DefenseRate { get; }
 
-        public OverwatchMaelstromBasic(ThargoidMaelstrom thargoidMaelstrom, int systemsInAlert, int systemsInInvasion, int systemsThargoidControlled, int systemsInRecovery) : base(thargoidMaelstrom)
+        public OverwatchMaelstromBasic(
+            ThargoidMaelstrom thargoidMaelstrom, 
+            int systemsInAlert, 
+            int systemsInInvasion, 
+            int systemsThargoidControlled, 
+            int systemsInRecovery,
+            int populatedSystemsInvaded,
+            int populatedAlertsDefended,
+            int populatedInvasionsDefended) : 
+            base(thargoidMaelstrom)
         {
             SystemsInAlert = systemsInAlert;
             SystemsInInvasion = systemsInInvasion;
             SystemsThargoidControlled = systemsThargoidControlled;
             SystemsInRecovery = systemsInRecovery;
+            int invasionsAlertsTotal = (populatedSystemsInvaded + populatedAlertsDefended);
+            if (invasionsAlertsTotal > 0)
+            {
+                DefenseRate = (decimal)(populatedInvasionsDefended + populatedAlertsDefended) / (decimal)invasionsAlertsTotal;
+            }
         }
     }
 }

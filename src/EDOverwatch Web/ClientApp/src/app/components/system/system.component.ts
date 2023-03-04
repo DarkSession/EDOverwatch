@@ -73,8 +73,8 @@ export class SystemComponent implements OnInit {
       }
     }
   };
-
   public lineChartType: ChartType = 'line';
+  private chartLoaded: boolean = false;
 
   public constructor(
     private readonly route: ActivatedRoute,
@@ -100,13 +100,7 @@ export class SystemComponent implements OnInit {
       .subscribe((message) => {
         if (message && message.Data) {
           this.starSystem = message.Data;
-          let labels: string[] = [];
-          for (const warEffort of this.starSystem.WarEfforts) {
-            if (!labels.includes(warEffort.Date)) {
-              labels.push(warEffort.Date);
-            }
-          }
-          labels = labels.sort();
+          let labels: string[] = message.Data.DaysSincePreviousTick ?? [];
           const totalAmounts: {
             [key: string]: Int32Array
           } = {};
@@ -165,7 +159,7 @@ export class SystemComponent implements OnInit {
                 display: true,
                 position: 'center',
                 color: 'orange',
-                content: 'Weekly tick'
+                content: 'Weekly tick',
               }
             });
           }
@@ -175,7 +169,11 @@ export class SystemComponent implements OnInit {
             labels: labels,
           };
           this.lineChartOptions!.plugins!.annotation!.annotations = annotations;
+          if (this.chartLoaded) {
+            this.lineChartOptions!.animation = false;
+          }
           this.changeDetectorRef.markForCheck();
+          this.chartLoaded = true;
         }
       });
   }
@@ -205,6 +203,7 @@ export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
   WarEffortSources: OverwatchStarSystemWarEffortType[];
   StateHistory: OverwatchStarSystemThargoidLevelHistory[];
   WarEffortSummaries: OverwatchStarSystemWarEffortCycle[];
+  DaysSincePreviousTick: string[];
 }
 
 export interface OverwatchStarSystemWarEffort {

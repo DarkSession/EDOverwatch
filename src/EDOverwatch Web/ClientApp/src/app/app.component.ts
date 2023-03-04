@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
               break;
             }
             case 'VERSION_INSTALLATION_FAILED': {
-              console.log(`Failed to install app version '${evt.version.hash}': ${evt.error}`);
+              console.error(`Failed to install app version '${evt.version.hash}': ${evt.error}`);
               break;
             }
           }

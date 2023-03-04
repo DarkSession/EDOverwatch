@@ -17,7 +17,7 @@
 
         public static async Task<OverwatchStarSystems> Create(EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 0);
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
             DateTimeOffset lastTick = WeeklyTick.GetLastTick();
             DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);

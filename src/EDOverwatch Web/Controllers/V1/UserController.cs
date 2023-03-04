@@ -1,5 +1,7 @@
 ﻿using EDCApi;
 using EDOverwatch_Web.Models;
+using EDOverwatch_Web.WebSockets;
+using EDOverwatch_Web.WebSockets.Handler;
 using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,13 +22,15 @@ namespace EDOverwatch_Web.Controllers.V1
         private EdDbContext DbContext { get; }
         private FDevOAuth FDevOAuth { get; }
         private ActiveMqMessageProducer Producer { get; }
+        private WebSocketServer WebSocketServer { get; }
 
         public UserController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             EdDbContext dbContext,
             FDevOAuth fDevOAuth,
-            ActiveMqMessageProducer producer
+            ActiveMqMessageProducer producer,
+            WebSocketServer webSocketServer
             )
         {
             UserManager = userManager;
@@ -34,6 +38,7 @@ namespace EDOverwatch_Web.Controllers.V1
             DbContext = dbContext;
             FDevOAuth = fDevOAuth;
             Producer = producer;
+            WebSocketServer = webSocketServer;
         }
 
         [HttpPost]
@@ -153,16 +158,29 @@ namespace EDOverwatch_Web.Controllers.V1
                     }
                     if (commander.User != null)
                     {
+                        bool oAuthWasExpired = commander.OAuthStatus != CommanderOAuthStatus.Active;
                         commander.OAuthAccessToken = oAuthenticationResult.Credentials.AccessToken;
                         commander.OAuthRefreshToken = oAuthenticationResult.Credentials.RefreshToken;
                         commander.OAuthTokenType = oAuthenticationResult.Credentials.TokenType;
                         commander.OAuthStatus = CommanderOAuthStatus.Active;
                         await DbContext.SaveChangesAsync(cancellationToken);
                         await SignInManager.SignInAsync(commander.User, true);
-                        if (isCommanderNew)
+                        if (isCommanderNew || oAuthWasExpired)
                         {
                             CommanderCApi commanderCApi = new(oAuthenticationResult.CustomerId);
                             await Producer.SendAsync(CommanderCApi.QueueName, CommanderCApi.Routing, commanderCApi.Message, cancellationToken);
+                        }
+                        if (oAuthWasExpired)
+                        {
+                            List<WebSocketSession> sessions = WebSocketServer.ActiveSessions.Where(a => a.UserId == commander.User.Id).ToList();
+                            if (sessions.Any())
+                            {
+                                WebSocketMessage webSocketMessage = new(nameof(CommanderMe), new User(commander));
+                                foreach (WebSocketSession session in sessions)
+                                {
+                                    await webSocketMessage.Send(session, cancellationToken);
+                                }
+                            }
                         }
                         return new OAuthResponse(new MeResponse(commander.User));
                     }

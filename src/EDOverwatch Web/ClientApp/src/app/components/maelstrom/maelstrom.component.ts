@@ -54,6 +54,7 @@ export class MaelstromComponent implements OnInit {
       }
     },
   };
+  private chartLoaded: boolean = false;
 
   public constructor(
     private readonly route: ActivatedRoute,
@@ -162,7 +163,9 @@ export class MaelstromComponent implements OnInit {
             datalabels: {
               align: 'center',
               anchor: 'center',
-              color: 'black',
+              color: (context) => {
+                return context.dataset.label === "Controlled" ? "white" : "black";
+              },
               backgroundColor: (context: Context) => {
                 return context.dataset.backgroundColor as Color;
               },
@@ -189,6 +192,10 @@ export class MaelstromComponent implements OnInit {
           },
         },
       };
+      if (this.chartLoaded) {
+        this.chartConfig.options!.animation = false;
+      }
+      this.chartLoaded = true;
     }
   }
 

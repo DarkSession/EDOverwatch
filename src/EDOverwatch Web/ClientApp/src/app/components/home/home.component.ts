@@ -47,6 +47,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     },
   };
+  private chartLoaded: boolean = false;
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -168,6 +169,10 @@ export class HomeComponent implements OnInit, OnDestroy {
           },
         },
       };
+      if (this.chartLoaded) {
+        this.chartConfig.options!.animation = false;
+      }
+      this.chartLoaded = true;
     }
   }
 

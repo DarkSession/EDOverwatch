@@ -19,7 +19,7 @@ namespace EDDataProcessor
             // We start with all the system which are at the end of the timer but did not progress to 100%
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
-                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Include(s => s.ThargoidLevel)
                     .Include(s => s.ThargoidLevel!.Maelstrom)
@@ -80,7 +80,7 @@ namespace EDDataProcessor
             // Next we update all the systems which have been cleared in the previous week to their new state
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
-                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s => s.ThargoidLevel!.Progress == 100)
@@ -168,7 +168,7 @@ namespace EDDataProcessor
             // Next, we change the station states for systems in invasion
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
-                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<Station> stations = await dbContext.Stations
                     .Where(s =>
@@ -197,7 +197,7 @@ namespace EDDataProcessor
             // Last update the progress for all systems except systems in recovery
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
-                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>

@@ -18,7 +18,7 @@
                         </ng-container>
                         <ng-container matColumnDef="SystemName">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Maelstrom System</th>
-                            <td mat-cell *matCellDef="let row"  class="nowrap">
+                            <td mat-cell *matCellDef="let row" class="nowrap">
                                 {{ row.SystemName }}
                                 <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
                                     (click)="copySystemName(row)"></fa-icon>
@@ -46,6 +46,15 @@
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Systems In Recovery</th>
                             <td mat-cell *matCellDef="let row">
                                 {{ row.SystemsInRecovery }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="DefenseRate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header matTooltip="Percentage of populated systems which were saved from falling to the Thargoids. This number does not include the current week/cycle.">
+                                Defense Rate&nbsp;
+                                <fa-icon [icon]="faCircleQuestion"></fa-icon>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{ row.DefenseRate | percent }}
                             </td>
                         </ng-container>
 

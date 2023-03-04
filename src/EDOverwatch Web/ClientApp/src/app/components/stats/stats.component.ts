@@ -52,6 +52,7 @@ export class StatsComponent implements OnInit {
       }
     },
   };
+  private chartLoaded: boolean = false;
 
   public constructor(
     private readonly websocketService: WebsocketService,
@@ -121,6 +122,9 @@ export class StatsComponent implements OnInit {
             }
           },
         };
+        if (this.chartLoaded) {
+          this.contributionSummaryChart.options!.animation = false;
+        }
       }
       {
         const labels = this.stats.ThargoidCycles.map(t => t.Cycle);
@@ -205,7 +209,9 @@ export class StatsComponent implements OnInit {
               datalabels: {
                 align: 'center',
                 anchor: 'center',
-                color: 'black',
+                color: (context) => {
+                  return context.dataset.label === "Controlled" ? "white" : "black";
+                },
                 backgroundColor: (context: Context) => {
                   return context.dataset.backgroundColor as Color;
                 },
@@ -232,7 +238,11 @@ export class StatsComponent implements OnInit {
             },
           },
         };
+        if (this.chartLoaded) {
+          this.maelstromHistoryChart.options!.animation = false;
+        }
       }
+      this.chartLoaded = true;
     }
   }
 

@@ -16,6 +16,7 @@
             .ToList();
         public List<OverwatchStarSystemThargoidLevelHistory> StateHistory { get; }
         public List<OverwatchStarSystemWarEffortCycle> WarEffortSummaries { get; }
+        public List<DateOnly> DaysSincePreviousTick { get; }
 
         protected OverwatchStarSystemDetail(
             StarSystem starSystem,
@@ -25,7 +26,8 @@
             List<Station> stations,
             List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress,
             List<StarSystemThargoidLevel> stateHistory,
-            List<OverwatchStarSystemWarEffortCycle> warEffortSummaries
+            List<OverwatchStarSystemWarEffortCycle> warEffortSummaries,
+            List<DateOnly> daysSincePreviousTick
             ) :
             base(starSystem, effortFocus, 0, new(), 0, 0, 0)
         {
@@ -41,6 +43,7 @@
             ProgressDetails = starSystemThargoidLevelProgress.Select(s => new OverwatchStarSystemDetailProgress(s)).ToList();
             StateHistory = stateHistory.Select(s => new OverwatchStarSystemThargoidLevelHistory(s)).ToList();
             WarEffortSummaries = warEffortSummaries;
+            DaysSincePreviousTick = daysSincePreviousTick;
         }
 
         public static async Task<OverwatchStarSystemDetail?> Create(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
@@ -78,6 +81,11 @@
 
                 DateOnly previousTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1).DateTime);
                 DateOnly lastTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 0).DateTime);
+                DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
+
+                List<DateOnly> daysSincePreviousTick = Enumerable.Range(0, today.DayNumber - previousTickDay.DayNumber)
+                    .Select(previousTickDay.AddDays)
+                    .ToList();
 
                 List<OverwatchStarSystemWarEffort> warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
@@ -163,7 +171,16 @@
                      .Where(s => s.StarSystem == starSystem && (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start))
                      .ToListAsync(cancellationToken);
 
-                return new OverwatchStarSystemDetail(starSystem, effortFocus, warEfforts, factionOperations, stations, starSystemThargoidLevelProgress, thargoidLevelHistory, warEffortSummaries);
+                return new OverwatchStarSystemDetail(
+                    starSystem,
+                    effortFocus,
+                    warEfforts,
+                    factionOperations,
+                    stations,
+                    starSystemThargoidLevelProgress,
+                    thargoidLevelHistory,
+                    warEffortSummaries,
+                    daysSincePreviousTick);
             }
             return null;
         }

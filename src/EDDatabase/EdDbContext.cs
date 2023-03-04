@@ -88,6 +88,8 @@ namespace EDDatabase
                 .WithOne(s => s.ThargoidLevel);
         }
 
+        public Task<ThargoidCycle> GetThargoidCycle(CancellationToken cancellationToken) => GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);
+
         public Task<ThargoidCycle> GetThargoidCycle(DateOnly date, CancellationToken cancellationToken, int weekOffset = 0)
         {
             DateTimeOffset cycleTime = WeeklyTick.GetTickTime(date);
