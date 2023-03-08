@@ -102,6 +102,18 @@ namespace EDDataProcessor.EDDN
                                 starSystem.PopulationMin = population;
                                 changed = true;
                             }
+                            if (Message.Factions?.Any() ?? false)
+                            {
+                                foreach (FSDJumpFaction faction in Message.Factions.Where(f => !string.IsNullOrEmpty(f.Allegiance)))
+                                {
+                                    MinorFaction minorFaction = await MinorFaction.GetByName(faction.Name, dbContext, cancellationToken);
+                                    if (minorFaction.Allegiance?.Name != faction.Allegiance)
+                                    {
+                                        minorFaction.Allegiance = await FactionAllegiance.GetByName(faction.Allegiance, dbContext, cancellationToken);
+                                        changed = true;
+                                    }
+                                }
+                            }
                             await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
                             {
@@ -171,29 +183,26 @@ namespace EDDataProcessor.EDDN
                         bool isFleetCarrier = r.Match(Message.StationName).Success;
 
                         bool isNew = false;
-                        Station? station;
+                        IQueryable<Station> stationQuery = dbContext.Stations
+                            .Include(s => s.StarSystem)
+                            .Include(s => s.Government)
+                            .Include(s => s.PrimaryEconomy)
+                            .Include(s => s.MinorFaction);
                         if (isFleetCarrier)
                         {
-                            station = await dbContext.Stations
-                                .Include(s => s.StarSystem)
-                                .Include(s => s.Government)
-                                .Include(s => s.PrimaryEconomy)
-                                .Include(s => s.Body)
-                                .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID || (s.MarketId == 0 && s.Name == Message.StationName), cancellationToken);
+                            stationQuery = stationQuery
+                                .Where(s => s.MarketId == Message.MarketID || (s.MarketId == 0 && s.Name == Message.StationName));
                         }
                         else
                         {
-                            station = await dbContext.Stations
-                                .Include(s => s.StarSystem)
-                                .Include(s => s.Government)
-                                .Include(s => s.PrimaryEconomy)
-                                .Include(s => s.Body)
-                                .FirstOrDefaultAsync(s => s.MarketId == Message.MarketID, cancellationToken);
+                            stationQuery = stationQuery
+                                .Where(s => s.MarketId == Message.MarketID);
                         }
+                        Station? station = await stationQuery.FirstOrDefaultAsync(cancellationToken);
                         if (station == null)
                         {
                             isNew = true;
-                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, StationState.Normal, Message.Timestamp, Message.Timestamp)
+                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, StationState.Normal, false, Message.Timestamp, Message.Timestamp)
                             {
                                 Type = await StationType.GetByName(Message.StationType, dbContext, cancellationToken)
                             };
@@ -279,6 +288,10 @@ namespace EDDataProcessor.EDDN
                                     station.Government = government;
                                     changed = true;
                                 }
+                            }
+                            if (!string.IsNullOrEmpty(Message.StationFaction?.Name) && Message.StationFaction.Name != station.MinorFaction?.Name)
+                            {
+                                station.MinorFaction = await MinorFaction.GetByName(Message.StationFaction.Name, dbContext, cancellationToken);
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
@@ -372,6 +385,9 @@ namespace EDDataProcessor.EDDN
 
         [JsonProperty("SurfacePressure")]
         public decimal? SurfacePressure { get; set; }
+
+        [JsonProperty("Factions")]
+        public List<FSDJumpFaction>? Factions { get; set; }
     }
 
     public class DockedLandingPads
@@ -399,6 +415,12 @@ namespace EDDataProcessor.EDDN
     {
         [JsonProperty("Name")]
         public string Name { get; set; } = string.Empty;
+    }
+
+    public class FSDJumpFaction
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Allegiance { get; set; } = string.Empty;
     }
 
     public enum JournalMessageEvent

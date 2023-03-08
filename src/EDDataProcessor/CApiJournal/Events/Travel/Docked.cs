@@ -12,7 +12,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
         public decimal DistFromStarLS { get; set; }
         public string StationEconomy { get; set; }
         public string StationGovernment { get; set; }
-        public DockedStationFaction StationFaction { get; set; }
+        public DockedStationFaction? StationFaction { get; set; }
         public DockedLandingPads? LandingPads { get; set; }
         public string? StationState { get; set; }
         public ICollection<DockedStationEconomy>? StationEconomies { get; set; }
@@ -45,27 +45,26 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
             bool isFleetCarrier = r.Match(StationName).Success;
 
             bool isNew = false;
-            EDDatabase.Station? station;
-            if (isFleetCarrier)
-            {
-                station = await dbContext.Stations
+            IQueryable<EDDatabase.Station> stationQuery = dbContext.Stations
                     .Include(s => s.StarSystem)
                     .Include(s => s.Government)
                     .Include(s => s.PrimaryEconomy)
-                    .FirstOrDefaultAsync(s => s.MarketId == MarketID || (s.MarketId == 0 && s.Name == StationName), cancellationToken);
+                    .Include(s => s.MinorFaction);
+            if (isFleetCarrier)
+            {
+                stationQuery = stationQuery
+                    .Where(s => s.MarketId == MarketID || (s.MarketId == 0 && s.Name == StationName));
             }
             else
             {
-                station = await dbContext.Stations
-                    .Include(s => s.StarSystem)
-                    .Include(s => s.Government)
-                    .Include(s => s.PrimaryEconomy)
-                    .FirstOrDefaultAsync(s => s.MarketId == MarketID, cancellationToken);
+                stationQuery = stationQuery
+                    .Where(s => s.MarketId == MarketID);
             }
+            EDDatabase.Station? station = await stationQuery.FirstOrDefaultAsync(cancellationToken);
             if (station == null)
             {
                 isNew = true;
-                station = new(0, StationName, MarketID, DistFromStarLS, LandingPads?.Small ?? 0, LandingPads?.Medium ?? 0, LandingPads?.Large ?? 0, EDDatabase.StationState.Normal, Timestamp, Timestamp)
+                station = new(0, StationName, MarketID, DistFromStarLS, LandingPads?.Small ?? 0, LandingPads?.Medium ?? 0, LandingPads?.Large ?? 0, EDDatabase.StationState.Normal, false, Timestamp, Timestamp)
                 {
                     Type = await EDDatabase.StationType.GetByName(StationType, dbContext, cancellationToken)
                 };
@@ -148,6 +147,11 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                         station.Government = government;
                         changed = true;
                     }
+                }
+                if (!string.IsNullOrEmpty(StationFaction?.Name) && StationFaction.Name != station.MinorFaction?.Name)
+                {
+                    station.MinorFaction = await MinorFaction.GetByName(StationFaction.Name, dbContext, cancellationToken);
+                    changed = true;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
                 if (changed)

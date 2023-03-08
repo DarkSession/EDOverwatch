@@ -2,6 +2,7 @@
 {
     [Table("Station")]
     [Index(nameof(MarketId))]
+    [Index(nameof(IsRescueShip))]
     public class Station
     {
         [Column]
@@ -34,6 +35,9 @@
         [ForeignKey("BodyId")]
         public StarSystemBody? Body { get; set; }
 
+        [ForeignKey("MinorFactionId")]
+        public MinorFaction? MinorFaction { get; set; }
+
         [Column]
         public short LandingPadSmall { get; set; }
 
@@ -45,6 +49,9 @@
 
         [Column]
         public StationState State { get; set; }
+
+        [Column]
+        public bool IsRescueShip { get; set; }
 
         [Column]
         public DateTimeOffset Created { get; set; }
@@ -61,6 +68,7 @@
             short landingPadMedium,
             short landingPadLarge,
             StationState state,
+            bool isRescueShip,
             DateTimeOffset created,
             DateTimeOffset updated)
         {
@@ -72,6 +80,7 @@
             LandingPadMedium = landingPadMedium;
             LandingPadLarge = landingPadLarge;
             State = state;
+            IsRescueShip = isRescueShip;
             Created = created;
             Updated = updated;
         }

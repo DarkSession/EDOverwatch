@@ -64,7 +64,7 @@ namespace EDDataProcessor.EDDN
                             if (station == null)
                             {
                                 isNew = true;
-                                station = new(0, carrierId, 0, 0, 4, 4, 8, StationState.Normal, signal.Timestamp, signal.Timestamp)
+                                station = new(0, carrierId, 0, 0, 4, 4, 8, StationState.Normal, false, signal.Timestamp, signal.Timestamp)
                                 {
                                     StarSystem = starSystem,
                                     Type = await StationType.GetFleetCarrier(dbContext, cancellationToken)

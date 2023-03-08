@@ -30,6 +30,8 @@ namespace EDDatabase
 
         public DbSet<IdentityUserClaim<string>> IdentityUserClaims { get; set; }
 
+        public DbSet<MinorFaction> MinorFactions { get; set; }
+
         public DbSet<OAuthCode> OAuthCodes { get; set; }
 
         public DbSet<StarSystem> StarSystems { get; set; }

@@ -1,4 +1,7 @@
-﻿namespace EDDataProcessor.CApiJournal.Events.Travel
+﻿using EDDataProcessor.EDDN;
+using System;
+
+namespace EDDataProcessor.CApiJournal.Events.Travel
 {
     internal class FSDJump : JournalEvent
     {
@@ -10,6 +13,7 @@
         public string? SystemAllegiance { get; set; }
         public string? SystemEconomy { get; set; }
         public string? SystemSecurity { get; set; }
+        public List<FSDJumpFaction>? Factions { get; set; }
 
         public FSDJump(long? population, string starSystem, long systemAddress, List<double> starPos, string? systemGovernment, string? systemAllegiance, string? systemEconomy, string? systemSecurity)
         {
@@ -94,6 +98,18 @@
                 {
                     starSystem.PopulationMin = population;
                     changed = true;
+                }
+                if (Factions?.Any() ?? false)
+                {
+                    foreach (FSDJumpFaction faction in Factions.Where(f => !string.IsNullOrEmpty(f.Allegiance)))
+                    {
+                        MinorFaction minorFaction = await MinorFaction.GetByName(faction.Name, dbContext, cancellationToken);
+                        if (minorFaction.Allegiance?.Name != faction.Allegiance)
+                        {
+                            minorFaction.Allegiance = await FactionAllegiance.GetByName(faction.Allegiance, dbContext, cancellationToken);
+                            changed = true;
+                        }
+                    }
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
                 if (changed)
