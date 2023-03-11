@@ -125,7 +125,10 @@ namespace EDDataProcessor.CApiJournal
             if (commander.JournalDay > day)
             {
                 day = commander.JournalDay;
-                lineStart = commander.JournalLastLine + 1;
+                if (commander.JournalLastLine > 0)
+                {
+                    lineStart = commander.JournalLastLine + 1;
+                }
             }
             OAuthCredentials oAuthCredentials = new(commander.OAuthTokenType, commander.OAuthAccessToken, commander.OAuthRefreshToken);
             Profile? profile = await capi.GetProfile(oAuthCredentials, cancellationToken);
@@ -142,10 +145,11 @@ namespace EDDataProcessor.CApiJournal
                         break;
                     }
                     commander.JournalDay = day;
+                    commander.JournalLastLine = lineStart;
 
                     if (!string.IsNullOrEmpty(journal))
                     {
-                        int line = 0;
+                        int currentLine = 0;
                         try
                         {
                             using StringReader strReader = new(journal);
@@ -153,12 +157,12 @@ namespace EDDataProcessor.CApiJournal
                             do
                             {
                                 journalLine = await strReader.ReadLineAsync(cancellationToken);
-                                line++;
-                                if (line < lineStart || string.IsNullOrWhiteSpace(journalLine))
+                                currentLine++;
+                                if (currentLine < lineStart || string.IsNullOrWhiteSpace(journalLine))
                                 {
                                     continue;
                                 }
-                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System, activeMqProducer, activeMqTransaction, line);
+                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System, activeMqProducer, activeMqTransaction, currentLine);
                                 DateTimeOffset? timestamp = await ProcessCommanderCApiMessageEvent(journalParameters, journalLine, dbContext, cancellationToken);
                                 if (timestamp is DateTimeOffset t)
                                 {
@@ -173,14 +177,14 @@ namespace EDDataProcessor.CApiJournal
 
                             if (string.IsNullOrWhiteSpace(journalLine)) // The last line very likely is empty
                             {
-                                line--;
+                                currentLine--;
                             }
                         }
                         catch (Exception e)
                         {
                             throw new Exception("Error processing journal", e);
                         }
-                        commander.JournalLastLine = line;
+                        commander.JournalLastLine = currentLine;
                         commander.JournalDay = day;
                     }
                     else if (today != day || (DateTimeOffset.UtcNow - commander.JournalLastActivity).TotalMinutes > 120)
@@ -198,7 +202,8 @@ namespace EDDataProcessor.CApiJournal
                         warEffortsUpdatedSystemAddresses.Clear();
                     }
                     day = day.AddDays(1);
-                    await Task.WhenAll(Task.Delay(TimeSpan.FromMilliseconds(500), cancellationToken), dbContext.SaveChangesAsync(cancellationToken));
+                    lineStart = 0;
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 while (day <= today);
 
