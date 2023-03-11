@@ -120,15 +120,12 @@ namespace EDDataProcessor.CApiJournal
                 return;
             }
             CAPI capi = serviceScope.ServiceProvider.GetRequiredService<CAPI>();
-            DateOnly day = DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).DateTime);
-            int lineStart = 0;
-            if (commander.JournalDay > day)
+            DateOnly journalDay = DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).DateTime);
+            int journalLastLine = 0;
+            if (commander.JournalDay > journalDay)
             {
-                day = commander.JournalDay;
-                if (commander.JournalLastLine > 0)
-                {
-                    lineStart = commander.JournalLastLine + 1;
-                }
+                journalDay = commander.JournalDay;
+                journalLastLine = commander.JournalLastLine;
             }
             OAuthCredentials oAuthCredentials = new(commander.OAuthTokenType, commander.OAuthAccessToken, commander.OAuthRefreshToken);
             Profile? profile = await capi.GetProfile(oAuthCredentials, cancellationToken);
@@ -138,14 +135,14 @@ namespace EDDataProcessor.CApiJournal
                 DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
                 do
                 {
-                    (bool success, string? journal) = await capi.GetJournal(oAuthCredentials, day, cancellationToken);
+                    (bool success, string? journal) = await capi.GetJournal(oAuthCredentials, journalDay, cancellationToken);
                     if (!success)
                     {
-                        Log.LogWarning("Unable to get log for {commanderName} for {date}", commander.Name, day);
+                        Log.LogWarning("Unable to get log for {commanderName} for {date}", commander.Name, journalDay);
                         break;
                     }
-                    commander.JournalDay = day;
-                    commander.JournalLastLine = lineStart;
+                    commander.JournalDay = journalDay;
+                    commander.JournalLastLine = journalLastLine;
 
                     if (!string.IsNullOrEmpty(journal))
                     {
@@ -158,7 +155,7 @@ namespace EDDataProcessor.CApiJournal
                             {
                                 journalLine = await strReader.ReadLineAsync(cancellationToken);
                                 currentLine++;
-                                if (currentLine < lineStart || string.IsNullOrWhiteSpace(journalLine))
+                                if (currentLine <= journalLastLine || string.IsNullOrWhiteSpace(journalLine))
                                 {
                                     continue;
                                 }
@@ -185,12 +182,12 @@ namespace EDDataProcessor.CApiJournal
                             throw new Exception("Error processing journal", e);
                         }
                         commander.JournalLastLine = currentLine;
-                        commander.JournalDay = day;
+                        commander.JournalDay = journalDay;
                     }
-                    else if (today != day || (DateTimeOffset.UtcNow - commander.JournalLastActivity).TotalMinutes > 120)
+                    else if (today != journalDay || (DateTimeOffset.UtcNow - commander.JournalLastActivity).TotalMinutes > 120)
                     {
                         commander.JournalLastLine = 0;
-                        commander.JournalDay = day;
+                        commander.JournalDay = journalDay;
                     }
                     if (warEffortsUpdatedSystemAddresses.Any())
                     {
@@ -201,11 +198,11 @@ namespace EDDataProcessor.CApiJournal
                         }
                         warEffortsUpdatedSystemAddresses.Clear();
                     }
-                    day = day.AddDays(1);
-                    lineStart = 0;
+                    journalDay = journalDay.AddDays(1);
+                    journalLastLine = 0;
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
-                while (day <= today);
+                while (journalDay <= today);
 
                 commander.JournalLastProcessed = DateTimeOffset.Now;
 
