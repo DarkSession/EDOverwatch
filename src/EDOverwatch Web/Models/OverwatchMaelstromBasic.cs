@@ -26,7 +26,7 @@
             int invasionsAlertsTotal = (populatedSystemsInvaded + populatedAlertsDefended);
             if (invasionsAlertsTotal > 0)
             {
-                DefenseRate = (decimal)(populatedInvasionsDefended + populatedAlertsDefended) / (decimal)invasionsAlertsTotal;
+                DefenseRate = Math.Round((decimal)(populatedInvasionsDefended + populatedAlertsDefended) / (decimal)invasionsAlertsTotal, 4);
             }
         }
     }

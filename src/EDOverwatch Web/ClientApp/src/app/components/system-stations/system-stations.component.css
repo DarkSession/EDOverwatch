@@ -19,3 +19,10 @@
 .state-container img {
     margin-right: 2px;
 }
+
+.badge-orange {
+    color: #1c1c1c;
+    background-color: #e95e03;
+    margin-left: 4px;
+    margin-right: 4px;
+}

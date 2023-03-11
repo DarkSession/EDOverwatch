@@ -11,7 +11,7 @@ import { OverwatchStarSystemDetail } from '../system/system.component';
 })
 export class SystemStationsComponent implements OnChanges, AfterViewInit {
   public stations: MatTableDataSource<OverwatchStation> = new MatTableDataSource<OverwatchStation>();
-  public readonly stationsDisplayedColumns = ['Name', 'State', 'DistanceFromStarLS'];
+  public readonly stationsDisplayedColumns = ['Name', 'State', 'RescueShip', 'DistanceFromStarLS'];
   @ViewChild(MatSort) sort!: MatSort;
 
   @Input() starSystem!: OverwatchStarSystemDetail;

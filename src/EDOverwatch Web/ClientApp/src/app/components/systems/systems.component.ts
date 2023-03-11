@@ -90,7 +90,7 @@ export class SystemsComponent implements OnInit, OnDestroy {
   private async update(data: OverwatchSystems) {
     this.nextTick = data.NextTick;
     this.dataRaw = data.Systems;
-    this.maelstroms = data.Maelstroms;
+    this.maelstroms = data.Maelstroms.sort((a, b) => (a.Name > b.Name) ? 1 : -1)
     const maelstromsSelectedSetting = await this.appService.getSetting("Maelstroms");
     if (maelstromsSelectedSetting) {
       const maelstromsSelected = maelstromsSelectedSetting.split(",");

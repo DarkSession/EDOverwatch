@@ -10,7 +10,7 @@
             </ng-container>
             <ng-container matColumnDef="State">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
-                <td mat-cell *matCellDef="let row"  class="nowrap">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     <div [ngSwitch]="row.State" class="state-container">
                         <ng-container *ngSwitchCase="'Normal'">
                             <img src="assets/station-operational.png" style="width: 16px; height: 16px;"
@@ -32,11 +32,30 @@
                             <img src="assets/station-abandoned.png" style="width: 16px; height: 16px;"
                                 matTooltip="Abandoned" /> Abandoned
                         </ng-container>
+                        <ng-container *ngSwitchCase="'Unknown'">
+                            Unknown
+                        </ng-container>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="RescueShip">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Rescue Ship <span class="badge badge-orange">
+                        Beta
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <div *ngIf="row.RescueShip">
+                        {{ row.RescueShip.System.Name }}: {{ row.RescueShip.DistanceLy | number: '1.0-0' }} Ly
+                        <br>
+                        <span class="small">
+                            {{ row.RescueShip.Name }}
+                        </span>
                     </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="DistanceFromStarLS">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance from star</th>
                 <td mat-cell *matCellDef="let row" class="cell-right">
                     <span [ngClass]="{ 'distance-warning': row.DistanceFromStarLS >= 50000 }">
                         {{ row.DistanceFromStarLS | number: '1.0-0' }} Ls

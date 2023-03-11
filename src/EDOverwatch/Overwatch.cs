@@ -402,12 +402,16 @@ namespace EDOverwatch
         {
             StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.None;
             // We check if the system is within range of a Maelstrom
-            ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms
+            List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .Include(t => t.StarSystem)
-                .FirstOrDefaultAsync(t =>
+                .Where(t =>
                         t.StarSystem!.LocationX >= starSystem.LocationX - MaelstromMaxDistanceLy && t.StarSystem!.LocationX <= starSystem.LocationX + MaelstromMaxDistanceLy &&
                         t.StarSystem!.LocationY >= starSystem.LocationY - MaelstromMaxDistanceLy && t.StarSystem!.LocationY <= starSystem.LocationY + MaelstromMaxDistanceLy &&
-                        t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy, cancellationToken);
+                        t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy)
+                .ToListAsync(cancellationToken);
+            ThargoidMaelstrom? maelstrom = maelstroms
+                .OrderBy(m => m.StarSystem?.DistanceTo(starSystem) ?? 999)
+                .FirstOrDefault();
             if (maelstrom != null)
             {
                 DateTimeOffset signalsMaxAge = DateTimeOffset.UtcNow.Subtract(maxAge);

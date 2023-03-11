@@ -27,14 +27,15 @@
             List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress,
             List<StarSystemThargoidLevel> stateHistory,
             List<OverwatchStarSystemWarEffortCycle> warEffortSummaries,
-            List<DateOnly> daysSincePreviousTick
+            List<DateOnly> daysSincePreviousTick,
+            List<Station> rescueShips
             ) :
             base(starSystem, effortFocus, 0, new(), 0, 0, 0)
         {
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;
             FactionOperationDetails = factionOperationDetails;
-            Stations = stations.Select(s => new OverwatchStation(s)).ToList();
+            Stations = stations.Select(s => new OverwatchStation(s, rescueShips, starSystem.ThargoidLevel!)).ToList();
             StationsUnderRepair = stations.Where(s => s.State == StationState.UnderRepairs).Count();
             StationsDamaged = stations.Where(s => s.State == StationState.Damaged).Count();
             StationsUnderAttack = stations.Where(s => s.State == StationState.UnderAttack).Count();
@@ -145,15 +146,28 @@
                     .AsNoTracking()
                     .Include(s => s.Type)
                     .Include(s => s.Body)
+                    .Include(s => s.StarSystem)
+                    .Include(s => s.MinorFaction)
+                    .ThenInclude(m => m!.Allegiance)
                     .Where(s =>
                         s.StarSystem == starSystem &&
                         StationTypes.Contains(s.Type!.Name));
+                /*
                 if (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Invasion)
                 {
                     stationQuery = stationQuery.Where(s => s.State != StationState.Normal || (s.State == StationState.Normal && s.Updated >= WeeklyTick.GetLastTick()));
                 }
+                */
 
                 List<Station> stations = await stationQuery
+                    .ToListAsync(cancellationToken);
+
+                List<Station> rescueShips = await dbContext.Stations
+                    .AsNoTracking()
+                    .Include(s => s.StarSystem)
+                    .Include(s => s.MinorFaction)
+                    .ThenInclude(m => m!.Allegiance)
+                    .Where(s => s.IsRescueShip)
                     .ToListAsync(cancellationToken);
 
                 List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress = await dbContext.StarSystemThargoidLevelProgress
@@ -180,7 +194,8 @@
                     starSystemThargoidLevelProgress,
                     thargoidLevelHistory,
                     warEffortSummaries,
-                    daysSincePreviousTick);
+                    daysSincePreviousTick,
+                    rescueShips);
             }
             return null;
         }

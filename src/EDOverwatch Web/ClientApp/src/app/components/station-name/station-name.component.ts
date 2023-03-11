@@ -22,4 +22,16 @@ export interface OverwatchStation {
   State: string;
   Gravity: number | null;
   OdysseyOnly: boolean;
+  RescueShip: OverwatchStationRescueShip | null;
+}
+
+interface OverwatchStationRescueShip {
+  Name: string;
+  System: OverwatchStarSystemMin;
+  DistanceLy: number;
+}
+
+interface OverwatchStarSystemMin {
+  SystemAddress: number;
+  Name: string;
 }
