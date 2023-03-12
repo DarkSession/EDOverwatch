@@ -97,7 +97,7 @@
             }
 
             List<OverwatchMaelstromDetailSystemAtRisk> systemsAtRiskResult = new();
-            decimal systemsAtRiskSphere = maelstrom.InfluenceSphere + 1m;
+            decimal systemsAtRiskSphere = maelstrom.InfluenceSphere + 10.02m;
             List<StarSystem> systemsAtRisk = await dbContext.StarSystems
                 .AsNoTracking()
                 .Where(s =>
@@ -106,6 +106,7 @@
                     s.LocationZ >= maelstrom.StarSystem.LocationZ - systemsAtRiskSphere && s.LocationZ <= maelstrom.StarSystem.LocationZ + systemsAtRiskSphere &&
                     s.Population > 0 &&
                     (s.ThargoidLevel == null || s.ThargoidLevel.State == StarSystemThargoidLevelState.None))
+                .Take(250)
                 .ToListAsync(cancellationToken);
             foreach (StarSystem systemAtRisk in systemsAtRisk)
             {
@@ -114,7 +115,10 @@
                 {
                     continue;
                 }
-                systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population));
+                if (systems.Any(s => s.StarSystem.DistanceTo(systemAtRisk) <= 10.02f))
+                {
+                    systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population));
+                }
             }
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
@@ -125,9 +129,7 @@
                 .ThenInclude(m => m!.StarSystem)
                 .ToListAsync(cancellationToken);
             List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory = maelstromHistoricalSummaries.Select(m => new OverwatchOverviewMaelstromHistoricalSummary(m)).ToList();
-
             List<OverwatchThargoidCycle> thargoidCycles = await OverwatchThargoidCycle.GetThargoidCycles(dbContext, cancellationToken);
-
             return new OverwatchMaelstromDetail(maelstrom, resultStarSystems, systemsAtRiskResult, maelstromHistory, thargoidCycles);
         }
     }

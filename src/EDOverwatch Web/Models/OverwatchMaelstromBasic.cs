@@ -9,14 +9,14 @@
         public decimal DefenseRate { get; }
 
         public OverwatchMaelstromBasic(
-            ThargoidMaelstrom thargoidMaelstrom, 
-            int systemsInAlert, 
-            int systemsInInvasion, 
-            int systemsThargoidControlled, 
+            ThargoidMaelstrom thargoidMaelstrom,
+            int systemsInAlert,
+            int systemsInInvasion,
+            int systemsThargoidControlled,
             int systemsInRecovery,
             int populatedSystemsInvaded,
             int populatedAlertsDefended,
-            int populatedInvasionsDefended) : 
+            int populatedInvasionsDefended) :
             base(thargoidMaelstrom)
         {
             SystemsInAlert = systemsInAlert;

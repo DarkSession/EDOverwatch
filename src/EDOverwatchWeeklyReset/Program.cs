@@ -34,7 +34,7 @@ namespace EDOverwatchWeeklyReset
 
             ILogger log = Services.GetRequiredService<ILogger<Program>>();
             log.LogInformation("Started weekly reset");
-       
+
             try
             {
                 CancellationToken cancellationToken = default;

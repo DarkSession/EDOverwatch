@@ -1,3 +1,8 @@
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+
 .cell-right {
     text-align: right;
 }
@@ -25,4 +30,20 @@
     background-color: #e95e03;
     margin-left: 4px;
     margin-right: 4px;
+}
+
+.mat-column-Name {
+    flex: 0 0 50%;
+}
+
+.mat-column-State {
+    flex: 0 0 15%;
+}
+
+.mat-column-RescueShip {
+    flex: 0 0 25%;
+}
+
+.mat-column-DistanceFromStarLS {
+    flex: 0 0 10%;
 }

@@ -1,5 +1,4 @@
 ﻿using EDDataProcessor.EDDN;
-using System;
 
 namespace EDDataProcessor.CApiJournal.Events.Travel
 {

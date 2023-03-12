@@ -27,7 +27,7 @@
                 })
                 .ToListAsync(cancellationToken);
             List<OverwatchMaelstromBasic> result = maelstroms
-                .Select(m => 
+                .Select(m =>
                     new OverwatchMaelstromBasic(m.Maelstrom, m.SystemsInAlert, m.SystemsInInvasion, m.SystemsThargoidControlled, m.SystemsInRecovery, m.PopulatedSystemsInvaded, m.PopulatedAlertsDefended, m.PopulatedInvasionsDefended))
                 .ToList();
 
