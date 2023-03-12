@@ -38,6 +38,7 @@
                         w.Date == Day &&
                         w.Type == type &&
                         w.Side == side &&
+                        w.StarSystem == starSystem &&
                         w.Source == WarEffortSource.OverwatchCAPI, cancellationToken);
             if (warEffort == null)
             {
