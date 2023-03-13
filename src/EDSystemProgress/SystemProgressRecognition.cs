@@ -15,20 +15,24 @@ namespace EDSystemProgress
             // Bar
             new ColorRange(25, 45, 25, 45, 25, 45),
             new ColorRange(30, 40, 10, 25, 20, 25),
+            new ColorRange(25, 35, 15, 25, 10, 20),
             new ColorRange(35, 50, 35, 50, 35, 50),
             new ColorRange(40, 50, 15, 25, 35, 45),
             new ColorRange(45, 50, 20, 25, 30, 40),
             new ColorRange(45, 55, 45, 55, 45, 55),
             new ColorRange(50, 60, 15, 25, 50, 65),
+            new ColorRange(50, 60, 40, 50, 30, 40),
+            new ColorRange(50, 55, 30, 40, 20, 25),
             new ColorRange(50, 100, 0, 50, 75, 130),
+            new ColorRange(60, 70, 55, 65, 50, 60),
             new ColorRange(70, 190, 0, 95, 98, 255),
             new ColorRange(80, 110, 5, 15, 135, 190),
             new ColorRange(100, 125, 5, 15, 200, 230),
             // Arrow
             new ColorRange(45, 65, 45, 65, 45, 65),
             new ColorRange(55, 75, 55, 75, 55, 75),
-            new ColorRange(120, 140, 120, 140, 120, 140),
-            new ColorRange(140, 160, 140, 160, 140, 160),
+            new ColorRange(120, 140, 120, 140, 110, 140),
+            new ColorRange(140, 170, 140, 170, 140, 170),
             new ColorRange(230, 255, 230, 255, 230, 255),
         };
 
@@ -281,7 +285,7 @@ namespace EDSystemProgress
                                                     systemStatus = SystemStatus.AlertPrevented;
                                                     break;
                                                 }
-                                                if (text.Contains("DEFENSIVE WINDOW") || (text.Contains("DEFENSIVE") && text.Contains("ENDS")))
+                                                if (text.Contains("DEFENSIVE WINDOW") || (text.Contains("DEFENSIVE") && text.Contains("ENDS")) || text.Contains("ENDS IN"))
                                                 {
                                                     remainingTime = text;
                                                     match = true;
@@ -421,8 +425,8 @@ namespace EDSystemProgress
                 List<ColorRange> progressColors = systemStatus switch
                 {
                     SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => InvasionProgressColors,
-                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated or SystemStatus.AlertInProgressUnpopulated => AlertProgressColors,
-                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated or SystemStatus.ThargoidControlledRegainedPopulated => InvasionProgressColors,
+                    SystemStatus.AlertPrevented or SystemStatus.AlertInProgressPopulated => AlertProgressColors,
+                    SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated or SystemStatus.ThargoidControlledRegainedPopulated or SystemStatus.AlertInProgressUnpopulated => InvasionProgressColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => AlertProgressColors,
                     _ => throw new NotImplementedException(),
                 };
@@ -577,6 +581,7 @@ namespace EDSystemProgress
             { "HIP 21891", "HIP 21991" },
             { "HIP 204892", "HIP 20492" },
             { "HIP 20893", "HIP 20899" },
+            { "PEGASI SECTOR GE-N A8-0", "PEGASI SECTOR QE-N A8-0" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]
