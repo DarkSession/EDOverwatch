@@ -34,7 +34,7 @@ namespace EDSystemProgressTest
         [DataRow("test24.png", "CEPHEI SECTOR YZ-Y B4", SystemStatus.InvasionInProgress, 42d, 16)]
         [DataRow("test25.png", "HUILE", SystemStatus.InvasionInProgress, 82d, 9)]
         [DataRow("test26.png", "HUILE", SystemStatus.InvasionInProgress, 82d, 9)]
-        [DataRow("test27.png", "SENOCIDI", SystemStatus.AlertPrevented, 100d, 1)]
+        [DataRow("test27.png", "SENOCIDI", SystemStatus.AlertPreventedPopulated, 100d, 1)]
         [DataRow("test28.png", "EBISU", SystemStatus.Recovery, 2d, 20)]
         [DataRow("test29.png", "HIP 21380", SystemStatus.RecoveryComplete, 100d, 6)]
         [DataRow("test30.png", "SENOCIDI", SystemStatus.HumanControlled, 0d, 0)]
@@ -49,6 +49,7 @@ namespace EDSystemProgressTest
         [DataRow("test39.png", "COL 285 SECTOR AF-E B13-0", SystemStatus.AlertInProgressUnpopulated, 54d, 3)]
         [DataRow("test40.png", "PEGASI SECTOR QE-N A8-0", SystemStatus.AlertInProgressUnpopulated, 0d, 3)]
         [DataRow("test41.png", "COL 285 SECTOR AF-E B13-0", SystemStatus.AlertInProgressUnpopulated, 24d, 3)]
+        [DataRow("test42.png", "COL 285 SECTOR AF-E B13-0", SystemStatus.AlertPreventedUnpopulated, 100d, 1)]
         public async Task Test(string fileName, string systemName, SystemStatus systemStatus, double progress, int remainingDays)
         {
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>

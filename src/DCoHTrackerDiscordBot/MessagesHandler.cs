@@ -101,11 +101,19 @@ namespace DCoHTrackerDiscordBot
                                     {
                                         StarSystemThargoidLevelState thargoidState = result.SystemStatus switch
                                         {
-                                            SystemStatus.AlertInProgressPopulated or SystemStatus.AlertInProgressUnpopulated or SystemStatus.AlertPrevented => StarSystemThargoidLevelState.Alert,
-                                            SystemStatus.InvasionInProgress or SystemStatus.InvasionPrevented => StarSystemThargoidLevelState.Invasion,
-                                            SystemStatus.ThargoidControlled or SystemStatus.ThargoidControlledRegainedUnpopulated or SystemStatus.ThargoidControlledRegainedPopulated => StarSystemThargoidLevelState.Controlled,
-                                            SystemStatus.Recovery or SystemStatus.RecoveryComplete => StarSystemThargoidLevelState.Recovery,
-                                            SystemStatus.HumanControlled or SystemStatus.Unpopulated => StarSystemThargoidLevelState.None,
+                                            SystemStatus.AlertInProgressPopulated or
+                                            SystemStatus.AlertInProgressUnpopulated or
+                                            SystemStatus.AlertPreventedPopulated or
+                                            SystemStatus.AlertPreventedUnpopulated => StarSystemThargoidLevelState.Alert,
+                                            SystemStatus.InvasionInProgress or
+                                            SystemStatus.InvasionPrevented => StarSystemThargoidLevelState.Invasion,
+                                            SystemStatus.ThargoidControlled or
+                                            SystemStatus.ThargoidControlledRegainedUnpopulated or
+                                            SystemStatus.ThargoidControlledRegainedPopulated => StarSystemThargoidLevelState.Controlled,
+                                            SystemStatus.Recovery or
+                                            SystemStatus.RecoveryComplete => StarSystemThargoidLevelState.Recovery,
+                                            SystemStatus.HumanControlled or
+                                            SystemStatus.Unpopulated => StarSystemThargoidLevelState.None,
                                             _ => StarSystemThargoidLevelState.None,
                                         };
                                         short progress = (short)result.Progress;
