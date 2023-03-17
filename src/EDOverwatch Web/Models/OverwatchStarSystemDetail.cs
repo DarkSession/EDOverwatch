@@ -30,7 +30,7 @@
             List<DateOnly> daysSincePreviousTick,
             List<Station> rescueShips
             ) :
-            base(starSystem, effortFocus, 0, new(), 0, 0, 0)
+            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0)
         {
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;

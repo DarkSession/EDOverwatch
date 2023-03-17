@@ -41,7 +41,10 @@
                 .Select(s => new
                 {
                     StarSystem = s,
-                    FactionOperations = s.FactionOperations!.Where(f => f.Status == DcohFactionOperationStatus.Active).Count(),
+                    FactionAxOperations = s.FactionOperations!.Where(f => f.Status == DcohFactionOperationStatus.Active && f.Type == DcohFactionOperationType.AXCombat).Count(),
+                    FactionGeneralOperations = s.FactionOperations!.Where(f => f.Status == DcohFactionOperationStatus.Active && f.Type == DcohFactionOperationType.General).Count(),
+                    FactionRescueOperations = s.FactionOperations!.Where(f => f.Status == DcohFactionOperationStatus.Active && f.Type == DcohFactionOperationType.Rescue).Count(),
+                    FactionLogisticsOperations = s.FactionOperations!.Where(f => f.Status == DcohFactionOperationStatus.Active && f.Type == DcohFactionOperationType.Logistics).Count(),
                     SpecialFactionOperations = s.FactionOperations!.Where(f => f.Faction!.SpecialFaction && f.Status == DcohFactionOperationStatus.Active).Select(s => new
                     {
                         s.Faction!.Name,
@@ -92,7 +95,17 @@
                 List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
                     .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
                     .ToList();
-                result.Systems.Add(new OverwatchStarSystem(starSystem, effortFocus, system.FactionOperations, specialFactionOperations, system.StationsUnderRepair, system.StationsDamaged, system.StationsUnderAttack));
+                result.Systems.Add(new OverwatchStarSystem(
+                    starSystem,
+                    effortFocus,
+                    factionAxOperations: system.FactionAxOperations,
+                    factionGeneralOperations: system.FactionGeneralOperations,
+                    factionRescueOperations: system.FactionRescueOperations,
+                    factionLogisticsOperations: system.FactionLogisticsOperations,
+                    specialFactionOperations,
+                    system.StationsUnderRepair,
+                    system.StationsDamaged,
+                    system.StationsUnderAttack));
             }
             return result;
         }

@@ -8,6 +8,10 @@
         public decimal? ProgressPercent { get; }
         public decimal EffortFocus { get; }
         public int FactionOperations { get; protected set; }
+        public int FactionAxOperations { get; protected set; }
+        public int FactionGeneralOperations { get; protected set; }
+        public int FactionRescueOperations { get; protected set; }
+        public int FactionLogisticsOperations { get; protected set; }
         public List<OverwatchStarSystemSpecialFactionOperation> SpecialFactionOperations { get; }
         public int StationsUnderRepair { get; protected set; }
         public int StationsDamaged { get; protected set; }
@@ -20,7 +24,10 @@
         public OverwatchStarSystem(
                     StarSystem starSystem,
                     decimal effortFocus,
-                    int factionOperations,
+                    int factionAxOperations,
+                    int factionGeneralOperations,
+                    int factionRescueOperations,
+                    int factionLogisticsOperations,
                     List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations,
                     int stationsUnderRepair,
                     int stationsDamaged,
@@ -36,7 +43,11 @@
                 DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 2);
             }
             EffortFocus = effortFocus;
-            FactionOperations = factionOperations;
+            FactionOperations = (factionAxOperations + factionGeneralOperations + factionRescueOperations + factionLogisticsOperations);
+            FactionAxOperations = factionAxOperations;
+            FactionGeneralOperations = factionGeneralOperations;
+            FactionRescueOperations = factionRescueOperations;
+            FactionLogisticsOperations = factionLogisticsOperations;
             SpecialFactionOperations = specialFactionOperations;
             StationsUnderRepair = stationsUnderRepair;
             StationsDamaged = stationsDamaged;

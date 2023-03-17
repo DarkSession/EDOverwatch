@@ -6,6 +6,7 @@ import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { FactionOperation } from '../system/system.component';
+import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 
 @Component({
   selector: 'app-operation-search',
@@ -17,7 +18,7 @@ export class OperationSearchComponent implements OnInit {
   public maelstromSelected: string = "";
   public systemName: string = "";
   public maelstroms: string[] = [];
-  public operations: MatTableDataSource<FactionOperation> = new MatTableDataSource<FactionOperation>();
+  public operations: MatTableDataSource<FactionOperationStarSystemLevel> = new MatTableDataSource<FactionOperationStarSystemLevel>();
   public searchNotFound = false;
   public operationTypeSelected: {
     key: number;
@@ -40,7 +41,7 @@ export class OperationSearchComponent implements OnInit {
         value: "Rescue",
       },
     ];
-  public readonly operationsDisplayedColumns = ['SystemName', 'Faction', 'Type', 'Started'];
+  public readonly operationsDisplayedColumns = ['Faction', 'Type', 'Started', 'SystemName', 'ThargoidLevel', 'Maelstrom'];
   @ViewChild(MatSort) sort!: MatSort;
 
   public constructor(
@@ -75,14 +76,27 @@ export class OperationSearchComponent implements OnInit {
       this.maelstroms = response.Data.Maelstroms.map(m => m.Name);
       this.maelstroms.unshift("");
       if (response.Data.Operations) {
-        this.operations = new MatTableDataSource<FactionOperation>(response.Data.Operations);
-        this.operations.sortingDataAccessor = (factionOperation: FactionOperation, columnName: string): string => {
-          return factionOperation[columnName as keyof FactionOperation] as string;
+        this.operations = new MatTableDataSource<FactionOperationStarSystemLevel>(response.Data.Operations);
+        this.operations.sortingDataAccessor = (factionOperation: FactionOperationStarSystemLevel, columnName: string): string | number => {
+          switch (columnName) {
+            case "ThargoidLevel": {
+              return factionOperation.ThargoidLevel.Level;
+            }
+            case "Maelstrom": {
+              return factionOperation.Maelstrom.Name;
+            }
+            /*
+case "Starports": {
+  return (factionOperation.StationsUnderAttack + factionOperation.StationsDamaged + factionOperation.StationsUnderRepair);
+}
+*/
+          }
+          return factionOperation[columnName as keyof FactionOperationStarSystemLevel] as string;
         }
         this.operations.sort = this.sort;
         this.searchNotFound = false;
       }
-      else if (this.operationTypeSelected && (this.maelstromSelected || this.systemName)) {
+      else if (this.systemName) {
         this.searchNotFound = true;
       }
       this.changeDetectorRef.detectChanges();
@@ -98,5 +112,10 @@ enum DcohFactionOperationType {
 
 interface OverwatchOperationSearchResponse {
   Maelstroms: OverwatchMaelstrom[];
-  Operations: FactionOperation[] | null;
+  Operations: FactionOperationStarSystemLevel[] | null;
+}
+
+interface FactionOperationStarSystemLevel extends FactionOperation {
+  ThargoidLevel: OverwatchThargoidLevel;
+  Maelstrom: OverwatchMaelstrom;
 }

@@ -83,11 +83,31 @@
             <ng-container matColumnDef="FactionOperations">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Operations</th>
                 <td mat-cell *matCellDef="let row">
-                    {{ row.FactionOperations | number }}
-                    <span *ngFor="let specialFactionOperation of row.SpecialFactionOperations">
-                        <img src="assets/badges/{{ specialFactionOperation.Tag }}.png" style="width: 24px; height: 24px"
-                            matTooltip="{{ specialFactionOperation.Name }} target" />
-                    </span>
+                    <div class="operations-column">
+                        <div class="operation operation-combat" *ngIf="row.FactionAxOperations" matTooltip="AX Operations">
+                            <fa-icon [icon]="faCrosshairs" size="lg"></fa-icon>
+                            {{ row.FactionAxOperations }}
+                        </div>
+                        <div class="operation operation-rescue" *ngIf="row.FactionRescueOperations" matTooltip="Rescue Operations">
+                            <fa-icon [icon]="faPlus" size="lg"></fa-icon>
+                            {{ row.FactionRescueOperations }}
+                        </div>
+                        <div class="operation operation-logistics" *ngIf="row.FactionLogisticsOperations" matTooltip="Logistics Operations">
+                            <fa-icon [icon]="faTruck" size="lg"></fa-icon>
+                            {{ row.FactionLogisticsOperations }}
+                        </div>
+                        <div class="operation operation-general" *ngIf="row.FactionGeneralOperations" matTooltip="General Operations">
+                            <fa-icon [icon]="faCircle" size="lg"></fa-icon>
+                            {{ row.FactionGeneralOperations }}
+                        </div>
+                        <!--
+                        <span *ngFor="let specialFactionOperation of row.SpecialFactionOperations">
+                            <img src="assets/badges/{{ specialFactionOperation.Tag }}.png"
+                                style="width: 24px; height: 24px"
+                                matTooltip="{{ specialFactionOperation.Name }} target" />
+                        </span>
+                        -->
+                    </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="StateExpiration">

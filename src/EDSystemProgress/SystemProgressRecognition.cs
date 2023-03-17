@@ -290,8 +290,8 @@ namespace EDSystemProgress
                                                     systemStatus = SystemStatus.AlertPreventedUnpopulated;
                                                     break;
                                                 }
-                                                if (text.Contains("DEFENSIVE WINDOW") || 
-                                                    (text.Contains("DEFENSIVE") && text.Contains("ENDS")) || 
+                                                if (text.Contains("DEFENSIVE WINDOW") ||
+                                                    (text.Contains("DEFENSIVE") && text.Contains("ENDS")) ||
                                                     text.Contains("ENDS IN"))
                                                 {
                                                     remainingTime = text;
@@ -433,13 +433,13 @@ namespace EDSystemProgress
             {
                 List<ColorRange> progressColors = systemStatus switch
                 {
-                    SystemStatus.InvasionInProgress or 
+                    SystemStatus.InvasionInProgress or
                     SystemStatus.InvasionPrevented => InvasionProgressColors,
-                    SystemStatus.AlertPreventedPopulated or 
+                    SystemStatus.AlertPreventedPopulated or
                     SystemStatus.AlertInProgressPopulated => AlertProgressColors,
-                    SystemStatus.ThargoidControlled or 
-                    SystemStatus.ThargoidControlledRegainedUnpopulated or 
-                    SystemStatus.ThargoidControlledRegainedPopulated or 
+                    SystemStatus.ThargoidControlled or
+                    SystemStatus.ThargoidControlledRegainedUnpopulated or
+                    SystemStatus.ThargoidControlledRegainedPopulated or
                     SystemStatus.AlertInProgressUnpopulated or
                     SystemStatus.AlertPreventedUnpopulated => InvasionProgressColors,
                     SystemStatus.Recovery or SystemStatus.RecoveryComplete => AlertProgressColors,
@@ -447,16 +447,16 @@ namespace EDSystemProgress
                 };
                 List<ColorRange> remainingColors = systemStatus switch
                 {
-                    SystemStatus.InvasionInProgress or 
-                    SystemStatus.InvasionPrevented or 
-                    SystemStatus.AlertInProgressUnpopulated or 
+                    SystemStatus.InvasionInProgress or
+                    SystemStatus.InvasionPrevented or
+                    SystemStatus.AlertInProgressUnpopulated or
                     SystemStatus.AlertPreventedUnpopulated => InvasionRemainingColors,
-                    SystemStatus.AlertPreventedPopulated or 
+                    SystemStatus.AlertPreventedPopulated or
                     SystemStatus.AlertInProgressPopulated => AlertRemainingColors,
-                    SystemStatus.ThargoidControlled or 
-                    SystemStatus.ThargoidControlledRegainedUnpopulated or 
+                    SystemStatus.ThargoidControlled or
+                    SystemStatus.ThargoidControlledRegainedUnpopulated or
                     SystemStatus.ThargoidControlledRegainedPopulated => InvasionRemainingColors,
-                    SystemStatus.Recovery or 
+                    SystemStatus.Recovery or
                     SystemStatus.RecoveryComplete => InvasionProgressColors,
                     _ => throw new NotImplementedException(),
                 };

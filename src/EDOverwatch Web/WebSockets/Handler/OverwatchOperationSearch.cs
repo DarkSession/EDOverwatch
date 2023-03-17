@@ -24,7 +24,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
         class OverwatchOperationSearchResponse
         {
             public List<Models.OverwatchMaelstrom> Maelstroms { get; }
-            public List<FactionOperation>? Operations { get; set; }
+            public List<FactionOperationStarSystemLevel>? Operations { get; set; }
 
             public OverwatchOperationSearchResponse(List<Models.OverwatchMaelstrom> maelstroms)
             {
@@ -51,14 +51,20 @@ namespace EDOverwatch_Web.WebSockets.Handler
                 IQueryable<DcohFactionOperation> operations = dbContext.DcohFactionOperations
                     .AsNoTracking()
                     .Include(d => d.StarSystem)
+                    .ThenInclude(s => s!.ThargoidLevel)
+                    .ThenInclude(t => t!.Maelstrom)
                     .Include(d => d.Faction)
-                    .Where(d => d.Status == DcohFactionOperationStatus.Active && (d.Type == DcohFactionOperationType.General || d.Type == data.Type));
+                    .Where(d => d.Status == DcohFactionOperationStatus.Active);
+                if (data.Type != null)
+                {
+                    operations = operations.Where(d => d.Type == DcohFactionOperationType.General || d.Type == data.Type);
+                }
 
                 List<DcohFactionOperation>? factionOperations = null;
                 if (!string.IsNullOrEmpty(data.SystemName))
                 {
                     string systemName = data.SystemName.Replace("%", string.Empty).Trim();
-                    if (systemName.Length >= 2)
+                    if (systemName.Length > 2)
                     {
                         StarSystem? starSystem = await dbContext.StarSystems.FirstOrDefaultAsync(s => EF.Functions.Like(s.Name, systemName), cancellationToken);
                         if (starSystem != null)
@@ -73,15 +79,18 @@ namespace EDOverwatch_Web.WebSockets.Handler
                         }
                     }
                 }
-                else if (!string.IsNullOrEmpty(data.Maelstrom))
+                else
                 {
-                    operations = operations.Where(o => o.StarSystem!.ThargoidLevel!.Maelstrom!.Name == data.Maelstrom);
+                    if (!string.IsNullOrEmpty(data.Maelstrom))
+                    {
+                        operations = operations.Where(o => o.StarSystem!.ThargoidLevel!.Maelstrom!.Name == data.Maelstrom);
+                    }
                     factionOperations = await operations.ToListAsync(cancellationToken);
                 }
 
                 if (factionOperations != null)
                 {
-                    response.Operations = factionOperations.Select(f => new FactionOperation(f)).ToList();
+                    response.Operations = factionOperations.Select(f => new FactionOperationStarSystemLevel(f)).ToList();
                 }
             }
 

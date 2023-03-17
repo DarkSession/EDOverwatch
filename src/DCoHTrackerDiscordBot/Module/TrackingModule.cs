@@ -105,12 +105,30 @@ namespace DCoHTrackerDiscordBot.Module
                 return;
             }
 
-            if (await DbContext.DcohFactionOperations.CountAsync(d =>
+            if (await DbContext.DcohFactionOperations.AnyAsync(d =>
                 d.StarSystem == starSystem &&
                 d.Status == DcohFactionOperationStatus.Active &&
-                d.Faction == user.Faction) >= 2)
+                d.Type == DcohFactionOperationType.General &&
+                d.Faction == user.Faction))
             {
-                await FollowupAsync($"Your squadron already reached the limit of 2 activities in **{starSystem.Name}**.", ephemeral: true);
+                await FollowupAsync($"Your squadron already registered general operations in **{starSystem.Name}**.", ephemeral: true);
+                return;
+            }
+            if (operation == OperationType.General &&
+                await DbContext.DcohFactionOperations.AnyAsync(d =>
+                d.StarSystem == starSystem &&
+                d.Status == DcohFactionOperationStatus.Active &&
+                d.Faction == user.Faction))
+            {
+                await FollowupAsync($"Your squadron already registered specialized operations in **{starSystem.Name}**. No general operations can be registered.", ephemeral: true);
+                return;
+            }
+            if (await DbContext.DcohFactionOperations.CountAsync(d =>
+                  d.StarSystem == starSystem &&
+                  d.Status == DcohFactionOperationStatus.Active &&
+                  d.Faction == user.Faction) >= 2)
+            {
+                await FollowupAsync($"Your squadron can only register up to 2 specialized operations in **{starSystem.Name}**.", ephemeral: true);
                 return;
             }
 

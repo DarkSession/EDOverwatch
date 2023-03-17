@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { faCircleQuestion, faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { faCircleCheck, faFileCsv } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faCircleCheck, faCrosshairs, faFileCsv, faPlus, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { AppService } from 'src/app/services/app.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
@@ -21,6 +21,10 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faCircleCheck = faCircleCheck;
   public readonly faFileCsv = faFileCsv;
   public readonly faCircleQuestion = faCircleQuestion;
+  public readonly faCrosshairs= faCrosshairs;
+  public readonly faPlus = faPlus;
+  public readonly faTruck = faTruck;
+  public readonly faCircle = faCircle;
   private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Progress', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
   public displayedColumns: string[] = [];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
@@ -116,9 +120,11 @@ export class SystemListComponent implements OnInit, OnChanges {
         case "Starports": {
           return (system.StationsUnderAttack + system.StationsDamaged + system.StationsUnderRepair);
         }
+        /*
         case "FactionOperations": {
           return (system.FactionOperations + system.SpecialFactionOperations.length * 9);
         }
+        */
         case "StateExpiration": {
           return (system.StateExpiration?.StateExpires ?? "");
         }
@@ -196,6 +202,10 @@ export interface OverwatchStarSystem {
   ProgressPercent: number | null;
   EffortFocus: number;
   FactionOperations: number;
+  FactionAxOperations: number;
+  FactionGeneralOperations: number;
+  FactionRescueOperations: number;
+  FactionLogisticsOperations: number;
   SpecialFactionOperations: OverwatchStarSystemSpecialFactionOperation[];
   StationsUnderRepair: number;
   StationsDamaged: number;
