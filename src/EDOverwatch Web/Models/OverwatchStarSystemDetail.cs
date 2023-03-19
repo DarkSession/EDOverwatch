@@ -148,6 +148,7 @@
                     .Include(s => s.Body)
                     .Include(s => s.StarSystem)
                     .Include(s => s.MinorFaction)
+                    .ThenInclude(m => m!.Allegiance)
                     .Include(s => s.PriorMinorFaction)
                     .ThenInclude(m => m!.Allegiance)
                     .Where(s =>

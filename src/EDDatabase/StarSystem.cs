@@ -63,7 +63,7 @@ namespace EDDatabase
 
         public List<StarSystemThargoidLevel>? ThargoidLevelHistory { get; set; }
 
-        public List<StarSystemMinorFactionPresence> MinorFactionPresences { get; set; }
+        public List<StarSystemMinorFactionPresence>? MinorFactionPresences { get; set; }
 
         public IEnumerable<DcohFactionOperation>? FactionOperations { get; set; }
 

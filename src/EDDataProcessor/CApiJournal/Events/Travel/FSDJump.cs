@@ -34,7 +34,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                                                     .Include(s => s.Allegiance)
                                                     .Include(s => s.Security)
                                                     .Include(s => s.ThargoidLevel)
-                                                    .Include(s => s.MinorFactionPresences)
+                                                    .Include(s => s.MinorFactionPresences!)
                                                     .ThenInclude(m => m.MinorFaction)
                                                     .SingleOrDefaultAsync(m => m.SystemAddress == SystemAddress, cancellationToken);
             if (starSystem == null)
@@ -113,9 +113,9 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                             minorFaction.Allegiance = await FactionAllegiance.GetByName(faction.Allegiance, dbContext, cancellationToken);
                             changed = true;
                         }
-                        if (!starSystem.MinorFactionPresences.Any(m => m.MinorFaction == minorFaction))
+                        if (!starSystem.MinorFactionPresences!.Any(m => m.MinorFaction == minorFaction))
                         {
-                            starSystem.MinorFactionPresences.Add(new(0)
+                            starSystem.MinorFactionPresences!.Add(new(0)
                             {
                                 MinorFaction = minorFaction,
                                 // StarSystem = starSystem,
@@ -123,7 +123,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                             changed = true;
                         }
                     }
-                    if (starSystem.MinorFactionPresences.RemoveAll(m => !Factions.Any(f => f.Name == m.MinorFaction?.Name)) > 0)
+                    if (starSystem.MinorFactionPresences!.RemoveAll(m => !Factions.Any(f => f.Name == m.MinorFaction?.Name)) > 0)
                     {
                         changed = true;
                     }
