@@ -502,6 +502,18 @@ namespace EDOverwatch
                     {
                         starSystem.WarAffected = true;
                     }
+                    if (thargoidLevel.State == StarSystemThargoidLevelState.Alert)
+                    {
+                        List<Station> stations = await dbContext.Stations
+                            .Include(s => s.MinorFaction)
+                            .Include(s => s.PriorMinorFaction)
+                            .Where(s => s.StarSystem == starSystem && s.PriorMinorFaction != s.MinorFaction)
+                            .ToListAsync(cancellationToken);
+                        foreach (Station station in stations)
+                        {
+                            station.PriorMinorFaction = station.MinorFaction;
+                        }
+                    }
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 if (progress != null && (isManualUpdate || thargoidLevel.Progress == null || progress > thargoidLevel.Progress))

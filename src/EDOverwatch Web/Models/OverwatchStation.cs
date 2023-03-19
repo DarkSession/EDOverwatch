@@ -32,22 +32,26 @@
                 Gravity = station.Body.Gravity / 0.980665m;
             }
             OdysseyOnly = (station.Body?.OdysseyOnly == true);
-            if (rescueShips.Any() && station.MinorFaction?.Allegiance != null)
+            if (rescueShips.Any())
             {
-                var rescueShip = rescueShips.Where(r =>
-                    r.StarSystem != null &&
-                    r.MinorFaction?.Allegiance != null &&
-                    r.MinorFaction?.Allegiance?.Name == station.MinorFaction.Allegiance.Name)
-                    .Select(r => new
-                    {
-                        RescueShip = r,
-                        Distance = r.StarSystem!.DistanceTo(station.StarSystem!),
-                    })
-                    .OrderBy(r => r.Distance)
-                    .FirstOrDefault();
-                if (rescueShip != null)
+                MinorFaction? minorFaction = station.PriorMinorFaction ?? station.MinorFaction;
+                if (minorFaction?.Allegiance != null)
                 {
-                    RescueShip = new(rescueShip.RescueShip.Name, rescueShip.RescueShip.StarSystem!, (decimal)rescueShip.Distance);
+                    var rescueShip = rescueShips.Where(r =>
+                        r.StarSystem != null &&
+                        r.MinorFaction?.Allegiance != null &&
+                        r.MinorFaction?.Allegiance?.Name == minorFaction.Allegiance.Name)
+                        .Select(r => new
+                        {
+                            RescueShip = r,
+                            Distance = r.StarSystem!.DistanceTo(station.StarSystem!),
+                        })
+                        .OrderBy(r => r.Distance)
+                        .FirstOrDefault();
+                    if (rescueShip != null)
+                    {
+                        RescueShip = new(rescueShip.RescueShip.Name, rescueShip.RescueShip.StarSystem!, (decimal)rescueShip.Distance);
+                    }
                 }
             }
         }

@@ -108,6 +108,19 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                             minorFaction.Allegiance = await FactionAllegiance.GetByName(faction.Allegiance, dbContext, cancellationToken);
                             changed = true;
                         }
+                        if (!starSystem.MinorFactionPresences.Any(m => m.MinorFaction == minorFaction))
+                        {
+                            starSystem.MinorFactionPresences.Add(new(0)
+                            {
+                                MinorFaction = minorFaction,
+                                // StarSystem = starSystem,
+                            });
+                            changed = true;
+                        }
+                    }
+                    if (starSystem.MinorFactionPresences.RemoveAll(m => !Factions.Any(f => f.Name == m.MinorFaction?.Name)) > 0)
+                    {
+                        changed = true;
                     }
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);

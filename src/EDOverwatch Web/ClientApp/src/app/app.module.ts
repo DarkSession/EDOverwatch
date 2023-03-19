@@ -202,6 +202,10 @@ export const httpInterceptorProviders = [
         component: OperationSearchComponent,
       },
       {
+        path: 'operations',
+        component: OperationSearchComponent,
+      },
+      {
         path: 'stats',
         component: StatsComponent,
       },

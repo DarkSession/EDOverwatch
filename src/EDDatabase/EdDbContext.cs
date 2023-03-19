@@ -37,6 +37,7 @@ namespace EDDatabase
         public DbSet<StarSystem> StarSystems { get; set; }
         public DbSet<StarSystemBody> StarSystemBodies { get; set; }
         public DbSet<StarSystemFssSignal> StarSystemFssSignals { get; set; }
+        public DbSet<StarSystemMinorFactionPresence> StarSystemMinorFactionPresences { get; set; }
         public DbSet<StarSystemThargoidLevel> StarSystemThargoidLevels { get; set; }
         public DbSet<StarSystemThargoidLevelProgress> StarSystemThargoidLevelProgress { get; set; }
         public DbSet<StarSystemSecurity> StarSystemSecurities { get; set; }
