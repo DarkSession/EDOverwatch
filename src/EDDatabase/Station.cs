@@ -38,6 +38,9 @@
         [ForeignKey("MinorFactionId")]
         public MinorFaction? MinorFaction { get; set; }
 
+        [ForeignKey("PriorMinorFactionId")]
+        public MinorFaction? PriorMinorFaction { get; set; }
+
         [Column]
         public short LandingPadSmall { get; set; }
 

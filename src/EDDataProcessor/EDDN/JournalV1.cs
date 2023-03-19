@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 namespace EDDataProcessor.EDDN
@@ -35,9 +36,12 @@ namespace EDDataProcessor.EDDN
                         bool isNew = false;
                         long population = Message.Population ?? 0;
                         StarSystem? starSystem = await dbContext.StarSystems
+                                                                .AsSplitQuery()
                                                                 .Include(s => s.Allegiance)
                                                                 .Include(s => s.Security)
                                                                 .Include(s => s.ThargoidLevel)
+                                                                .Include(s => s.MinorFactionPresences)
+                                                                .ThenInclude(m => m.MinorFaction)
                                                                 .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
                         if (starSystem == null)
                         {
@@ -54,7 +58,10 @@ namespace EDDataProcessor.EDDN
                                 false,
                                 false,
                                 Message.Timestamp,
-                                Message.Timestamp);
+                                Message.Timestamp)
+                            {
+                                MinorFactionPresences = new(),
+                            };
                             starSystem.UpdateWarRelevantSystem();
                             dbContext.StarSystems.Add(starSystem);
                         }
@@ -112,6 +119,18 @@ namespace EDDataProcessor.EDDN
                                         minorFaction.Allegiance = await FactionAllegiance.GetByName(faction.Allegiance, dbContext, cancellationToken);
                                         changed = true;
                                     }
+                                    if (!starSystem.MinorFactionPresences.Any(m => m.MinorFaction == minorFaction))
+                                    {
+                                        starSystem.MinorFactionPresences.Add(new(0)
+                                        {
+                                            MinorFaction = minorFaction,
+                                        });
+                                        changed = true;
+                                    }
+                                }
+                                if (starSystem.MinorFactionPresences.RemoveAll(m => !Message.Factions.Any(f => f.Name == m.MinorFaction?.Name)) > 0)
+                                {
+                                    changed = true;
                                 }
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);
