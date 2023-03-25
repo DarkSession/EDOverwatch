@@ -184,7 +184,7 @@ namespace EDDataProcessor.CApiJournal
                         commander.JournalLastLine = currentLine;
                         commander.JournalDay = journalDay;
                     }
-                    else if (today != journalDay || (DateTimeOffset.UtcNow - commander.JournalLastActivity).TotalMinutes > 120)
+                    else if (today != journalDay || DateTimeOffset.UtcNow.Hour > 0 || DateTimeOffset.UtcNow.Minute >= 15)
                     {
                         commander.JournalLastLine = 0;
                         commander.JournalDay = journalDay;

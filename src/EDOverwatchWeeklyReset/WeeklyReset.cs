@@ -113,7 +113,7 @@ namespace EDDataProcessor
                         case StarSystemThargoidLevelState.Recovery:
                             {
                                 List<Station> stations = await dbContext.Stations
-                                    .Where(s => s.StarSystem == starSystem && s.State != StationState.Normal && s.Updated < newThargoidCycle.Start)
+                                    .Where(s => s.StarSystem == starSystem && (s.State == StationState.Abandoned || s.State == StationState.Damaged) && s.Updated < newThargoidCycle.Start)
                                     .ToListAsync(cancellationToken);
                                 foreach (Station station in stations)
                                 {

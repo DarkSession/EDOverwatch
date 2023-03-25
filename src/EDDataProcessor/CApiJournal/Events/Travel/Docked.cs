@@ -39,8 +39,6 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 return;
             }
 
-            journalParameters.Commander.System = starSystem;
-
             Regex r = FleetCarrierIdRegex();
             bool isFleetCarrier = r.Match(StationName).Success;
 
@@ -64,7 +62,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
             if (station == null)
             {
                 isNew = true;
-                station = new(0, StationName, MarketID, DistFromStarLS, LandingPads?.Small ?? 0, LandingPads?.Medium ?? 0, LandingPads?.Large ?? 0, EDDatabase.StationState.Normal, false, Timestamp, Timestamp)
+                station = new(0, StationName, MarketID, DistFromStarLS, LandingPads?.Small ?? 0, LandingPads?.Medium ?? 0, LandingPads?.Large ?? 0, EDDatabase.StationState.Normal, RescueShipType.No, Timestamp, Timestamp)
                 {
                     Type = await EDDatabase.StationType.GetByName(StationType, dbContext, cancellationToken)
                 };
@@ -160,6 +158,8 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     await journalParameters.ActiveMqProducer.SendAsync(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
                 }
             }
+            journalParameters.Commander.System = starSystem;
+            journalParameters.Commander.Station = station;
         }
 
         [GeneratedRegex("^([A-Z]{3})-([A-Z]{3})$", RegexOptions.IgnoreCase, "en-CH")]

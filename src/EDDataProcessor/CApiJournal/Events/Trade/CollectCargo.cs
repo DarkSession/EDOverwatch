@@ -41,6 +41,7 @@
                     case "USSCargoBlackBox":
                     case "OccupiedCryoPod":
                     case "DamagedEscapePod":
+                    case "WreckageComponents":
                         {
                             Commodity commodity = await Commodity.GetCommodity(Type, dbContext, cancellationToken);
                             CommanderCargoItem? commanderCargoItem = await dbContext.CommanderCargoItems

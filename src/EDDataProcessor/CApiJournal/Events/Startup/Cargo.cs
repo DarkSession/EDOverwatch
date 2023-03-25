@@ -4,6 +4,8 @@
     {
         public string Vessel { get; set; }
 
+        public int Count { get; set; }
+
         public List<CargoInventory>? Inventory { get; set; }
 
         public Cargo(string vessel)
@@ -13,8 +15,9 @@
 
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            if (Vessel == "Ship" && Inventory != null)
+            if (Vessel == "Ship" && (Inventory != null || Count == 0))
             {
+                Inventory ??= new();
                 List<CommanderCargoItem> commanderCargoItems = await dbContext.CommanderCargoItems
                    .Include(i => i.Commodity)
                    .Where(c => c.Commander == journalParameters.Commander && c.Commodity != null)

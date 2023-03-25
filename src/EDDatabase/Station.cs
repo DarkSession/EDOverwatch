@@ -54,7 +54,7 @@
         public StationState State { get; set; }
 
         [Column]
-        public bool IsRescueShip { get; set; }
+        public RescueShipType IsRescueShip { get; set; }
 
         [Column]
         public DateTimeOffset Created { get; set; }
@@ -71,7 +71,7 @@
             short landingPadMedium,
             short landingPadLarge,
             StationState state,
-            bool isRescueShip,
+            RescueShipType isRescueShip,
             DateTimeOffset created,
             DateTimeOffset updated)
         {
@@ -96,5 +96,12 @@
         Damaged,
         UnderRepairs,
         Abandoned,
+    }
+
+    public enum RescueShipType : byte
+    {
+        No,
+        Primary,
+        Secondary,
     }
 }

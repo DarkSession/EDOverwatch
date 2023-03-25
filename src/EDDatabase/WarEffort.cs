@@ -69,8 +69,14 @@ namespace EDDatabase
             { WarEffortType.MissionCompletionDelivery, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionRescue, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionSettlementReboot, WarEffortTypeGroup.Mission },
-            { WarEffortType.ThargoidProbeCollection, WarEffortTypeGroup.Recovery },
-            { WarEffortType.Recovery, WarEffortTypeGroup.Recovery },
+            { WarEffortType.ThargoidProbeCollection, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.Recovery, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleScout, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleCyclops, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleBasilisk, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleMedusa, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleHydra, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleOrthrus, WarEffortTypeGroup.RecoveryAndProbing },
         };
     }
 
@@ -82,25 +88,25 @@ namespace EDDatabase
         [EnumMember(Value = "Rescues")]
         Rescue,
 
-        [EnumMember(Value = "Supply Delivery")]
+        [EnumMember(Value = "Supply delivery")]
         SupplyDelivery,
 
-        [EnumMember(Value = "Thargoid Scout Kill")]
+        [EnumMember(Value = "Thargoid Scout kill")]
         KillThargoidScout,
 
-        [EnumMember(Value = "Thargoid Cyclops Kill")]
+        [EnumMember(Value = "Thargoid Cyclops kill")]
         KillThargoidCyclops,
 
-        [EnumMember(Value = "Thargoid Basilisk Kill")]
+        [EnumMember(Value = "Thargoid Basilisk kill")]
         KillThargoidBasilisk,
 
-        [EnumMember(Value = "Thargoid Medusa Kill")]
+        [EnumMember(Value = "Thargoid Medusa kill")]
         KillThargoidMedusa,
 
-        [EnumMember(Value = "Thargoid Hydra Kill")]
+        [EnumMember(Value = "Thargoid Hydra kill")]
         KillThargoidHydra,
 
-        [EnumMember(Value = "Thargoid Orthrus Kill")]
+        [EnumMember(Value = "Thargoid Orthrus kill")]
         KillThargoidOrthrus,
 
         [EnumMember(Value = "Mission completed")]
@@ -126,6 +132,24 @@ namespace EDDatabase
 
         [EnumMember(Value = "Settlement reboot mission completed")]
         MissionCompletionSettlementReboot,
+
+        [EnumMember(Value = "Thargoid Scout tissue sample collection")]
+        TissueSampleScout,
+
+        [EnumMember(Value = "Thargoid Cyclops tissue sample collection")]
+        TissueSampleCyclops,
+
+        [EnumMember(Value = "Thargoid Basilisk tissue sample collection")]
+        TissueSampleBasilisk,
+
+        [EnumMember(Value = "Thargoid Medusa tissue sample collection")]
+        TissueSampleMedusa,
+
+        [EnumMember(Value = "Thargoid Hydra tissue sample collection")]
+        TissueSampleHydra,
+
+        [EnumMember(Value = "Thargoid Orthrus tissue sample collection")]
+        TissueSampleOrthrus,
     }
 
     public enum WarEffortTypeGroup : byte
@@ -137,8 +161,8 @@ namespace EDDatabase
         Supply,
         [EnumMember(Value = "Missions")]
         Mission,
-        [EnumMember(Value = "Recovery")]
-        Recovery,
+        [EnumMember(Value = "Recovery and probing")]
+        RecoveryAndProbing,
     }
 
     public enum WarEffortSide : byte

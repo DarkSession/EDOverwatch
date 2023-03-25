@@ -169,7 +169,7 @@
                     .Include(s => s.StarSystem)
                     .Include(s => s.MinorFaction)
                     .ThenInclude(m => m!.Allegiance)
-                    .Where(s => s.IsRescueShip)
+                    .Where(s => s.IsRescueShip == RescueShipType.Primary)
                     .ToListAsync(cancellationToken);
 
                 List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress = await dbContext.StarSystemThargoidLevelProgress

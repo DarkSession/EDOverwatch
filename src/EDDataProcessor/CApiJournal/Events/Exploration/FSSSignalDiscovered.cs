@@ -44,7 +44,7 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
                         if (station == null)
                         {
                             isNew = true;
-                            station = new(0, carrierId, 0, 0, 4, 4, 8, StationState.Normal, false, Timestamp, Timestamp)
+                            station = new(0, carrierId, 0, 0, 4, 4, 8, StationState.Normal, RescueShipType.No, Timestamp, Timestamp)
                             {
                                 StarSystem = starSystem,
                                 Type = await StationType.GetFleetCarrier(dbContext, cancellationToken)

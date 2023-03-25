@@ -368,7 +368,7 @@ namespace EDSystemProgress
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
                                         case SystemStatus.ThargoidControlledRegainedPopulated:
                                             {
-                                                match = text.Contains("VICTORY STATE");
+                                                match = text.Contains("VICTORY STATE") || text.Contains("VIGTORY STATE");
                                                 break;
                                             }
                                         case SystemStatus.ThargoidControlled:
@@ -604,6 +604,7 @@ namespace EDSystemProgress
             { "HIP 204892", "HIP 20492" },
             { "HIP 20893", "HIP 20899" },
             { "PEGASI SECTOR GE-N A8-0", "PEGASI SECTOR QE-N A8-0" },
+            { "Bl DHORORA", "BI DHORORA" },
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]

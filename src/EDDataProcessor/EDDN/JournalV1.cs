@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 namespace EDDataProcessor.EDDN
@@ -221,7 +220,7 @@ namespace EDDataProcessor.EDDN
                         if (station == null)
                         {
                             isNew = true;
-                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, StationState.Normal, false, Message.Timestamp, Message.Timestamp)
+                            station = new(0, Message.StationName, Message.MarketID, Message.DistFromStarLS, Message.LandingPads?.Small ?? 0, Message.LandingPads?.Medium ?? 0, Message.LandingPads?.Large ?? 0, StationState.Normal, RescueShipType.No, Message.Timestamp, Message.Timestamp)
                             {
                                 Type = await StationType.GetByName(Message.StationType, dbContext, cancellationToken)
                             };
