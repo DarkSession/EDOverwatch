@@ -5,7 +5,7 @@ using System.Data;
 
 namespace EDDataProcessor.CApiJournal
 {
-    internal class JournalProcessor
+    public class JournalProcessor
     {
         private IConfiguration Configuration { get; }
         private IServiceProvider ServiceProvider { get; }
@@ -149,33 +149,7 @@ namespace EDDataProcessor.CApiJournal
                         int currentLine = 0;
                         try
                         {
-                            using StringReader strReader = new(journal);
-                            string? journalLine;
-                            do
-                            {
-                                journalLine = await strReader.ReadLineAsync(cancellationToken);
-                                currentLine++;
-                                if (currentLine <= journalLastLine || string.IsNullOrWhiteSpace(journalLine))
-                                {
-                                    continue;
-                                }
-                                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System, activeMqProducer, activeMqTransaction, currentLine);
-                                DateTimeOffset? timestamp = await ProcessCommanderCApiMessageEvent(journalParameters, journalLine, dbContext, cancellationToken);
-                                if (timestamp is DateTimeOffset t)
-                                {
-                                    commander.JournalLastActivity = t;
-                                }
-                                if (journalParameters.WarEffortsUpdatedSystemAddresses != null)
-                                {
-                                    warEffortsUpdatedSystemAddresses.AddRange(journalParameters.WarEffortsUpdatedSystemAddresses);
-                                }
-                            }
-                            while (!string.IsNullOrEmpty(journalLine));
-
-                            if (string.IsNullOrWhiteSpace(journalLine)) // The last line very likely is empty
-                            {
-                                currentLine--;
-                            }
+                            await ProcessCommanderJournal(journal, journalLastLine, commander, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
                         }
                         catch (Exception e)
                         {
@@ -226,6 +200,42 @@ namespace EDDataProcessor.CApiJournal
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task<JournalProcessResult> ProcessCommanderJournal(string journal, int lineStart, Commander commander, EdDbContext dbContext, IAnonymousProducer? activeMqProducer, Transaction? activeMqTransaction, CancellationToken cancellationToken)
+        {
+            using StringReader strReader = new(journal);
+
+            int currentLine = 0;
+            List<long> warEffortsUpdatedSystemAddresses = new();
+            string? journalLine;
+            do
+            {
+                journalLine = await strReader.ReadLineAsync(cancellationToken);
+                currentLine++;
+                if (currentLine <= lineStart || string.IsNullOrWhiteSpace(journalLine))
+                {
+                    continue;
+                }
+                JournalParameters journalParameters = new(false, WarEffortSource.OverwatchCAPI, commander, commander.System, activeMqProducer, activeMqTransaction, currentLine);
+                DateTimeOffset? timestamp = await ProcessCommanderCApiMessageEvent(journalParameters, journalLine, dbContext, cancellationToken);
+                if (timestamp is DateTimeOffset t)
+                {
+                    commander.JournalLastActivity = t;
+                }
+                if (journalParameters.WarEffortsUpdatedSystemAddresses != null)
+                {
+                    warEffortsUpdatedSystemAddresses.AddRange(journalParameters.WarEffortsUpdatedSystemAddresses);
+                }
+            }
+            while (!string.IsNullOrEmpty(journalLine));
+
+            if (string.IsNullOrWhiteSpace(journalLine)) // The last line very likely is empty
+            {
+                currentLine--;
+            }
+
+            return new JournalProcessResult(currentLine, warEffortsUpdatedSystemAddresses);
+        }
+
         private async Task<DateTimeOffset?> ProcessCommanderCApiMessageEvent(JournalParameters journalParameters, string journalLine, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             JObject journalObject;
@@ -257,6 +267,18 @@ namespace EDDataProcessor.CApiJournal
                 return timestamp;
             }
             return null;
+        }
+    }
+
+    public class JournalProcessResult
+    {
+        public int CurrentLine { get; }
+        public List<long> WarEffortsUpdatedSystemAddresses { get; }
+
+        public JournalProcessResult(int currentLine, List<long> warEffortsUpdatedSystemAddresses)
+        {
+            CurrentLine = currentLine;
+            WarEffortsUpdatedSystemAddresses = warEffortsUpdatedSystemAddresses;
         }
     }
 }

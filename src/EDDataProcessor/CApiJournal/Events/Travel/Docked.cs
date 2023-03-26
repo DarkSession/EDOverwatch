@@ -155,7 +155,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 if (changed)
                 {
                     StationUpdated stationUpdated = new(MarketID, SystemAddress);
-                    await journalParameters.ActiveMqProducer.SendAsync(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
+                    await journalParameters.SendMqMessage(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, cancellationToken);
                 }
             }
             journalParameters.Commander.System = starSystem;

@@ -64,7 +64,7 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
                             if (changed)
                             {
                                 StationUpdated stationUpdated = new(station.MarketId, SystemAddress);
-                                await journalParameters.ActiveMqProducer.SendAsync(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
+                                await journalParameters.SendMqMessage(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, cancellationToken);
                             }
                         }
                     }
@@ -105,7 +105,7 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
                     if (createdUpdated && thargoidMaelstrom != null)
                     {
                         ThargoidMaelstromCreatedUpdated thargoidMaelstromCreatedUpdated = new(thargoidMaelstrom.Id, thargoidMaelstrom.Name);
-                        await journalParameters.ActiveMqProducer.SendAsync(ThargoidMaelstromCreatedUpdated.QueueName, ThargoidMaelstromCreatedUpdated.Routing, thargoidMaelstromCreatedUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
+                        await journalParameters.SendMqMessage(ThargoidMaelstromCreatedUpdated.QueueName, ThargoidMaelstromCreatedUpdated.Routing, thargoidMaelstromCreatedUpdated.Message, cancellationToken);
                     }
                 }
                 else if (SignalName.StartsWith("$Warzone_TG_"))
@@ -144,7 +144,7 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
             if (starSystemSignalsUpdated.Any())
             {
                 StarSystemFssSignalsUpdated starSystemFssSignalsUpdated = new(SystemAddress);
-                await journalParameters.ActiveMqProducer.SendAsync(StarSystemFssSignalsUpdated.QueueName, StarSystemFssSignalsUpdated.Routing, starSystemFssSignalsUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
+                await journalParameters.SendMqMessage(StarSystemFssSignalsUpdated.QueueName, StarSystemFssSignalsUpdated.Routing, starSystemFssSignalsUpdated.Message, cancellationToken);
             }
         }
 

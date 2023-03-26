@@ -132,7 +132,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 if (changed)
                 {
                     StarSystemUpdated starSystemUpdated = new(SystemAddress);
-                    await journalParameters.ActiveMqProducer.SendAsync(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, journalParameters.ActiveMqTransaction, cancellationToken);
+                    await journalParameters.SendMqMessage(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, cancellationToken);
                 }
             }
             journalParameters.Commander.System = starSystem;

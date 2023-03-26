@@ -63,7 +63,23 @@ namespace EDOverwatch_Web
             builder.Services.AddActiveMq("DN", new[] { activeMqEndpont })
                 .AddAnonymousProducer<ActiveMqMessageProducer>();
             builder.Services.AddActiveMqHostedService();
-            builder.Services.AddDbContext<EdDbContext>();
+            builder.Services.AddDbContext<EdDbContext>(optionsBuilder =>
+            {
+                string connectionString = builder.Configuration.GetValue<string>("ConnectionString") ?? string.Empty;
+                optionsBuilder.UseMySql(connectionString,
+                    new MariaDbServerVersion(new Version(10, 3, 25)),
+                    options =>
+                    {
+                        options.EnableRetryOnFailure();
+                        options.CommandTimeout(60 * 10 * 1000);
+                    })
+#if DEBUG
+                    .EnableSensitiveDataLogging()
+                    .LogTo(Console.WriteLine)
+#endif
+                    ;
+            });
+
             builder.Services.AddSingleton<WebSocketServer>();
             builder.Services.AddCors(options =>
             {

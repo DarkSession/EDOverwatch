@@ -6,7 +6,20 @@ namespace EDDatabase
     {
         public EdDbContext CreateDbContext(string[] args)
         {
-            return new EdDbContext("server=localhost;user=dummy;password=dummy;database=dummy;");
+            DbContextOptions<EdDbContext> options = new DbContextOptionsBuilder<EdDbContext>()
+                .UseMySql("server=localhost;user=dummy;password=dummy;database=dummy;",
+                new MariaDbServerVersion(new Version(10, 3, 25)),
+                options =>
+                {
+                    options.EnableRetryOnFailure();
+                    options.CommandTimeout(60 * 10 * 1000);
+                })
+#if DEBUG
+                .EnableSensitiveDataLogging()
+                .LogTo(Console.WriteLine)
+#endif
+                .Options;
+            return new EdDbContext(options);
         }
     }
 }

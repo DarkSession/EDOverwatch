@@ -41,7 +41,22 @@ namespace EDDataProcessor
                     builder.AddConfiguration(Configuration.GetSection("Logging"));
                 })
                 .AddSingleton<EDDNProcessor>()
-                .AddDbContext<EdDbContext>()
+                .AddDbContext<EdDbContext>(optionsBuilder =>
+                {
+                    string connectionString = Configuration.GetValue<string>("ConnectionString") ?? string.Empty;
+                    optionsBuilder.UseMySql(connectionString,
+                        new MariaDbServerVersion(new Version(10, 3, 25)),
+                        options =>
+                        {
+                            options.EnableRetryOnFailure();
+                            options.CommandTimeout(60 * 10 * 1000);
+                        })
+#if DEBUG
+                        .EnableSensitiveDataLogging()
+                        .LogTo(Console.WriteLine)
+#endif
+                        ;
+                })
                 .AddScoped<CAPI>()
                 .AddScoped<FDevOAuth>()
                 .AddSingleton<JournalProcessor>()
@@ -190,7 +205,7 @@ namespace EDDataProcessor
                         CommanderCApi commanderCApi = new(commander.FDevCustomerId);
                         await commanderCApiProducer.SendAsync(commanderCApi.Message, cancellationToken);
                     }
-                    await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
+                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
                 }
                 catch (Exception e)
                 {

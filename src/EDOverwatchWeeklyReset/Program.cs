@@ -1,5 +1,6 @@
 ﻿using EDDatabase;
 using EDDataProcessor;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,7 +30,22 @@ namespace EDOverwatchWeeklyReset
                     builder.AddConsole();
                     builder.AddConfiguration(Configuration.GetSection("Logging"));
                 })
-                .AddDbContext<EdDbContext>()
+                .AddDbContext<EdDbContext>(optionsBuilder =>
+                {
+                    string connectionString = Configuration.GetValue<string>("ConnectionString") ?? string.Empty;
+                    optionsBuilder.UseMySql(connectionString,
+                        new MariaDbServerVersion(new Version(10, 3, 25)),
+                        options =>
+                        {
+                            options.EnableRetryOnFailure();
+                            options.CommandTimeout(60 * 10 * 1000);
+                        })
+#if DEBUG
+                        .EnableSensitiveDataLogging()
+                        .LogTo(Console.WriteLine)
+#endif
+                        ;
+                })
                 .BuildServiceProvider();
 
             ILogger log = Services.GetRequiredService<ILogger<Program>>();

@@ -80,7 +80,8 @@
                     effortFocus = WarEffort.CalculateSystemFocus(systemEfforts, totalEffortSums);
                 }
 
-                DateOnly previousTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1).DateTime);
+                DateTimeOffset previousTickTime = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1);
+                DateOnly previousTickDay = DateOnly.FromDateTime(previousTickTime.DateTime);
                 DateOnly lastTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 0).DateTime);
                 DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
 
@@ -175,7 +176,7 @@
                 List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress = await dbContext.StarSystemThargoidLevelProgress
                     .AsNoTracking()
                     .Include(s => s.ThargoidLevel)
-                    .Where(s => s.ThargoidLevel!.StarSystem == starSystem && s.Updated >= DateTimeOffset.UtcNow.AddDays(-7))
+                    .Where(s => s.ThargoidLevel!.StarSystem == starSystem && s.Updated >= previousTickTime)
                     .OrderByDescending(s => s.Updated)
                     .ToListAsync(cancellationToken);
 

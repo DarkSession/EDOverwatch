@@ -83,12 +83,12 @@
         public Commander Commander { get; }
         public StarSystem? CommanderCurrentStarSystem { get; }
         public bool DeferRequested { get; set; }
-        public IAnonymousProducer ActiveMqProducer { get; }
-        public Transaction ActiveMqTransaction { get; }
+        public IAnonymousProducer? ActiveMqProducer { get; }
+        public Transaction? ActiveMqTransaction { get; }
         public List<long>? WarEffortsUpdatedSystemAddresses { get; set; }
         public int Line { get; set; }
 
-        public JournalParameters(bool isDeferred, WarEffortSource source, Commander commander, StarSystem? commanderCurrentStarSystem, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, int line)
+        public JournalParameters(bool isDeferred, WarEffortSource source, Commander commander, StarSystem? commanderCurrentStarSystem, IAnonymousProducer? activeMqProducer, Transaction? activeMqTransaction, int line)
         {
             IsDeferred = isDeferred;
             Source = source;
@@ -103,6 +103,15 @@
         {
             WarEffortsUpdatedSystemAddresses ??= new();
             WarEffortsUpdatedSystemAddresses.Add(systemAddress);
+        }
+
+        public Task SendMqMessage(string address, RoutingType routingType, Message message, CancellationToken cancellationToken)
+        {
+            if (ActiveMqProducer == null || ActiveMqTransaction == null)
+            {
+                return Task.CompletedTask;
+            }
+            return ActiveMqProducer.SendAsync(address, routingType, message, ActiveMqTransaction, cancellationToken);
         }
     }
 }

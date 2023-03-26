@@ -2,7 +2,6 @@
 global using System.ComponentModel.DataAnnotations.Schema;
 using EDUtils;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 
 namespace EDDatabase
 {
@@ -52,6 +51,7 @@ namespace EDDatabase
 
         public DbSet<WarEffort> WarEfforts { get; set; }
 
+        /*
         private string ConnectionString { get; }
 
         public EdDbContext(IConfiguration configuration)
@@ -63,22 +63,33 @@ namespace EDDatabase
         {
             ConnectionString = connectionString;
         }
+        */
 
+        public EdDbContext(DbContextOptions<EdDbContext> options) : base(options)
+        {
+            // ConnectionString = string.Empty;
+        }
+
+        /*
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql(ConnectionString,
-                new MariaDbServerVersion(new Version(10, 3, 25)),
-                options =>
-                {
-                    options.EnableRetryOnFailure();
-                    options.CommandTimeout(60 * 10 * 1000);
-                })
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseMySql(ConnectionString,
+                    new MariaDbServerVersion(new Version(10, 3, 25)),
+                    options =>
+                    {
+                        options.EnableRetryOnFailure();
+                        options.CommandTimeout(60 * 10 * 1000);
+                    })
 #if DEBUG
-                .EnableSensitiveDataLogging()
-                .LogTo(Console.WriteLine)
+                    .EnableSensitiveDataLogging()
+                    .LogTo(Console.WriteLine)
 #endif
-                ;
+                    ;
+            }
         }
+        */
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
