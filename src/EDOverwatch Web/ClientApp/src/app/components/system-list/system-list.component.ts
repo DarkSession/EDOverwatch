@@ -21,7 +21,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faCircleCheck = faCircleCheck;
   public readonly faFileCsv = faFileCsv;
   public readonly faCircleQuestion = faCircleQuestion;
-  public readonly faCrosshairs= faCrosshairs;
+  public readonly faCrosshairs = faCrosshairs;
   public readonly faPlus = faPlus;
   public readonly faTruck = faTruck;
   public readonly faCircle = faCircle;
@@ -125,6 +125,9 @@ export class SystemListComponent implements OnInit, OnChanges {
           return (system.FactionOperations + system.SpecialFactionOperations.length * 9);
         }
         */
+        case "ProgressReportedCompletion": {
+          return (system.StateProgress.IsCompleted) ? system.StateProgress.ProgressLastChange : Number.MIN_SAFE_INTEGER;
+        }
         case "StateExpiration": {
           return (system.StateExpiration?.StateExpires ?? "");
         }
@@ -163,6 +166,7 @@ export class SystemListComponent implements OnInit, OnChanges {
         StateExpires: system.StateExpiration?.StateExpires ?? "",
         Progress: system.Progress ?? 0,
         ProgressIsCompleted: system.StateProgress.IsCompleted,
+        ProgressLastChange: system.StateProgress.ProgressLastChange,
         NextSystemState: system.StateProgress.NextSystemState?.Name ?? "",
         NextSystemStateChanges: system.StateProgress.SystemStateChanges ?? "",
         Focus: system.EffortFocus,
@@ -238,4 +242,5 @@ interface StateProgress {
   IsCompleted: boolean;
   NextSystemState: OverwatchThargoidLevel | null;
   SystemStateChanges: string;
+  ProgressLastChange: string;
 }

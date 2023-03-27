@@ -70,6 +70,15 @@
                     </div>
                 </td>
             </ng-container>
+            <ng-container matColumnDef="ProgressReportedCompletion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Reported progress completion</th>
+                <td mat-cell *matCellDef="let row">
+                    <span *ngIf="row.StateProgress.IsCompleted && row.StateProgress.ProgressLastChange"
+                        matTooltip="{{ row.StateProgress.ProgressLastChange | date:'long' }}">
+                        {{ row.StateProgress.ProgressLastChange | timeago }}
+                    </span>
+                </td>
+            </ng-container>
             <ng-container matColumnDef="EffortFocus">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     matTooltip="Registered effort focus approximately since the last tick or the last 24 hours if the tick happened more than 24 hours ago">
@@ -84,19 +93,23 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Operations</th>
                 <td mat-cell *matCellDef="let row">
                     <div class="operations-column">
-                        <div class="operation operation-combat" *ngIf="row.FactionAxOperations" matTooltip="AX Operations">
+                        <div class="operation operation-combat" *ngIf="row.FactionAxOperations"
+                            matTooltip="AX Operations">
                             <fa-icon [icon]="faCrosshairs" size="lg"></fa-icon>
                             {{ row.FactionAxOperations }}
                         </div>
-                        <div class="operation operation-rescue" *ngIf="row.FactionRescueOperations" matTooltip="Rescue Operations">
+                        <div class="operation operation-rescue" *ngIf="row.FactionRescueOperations"
+                            matTooltip="Rescue Operations">
                             <fa-icon [icon]="faPlus" size="lg"></fa-icon>
                             {{ row.FactionRescueOperations }}
                         </div>
-                        <div class="operation operation-logistics" *ngIf="row.FactionLogisticsOperations" matTooltip="Logistics Operations">
+                        <div class="operation operation-logistics" *ngIf="row.FactionLogisticsOperations"
+                            matTooltip="Logistics Operations">
                             <fa-icon [icon]="faTruck" size="lg"></fa-icon>
                             {{ row.FactionLogisticsOperations }}
                         </div>
-                        <div class="operation operation-general" *ngIf="row.FactionGeneralOperations" matTooltip="General Operations">
+                        <div class="operation operation-general" *ngIf="row.FactionGeneralOperations"
+                            matTooltip="General Operations">
                             <fa-icon [icon]="faCircle" size="lg"></fa-icon>
                             {{ row.FactionGeneralOperations }}
                         </div>

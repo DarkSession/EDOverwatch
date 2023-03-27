@@ -6,10 +6,11 @@
         public bool IsCompleted { get; }
         public OverwatchThargoidLevel? NextSystemState { get; }
         public DateTimeOffset? SystemStateChanges { get; }
+        public DateTimeOffset? ProgressLastChange { get; }
         public OverwatchStarSystemStateProgress(StarSystem starSystem, decimal? progressPercent, StarSystemThargoidLevelState currentSystemState)
         {
             ProgressPercent = progressPercent;
-            IsCompleted = (ProgressPercent >= 1);
+            IsCompleted = ProgressPercent >= 1;
             if (IsCompleted)
             {
                 StarSystemThargoidLevelState nextSystemState = currentSystemState switch
@@ -24,6 +25,7 @@
                 NextSystemState = new(nextSystemState);
                 SystemStateChanges = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
             }
+            ProgressLastChange = starSystem.ThargoidLevel?.CurrentProgress?.Updated;
         }
     }
 }

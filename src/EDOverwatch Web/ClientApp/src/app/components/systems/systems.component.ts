@@ -44,6 +44,10 @@ export class SystemsComponent implements OnInit, OnDestroy {
         key: "PopulationOriginal",
         value: "Population (Original)",
       },
+      {
+        key: "ProgressReportedCompletion",
+        value: "Reported progress completion",
+      },
     ];
 
   public maelstroms: OverwatchMaelstrom[] = [];

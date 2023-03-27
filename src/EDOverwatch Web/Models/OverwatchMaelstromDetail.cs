@@ -44,6 +44,7 @@
                 .ThenInclude(m => m!.StarSystem)
                 .Include(s => s.ThargoidLevel!.CycleStart)
                 .Include(s => s.ThargoidLevel!.StateExpires)
+                .Include(s => s.ThargoidLevel!.CurrentProgress)
                 .Select(s => new
                 {
                     StarSystem = s,
