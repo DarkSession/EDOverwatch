@@ -52,7 +52,8 @@ namespace DCoHTrackerDiscordBot
                         {
                             await using MemoryStream imageContent = new();
                             await httpResponse.Content.CopyToAsync(imageContent);
-                            if (imageContent.Length == attachment.Size)
+                            // if (imageContent.Length == attachment.Size)
+                            if (imageContent.Length >= attachment.Size)
                             {
                                 imageContent.Position = 0;
                                 ExtractSystemProgressResult result = await SystemProgressRecognition.ExtractSystemProgress(imageContent, Log);
