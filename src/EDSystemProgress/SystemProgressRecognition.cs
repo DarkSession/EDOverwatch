@@ -83,9 +83,11 @@ namespace EDSystemProgress
                 using Image image = await Image.LoadAsync(imageContent);
                 image.Mutate(x => x.Invert());
                 await image.SaveAsPngAsync(invertedImage);
+                /*
 #if DEBUG
                 await image.SaveAsPngAsync($"test_result{fileId}_i.png");
 #endif
+                */
             }
             byte[] file = invertedImage.ToArray();
 
@@ -114,6 +116,7 @@ namespace EDSystemProgress
             int progressBarUpperY = 0;
             int progressBarLowerY = 0;
             int leftSideBorder = 0;
+            int? rightSideBorder = null;
 
             do
             {
@@ -139,7 +142,7 @@ namespace EDSystemProgress
 
                                         if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
                                         {
-                                            leftSideBorder = bounds.X1;
+                                            leftSideBorder = bounds.X1 + (int)Math.Floor(bounds.Width * 0.04);
                                         }
                                     }
                                     break;
@@ -192,16 +195,31 @@ namespace EDSystemProgress
                                         {
                                             systemStatus = SystemStatus.InvasionInProgress;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
+
+                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                            {
+                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.08);
+                                            }
                                         }
                                         else if (text.Contains("have established"))
                                         {
                                             systemStatus = SystemStatus.ThargoidControlled;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
+
+                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                            {
+                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.1);
+                                            }
                                         }
                                         else if (text.Contains("Thargoid vessels") || text.Contains("are present in"))
                                         {
                                             systemStatus = SystemStatus.AlertInProgressPopulated;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
+
+                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                            {
+                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.08);
+                                            }
                                         }
                                         else if (text.Contains("currently populat") || text.Contains("populate"))
                                         {
@@ -223,6 +241,11 @@ namespace EDSystemProgress
                                         {
                                             systemStatus = SystemStatus.RecoveryComplete;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
+
+                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                            {
+                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.08);
+                                            }
                                         }
                                     }
                                     break;
@@ -352,12 +375,7 @@ namespace EDSystemProgress
                                                     systemStatus = SystemStatus.AlertInProgressUnpopulated;
                                                 }
                                                 break;
-                                            }
-                                        case SystemStatus.InvasionPrevented:
-                                            {
-                                                match = text.Contains("POST-THARGOID RECOVER") || text.Contains("POST THARGOID RECOVER");
-                                                break;
-                                            }
+                                            }   
                                         case SystemStatus.RecoveryComplete:
                                             {
                                                 match = text.Contains("COMPLETION STATE");
@@ -367,6 +385,7 @@ namespace EDSystemProgress
                                         case SystemStatus.AlertPreventedUnpopulated:
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
                                         case SystemStatus.ThargoidControlledRegainedPopulated:
+                                        case SystemStatus.InvasionPrevented:
                                             {
                                                 match = text.Contains("VICTORY STATE") || text.Contains("VIGTORY STATE");
                                                 break;
@@ -473,10 +492,20 @@ namespace EDSystemProgress
                         Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
                         // pixelRow.Length has the same value as accessor.Width,
                         // but using pixelRow.Length allows the JIT to optimize away bounds checks:
-                        for (int x = leftSideBorder; x < pixelRow.Length; x++)
+                        if (rightSideBorder is null || rightSideBorder > pixelRow.Length)
+                        {
+                            rightSideBorder = pixelRow.Length;
+                        }
+                        for (int x = leftSideBorder; x < rightSideBorder; x++)
                         {
                             // Get a reference to the pixel at position x
                             ref Rgba32 pixel = ref pixelRow[x];
+                            if (y == progressBarUpperY || y == (progressBarLowerY - 1) || x == leftSideBorder || x == (rightSideBorder - 1))
+                            {
+                                pixel.R = 0;
+                                pixel.G = 255;
+                                pixel.B = 255;
+                            }
                             foreach (ColorRange progressColor in progressColors)
                             {
                                 if (progressColor.IsInRange(pixel))
