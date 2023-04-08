@@ -4,7 +4,9 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Tesseract;
+using TesseractOCR;
+using TesseractOCR.Enums;
+using TesseractOCR.Layout;
 
 namespace EDSystemProgress
 {
@@ -91,20 +93,15 @@ namespace EDSystemProgress
             }
             byte[] file = invertedImage.ToArray();
 
-            using TesseractEngine engine = new("tessdata", "eng", EngineMode.Default, "config");
+            using Engine engine = new(@"./tessdata", Language.English, EngineMode.Default);
             engine.SetVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890:.- ");
 
             log.LogInformation("TesseractEngine version {version}", engine.Version);
 
-            using Pix img = Pix.LoadFromMemory(file);
+            using TesseractOCR.Pix.Image img = TesseractOCR.Pix.Image.LoadFromMemory(file);
             using Page page = engine.Process(img);
 
-            using ResultIterator iter = page.GetIterator();
-
-            iter.Begin();
-
             int paragraphNumber = 0;
-            int paragraphLineNumber = 0;
             ImageProcessingStep processingStep = ImageProcessingStep.WaitForTitle;
 
             string systemName = string.Empty;
@@ -118,19 +115,24 @@ namespace EDSystemProgress
             int leftSideBorder = 0;
             int? rightSideBorder = null;
 
-            do
+            foreach (Block block in page.Layout)
             {
-                do
+                foreach (Paragraph paragraph in block.Paragraphs)
                 {
-                    do
+                    foreach (TextLine textLine in paragraph.TextLines)
                     {
-                        if (iter.IsAtBeginningOf(PageIteratorLevel.Block))
-                        {
-                            log.LogDebug("Start of new block");
-                        }
-                        string text = iter.GetText(PageIteratorLevel.TextLine).Trim();
+                        string text = textLine.Text.Trim();
+                        log.LogDebug("Line Text: {text}", text);
 
-                        log.LogDebug("Text: {text}", text);
+                        if (textLine.BoundingBox != null && (processingStep == ImageProcessingStep.AboveProgressBar || processingStep == ImageProcessingStep.NextStep))
+                        {
+                            Rect bounds = textLine.BoundingBox.Value;
+                            int tempRightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.05);
+                            if (rightSideBorder == null || tempRightSideBorder > rightSideBorder)
+                            {
+                                rightSideBorder = tempRightSideBorder;
+                            }
+                        }
 
                         switch (processingStep)
                         {
@@ -140,8 +142,9 @@ namespace EDSystemProgress
                                     {
                                         processingStep = ImageProcessingStep.SystemName;
 
-                                        if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                        if (textLine.BoundingBox != null)
                                         {
+                                            Rect bounds = textLine.BoundingBox.Value;
                                             leftSideBorder = bounds.X1 + (int)Math.Floor(bounds.Width * 0.04);
                                         }
                                     }
@@ -158,33 +161,6 @@ namespace EDSystemProgress
                                         systemName = text;
                                     }
                                     processingStep = ImageProcessingStep.NextStep;
-#if DEBUG
-                                    do
-                                    {
-                                        do
-                                        {
-                                            using ChoiceIterator choiceIter = iter.GetChoiceIterator();
-                                            float symbolConfidence = iter.GetConfidence(PageIteratorLevel.Symbol) / 100;
-                                            if (choiceIter != null)
-                                            {
-                                                log.LogDebug("<symbol text=\"{0}\" confidence=\"{1:P}\">", iter.GetText(PageIteratorLevel.Symbol), symbolConfidence);
-                                                log.LogDebug("<choices>");
-                                                do
-                                                {
-                                                    float choiceConfidence = choiceIter.GetConfidence() / 100;
-                                                    log.LogDebug("<choice text=\"{0}\" confidence\"{1:P}\"/>", choiceIter.GetText(), choiceConfidence);
-
-                                                } while (choiceIter.Next());
-                                                log.LogDebug("</choices>");
-                                                log.LogDebug("</symbol>");
-                                            }
-                                            else
-                                            {
-                                                log.LogDebug("<symbol text=\"{0}\" confidence=\"{1:P}\"/>", iter.GetText(PageIteratorLevel.Symbol), symbolConfidence);
-                                            }
-                                        } while (iter.Next(PageIteratorLevel.Word, PageIteratorLevel.Symbol));
-                                    } while (iter.Next(PageIteratorLevel.TextLine, PageIteratorLevel.Word));
-#endif
                                     break;
                                 }
                             case ImageProcessingStep.NextStep:
@@ -195,31 +171,16 @@ namespace EDSystemProgress
                                         {
                                             systemStatus = SystemStatus.InvasionInProgress;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
-
-                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
-                                            {
-                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.08);
-                                            }
                                         }
                                         else if (text.Contains("have established"))
                                         {
                                             systemStatus = SystemStatus.ThargoidControlled;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
-
-                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
-                                            {
-                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.1);
-                                            }
                                         }
                                         else if (text.Contains("Thargoid vessels") || text.Contains("are present in"))
                                         {
                                             systemStatus = SystemStatus.AlertInProgressPopulated;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
-
-                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
-                                            {
-                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.08);
-                                            }
                                         }
                                         else if (text.Contains("currently populat") || text.Contains("populate"))
                                         {
@@ -241,11 +202,6 @@ namespace EDSystemProgress
                                         {
                                             systemStatus = SystemStatus.RecoveryComplete;
                                             processingStep = ImageProcessingStep.AboveProgressBar;
-
-                                            if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
-                                            {
-                                                rightSideBorder = bounds.X2 + (int)Math.Ceiling(bounds.Width * 0.08);
-                                            }
                                         }
                                     }
                                     break;
@@ -337,8 +293,9 @@ namespace EDSystemProgress
                                     }
                                     if (match)
                                     {
-                                        if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                        if (textLine.BoundingBox != null)
                                         {
+                                            Rect bounds = textLine.BoundingBox.Value;
                                             progressBarUpperY = bounds.Y2;
                                         }
                                         processingStep = ImageProcessingStep.BelowProgressBar;
@@ -375,7 +332,7 @@ namespace EDSystemProgress
                                                     systemStatus = SystemStatus.AlertInProgressUnpopulated;
                                                 }
                                                 break;
-                                            }   
+                                            }
                                         case SystemStatus.RecoveryComplete:
                                             {
                                                 match = text.Contains("COMPLETION STATE");
@@ -403,8 +360,9 @@ namespace EDSystemProgress
                                     }
                                     if (match)
                                     {
-                                        if (iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out Rect bounds))
+                                        if (textLine.BoundingBox != null)
                                         {
+                                            Rect bounds = textLine.BoundingBox.Value;
                                             progressBarLowerY = bounds.Y1;
                                         }
                                         processingStep = ImageProcessingStep.Completed;
@@ -431,16 +389,11 @@ namespace EDSystemProgress
                                     break;
                                 }
                         }
-                        if (iter.IsAtFinalOf(PageIteratorLevel.Para, PageIteratorLevel.TextLine))
-                        {
-                            log.LogDebug("End of para");
-                        }
-                        paragraphLineNumber++;
-                    } while (iter.Next(PageIteratorLevel.Para, PageIteratorLevel.TextLine));
+                    }
+
                     paragraphNumber++;
-                    paragraphLineNumber = 0;
-                } while (iter.Next(PageIteratorLevel.Block, PageIteratorLevel.Para));
-            } while (iter.Next(PageIteratorLevel.Block));
+                }
+            }
 
             progressBarUpperY += 20;
             progressBarLowerY -= 10;
