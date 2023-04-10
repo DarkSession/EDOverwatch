@@ -221,7 +221,7 @@ namespace EDDataProcessor
                         progress -= 33;
                         starSystem.ThargoidLevel!.Progress = progress;
                     }
-                    starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, starSystem.ThargoidLevel!.Progress)
+                    starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, starSystem.ThargoidLevel!.Progress)
                     {
                         ThargoidLevel = starSystem.ThargoidLevel,
                     };

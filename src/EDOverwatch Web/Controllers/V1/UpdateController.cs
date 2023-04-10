@@ -60,20 +60,28 @@ namespace EDOverwatch_Web.Controllers.V1
             {
                 StarSystem? starSystem = await DbContext.StarSystems
                     .Include(s => s.ThargoidLevel)
+                    .ThenInclude(t => t!.CurrentProgress)
                     .FirstOrDefaultAsync(s => s.SystemAddress == model.SystemAddress, cancellationToken);
                 if (starSystem?.ThargoidLevel == null)
                 {
                     return NotFound();
                 }
-                if (starSystem.ThargoidLevel.State == model.SystemState && ((starSystem.ThargoidLevel.Progress ?? -1) < model.Progress))
+                if (starSystem.ThargoidLevel.State == model.SystemState && ((starSystem.ThargoidLevel.Progress ?? -1) <= model.Progress))
                 {
                     starSystem.ThargoidLevel.Progress = model.Progress;
-                    StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, model.Progress)
+                    if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < model.Progress)
                     {
-                        ThargoidLevel = starSystem.ThargoidLevel,
-                    };
-                    DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
-                    starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, model.Progress)
+                        {
+                            ThargoidLevel = starSystem.ThargoidLevel,
+                        };
+                        DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
+                        starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                    }
+                    else
+                    {
+                        starSystem.ThargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
+                    }
 
                     TimeSpan remainingTime = TimeSpan.FromDays(model.DaysLeft ?? 0);
                     if (remainingTime > TimeSpan.Zero && starSystem.ThargoidLevel.StateExpires == null)

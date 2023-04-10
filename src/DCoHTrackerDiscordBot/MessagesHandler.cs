@@ -63,6 +63,7 @@ namespace DCoHTrackerDiscordBot
                                         .Include(s => s.ThargoidLevel)
                                         .ThenInclude(t => t!.Maelstrom)
                                         .Include(s => s.ThargoidLevel.StateExpires)
+                                        .Include(s => s.ThargoidLevel.CurrentProgress)
                                         .FirstOrDefaultAsync(s =>
                                             EF.Functions.Like(s.Name, result.SystemName.Replace("%", string.Empty)) &&
                                             s.ThargoidLevel != null &&
@@ -123,15 +124,22 @@ namespace DCoHTrackerDiscordBot
                                             (_, string updateRequestMessage) = await TrackingModule.SystemUpdateRequest(starSystem.Name, message.Author.Id, message.Channel.Id, DbContext, AnonymousProducer);
                                             updateRequests.Add((starSystem.Name, updateRequestMessage));
                                         }
-                                        else if ((starSystem.ThargoidLevel.Progress ?? -1) < progress)
+                                        else if ((starSystem.ThargoidLevel.Progress ?? -1) <= progress)
                                         {
                                             starSystem.ThargoidLevel.Progress = progress;
-                                            StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, progress)
+                                            if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < progress)
                                             {
-                                                ThargoidLevel = starSystem.ThargoidLevel,
-                                            };
-                                            DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
-                                            starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                                                StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress)
+                                                {
+                                                    ThargoidLevel = starSystem.ThargoidLevel,
+                                                };
+                                                DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
+                                                starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                                            }
+                                            else
+                                            {
+                                                starSystem.ThargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
+                                            }
 
                                             if (result.RemainingTime > TimeSpan.Zero && starSystem.ThargoidLevel.StateExpires == null)
                                             {

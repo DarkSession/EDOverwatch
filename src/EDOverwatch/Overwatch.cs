@@ -131,6 +131,7 @@ namespace EDOverwatch
                                     .ThenInclude(t => t!.Maelstrom)
                                     .Include(s => s.ThargoidLevel!.CycleEnd)
                                     .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
+                                    .Include(s => s.ThargoidLevel!.CurrentProgress)
                                     .FirstOrDefaultAsync(s => s.SystemAddress == stationUpdated.SystemAddress, cancellationToken);
                                 if (starSystem?.ThargoidLevel != null &&
                                     starSystem.ThargoidLevel.Maelstrom is ThargoidMaelstrom maelstrom &&
@@ -262,6 +263,7 @@ namespace EDOverwatch
                                     .ThenInclude(t => t!.Maelstrom)
                                     .Include(s => s.ThargoidLevel!.CycleEnd)
                                     .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
+                                    .Include(s => s.ThargoidLevel!.CurrentProgress)
                                     .FirstOrDefaultAsync(s => s.SystemAddress == starSystemThargoidManualUpdate.SystemAddress, cancellationToken);
                             }
                             else if (!string.IsNullOrEmpty(starSystemThargoidManualUpdate.SystemName))
@@ -374,6 +376,7 @@ namespace EDOverwatch
                 .ThenInclude(t => t!.Maelstrom)
                 .Include(s => s.ThargoidLevel!.CycleStart)
                 .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
+                .Include(s => s.ThargoidLevel!.CurrentProgress)
                 .SingleOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
             if (starSystem != null && starSystem.Updated > currentThargoidCycle.Start)
             {
@@ -516,15 +519,22 @@ namespace EDOverwatch
                     }
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
-                if (progress != null && (isManualUpdate || thargoidLevel.Progress == null || progress > thargoidLevel.Progress))
+                if (progress != null && (isManualUpdate || (thargoidLevel.Progress ?? -1) <= progress))
                 {
-                    StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, progress)
-                    {
-                        ThargoidLevel = starSystem.ThargoidLevel,
-                    };
-                    dbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
-                    thargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
                     thargoidLevel.Progress = progress;
+                    if (thargoidLevel.CurrentProgress == null || (thargoidLevel.Progress ?? -1) < progress)
+                    {
+                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress)
+                        {
+                            ThargoidLevel = starSystem.ThargoidLevel,
+                        };
+                        dbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
+                        thargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                    }
+                    else
+                    {
+                        thargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
+                    }
                 }
                 if (stateExpires != null)
                 {
