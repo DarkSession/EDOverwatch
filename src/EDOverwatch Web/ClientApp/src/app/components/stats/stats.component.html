@@ -166,6 +166,14 @@
             <canvas baseChart class="chart hide-on-small-mobile" [data]="maelstromHistoryChart.data"
                 [options]="maelstromHistoryChart.options" [type]="maelstromHistoryChart.type" width="200"
                 height="100"></canvas>
+
+            <div class="subtitle">
+                Cleared systems by state
+            </div>
+            <canvas baseChart class="chart hide-on-small-mobile" [data]="clearedSystemsByType.data"
+                [options]="clearedSystemsByType.options" [type]="clearedSystemsByType.type" width="200"
+                height="50"></canvas>
+
             <div class="subtitle">
                 War efforts over time
             </div>

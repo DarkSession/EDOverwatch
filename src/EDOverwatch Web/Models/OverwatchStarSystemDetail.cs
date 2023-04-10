@@ -144,7 +144,7 @@
                     factionOperations = dcohFactionOperation.Select(d => new FactionOperation(d)).ToList();
                 }
 
-                IQueryable<Station> stationQuery = dbContext.Stations
+                List<Station> stations = await dbContext.Stations
                     .AsNoTracking()
                     .Include(s => s.Type)
                     .Include(s => s.Body)
@@ -155,15 +155,7 @@
                     .ThenInclude(m => m!.Allegiance)
                     .Where(s =>
                         s.StarSystem == starSystem &&
-                        StationTypes.Contains(s.Type!.Name));
-                /*
-                if (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Invasion)
-                {
-                    stationQuery = stationQuery.Where(s => s.State != StationState.Normal || (s.State == StationState.Normal && s.Updated >= WeeklyTick.GetLastTick()));
-                }
-                */
-
-                List<Station> stations = await stationQuery
+                        StationTypes.Contains(s.Type!.Name))
                     .ToListAsync(cancellationToken);
 
                 List<Station> rescueShips = await dbContext.Stations

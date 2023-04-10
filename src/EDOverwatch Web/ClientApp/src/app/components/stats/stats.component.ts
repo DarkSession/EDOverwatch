@@ -4,6 +4,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
 import { OverwatchOverviewContested, OverwatchOverviewHuman, OverwatchOverviewMaelstromHistoricalSummary, OverwatchOverviewThargoids, OverwatchThargoidCycle } from '../home/home.component';
 import { Context } from 'chartjs-plugin-datalabels';
+import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 
 @UntilDestroy()
 @Component({
@@ -28,6 +29,31 @@ export class StatsComponent implements OnInit {
     },
   };
   public maelstromHistoryChart: ChartConfiguration = {
+    type: 'bar',
+    data: {
+      datasets: [],
+      labels: [],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        }
+      },
+      scales: {
+        y1: {
+          type: 'linear',
+          display: false,
+          position: 'right',
+        },
+        y: {
+          position: 'left',
+        },
+      }
+    },
+  };
+  public clearedSystemsByType: ChartConfiguration = {
     type: 'bar',
     data: {
       datasets: [],
@@ -130,6 +156,28 @@ export class StatsComponent implements OnInit {
         const labels = this.stats.ThargoidCycles.map(t => t.Cycle);
         const datasets: ChartDataset<'line', number[]>[] = [];
 
+        {
+          const dataset: ChartDataset<'line', number[]> = {
+            label: "Cleared",
+            data: labels.map(t => 0),
+            type: 'line',
+            order: 0,
+            // borderWidth: 8,
+            yAxisID: 'y',
+            segment: {
+              borderWidth: 8,
+            }
+          };
+          this.updateDatasetColor(dataset);
+          datasets.push(dataset);
+          for (const completedSystemPerCycle of this.stats.CompletdSystemsPerCycles) {
+            const index = labels.findIndex(c => c === completedSystemPerCycle.Cycle);
+            if (index !== -1) {
+              dataset.data[index] += completedSystemPerCycle.Completed;
+            }
+          }
+        }
+
         for (const maelstromHistory of this.stats.MaelstromHistory) {
           if (maelstromHistory.State.Name === "Controlled") {
             let dataset = datasets.find(d => d.label === maelstromHistory.State.Name && d.type === 'line');
@@ -169,27 +217,6 @@ export class StatsComponent implements OnInit {
             const index = labels.findIndex(c => c === maelstromHistory.Cycle.Cycle);
             if (index !== -1) {
               dataset.data[index] += maelstromHistory.Amount;
-            }
-          }
-        }
-        {
-          const dataset: ChartDataset<'line', number[]> = {
-            label: "Cleared",
-            data: labels.map(t => 0),
-            type: 'line',
-            order: 0,
-            // borderWidth: 8,
-            yAxisID: 'y',
-            segment: {
-              borderWidth: 8,
-            }
-          };
-          this.updateDatasetColor(dataset);
-          datasets.push(dataset);
-          for (const completedSystemPerCycle of this.stats.CompletdSystemsPerCycles) {
-            const index = labels.findIndex(c => c === completedSystemPerCycle.Cycle);
-            if (index !== -1) {
-              dataset.data[index] += completedSystemPerCycle.Completed;
             }
           }
         }
@@ -242,6 +269,78 @@ export class StatsComponent implements OnInit {
           this.maelstromHistoryChart.options!.animation = false;
         }
       }
+      {
+
+        const labels = this.stats.ThargoidCycles.map(t => t.Cycle);
+        const datasets: ChartDataset<'line', number[]>[] = [];
+
+        for (const completedSystemPerCycle of this.stats.CompletdSystemsPerCycles) {
+          let dataset = datasets.find(d => d.label === completedSystemPerCycle.State.Name);
+          if (!dataset) {
+            dataset = {
+              label: completedSystemPerCycle.State.Name,
+              data: labels.map(t => 0),
+              yAxisID: 'y',
+              order: 1,
+              stack: "stack",
+            };
+            this.updateDatasetColor(dataset);
+            datasets.push(dataset);
+          }
+          const index = labels.findIndex(c => c === completedSystemPerCycle.Cycle);
+          if (index !== -1) {
+            dataset.data[index] += completedSystemPerCycle.Completed;
+          }
+        }
+
+        this.clearedSystemsByType = {
+          type: 'bar',
+          data: {
+            datasets: [...datasets],
+            labels: labels,
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+              },
+              datalabels: {
+                align: 'center',
+                anchor: 'center',
+                color: (context) => {
+                  return context.dataset.label === "Controlled" ? "white" : "black";
+                },
+                backgroundColor: (context: Context) => {
+                  return context.dataset.backgroundColor as Color;
+                },
+                display: (context) => {
+                  return !!context.dataset.data[context.dataIndex];
+                },
+                borderRadius: 4,
+              }
+            },
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            scales: {
+              y1: {
+                type: 'linear',
+                position: 'right',
+                display: false,
+              },
+              y: {
+                position: 'left',
+                stacked: true,
+              },
+            },
+          },
+        };
+        if (this.chartLoaded) {
+          this.clearedSystemsByType.options!.animation = false;
+        }
+      }
       this.chartLoaded = true;
     }
   }
@@ -265,7 +364,7 @@ export class StatsComponent implements OnInit {
         break;
       }
       case "Cleared": {
-        dataset.backgroundColor = "#66ccff";
+        dataset.backgroundColor = "#3498db";
         break;
       }
     }
@@ -300,4 +399,5 @@ interface WarEffortSummary {
 interface StatsCompletdSystemsPerCycle {
   Cycle: string;
   Completed: number;
+  State: OverwatchThargoidLevel;
 }

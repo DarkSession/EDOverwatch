@@ -57,10 +57,15 @@
                                 {{ starSystem.EffortFocus | percent }}
                             </td>
                         </tr>
-                        <tr *ngIf="starSystem.ProgressPercent">
+                        <tr *ngIf="starSystem.StateProgress">
                             <td class="t">Progress</td>
                             <td class="number">
-                                {{ starSystem.ProgressPercent | percent }}
+                                <div>
+                                    {{ starSystem.StateProgress.ProgressPercent | percent }}
+                                </div>
+                                <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                    Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                </div>
                             </td>
                         </tr>
                     </tbody>

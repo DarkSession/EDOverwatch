@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using EDDatabase;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchWarStats
     {
@@ -63,8 +65,12 @@
                 .Where(s =>
                     s.Progress == 100 &&
                     (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled))
-                .GroupBy(s => s.CycleEnd)
-                .Select(s => new StatsCompletdSystemsPerCycle(s.Key, s.Count()))
+                .GroupBy(s => new
+                {
+                    s.CycleEndId,
+                    s.State,
+                })
+                .Select(s => new StatsCompletdSystemsPerCycle(s.Key.CycleEndId, thargoidCycles, s.Key.State, s.Count()))
                 .ToListAsync(cancellationToken);
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
@@ -247,10 +253,13 @@
     {
         public DateOnly Cycle { get; }
         public int Completed { get; }
+        public OverwatchThargoidLevel State { get; }
 
-        public StatsCompletdSystemsPerCycle(ThargoidCycle? thargoidCycle, int completed)
+        public StatsCompletdSystemsPerCycle(int? cycleEndId, List<OverwatchThargoidCycle> thargoidCycles, StarSystemThargoidLevelState level, int completed)
         {
-            Cycle = DateOnly.FromDateTime((thargoidCycle?.Start ?? WeeklyTick.GetLastTick()).DateTime);
+            OverwatchThargoidCycle? overwatchThargoidCycle = thargoidCycles.FirstOrDefault(t => t.Id == cycleEndId);
+            Cycle = DateOnly.FromDateTime((overwatchThargoidCycle?.Start ?? WeeklyTick.GetLastTick()).DateTime);
+            State = new(level);
             Completed = completed;
         }
     }

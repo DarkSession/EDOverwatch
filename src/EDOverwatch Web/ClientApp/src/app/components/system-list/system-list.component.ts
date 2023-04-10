@@ -243,4 +243,5 @@ interface StateProgress {
   NextSystemState: OverwatchThargoidLevel | null;
   SystemStateChanges: string;
   ProgressLastChange: string;
+  ProgressLastChecked: string;
 }
