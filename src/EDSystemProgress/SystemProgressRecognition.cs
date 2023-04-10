@@ -568,6 +568,7 @@ namespace EDSystemProgress
         // Manually fixing some stuff until a better solution is found...
         private static Dictionary<string, string> SystemNameCorrections { get; } = new()
         {
+            /*
             { "ARIETIS SECTOR AG-P B5-0", "ARIETIS SECTOR AQ-P B5-0" },
             { "OBASSI 0SAW", "OBASSI OSAW" },
             { "HIP 20880", "HIP 20890" },
@@ -587,6 +588,7 @@ namespace EDSystemProgress
             { "HIP 20893", "HIP 20899" },
             { "PEGASI SECTOR GE-N A8-0", "PEGASI SECTOR QE-N A8-0" },
             { "Bl DHORORA", "BI DHORORA" },
+            */
         };
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]
