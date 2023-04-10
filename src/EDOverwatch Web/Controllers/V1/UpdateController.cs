@@ -68,7 +68,6 @@ namespace EDOverwatch_Web.Controllers.V1
                 }
                 if (starSystem.ThargoidLevel.State == model.SystemState && ((starSystem.ThargoidLevel.Progress ?? -1) <= model.Progress))
                 {
-                    starSystem.ThargoidLevel.Progress = model.Progress;
                     if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < model.Progress)
                     {
                         StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, model.Progress)
@@ -82,6 +81,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     {
                         starSystem.ThargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
                     }
+                    starSystem.ThargoidLevel.Progress = model.Progress;
 
                     TimeSpan remainingTime = TimeSpan.FromDays(model.DaysLeft ?? 0);
                     if (remainingTime > TimeSpan.Zero && starSystem.ThargoidLevel.StateExpires == null)

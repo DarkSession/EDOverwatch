@@ -521,7 +521,6 @@ namespace EDOverwatch
                 }
                 if (progress != null && (isManualUpdate || (thargoidLevel.Progress ?? -1) <= progress))
                 {
-                    thargoidLevel.Progress = progress;
                     if (thargoidLevel.CurrentProgress == null || (thargoidLevel.Progress ?? -1) < progress)
                     {
                         StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress)
@@ -535,6 +534,7 @@ namespace EDOverwatch
                     {
                         thargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
                     }
+                    thargoidLevel.Progress = progress;
                 }
                 if (stateExpires != null)
                 {

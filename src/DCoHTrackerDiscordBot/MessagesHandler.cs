@@ -126,7 +126,6 @@ namespace DCoHTrackerDiscordBot
                                         }
                                         else if ((starSystem.ThargoidLevel.Progress ?? -1) <= progress)
                                         {
-                                            starSystem.ThargoidLevel.Progress = progress;
                                             if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < progress)
                                             {
                                                 StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress)
@@ -140,6 +139,7 @@ namespace DCoHTrackerDiscordBot
                                             {
                                                 starSystem.ThargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
                                             }
+                                            starSystem.ThargoidLevel.Progress = progress;
 
                                             if (result.RemainingTime > TimeSpan.Zero && starSystem.ThargoidLevel.StateExpires == null)
                                             {
