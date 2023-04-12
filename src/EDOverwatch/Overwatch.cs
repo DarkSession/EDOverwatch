@@ -124,7 +124,7 @@ namespace EDOverwatch
                             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
 
                             Station? station = await dbContext.Stations.FirstOrDefaultAsync(s => s.MarketId == stationUpdated.MarketId, cancellationToken);
-                            if (station?.State == StationState.UnderRepairs)
+                            if (station?.State == StationState.UnderRepairs && station.Updated > WeeklyTick.GetLastTick())
                             {
                                 StarSystem? starSystem = await dbContext.StarSystems
                                     .Include(s => s.ThargoidLevel)
@@ -315,9 +315,7 @@ namespace EDOverwatch
                             {
                                 bool changed = false;
                                 using AsyncLockInstance l = await Lock(cancellationToken);
-                                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
-                                TimeSpan timeSinceLastTick = DateTimeOffset.UtcNow - currentThargoidCycle.Start;
-                                (_, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, timeSinceLastTick, dbContext, cancellationToken);
+                                (_, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, dbContext, cancellationToken);
                                 if (maelstrom != null)
                                 {
                                     TimeSpan timeLeft = TimeSpan.Zero;
@@ -369,7 +367,6 @@ namespace EDOverwatch
         {
             await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
             StarSystem? starSystem = await dbContext.StarSystems
                 .Include(s => s.Allegiance)
                 .Include(s => s.ThargoidLevel)
@@ -378,12 +375,9 @@ namespace EDOverwatch
                 .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
                 .Include(s => s.ThargoidLevel!.CurrentProgress)
                 .SingleOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
-            if (starSystem != null && starSystem.Updated > currentThargoidCycle.Start)
+            if (starSystem != null && starSystem.Updated > WeeklyTick.GetLastTick().AddDays(1))
             {
-                TimeSpan timeSinceLastTick = DateTimeOffset.UtcNow - currentThargoidCycle.Start;
-                TimeSpan signalSourceMaxAge = (timeSinceLastTick > TimeSpan.FromDays(1)) ? timeSinceLastTick : TimeSpan.FromDays(1);
-
-                (StarSystemThargoidLevelState newThargoidLevel, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, signalSourceMaxAge, dbContext, cancellationToken);
+                (StarSystemThargoidLevelState newThargoidLevel, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, dbContext, cancellationToken);
                 // If the system is brand new, we might not have all the data yet, so we skip it for now.
                 if (newThargoidLevel == StarSystemThargoidLevelState.None && starSystem.Created > DateTimeOffset.UtcNow.AddHours(-6))
                 {
@@ -401,7 +395,7 @@ namespace EDOverwatch
             }
         }
 
-        private async Task<(StarSystemThargoidLevelState level, ThargoidMaelstrom? maelstrom)> AnalyzeThargoidLevelForSystem(StarSystem starSystem, TimeSpan maxAge, EdDbContext dbContext, CancellationToken cancellationToken)
+        private async Task<(StarSystemThargoidLevelState level, ThargoidMaelstrom? maelstrom)> AnalyzeThargoidLevelForSystem(StarSystem starSystem, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.None;
             // We check if the system is within range of a Maelstrom
@@ -417,7 +411,9 @@ namespace EDOverwatch
                 .FirstOrDefault();
             if (maelstrom != null)
             {
-                DateTimeOffset signalsMaxAge = DateTimeOffset.UtcNow.Subtract(maxAge);
+                // We ignore everything 24 hours after the last tick since there is too much bad data within those 24 hours
+                // Considering to remove EDDN data to define system Thargoid state entirely
+                DateTimeOffset signalsMaxAge = WeeklyTick.GetLastTick().AddDays(1);
                 IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
                 if (starSystem.Allegiance?.IsThargoid ?? false)
                 {
