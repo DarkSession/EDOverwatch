@@ -1,6 +1,5 @@
 table {
     width: 100%;
-    table-layout: fixed;
 }
 
 .cell-right {
@@ -33,17 +32,25 @@ table {
 }
 
 .mat-column-Name {
-    flex: 0 0 50%;
+    /*flex: 0 0 40%;*/
+    width: 40%;
+    min-width: 200px;
 }
 
 .mat-column-State {
-    flex: 0 0 15%;
+    /*flex: 0 0 15%;*/
+    width: 15%;
+    min-width: 150px;
 }
 
 .mat-column-RescueShip {
-    flex: 0 0 25%;
+    /*flex: 0 0 35%;*/
+    width: 30%;
+    min-width: 150px;
 }
 
 .mat-column-DistanceFromStarLS {
-    flex: 0 0 10%;
+    /*flex: 0 0 10%;*/
+    width: 15%;
+    min-width: 150px;
 }

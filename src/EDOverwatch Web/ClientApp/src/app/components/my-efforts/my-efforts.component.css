@@ -11,3 +11,7 @@
     align-items: center;
     margin-bottom: 24px;
 }
+
+.thead {
+    background-color: #272727;
+}
