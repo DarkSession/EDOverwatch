@@ -129,7 +129,10 @@
                 {
                     continue;
                 }
-                if (systems.Any(s => s.StarSystem.DistanceTo(systemAtRisk) <= 10.02f))
+                if (systems.Any(s =>
+                    ((s.StarSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && (s.StarSystem.ThargoidLevel!.Progress < 100 || s.StarSystem.ThargoidLevel!.Progress == null)) ||
+                    s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Maelstrom) &&
+                    s.StarSystem.DistanceTo(systemAtRisk) <= 10.02f))
                 {
                     systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population));
                 }

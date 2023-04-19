@@ -1,6 +1,4 @@
-﻿using EDDatabase;
-
-namespace EDOverwatch_Web.Models
+﻿namespace EDOverwatch_Web.Models
 {
     public class OverwatchWarStats
     {

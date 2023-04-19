@@ -243,16 +243,28 @@ namespace EDSystemProgress
                                         case SystemStatus.ThargoidControlledRegainedUnpopulated:
                                         case SystemStatus.ThargoidControlled:
                                             {
-                                                match = text.Contains("COUNTER-ATTACK");
-                                                if (match)
-                                                {
-                                                    remainingTime = text;
-                                                }
-                                                else if (text.Contains("WILL RETREAT"))
+                                                if (systemStatus == SystemStatus.ThargoidControlledRegainedPopulated && text.Contains("BEGINS"))
                                                 {
                                                     match = true;
-                                                    systemStatus = SystemStatus.ThargoidControlledRegainedUnpopulated;
                                                     remainingTime = text;
+                                                }
+                                                else
+                                                {
+                                                    match = text.Contains("COUNTER-ATTACK");
+                                                    if (match)
+                                                    {
+                                                        remainingTime = text;
+                                                    }
+                                                    else if (text.Contains("WILL RETREAT"))
+                                                    {
+                                                        match = true;
+                                                        systemStatus = SystemStatus.ThargoidControlledRegainedUnpopulated;
+                                                        remainingTime = text;
+                                                    }
+                                                    else if (text.Contains("CONTROL REGAINED"))
+                                                    {
+                                                        systemStatus = SystemStatus.ThargoidControlledRegainedPopulated;
+                                                    }
                                                 }
                                                 break;
                                             }

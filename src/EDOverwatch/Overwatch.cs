@@ -383,6 +383,11 @@ namespace EDOverwatch
                 {
                     return;
                 }
+                // Clear cannot jump straight to controlled
+                else if (newThargoidLevel == StarSystemThargoidLevelState.Controlled && starSystem.ThargoidLevel?.State == StarSystemThargoidLevelState.None)
+                {
+                    return;
+                }
                 if (maelstrom != null)
                 {
                     await UpdateStarSystemThargoidLevel(starSystem, false, null, TimeSpan.Zero, newThargoidLevel, maelstrom, dbContext, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);

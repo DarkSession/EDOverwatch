@@ -22,6 +22,12 @@ namespace EDOverwatch_Web.Controllers.V1
         [HttpGet]
         public async Task<List<OverwatchStarSystemMin>> PossibleNewSystems(CancellationToken cancellationToken)
         {
+            List<StarSystem> allThargoidControlledSystems = await DbContext.StarSystems
+                .AsNoTracking()
+                .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom || s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
+                .Include(s => s.ThargoidLevel)
+                .ToListAsync(cancellationToken);
+
             List<OverwatchStarSystemMin> result = new();
             List<ThargoidMaelstrom> thargoidMaelstroms = await DbContext.ThargoidMaelstroms
                 .AsNoTracking()
@@ -33,7 +39,10 @@ namespace EDOverwatch_Web.Controllers.V1
                 {
                     continue;
                 }
-                decimal distance = maelstrom.InfluenceSphere + 8m;
+                decimal distance = maelstrom.InfluenceSphere + 11m;
+                List<StarSystem> maelstromControlledSystems = allThargoidControlledSystems
+                    .Where(a => a.ThargoidLevel!.MaelstromId == maelstrom.Id)
+                    .ToList();
                 List<StarSystem> starSystems = await DbContext.StarSystems
                     .AsNoTracking()
                     .Where(s =>
@@ -44,7 +53,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     .ToListAsync(cancellationToken);
                 foreach (StarSystem starSystem in starSystems)
                 {
-                    if (starSystem.DistanceTo(maelstrom.StarSystem) <= (float)distance)
+                    if (maelstromControlledSystems.Any(s => s.DistanceTo(starSystem) <= 10.02f))
                     {
                         result.Add(new(starSystem));
                     }
