@@ -198,10 +198,8 @@ export class SystemListComponent implements OnInit, OnChanges {
   }
 }
 
-export interface OverwatchStarSystem {
+export interface OverwatchStarSystem extends OverwatchStarSystemMin {
   PopulationOriginal: number;
-  SystemAddress: number;
-  Name: string;
   Coordinates: OverwatchStarSystemCoordinates;
   Maelstrom: OverwatchMaelstrom;
   ThargoidLevel: OverwatchThargoidLevel;
@@ -221,6 +219,11 @@ export interface OverwatchStarSystem {
   StateProgress: StateProgress;
   Population: number;
   DistanceToMaelstrom: number;
+}
+
+export interface OverwatchStarSystemMin {
+  SystemAddress: number;
+  Name: string;
 }
 
 export interface OverwatchStarSystemCoordinates {

@@ -69,6 +69,7 @@ import { SystemsDefenceScoreComponent } from './components/systems-defence-score
 import * as duration from 'dayjs/plugin/duration';
 import * as utc from 'dayjs/plugin/utc';
 import * as dayjs from 'dayjs';
+import 'chartjs-adapter-moment';
 import { CommanderFcCargoComponent } from './components/commander-fc-cargo/commander-fc-cargo.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 

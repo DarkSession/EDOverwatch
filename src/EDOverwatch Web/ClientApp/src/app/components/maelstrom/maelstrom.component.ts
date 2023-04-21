@@ -10,7 +10,7 @@ import { Context } from 'chartjs-plugin-datalabels';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchOverviewMaelstromHistoricalSummary, OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
-import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { OverwatchStarSystem, OverwatchStarSystemMin } from '../system-list/system-list.component';
 
 @UntilDestroy()
 @Component({
@@ -23,7 +23,7 @@ export class MaelstromComponent implements OnInit {
   public readonly faClipboard = faClipboard;
   public maelstrom: OverwatchMaelstromDetail | null = null;
   public systemsAtRisk: MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk> = new MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk>();
-  public readonly systemsAtRiskColumns = ['Name', 'Population', 'Distance'];
+  public readonly systemsAtRiskColumns = ['Name', 'Population', 'AttackingSystems', 'Distance'];
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
   public chartConfig: ChartConfiguration = {
     type: 'bar',
@@ -163,13 +163,13 @@ export class MaelstromComponent implements OnInit {
             datalabels: {
               align: 'center',
               anchor: 'center',
-              color: (context) => {
+              color: (context: Context) => {
                 return context.dataset.label === "Controlled" ? "white" : "black";
               },
               backgroundColor: (context: Context) => {
                 return context.dataset.backgroundColor as Color;
               },
-              display: (context) => {
+              display: (context: Context) => {
                 return !!context.dataset.data[context.dataIndex];
               },
               borderRadius: 4,
@@ -235,4 +235,5 @@ interface OverwatchMaelstromDetailSystemAtRisk {
   Name: string;
   Distance: number;
   Population: number;
+  AttackingSystems: OverwatchStarSystemMin[];
 }

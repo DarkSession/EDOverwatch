@@ -186,6 +186,16 @@
                     WarEffortType.ThargoidProbeCollection,
                 };
 
+                List<WarEffortType> tissueSampleTypes = new()
+                {
+                    WarEffortType.TissueSampleScout,
+                    WarEffortType.TissueSampleCyclops,
+                    WarEffortType.TissueSampleBasilisk,
+                    WarEffortType.TissueSampleMedusa,
+                    WarEffortType.TissueSampleHydra,
+                    WarEffortType.TissueSampleOrthrus,
+                };
+
                 statsHumans = new(
                     Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),
                     humansSystemsControlling,
@@ -194,7 +204,8 @@
                     warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.Rescue)?.amount,
                     warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.SupplyDelivery)?.amount,
                     warEfforts.Where(w => w.side == WarEffortSide.Humans && warEffortTypeMissions.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
-                    warEfforts.Where(w => w.side == WarEffortSide.Humans && recoveryTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0)
+                    warEfforts.Where(w => w.side == WarEffortSide.Humans && recoveryTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
+                    warEfforts.Where(w => w.side == WarEffortSide.Humans && tissueSampleTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0)
                 );
             }
 

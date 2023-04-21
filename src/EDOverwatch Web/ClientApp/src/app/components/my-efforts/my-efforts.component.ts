@@ -95,7 +95,7 @@ export class MyEffortsComponent implements OnInit {
             backgroundColor: (context: Context) => {
               return context.dataset.backgroundColor as Color;
             },
-            display: (context) => {
+            display: (context: Context) => {
               return !!context.dataset.data[context.dataIndex];
             },
             borderRadius: 4,

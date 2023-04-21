@@ -146,7 +146,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               backgroundColor: (context: Context) => {
                 return context.dataset.backgroundColor as Color;
               },
-              display: (context) => {
+              display: (context: Context) => {
                 return context.dataset.label === "Controlled";
               },
               borderRadius: 4,
@@ -263,6 +263,7 @@ export interface OverwatchOverviewHuman {
   RescueSupplies: number | null;
   Missions: number | null;
   ItemsRecovered: number | null;
+  TissuesSampled: number | null;
 }
 
 export interface OverwatchOverviewThargoids {

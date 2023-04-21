@@ -236,13 +236,13 @@ export class StatsComponent implements OnInit {
               datalabels: {
                 align: 'center',
                 anchor: 'center',
-                color: (context) => {
+                color: (context: Context) => {
                   return context.dataset.label === "Controlled" ? "white" : "black";
                 },
                 backgroundColor: (context: Context) => {
                   return context.dataset.backgroundColor as Color;
                 },
-                display: (context) => {
+                display: (context: Context) => {
                   return !!context.dataset.data[context.dataIndex];
                 },
                 borderRadius: 4,
@@ -308,13 +308,13 @@ export class StatsComponent implements OnInit {
               datalabels: {
                 align: 'center',
                 anchor: 'center',
-                color: (context) => {
+                color: (context: Context) => {
                   return context.dataset.label === "Controlled" ? "white" : "black";
                 },
                 backgroundColor: (context: Context) => {
                   return context.dataset.backgroundColor as Color;
                 },
-                display: (context) => {
+                display: (context: Context) => {
                   return !!context.dataset.data[context.dataIndex];
                 },
                 borderRadius: 4,
