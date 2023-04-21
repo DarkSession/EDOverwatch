@@ -69,6 +69,7 @@ import { SystemsDefenceScoreComponent } from './components/systems-defence-score
 import * as duration from 'dayjs/plugin/duration';
 import * as utc from 'dayjs/plugin/utc';
 import * as dayjs from 'dayjs';
+import 'chartjs-adapter-moment';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";

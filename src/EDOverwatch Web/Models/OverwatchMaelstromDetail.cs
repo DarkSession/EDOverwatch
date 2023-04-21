@@ -110,31 +110,50 @@
                     system.StationsUnderAttack));
             }
 
+            DateTimeOffset controlledMaxEnd = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -3);
+            DateTimeOffset alertInvasionMaxEnd = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1);
+            DateTimeOffset nextTick = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
+
             List<OverwatchMaelstromDetailSystemAtRisk> systemsAtRiskResult = new();
             decimal systemsAtRiskSphere = maelstrom.InfluenceSphere + 10.02m;
             List<StarSystem> systemsAtRisk = await dbContext.StarSystems
                 .AsNoTracking()
+                .Include(s => 
+                    s.ThargoidLevelHistory!.Where(s => 
+                        s.CycleEnd != null && 
+                        s.CycleEnd.Start >= controlledMaxEnd && 
+                        (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled)))
+                .ThenInclude(t => t.CycleEnd)
                 .Where(s =>
                     s.LocationX >= maelstrom.StarSystem.LocationX - systemsAtRiskSphere && s.LocationX <= maelstrom.StarSystem.LocationX + systemsAtRiskSphere &&
                     s.LocationY >= maelstrom.StarSystem.LocationY - systemsAtRiskSphere && s.LocationY <= maelstrom.StarSystem.LocationY + systemsAtRiskSphere &&
                     s.LocationZ >= maelstrom.StarSystem.LocationZ - systemsAtRiskSphere && s.LocationZ <= maelstrom.StarSystem.LocationZ + systemsAtRiskSphere &&
-                    s.Population > 0 &&
-                    (s.ThargoidLevel == null || s.ThargoidLevel.State == StarSystemThargoidLevelState.None))
-                .Take(250)
+                    (s.ThargoidLevel == null || s.ThargoidLevel.State == StarSystemThargoidLevelState.None || (s.ThargoidLevel.State == StarSystemThargoidLevelState.Recovery && s.ThargoidLevel.StateExpires!.End <= nextTick)))
                 .ToListAsync(cancellationToken);
-            foreach (StarSystem systemAtRisk in systemsAtRisk)
+            foreach (StarSystem systemAtRisk in systemsAtRisk.OrderBy(s => maelstrom.StarSystem.DistanceTo(s)))
             {
                 double distance = Math.Round(maelstrom.StarSystem.DistanceTo(systemAtRisk), 2);
-                if (distance > (double)systemsAtRiskSphere)
+                if (distance > (double)systemsAtRiskSphere ||
+                    systemAtRisk.ThargoidLevelHistory!.Any(t => t.CycleEnd!.Start >= alertInvasionMaxEnd) ||
+                    systemAtRisk.ThargoidLevelHistory!.Any(t => t.State == StarSystemThargoidLevelState.Controlled && t.CycleEnd!.Start >= controlledMaxEnd))
                 {
                     continue;
                 }
-                if (systems.Any(s =>
-                    ((s.StarSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && (s.StarSystem.ThargoidLevel!.Progress < 100 || s.StarSystem.ThargoidLevel!.Progress == null)) ||
-                    s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Maelstrom) &&
-                    s.StarSystem.DistanceTo(systemAtRisk) <= 10.02f))
+                List<StarSystem> attackingSystems = systems.Where(s =>
+                        ((s.StarSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled &&
+                        (s.StarSystem.ThargoidLevel!.Progress < 100 || s.StarSystem.ThargoidLevel!.Progress == null)) ||
+                        s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Maelstrom) &&
+
+                        s.StarSystem.DistanceTo(systemAtRisk) <= 10.02f)
+                    .Select(s => s.StarSystem)
+                    .ToList();
+                if (attackingSystems.Any())
                 {
-                    systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population));
+                    systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population, attackingSystems));
+                    if (systemsAtRiskResult.Count >= 20)
+                    {
+                        break;
+                    }
                 }
             }
 

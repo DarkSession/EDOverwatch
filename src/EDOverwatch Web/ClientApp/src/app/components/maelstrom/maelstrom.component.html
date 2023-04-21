@@ -50,6 +50,15 @@
                                         {{ row.Population | numberSuffix:1 }}
                                     </td>
                                 </ng-container>
+                                <ng-container matColumnDef="AttackingSystems">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Source/Attacking Systems</th>
+                                    <td mat-cell *matCellDef="let row">
+                                        <div *ngFor="let attackinSystem of row.AttackingSystems" class="clickable"
+                                            [routerLink]="['/system', attackinSystem.SystemAddress]">
+                                            {{ attackinSystem.Name }}
+                                        </div>
+                                    </td>
+                                </ng-container>
                                 <ng-container matColumnDef="Distance">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
                                     <td mat-cell *matCellDef="let row">
