@@ -1,4 +1,4 @@
-﻿namespace EDDataProcessor.CApiJournal.Events.Startup
+﻿namespace EDDataProcessor.Journal.Events.Startup
 {
     internal class LoadGame : JournalEvent
     {

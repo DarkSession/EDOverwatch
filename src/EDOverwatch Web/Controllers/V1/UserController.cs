@@ -112,6 +112,11 @@ namespace EDOverwatch_Web.Controllers.V1
                 OAuthenticationResult? oAuthenticationResult = await FDevOAuth.AuthenticateUser(requestData.Code, oAuthCode.Code, cancellationToken);
                 if (oAuthenticationResult != null && oAuthenticationResult.CustomerId > 0)
                 {
+                    Profile? profile = await FDevOAuth.GetProfile(oAuthenticationResult.Credentials, cancellationToken);
+                    if (string.IsNullOrEmpty(profile?.Commander?.Name))
+                    {
+                        return new OAuthResponse(new List<string>() { "Your Frontier profile does not seem to have an Elite Dangerous live profile. Overwatch only supports live profiles." });
+                    }
                     EDDatabase.Commander? commander = await DbContext.Commanders
                         .Include(c => c.User)
                         .FirstOrDefaultAsync(u => u.FDevCustomerId == oAuthenticationResult.CustomerId, cancellationToken);
@@ -119,11 +124,6 @@ namespace EDOverwatch_Web.Controllers.V1
                     if (commander == null)
                     {
                         isCommanderNew = true;
-                        Profile? profile = await FDevOAuth.GetProfile(oAuthenticationResult.Credentials, cancellationToken);
-                        if (string.IsNullOrEmpty(profile?.Commander?.Name))
-                        {
-                            return new OAuthResponse(new List<string>() { "Authentication failed! Your Frontier profile does not seem to have an Elite Dangerous profile." });
-                        }
                         string userName = RegexRemoveCharacters().Replace(profile!.Commander!.Name, "_") + "-" + oAuthenticationResult.CustomerId;
 
                         ApplicationUser user = new(userName)

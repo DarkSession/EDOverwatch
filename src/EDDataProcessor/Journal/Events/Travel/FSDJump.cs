@@ -1,7 +1,7 @@
 ﻿using EDDataProcessor.EDDN;
 using EDDataProcessor.Journal;
 
-namespace EDDataProcessor.CApiJournal.Events.Travel
+namespace EDDataProcessor.Journal.Events.Travel
 {
     internal class FSDJump : JournalEvent
     {
@@ -144,7 +144,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     await journalParameters.SendMqMessage(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, cancellationToken);
                 }
             }
-            journalParameters.Commander.System = starSystem;
+            journalParameters.SetCommanderLocation(starSystem);
         }
     }
 }

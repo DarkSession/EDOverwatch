@@ -1,7 +1,7 @@
 ﻿using EDDataProcessor.EDDN;
 using System.Text.RegularExpressions;
 
-namespace EDDataProcessor.CApiJournal.Events.Travel
+namespace EDDataProcessor.Journal.Events.Travel
 {
     internal partial class Docked : JournalEvent
     {
@@ -160,8 +160,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 }
                 */
             }
-            journalParameters.Commander.System = starSystem;
-            journalParameters.Commander.Station = station;
+            journalParameters.SetCommanderLocation(starSystem, station);
         }
 
         [GeneratedRegex("^([A-Z]{3})-([A-Z]{3})$", RegexOptions.IgnoreCase, "en-CH")]

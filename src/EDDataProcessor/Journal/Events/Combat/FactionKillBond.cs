@@ -1,4 +1,4 @@
-﻿namespace EDDataProcessor.CApiJournal.Events.Combat
+﻿namespace EDDataProcessor.Journal.Events.Combat
 {
     // { "timestamp":"2023-03-23T17:44:06Z", "event":"FactionKillBond", "Reward":50000000, "AwardingFaction":"$faction_PilotsFederation;", "AwardingFaction_Localised":"Pilots' Federation", "VictimFaction":"$faction_Thargoid;", "VictimFaction_Localised":"Thargoids" }
 

@@ -203,5 +203,7 @@ namespace EDDatabase
         Inara,
         [EnumMember(Value = "ED: Overwatch")]
         OverwatchCAPI,
+        [EnumMember(Value = "ED: Overwatch")]
+        OverwatchPublicAPI,
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace EDDataProcessor.CApiJournal.Events.Combat
+namespace EDDataProcessor.Journal.Events.Combat
 {
     internal class Died : JournalEvent
     {
