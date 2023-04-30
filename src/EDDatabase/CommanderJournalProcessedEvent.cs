@@ -1,4 +1,6 @@
-﻿namespace EDDatabase
+﻿using System.Globalization;
+
+namespace EDDatabase
 {
     [Table("CommanderJournalProcessedEvent")]
     [Index(nameof(Hash), nameof(Line), IsUnique = true)]
@@ -29,7 +31,16 @@
 
         public static string GetEventHash(Commander commander, StarSystem? starSystem, DateTimeOffset date, string eventName, WarEffortType warEffortType)
         {
-            return EDUtils.HashUtil.SHA256Hex($"{commander.Name.ToUpper()}:{starSystem?.Id ?? 0}:{date}:{eventName}:{warEffortType}");
+            string eventHashBase;
+            if (date >= new DateTimeOffset(2023, 5, 1, 0, 0, 0, TimeSpan.Zero))
+            {
+                eventHashBase = $"{commander.Name.ToUpper()}:{starSystem?.Id ?? 0}:{date.ToString("s")}:{eventName}:{warEffortType}";
+            }
+            else
+            {
+                eventHashBase = $"{commander.Name.ToUpper()}:{starSystem?.Id ?? 0}:{date.ToString("MM/dd/yyyy HH:mm:ss")} +00:00:{eventName}:{warEffortType}";
+            }
+            return EDUtils.HashUtil.SHA256Hex(eventHashBase);
         }
     }
 }

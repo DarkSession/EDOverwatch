@@ -1,4 +1,6 @@
-﻿namespace EDDataProcessor.CApiJournal.Events
+﻿using EDDatabase;
+
+namespace EDDataProcessor.Journal.Events
 {
     internal abstract class JournalEvent
     {
@@ -22,8 +24,18 @@
         protected async Task AddOrUpdateWarEffort(JournalParameters journalParameters, StarSystem? starSystem, WarEffortType type, long amount, WarEffortSide side, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             string eventHash = CommanderJournalProcessedEvent.GetEventHash(journalParameters.Commander, starSystem, Timestamp, Event, type);
-            if (await dbContext.CommanderJournalProcessedEvents
-                .AnyAsync(c => (c.Hash == eventHash && c.Line == 0) || (c.Hash == eventHash && c.Line == journalParameters.Line), cancellationToken))
+
+            IQueryable<CommanderJournalProcessedEvent> processedEvents;
+            if (journalParameters.Line == 0)
+            {
+                processedEvents = dbContext.CommanderJournalProcessedEvents.Where(c => c.Hash == eventHash);
+            }
+            else
+            {
+                processedEvents = dbContext.CommanderJournalProcessedEvents.Where(c => (c.Hash == eventHash && c.Line == 0) || (c.Hash == eventHash && c.Line == journalParameters.Line));
+            }
+
+            if (await processedEvents.AnyAsync(cancellationToken))
             {
                 return;
             }
@@ -112,6 +124,23 @@
                 return Task.CompletedTask;
             }
             return ActiveMqProducer.SendAsync(address, routingType, message, ActiveMqTransaction, cancellationToken);
+        }
+
+        public void SetCommanderLocation(StarSystem starSystem)
+        {
+            if (Source == WarEffortSource.OverwatchCAPI)
+            {
+                Commander.System = starSystem;
+            }
+        }
+
+        public void SetCommanderLocation(StarSystem starSystem, EDDatabase.Station station)
+        {
+            if (Source == WarEffortSource.OverwatchCAPI)
+            {
+                Commander.System = starSystem;
+                Commander.Station = station;
+            }
         }
     }
 }

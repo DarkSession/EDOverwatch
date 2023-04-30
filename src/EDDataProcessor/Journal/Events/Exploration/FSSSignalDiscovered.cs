@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace EDDataProcessor.CApiJournal.Events.Exploration
+namespace EDDataProcessor.Journal.Events.Exploration
 {
     internal partial class FSSSignalDiscovered : JournalEvent
     {

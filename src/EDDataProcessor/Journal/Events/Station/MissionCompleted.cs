@@ -1,4 +1,4 @@
-﻿namespace EDDataProcessor.CApiJournal.Events.Station
+﻿namespace EDDataProcessor.Journal.Events.Station
 {
     internal class MissionCompleted : JournalEvent
     {

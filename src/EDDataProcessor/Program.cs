@@ -9,10 +9,10 @@ global using Microsoft.Extensions.Logging;
 global using Newtonsoft.Json;
 using EDCApi;
 using EDDataProcessor.AXI;
-using EDDataProcessor.CApiJournal;
 using EDDataProcessor.EDDN;
 using EDDataProcessor.IDA;
 using EDDataProcessor.Inara;
+using EDDataProcessor.Journal;
 
 namespace EDDataProcessor
 {
@@ -59,7 +59,8 @@ namespace EDDataProcessor
                 })
                 .AddScoped<CAPI>()
                 .AddScoped<FDevOAuth>()
-                .AddSingleton<JournalProcessor>()
+                .AddSingleton<CApiJournalProcessor>()
+                .AddSingleton<PublicApiJournalProcessor>()
                 .AddScoped<IdaClient>()
                 .AddSingleton<InaraClient>()
                 .AddScoped<AXIClient>()
@@ -96,11 +97,17 @@ namespace EDDataProcessor
             Task journalCommanderSelectionTask = Task.CompletedTask;
             if (Configuration.GetValue<bool>("EDCApi:Enabled"))
             {
-                JournalProcessor journalProcessor = Services.GetRequiredService<JournalProcessor>();
+                CApiJournalProcessor journalProcessor = Services.GetRequiredService<CApiJournalProcessor>();
                 journalProcessorTask = journalProcessor.ProcessJournals(cancellationToken);
                 journalCommanderSelectionTask = CommanderJournalUpdateQueue(connection, cancellationToken);
             }
-            await Task.WhenAll(eddnProcessorTask, scheduledInaraAndIdaUpdates, scheduledAXIUpdates, journalProcessorTask, journalCommanderSelectionTask);
+            Task publicApiProcessorTask = Task.CompletedTask;
+            if (Configuration.GetValue<bool>("JournalApi:Enabled"))
+            {
+                PublicApiJournalProcessor publicApiJournalProcessor = Services.GetRequiredService<PublicApiJournalProcessor>();
+                publicApiProcessorTask = publicApiJournalProcessor.ProcessJournals(cancellationToken);
+            }
+            await Task.WhenAll(eddnProcessorTask, scheduledInaraAndIdaUpdates, scheduledAXIUpdates, journalProcessorTask, journalCommanderSelectionTask, publicApiProcessorTask);
         }
 
         private static async Task ScheduledInaraAndIdaUpdates(IConnection connection, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-﻿namespace EDDataProcessor.CApiJournal.Events.Trade
+﻿namespace EDDataProcessor.Journal.Events.Trade
 {
     internal class MarketSell : JournalEvent
     {

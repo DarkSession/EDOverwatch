@@ -1,38 +1,40 @@
-﻿namespace EDDataProcessor.CApiJournal.Events.Trade
+﻿namespace EDDataProcessor.Journal.Events.Station
 {
-    internal class EjectCargo : JournalEvent
+    internal class SearchAndRescue : JournalEvent
     {
-        public string Type { get; set; }
-
+        public string Name { get; set; }
         public int Count { get; set; }
 
-        public EjectCargo(string type, int count)
+        public SearchAndRescue(string name, int count)
         {
-            Type = type;
+            Name = name;
             Count = count;
         }
 
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            Commodity commodity = await Commodity.GetCommodity(Type, dbContext, cancellationToken);
             List<CommanderCargoItem> commanderCargoItems = await dbContext.CommanderCargoItems
-                .Where(c =>
-                    c.Commander == journalParameters.Commander &&
-                    c.Commodity == commodity)
-                .ToListAsync(cancellationToken);
+                   .Include(i => i.Commodity)
+                   .Include(i => i.SourceStarSystem)
+                   .Where(c => c.Commander == journalParameters.Commander && c.Commodity!.Name == Name.ToLower())
+                   .ToListAsync(cancellationToken);
+
             int remainingAmount = Count;
             foreach (CommanderCargoItem commanderCargoItem in commanderCargoItems)
             {
                 if (commanderCargoItem.Amount <= remainingAmount)
                 {
+                    await AddOrUpdateWarEffort(journalParameters, commanderCargoItem.SourceStarSystem, WarEffortType.Recovery, commanderCargoItem.Amount, WarEffortSide.Humans, dbContext, cancellationToken);
+
                     remainingAmount -= commanderCargoItem.Amount;
-                    commanderCargoItem.Amount = 0;
                     dbContext.CommanderCargoItems.Remove(commanderCargoItem);
                 }
                 else
                 {
-                    commanderCargoItem.Amount -= remainingAmount;
+                    await AddOrUpdateWarEffort(journalParameters, commanderCargoItem.SourceStarSystem, WarEffortType.Recovery, remainingAmount, WarEffortSide.Humans, dbContext, cancellationToken);
+
                     remainingAmount = 0;
+                    commanderCargoItem.Amount -= remainingAmount;
                 }
 
                 if (remainingAmount <= 0)
@@ -40,6 +42,7 @@
                     break;
                 }
             }
+
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }

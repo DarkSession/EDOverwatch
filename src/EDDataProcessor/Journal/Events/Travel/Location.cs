@@ -1,4 +1,4 @@
-﻿namespace EDDataProcessor.CApiJournal.Events.Travel
+﻿namespace EDDataProcessor.Journal.Events.Travel
 {
     internal class Location : FSDJump
     {

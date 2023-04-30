@@ -23,7 +23,7 @@ namespace EDDataProcessorJournalTest
             await DbContext.SaveChangesAsync();
 
             await using AsyncServiceScope serviceScope = Services.CreateAsyncScope();
-            JournalProcessor journalProcessor = (JournalProcessor)ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, typeof(JournalProcessor));
+            CApiJournalProcessor journalProcessor = (CApiJournalProcessor)ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, typeof(CApiJournalProcessor));
 
             JournalProcessResult result = await journalProcessor.ProcessCommanderJournal(journal, 0, commander, DbContext, null, null, CancellationToken.None);
             Assert.AreEqual(lines, result.CurrentLine);

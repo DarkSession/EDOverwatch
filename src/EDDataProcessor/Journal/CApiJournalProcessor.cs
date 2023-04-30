@@ -1,18 +1,18 @@
 ﻿using EDCApi;
-using EDDataProcessor.CApiJournal.Events;
+using EDDataProcessor.Journal.Events;
 using Newtonsoft.Json.Linq;
 using System.Data;
 
-namespace EDDataProcessor.CApiJournal
+namespace EDDataProcessor.Journal
 {
-    public class JournalProcessor
+    public class CApiJournalProcessor
     {
         private IConfiguration Configuration { get; }
         private IServiceProvider ServiceProvider { get; }
         private ILogger Log { get; }
         private Dictionary<string, Type> JournalEvents { get; } = new();
 
-        public JournalProcessor(IConfiguration configuration, IServiceProvider serviceProvider, ILogger<JournalProcessor> log)
+        public CApiJournalProcessor(IConfiguration configuration, IServiceProvider serviceProvider, ILogger<CApiJournalProcessor> log)
         {
             Configuration = configuration;
             ServiceProvider = serviceProvider;
