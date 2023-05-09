@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using EDDataProcessor.Journal;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 namespace EDDataProcessor.EDDN
@@ -39,6 +40,7 @@ namespace EDDataProcessor.EDDN
                                                                 .Include(s => s.Allegiance)
                                                                 .Include(s => s.Security)
                                                                 .Include(s => s.ThargoidLevel)
+                                                                .Include(s => s.ThargoidLevel!.CurrentProgress)
                                                                 .Include(s => s.MinorFactionPresences!)
                                                                 .ThenInclude(m => m.MinorFaction)
                                                                 .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
@@ -64,7 +66,7 @@ namespace EDDataProcessor.EDDN
                             starSystem.UpdateWarRelevantSystem();
                             dbContext.StarSystems.Add(starSystem);
                         }
-                        if (starSystem.Updated < Message.Timestamp || isNew)
+                        if (starSystem.Updated <= Message.Timestamp || isNew)
                         {
                             bool changed = isNew;
                             starSystem.Updated = Message.Timestamp;
@@ -131,6 +133,10 @@ namespace EDDataProcessor.EDDN
                                 {
                                     changed = true;
                                 }
+                            }
+                            if (Message.ThargoidWar != null)
+                            {
+                                changed = await starSystem.UpdateThargoidWar(Message.Timestamp, Message.ThargoidWar, dbContext, cancellationToken) || changed;
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);
                             if (changed)
@@ -406,6 +412,9 @@ namespace EDDataProcessor.EDDN
 
         [JsonProperty("Factions")]
         public List<FSDJumpFaction>? Factions { get; set; }
+
+        [JsonProperty("ThargoidWar")]
+        public FSDJumpThargoidWar? ThargoidWar { get; set; }
     }
 
     public class DockedLandingPads
@@ -439,6 +448,34 @@ namespace EDDataProcessor.EDDN
     {
         public string Name { get; set; } = string.Empty;
         public string Allegiance { get; set; } = string.Empty;
+    }
+
+    public class FSDJumpThargoidWar
+    {
+        public string? CurrentState { get; set; }
+        public string? NextStateSuccess { get; set; }
+        public string? NextStateFailure { get; set; }
+        public bool SuccessStateReached { get; set; }
+        public decimal WarProgress { get; set; }
+        [JsonIgnore]
+        public short WarProgressInternal
+        {
+            get
+            {
+                short result = (short)Math.Floor(WarProgress * 100m);
+                if (result < 0)
+                {
+                    return 0;
+                }
+                else if (result > 100)
+                {
+                    return 100;
+                }
+                return result;
+            }
+        }
+        public int RemainingPorts { get; set; }
+        public string? EstimatedRemainingTime { get; set; }
     }
 
     public enum JournalMessageEvent

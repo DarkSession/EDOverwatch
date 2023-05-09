@@ -32,6 +32,9 @@ namespace EDDatabase
         [ForeignKey("ManualUpdateCycleId")]
         public ThargoidCycle? ManualUpdateCycle { get; set; }
 
+        [ForeignKey("ManualUpdateCycleId")]
+        public int? ManualUpdateCycleId { get; set; }
+
         [ForeignKey("MaelstromId")]
         public ThargoidMaelstrom? Maelstrom { get; set; }
 
@@ -59,12 +62,6 @@ namespace EDDatabase
             Progress = progress;
             Created = created;
             IsInvisibleState = isInvisibleState;
-        }
-
-        public StarSystemThargoidLevel(short? progress, StarSystemThargoidLevelProgress? currentProgress)
-        {
-            Progress = progress;
-            CurrentProgress = currentProgress;
         }
     }
 

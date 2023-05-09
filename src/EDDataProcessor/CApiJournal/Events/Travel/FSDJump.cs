@@ -13,6 +13,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
         public string? SystemEconomy { get; set; }
         public string? SystemSecurity { get; set; }
         public List<FSDJumpFaction>? Factions { get; set; }
+        public FSDJumpThargoidWar? ThargoidWar { get; set; }
 
         public FSDJump(long? population, string starSystem, long systemAddress, List<double> starPos, string? systemGovernment, string? systemAllegiance, string? systemEconomy, string? systemSecurity)
         {
