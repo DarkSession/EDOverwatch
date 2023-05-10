@@ -70,6 +70,10 @@
                     {
                         missionWarEffortType = WarEffortType.MissionCompletionSettlementReboot;
                     }
+                    else if (Name.StartsWith("Mission_TW_OnFoot_Reboot_Occupied_MB"))
+                    {
+                        missionWarEffortType = WarEffortType.MissionCompletionThargoidControlledSettlementReboot;
+                    }
                     else
                     {
                         await DeferEvent(journalParameters, dbContext, cancellationToken);

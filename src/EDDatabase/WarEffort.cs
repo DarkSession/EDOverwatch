@@ -77,6 +77,10 @@ namespace EDDatabase
             { WarEffortType.TissueSampleMedusa, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleHydra, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleOrthrus, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.KillThargoidGlaive, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidRevenant, WarEffortTypeGroup.Kills },
+            { WarEffortType.MissionCompletionThargoidControlledSettlementReboot, WarEffortTypeGroup.Mission },
+
         };
     }
 
@@ -109,19 +113,19 @@ namespace EDDatabase
         [EnumMember(Value = "Thargoid Orthrus kill")]
         KillThargoidOrthrus,
 
-        [EnumMember(Value = "Mission completed")]
+        [EnumMember(Value = "Mission")]
         MissionCompletionGeneric,
 
-        [EnumMember(Value = "Delivery mission completed")]
+        [EnumMember(Value = "Delivery mission")]
         MissionCompletionDelivery,
 
-        [EnumMember(Value = "Rescue mission completed")]
+        [EnumMember(Value = "Rescue mission")]
         MissionCompletionRescue,
 
-        [EnumMember(Value = "Thargoid kill mission completed")]
+        [EnumMember(Value = "Thargoid kill mission")]
         MissionCompletionThargoidKill,
 
-        [EnumMember(Value = "Passenger evacuation mission completed")]
+        [EnumMember(Value = "Passenger evacuation mission")]
         MissionCompletionPassengerEvacuation,
 
         [EnumMember(Value = "Thargoid probe collected")]
@@ -130,7 +134,7 @@ namespace EDDatabase
         [EnumMember(Value = "Recovery")]
         Recovery,
 
-        [EnumMember(Value = "Settlement reboot mission completed")]
+        [EnumMember(Value = "Settlement reboot mission")]
         MissionCompletionSettlementReboot,
 
         [EnumMember(Value = "Thargoid Scout tissue sample collection")]
@@ -150,6 +154,15 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid Orthrus tissue sample collection")]
         TissueSampleOrthrus,
+
+        [EnumMember(Value = "Thargoid Glaive kill")]
+        KillThargoidGlaive,
+
+        [EnumMember(Value = "Thargoid Revenant kill")]
+        KillThargoidRevenant,
+
+        [EnumMember(Value = "Thargoid controlled settlement reboot mission")]
+        MissionCompletionThargoidControlledSettlementReboot,
     }
 
     public enum WarEffortTypeGroup : byte
