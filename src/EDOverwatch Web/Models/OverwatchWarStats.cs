@@ -163,8 +163,10 @@
                     WarEffortType.KillThargoidCyclops,
                     WarEffortType.KillThargoidBasilisk,
                     WarEffortType.KillThargoidMedusa,
-                    WarEffortType.KillThargoidHydra,
+                    WarEffortType.KillThargoidHydra,    
                     WarEffortType.KillThargoidOrthrus,
+                    WarEffortType.KillThargoidGlaive,
+                    WarEffortType.KillThargoidRevenant,
                 };
 
                 List<WarEffortType> warEffortTypeMissions = new()
@@ -175,6 +177,7 @@
                     WarEffortType.MissionCompletionThargoidKill,
                     WarEffortType.MissionCompletionPassengerEvacuation,
                     WarEffortType.MissionCompletionSettlementReboot,
+                    WarEffortType.MissionCompletionThargoidControlledSettlementReboot,
                 };
 
                 List<WarEffortType> recoveryTypes = new()

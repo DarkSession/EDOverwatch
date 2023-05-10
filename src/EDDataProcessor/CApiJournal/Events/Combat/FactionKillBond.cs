@@ -23,12 +23,14 @@
             {
                 WarEffortType warEffortType = Reward switch
                 {
+                    25_000 => WarEffortType.KillThargoidRevenant, // Revenant
                     65_000 or 75_000 => WarEffortType.KillThargoidScout, // Scout
+                    4_500_000 => WarEffortType.KillThargoidGlaive, // Glaive
                     6_500_000 => WarEffortType.KillThargoidCyclops, // Cyclops
                     20_000_000 => WarEffortType.KillThargoidBasilisk, // Basilisk
                     34_000_000 => WarEffortType.KillThargoidMedusa, // Medusa
                     50_000_000 => WarEffortType.KillThargoidHydra, // Hydra
-                    25_000_000 or 40_000_000 => WarEffortType.KillThargoidOrthrus, // Orthrus
+                    40_000_000 => WarEffortType.KillThargoidOrthrus, // Orthrus
                     _ => WarEffortType.KillGeneric,
                 };
                 if (warEffortType == WarEffortType.KillGeneric)
