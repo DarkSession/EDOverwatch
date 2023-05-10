@@ -1,4 +1,5 @@
 ﻿using EDDataProcessor.EDDN;
+using EDDataProcessor.Journal;
 
 namespace EDDataProcessor.CApiJournal.Events.Travel
 {
@@ -35,6 +36,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                                                     .Include(s => s.Allegiance)
                                                     .Include(s => s.Security)
                                                     .Include(s => s.ThargoidLevel)
+                                                    .Include(s => s.ThargoidLevel!.CurrentProgress)
                                                     .Include(s => s.MinorFactionPresences!)
                                                     .ThenInclude(m => m.MinorFaction)
                                                     .SingleOrDefaultAsync(m => m.SystemAddress == SystemAddress, cancellationToken);
@@ -128,6 +130,10 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     {
                         changed = true;
                     }
+                }
+                if (ThargoidWar != null)
+                {
+                    changed = await starSystem.UpdateThargoidWar(Timestamp, ThargoidWar, dbContext, cancellationToken) || changed;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
                 if (changed)
