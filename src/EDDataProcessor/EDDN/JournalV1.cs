@@ -41,6 +41,8 @@ namespace EDDataProcessor.EDDN
                                                                 .Include(s => s.Security)
                                                                 .Include(s => s.ThargoidLevel)
                                                                 .Include(s => s.ThargoidLevel!.CurrentProgress)
+                                                                .Include(s => s.ThargoidLevel!.StateExpires)
+                                                                .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
                                                                 .Include(s => s.MinorFactionPresences!)
                                                                 .ThenInclude(m => m.MinorFaction)
                                                                 .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
@@ -450,7 +452,7 @@ namespace EDDataProcessor.EDDN
         public string Allegiance { get; set; } = string.Empty;
     }
 
-    public class FSDJumpThargoidWar
+    public partial class FSDJumpThargoidWar
     {
         public string? CurrentState { get; set; }
         public string? NextStateSuccess { get; set; }
@@ -476,6 +478,28 @@ namespace EDDataProcessor.EDDN
         }
         public int RemainingPorts { get; set; }
         public string? EstimatedRemainingTime { get; set; }
+
+        [JsonIgnore]
+        public int? RemainingDays
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(EstimatedRemainingTime))
+                {
+                    return null;
+                }
+                Regex remainingDaysRegex = RemainingDaysRegexFunction();
+                Match remainingDaysMatch = remainingDaysRegex.Match(EstimatedRemainingTime);
+                if (remainingDaysMatch.Success && int.TryParse(remainingDaysMatch.Groups[1].Value, out int days))
+                {
+                    return days;
+                }
+                return null;
+            }
+        }
+
+        [GeneratedRegex("^([0-9]{1,2}) Day", RegexOptions.IgnoreCase, "en-CH")]
+        private static partial Regex RemainingDaysRegexFunction();
     }
 
     public enum JournalMessageEvent

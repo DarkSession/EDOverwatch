@@ -37,6 +37,8 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                                                     .Include(s => s.Security)
                                                     .Include(s => s.ThargoidLevel)
                                                     .Include(s => s.ThargoidLevel!.CurrentProgress)
+                                                    .Include(s => s.ThargoidLevel!.StateExpires)
+                                                    .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
                                                     .Include(s => s.MinorFactionPresences!)
                                                     .ThenInclude(m => m.MinorFaction)
                                                     .SingleOrDefaultAsync(m => m.SystemAddress == SystemAddress, cancellationToken);

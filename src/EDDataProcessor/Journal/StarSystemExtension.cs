@@ -6,15 +6,15 @@ namespace EDDataProcessor.Journal
     {
         public static async Task<bool> UpdateThargoidWar(this StarSystem starSystem, DateTimeOffset updateTime, FSDJumpThargoidWar fsdJumpThargoidWar, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(updateTime, cancellationToken);
-            if (starSystem.ThargoidLevel?.ManualUpdateCycleId == currentThargoidCycle.Id)
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+            if (updateTime <= currentThargoidCycle.Start || updateTime >= currentThargoidCycle.End || starSystem.ThargoidLevel?.ManualUpdateCycleId == currentThargoidCycle.Id)
             {
                 return false;
             }
             StarSystemThargoidLevelState? parsedState = fsdJumpThargoidWar.CurrentState switch
             {
                 "" => StarSystemThargoidLevelState.None,
-                "Thargoid_Alert" => StarSystemThargoidLevelState.Alert,
+                "Thargoid_Probing" => StarSystemThargoidLevelState.Alert,
                 "Thargoid_Harvest" => StarSystemThargoidLevelState.Invasion,
                 "Thargoid_Controlled" => StarSystemThargoidLevelState.Controlled,
                 "Thargoid_Stronghold" => StarSystemThargoidLevelState.Maelstrom,
@@ -60,10 +60,29 @@ namespace EDDataProcessor.Journal
                         starSystem.ThargoidLevel.Progress = fsdJumpThargoidWar.WarProgressInternal;
                         starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, fsdJumpThargoidWar.WarProgressInternal);
                         changed = true;
+                        if (starSystem.ThargoidLevel.Progress >= 100)
+                        {
+                            await dbContext.DcohFactionOperations
+                                .Where(d =>
+                                    d.StarSystem == starSystem &&
+                                    d.Status == DcohFactionOperationStatus.Active)
+                                .ForEachAsync(d => d.Status = DcohFactionOperationStatus.Expired, cancellationToken);
+                        }
                     }
                     if (starSystem.ThargoidLevel.CurrentProgress != null && starSystem.ThargoidLevel.CurrentProgress.LastChecked < updateTime)
                     {
 						starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
+                    }
+                    if (starSystem.ThargoidLevel.StateExpires == null && fsdJumpThargoidWar.RemainingDays is int remainingDays && remainingDays > 0)
+                    {
+                        DateTimeOffset remainingTimeEnd = DateTimeOffset.UtcNow.AddDays(remainingDays);
+                        if (remainingTimeEnd.DayOfWeek == DayOfWeek.Wednesday || (remainingTimeEnd.DayOfWeek == DayOfWeek.Thursday && remainingTimeEnd.Hour < 7))
+                        {
+                            remainingTimeEnd = new DateTimeOffset(remainingTimeEnd.Year, remainingTimeEnd.Month, remainingTimeEnd.Day, 0, 0, 0, TimeSpan.Zero);
+                            ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(remainingTimeEnd, CancellationToken.None);
+                            starSystem.ThargoidLevel.StateExpires = thargoidCycle;
+                            changed = true;
+                        }
                     }
                 }
                 return changed;

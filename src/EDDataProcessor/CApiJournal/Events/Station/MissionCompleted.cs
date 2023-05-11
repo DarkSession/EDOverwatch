@@ -66,7 +66,7 @@
                         // Mission_TW_Massacre_Hydra_Plural
                         missionWarEffortType = WarEffortType.MissionCompletionThargoidKill;
                     }
-                    else if (Name.StartsWith("Mission_TW_OnFoot_Reboot_NR"))
+                    else if (Name.StartsWith("Mission_TW_OnFoot_Reboot_NR") || Name.StartsWith("Mission_TW_OnFoot_Reboot_MB"))
                     {
                         missionWarEffortType = WarEffortType.MissionCompletionSettlementReboot;
                     }
