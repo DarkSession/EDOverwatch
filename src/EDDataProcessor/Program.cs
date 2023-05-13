@@ -138,6 +138,7 @@ namespace EDDataProcessor
                         await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
                         if (ActivatorUtilities.CreateInstance(serviceScope.ServiceProvider, typeof(UpdateFromInara)) is UpdateFromInara updateFromInara)
                         {
+                            log.LogInformation("Inara: Starting update");
                             List<long> systemsUpdated = await updateFromInara.Update().ToListAsync(cancellationToken);
                             log.LogInformation("Inara: Updated {systemsCount} systems", systemsUpdated.Count);
                             if (systemsUpdated.Any())

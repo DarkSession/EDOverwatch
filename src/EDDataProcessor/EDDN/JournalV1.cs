@@ -68,7 +68,7 @@ namespace EDDataProcessor.EDDN
                             starSystem.UpdateWarRelevantSystem();
                             dbContext.StarSystems.Add(starSystem);
                         }
-                        if (starSystem.Updated <= Message.Timestamp || isNew)
+                        if (starSystem.Updated < Message.Timestamp || isNew)
                         {
                             bool changed = isNew;
                             starSystem.Updated = Message.Timestamp;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Runtime.Serialization;
@@ -82,14 +83,53 @@ namespace EDSystemProgress
 
             await using MemoryStream invertedImage = new();
             {
-                using Image image = await Image.LoadAsync(imageContent);
+                using Image<Rgba32> image = await Image.LoadAsync<Rgba32>(imageContent);
                 image.Mutate(x => x.Invert());
-                await image.SaveAsPngAsync(invertedImage);
                 /*
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < image.Height; y++)
+                    {
+                        Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < image.Width; x++)
+                        {
+                            ref Rgba32 pixel = ref pixelRow[x];
+                            int m = (int)Math.Floor((pixel.R + pixel.G + pixel.G) / 3f);
+                            if (Math.Abs(pixel.R - m) <= 10 && Math.Abs(pixel.G - m) <= 10 && Math.Abs(pixel.B - m) <= 10)
+                            {
+                                if (m > 200)
+                                {
+                                    pixel.R = 255;
+                                    pixel.G = 255;
+                                    pixel.B = 255;
+                                }
+                                else if (m > 80)
+                                {
+                                    pixel.R -= 80;
+                                    pixel.G -= 80;
+                                    pixel.B -= 80;
+                                }
+                                else if (m <= 80)
+                                {
+                                    pixel.R = 0;
+                                    pixel.G = 0;
+                                    pixel.B = 0;
+                                }
+                            }
+                        }
+                    }
+                });
+                */
+                /*
+                PngEncoder encoder = new();
+                encoder.CompressionLevel = PngCompressionLevel.Level0;
+                encoder.ColorType = PngColorType.Grayscale;
+                encoder.BitDepth = PngBitDepth.Bit2;
+                */
 #if DEBUG
                 await image.SaveAsPngAsync($"test_result{fileId}_i.png");
 #endif
-                */
+                await image.SaveAsPngAsync(invertedImage);
             }
             byte[] file = invertedImage.ToArray();
 
@@ -133,6 +173,10 @@ namespace EDSystemProgress
                                 rightSideBorder = tempRightSideBorder;
                             }
                         }
+                        if (string.IsNullOrEmpty(text))
+                        {
+                            continue;
+                        }
 
                         switch (processingStep)
                         {
@@ -158,6 +202,10 @@ namespace EDSystemProgress
                                     }
                                     else
                                     {
+                                        if (text.EndsWith("."))
+                                        {
+                                            text = text[..^1].Trim();
+                                        }
                                         systemName = text;
                                     }
                                     processingStep = ImageProcessingStep.NextStep;
@@ -455,21 +503,31 @@ namespace EDSystemProgress
                     for (int y = progressBarUpperY; y < progressBarLowerY; y++)
                     {
                         Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
-                        // pixelRow.Length has the same value as accessor.Width,
-                        // but using pixelRow.Length allows the JIT to optimize away bounds checks:
                         if (rightSideBorder is null || rightSideBorder > pixelRow.Length)
                         {
                             rightSideBorder = pixelRow.Length;
                         }
+
+                        bool colorRangeFound = false;
+                        int pixelsSinceColorRangeNotFound = 0;
+                        int progressBarRangeWidth = ((int)rightSideBorder - leftSideBorder);
                         for (int x = leftSideBorder; x < rightSideBorder; x++)
                         {
+                            bool found = false;
                             // Get a reference to the pixel at position x
                             ref Rgba32 pixel = ref pixelRow[x];
                             if (y == progressBarUpperY || y == (progressBarLowerY - 1) || x == leftSideBorder || x == (rightSideBorder - 1))
                             {
+                                bool isRightSideEnd = pixel.R == 0 && pixel.B == 0 && pixel.G == 0;
                                 pixel.R = 0;
                                 pixel.G = 255;
                                 pixel.B = 255;
+                                if (isRightSideEnd)
+                                {
+                                    rightSideBorder = x;
+                                    break;
+                                }
+                                continue;
                             }
                             foreach (ColorRange progressColor in progressColors)
                             {
@@ -479,6 +537,7 @@ namespace EDSystemProgress
                                     pixel.G = 0;
                                     pixel.B = 0;
                                     pixelsProgress++;
+                                    found = true;
                                     break;
                                 }
                             }
@@ -490,8 +549,23 @@ namespace EDSystemProgress
                                     pixel.G = 255;
                                     pixel.B = 0;
                                     pixelsRemaining++;
+                                    found = true;
                                     break;
                                 }
+                            }
+                            if (found)
+                            {
+                                colorRangeFound = true;
+                                pixelsSinceColorRangeNotFound = 0;
+                            }
+                            else
+                            {
+                                int treshold = (int)Math.Ceiling(progressBarRangeWidth * (colorRangeFound ? 0.05 : 0.1));
+                                if (pixelsSinceColorRangeNotFound >= treshold)
+                                {
+                                    break;
+                                }
+                                pixelsSinceColorRangeNotFound++;
                             }
                         }
                     }

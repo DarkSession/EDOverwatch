@@ -18,8 +18,7 @@
                 {
                     StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.None,
                     StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Recovery,
-                    StarSystemThargoidLevelState.Controlled when starSystem.Population > 0 => StarSystemThargoidLevelState.Recovery,
-                    // StarSystemThargoidLevelState.Recapture => StarSystemThargoidLevelState.Recovery,
+                    StarSystemThargoidLevelState.Controlled when starSystem.OriginalPopulation > 0 => StarSystemThargoidLevelState.Recovery,
                     StarSystemThargoidLevelState.Recovery => StarSystemThargoidLevelState.None,
                     _ => StarSystemThargoidLevelState.None,
                 };
