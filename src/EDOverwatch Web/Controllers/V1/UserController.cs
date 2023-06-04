@@ -30,8 +30,7 @@ namespace EDOverwatch_Web.Controllers.V1
             EdDbContext dbContext,
             FDevOAuth fDevOAuth,
             ActiveMqMessageProducer producer,
-            WebSocketServer webSocketServer
-            )
+            WebSocketServer webSocketServer)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -87,7 +86,8 @@ namespace EDOverwatch_Web.Controllers.V1
                             CommanderOAuthStatus.Inactive,
                             string.Empty,
                             string.Empty,
-                            string.Empty)
+                            string.Empty,
+                            CommanderFleetHasFleetCarrier.Unknown)
                 {
                     User = user
                 };
@@ -149,7 +149,8 @@ namespace EDOverwatch_Web.Controllers.V1
                             CommanderOAuthStatus.Active,
                             oAuthenticationResult.Credentials.AccessToken,
                             oAuthenticationResult.Credentials.RefreshToken,
-                            oAuthenticationResult.Credentials.TokenType)
+                            oAuthenticationResult.Credentials.TokenType,
+                            CommanderFleetHasFleetCarrier.Unknown)
                         {
                             User = user
                         };

@@ -55,12 +55,15 @@
         [Column(TypeName = "varchar(256)")]
         public string OAuthTokenType { get; set; }
 
+        [Column]
+        public CommanderFleetHasFleetCarrier HasFleetCarrier { get; set; }
+
         [NotMapped]
         public bool CanProcessCApiJournal => OAuthStatus == CommanderOAuthStatus.Active && JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-5);
 
         public IEnumerable<CommanderApiKeyClaim>? ApiKeyClaims { get; set; }
 
-        public Commander(int id, string name, long fDevCustomerId, bool isInLiveVersion, DateTimeOffset journalLastProcessed, DateOnly journalDay, int journalLastLine, DateTimeOffset journalLastActivity, DateTimeOffset oAuthCreated, CommanderOAuthStatus oAuthStatus, string oAuthAccessToken, string oAuthRefreshToken, string oAuthTokenType)
+        public Commander(int id, string name, long fDevCustomerId, bool isInLiveVersion, DateTimeOffset journalLastProcessed, DateOnly journalDay, int journalLastLine, DateTimeOffset journalLastActivity, DateTimeOffset oAuthCreated, CommanderOAuthStatus oAuthStatus, string oAuthAccessToken, string oAuthRefreshToken, string oAuthTokenType, CommanderFleetHasFleetCarrier hasFleetCarrier)
         {
             Id = id;
             Name = name;
@@ -75,6 +78,7 @@
             OAuthAccessToken = oAuthAccessToken;
             OAuthRefreshToken = oAuthRefreshToken;
             OAuthTokenType = oAuthTokenType;
+            HasFleetCarrier = hasFleetCarrier;
         }
     }
 
@@ -83,5 +87,12 @@
         Inactive = 0,
         Active,
         Expired,
+    }
+
+    public enum CommanderFleetHasFleetCarrier : byte
+    {
+        Unknown = 0,
+        Yes,
+        No,
     }
 }

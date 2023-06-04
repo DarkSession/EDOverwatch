@@ -178,6 +178,72 @@ namespace EDDataProcessor.CApiJournal
                 }
                 while (journalDay <= today);
 
+                if (commander.HasFleetCarrier != CommanderFleetHasFleetCarrier.No)
+                {
+                    (bool success, FleetCarrier? fleetCarrier) = await capi.GetFleetCarrier(oAuthCredentials, cancellationToken);
+                    if (success)
+                    {
+                        if (fleetCarrier == null)
+                        {
+                            commander.HasFleetCarrier = CommanderFleetHasFleetCarrier.No;
+                        }
+                        else if (fleetCarrier.Cargo != null)
+                        {
+                            List<CommanderFleetCarrierCargoItem> commanderFleetCarrierCargoItems = await dbContext.CommanderFleetCarrierCargoItems
+                                .Where(c => c.Commander == commander)
+                                .Include(c => c.Commodity)
+                                .Include(c => c.SourceStarSystem)
+                                .ToListAsync(cancellationToken);
+
+                            var fleetCarrierCargo = fleetCarrier.Cargo.GroupBy(c => new
+                            {
+                                c.Commodity,
+                                c.OriginSystem
+                            })
+                                .Select(c => new
+                                {
+                                    c.Key.Commodity,
+                                    c.Key.OriginSystem,
+                                    Total = c.Sum(x => x.Qty),
+                                });
+                            foreach (var fleetCarrierCargoEntry in fleetCarrierCargo)
+                            {
+                                if (string.IsNullOrEmpty(fleetCarrierCargoEntry.Commodity))
+                                {
+                                    continue;
+                                }
+                                if (commanderFleetCarrierCargoItems.FirstOrDefault(c => c.Commodity?.Name.ToLower() == fleetCarrierCargoEntry.Commodity.ToLower() && c.SourceStarSystem?.SystemAddress == fleetCarrierCargoEntry.OriginSystem) is CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem)
+                                {
+                                    commanderFleetCarrierCargoItem.Amount = fleetCarrierCargoEntry.Total;
+                                    commanderFleetCarrierCargoItems.Remove(commanderFleetCarrierCargoItem);
+                                }
+                                else
+                                {
+                                    StarSystem? starSystem = null;
+                                    if (fleetCarrierCargoEntry.OriginSystem != null)
+                                    {
+                                        starSystem = await dbContext.StarSystems.FirstOrDefaultAsync(s => s.SystemAddress == fleetCarrierCargoEntry.OriginSystem, cancellationToken);
+                                        if (starSystem == null)
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    CommanderFleetCarrierCargoItem newCommanderFleetCarrierCargoItem = new(0, fleetCarrierCargoEntry.Total)
+                                    {
+                                        SourceStarSystem = starSystem,
+                                        Commander = commander,
+                                        Commodity = await Commodity.GetCommodity(fleetCarrierCargoEntry.Commodity, dbContext, cancellationToken),
+                                    };
+                                    dbContext.CommanderFleetCarrierCargoItems.Add(newCommanderFleetCarrierCargoItem);
+                                }
+                            }
+                            foreach (CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem in commanderFleetCarrierCargoItems)
+                            {
+                                dbContext.CommanderFleetCarrierCargoItems.Remove(commanderFleetCarrierCargoItem);
+                            }
+                        }
+                    }
+                }
                 commander.JournalLastProcessed = DateTimeOffset.Now;
 
                 CommanderUpdated commanderUpdated = new(commander.FDevCustomerId);

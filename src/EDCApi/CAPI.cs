@@ -114,11 +114,10 @@ namespace EDCApi
             return (false, null);
         }
 
-        /*
-        public async Task<(bool, FleetCarrier?)> GetFleetCarrier(OAuthCredentials oAuthCredentials)
+        public async Task<(bool success, FleetCarrier? fleetCarrier)> GetFleetCarrier(OAuthCredentials oAuthCredentials, CancellationToken cancellationToken)
         {
             string fleetCarrierUrl = Configuration.GetValue<string>("CApi:FleetCarrierUrl") ?? throw new Exception("CApi:FleetCarrierUrl is not configured");
-            (string? fleetCarrierData, HttpStatusCode httpStatusCode) = await GetUrl(fleetCarrierUrl, oAuthCredentials);
+            (HttpStatusCode httpStatusCode, string? fleetCarrierData) = await GetUrl(fleetCarrierUrl, oAuthCredentials, cancellationToken);
             if (httpStatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(fleetCarrierData))
             {
                 FleetCarrier? fleetCarrier = JsonConvert.DeserializeObject<FleetCarrier>(fleetCarrierData);
@@ -130,6 +129,5 @@ namespace EDCApi
             }
             return (false, null);
         }
-        */
     }
 }

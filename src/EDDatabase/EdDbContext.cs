@@ -14,6 +14,7 @@ namespace EDDatabase
         public DbSet<CommanderApiKeyClaim> CommanderApiKeyClaims { get; set; }
         public DbSet<CommanderCargoItem> CommanderCargoItems { get; set; }
         public DbSet<CommanderDeferredJournalEvent> CommanderDeferredJournalEvents { get; set; }
+        public DbSet<CommanderFleetCarrierCargoItem> CommanderFleetCarrierCargoItems { get; set; }
         public DbSet<CommanderJournalProcessedEvent> CommanderJournalProcessedEvents { get; set; }
         public DbSet<CommanderMission> CommanderMissions { get; set; }
         public DbSet<Commodity> Commodities { get; set; }

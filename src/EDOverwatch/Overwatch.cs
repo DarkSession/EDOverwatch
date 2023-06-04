@@ -1,4 +1,5 @@
-﻿using EDUtils;
+﻿using EDDatabase;
+using EDUtils;
 using Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,9 +51,6 @@ namespace EDOverwatch
                 await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
                 await using IProducer starSystemThargoidLevelChangedProducer = await connection.CreateProducerAsync(StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing, cancellationToken);
 
-                _ = StarSystemUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
-                _ = StationUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
-                _ = StarSystemFssSignalsUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
                 _ = ThargoidMaelstromCreatedUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
                 _ = StarSystemThargoidManualUpdateConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
                 _ = UpdateMaelstromTotals(cancellationToken);
@@ -64,130 +62,6 @@ namespace EDOverwatch
             catch (Exception e)
             {
                 Log.LogError(e, "Overwatch exception");
-            }
-        }
-
-        private async Task StarSystemUpdatedEventConsumer(IConnection connection, IProducer starSystemThargoidLevelChangedProducer, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await using IConsumer consumer = await connection.CreateConsumerAsync(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, cancellationToken);
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    try
-                    {
-                        Message message = await consumer.ReceiveAsync(cancellationToken);
-                        await using Transaction transaction = new();
-                        await consumer.AcceptAsync(message, transaction, cancellationToken);
-
-                        string jsonString = message.GetBody<string>();
-                        StarSystemUpdated? starSystemUpdated = JsonConvert.DeserializeObject<StarSystemUpdated>(jsonString);
-                        if (starSystemUpdated != null)
-                        {
-                            using AsyncLockInstance l = await Lock(cancellationToken);
-                            await CheckStarSystem(starSystemUpdated.SystemAddress, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
-                        }
-
-                        await transaction.CommitAsync(cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.LogError(e, "Exception while processing star system updated event");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.LogError(e, "StarSystemUpdatedEventConsumer exception");
-            }
-        }
-
-        private async Task StationUpdatedEventConsumer(IConnection connection, IProducer starSystemThargoidLevelChangedProducer, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await using IConsumer consumer = await connection.CreateConsumerAsync(StationUpdated.QueueName, StationUpdated.Routing, cancellationToken);
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    try
-                    {
-                        Message message = await consumer.ReceiveAsync(cancellationToken);
-                        await using Transaction transaction = new();
-                        await consumer.AcceptAsync(message, transaction, cancellationToken);
-
-                        string jsonString = message.GetBody<string>();
-                        StationUpdated? stationUpdated = JsonConvert.DeserializeObject<StationUpdated>(jsonString);
-                        if (stationUpdated != null)
-                        {
-                            using AsyncLockInstance l = await Lock(cancellationToken);
-                            await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
-                            EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-
-                            Station? station = await dbContext.Stations.FirstOrDefaultAsync(s => s.MarketId == stationUpdated.MarketId, cancellationToken);
-                            if (station?.State == StationState.UnderRepairs && station.Updated > WeeklyTick.GetLastTick())
-                            {
-                                StarSystem? starSystem = await dbContext.StarSystems
-                                    .Include(s => s.ThargoidLevel)
-                                    .ThenInclude(t => t!.Maelstrom)
-                                    .Include(s => s.ThargoidLevel!.CycleEnd)
-                                    .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
-                                    .Include(s => s.ThargoidLevel!.CurrentProgress)
-                                    .FirstOrDefaultAsync(s => s.SystemAddress == stationUpdated.SystemAddress, cancellationToken);
-                                if (starSystem?.ThargoidLevel != null &&
-                                    starSystem.ThargoidLevel.Maelstrom is ThargoidMaelstrom maelstrom &&
-                                    starSystem.ThargoidLevel.State != StarSystemThargoidLevelState.None &&
-                                    starSystem.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery)
-                                {
-                                    await UpdateStarSystemThargoidLevel(starSystem, false, null, TimeSpan.Zero, StarSystemThargoidLevelState.Recovery, maelstrom, dbContext, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
-                                }
-                            }
-                        }
-                        await transaction.CommitAsync(cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.LogError(e, "Exception while processing station update event");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.LogError(e, "StationUpdatedEventConsumer exception");
-            }
-        }
-
-        private async Task StarSystemFssSignalsUpdatedEventConsumer(IConnection connection, IProducer starSystemThargoidLevelChangedProducer, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await using IConsumer consumer = await connection.CreateConsumerAsync(StarSystemFssSignalsUpdated.QueueName, StarSystemFssSignalsUpdated.Routing, cancellationToken);
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    try
-                    {
-                        Message message = await consumer.ReceiveAsync(cancellationToken);
-
-                        await using Transaction transaction = new();
-                        await consumer.AcceptAsync(message, transaction, cancellationToken);
-
-                        string jsonString = message.GetBody<string>();
-                        StarSystemFssSignalsUpdated? starSystemFssSignalsUpdated = JsonConvert.DeserializeObject<StarSystemFssSignalsUpdated>(jsonString);
-                        if (starSystemFssSignalsUpdated != null)
-                        {
-                            using AsyncLockInstance l = await Lock(cancellationToken);
-                            await CheckStarSystem(starSystemFssSignalsUpdated.SystemAddress, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
-                        }
-                        await transaction.CommitAsync(cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.LogError(e, "Exception while processing fss signals updated event");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.LogError(e, "StarSystemFssSignalsUpdatedEventConsumer exception");
             }
         }
 
@@ -213,11 +87,16 @@ namespace EDOverwatch
 
                             ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms
                                 .Include(t => t.StarSystem)
+                                .ThenInclude(s => s!.ThargoidLevel)
                                 .FirstOrDefaultAsync(t => t.Id == thargoidMaelstromCreatedUpdated.Id, cancellationToken);
                             if (maelstrom?.StarSystem != null)
                             {
                                 using AsyncLockInstance l = await Lock(cancellationToken);
-                                await CheckStarSystem(maelstrom.StarSystem.SystemAddress, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
+                                if (maelstrom.StarSystem.ThargoidLevel?.State != StarSystemThargoidLevelState.Maelstrom)
+                                {
+                                    await UpdateStarSystemThargoidLevel(maelstrom.StarSystem, false, null, TimeSpan.Zero, StarSystemThargoidLevelState.Maelstrom, maelstrom, dbContext, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
+                                    await dbContext.SaveChangesAsync(cancellationToken);
+                                }
                             }
                         }
                         await transaction.CommitAsync(cancellationToken);
@@ -315,8 +194,7 @@ namespace EDOverwatch
                             {
                                 bool changed = false;
                                 using AsyncLockInstance l = await Lock(cancellationToken);
-                                (_, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, dbContext, cancellationToken);
-                                if (maelstrom != null)
+                                if (await GetMaelstromForSystem(starSystem, dbContext, cancellationToken) is ThargoidMaelstrom maelstrom)
                                 {
                                     TimeSpan timeLeft = TimeSpan.Zero;
                                     if (starSystemThargoidManualUpdate.DaysLeft is short daysLeft && daysLeft > 0)
@@ -363,47 +241,8 @@ namespace EDOverwatch
             }
         }
 
-        private async Task CheckStarSystem(long systemAddress, IProducer starSystemThargoidLevelChangedProducer, Transaction transaction, CancellationToken cancellationToken)
+        private async Task<ThargoidMaelstrom?> GetMaelstromForSystem(StarSystem starSystem, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
-            EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-            StarSystem? starSystem = await dbContext.StarSystems
-                .Include(s => s.Allegiance)
-                .Include(s => s.ThargoidLevel)
-                .ThenInclude(t => t!.Maelstrom)
-                .Include(s => s.ThargoidLevel!.CycleStart)
-                .Include(s => s.ThargoidLevel!.ManualUpdateCycle)
-                .Include(s => s.ThargoidLevel!.CurrentProgress)
-                .SingleOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
-            if (starSystem != null && starSystem.Updated > WeeklyTick.GetLastTick().AddDays(1))
-            {
-                (StarSystemThargoidLevelState newThargoidLevel, ThargoidMaelstrom? maelstrom) = await AnalyzeThargoidLevelForSystem(starSystem, dbContext, cancellationToken);
-                // If the system is brand new, we might not have all the data yet, so we skip it for now.
-                if (newThargoidLevel == StarSystemThargoidLevelState.None && starSystem.Created > DateTimeOffset.UtcNow.AddHours(-6))
-                {
-                    return;
-                }
-                // Clear cannot jump straight to controlled
-                else if (newThargoidLevel == StarSystemThargoidLevelState.Controlled && starSystem.ThargoidLevel?.State == StarSystemThargoidLevelState.None)
-                {
-                    return;
-                }
-                if (maelstrom != null)
-                {
-                    await UpdateStarSystemThargoidLevel(starSystem, false, null, TimeSpan.Zero, newThargoidLevel, maelstrom, dbContext, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
-                }
-                if (!starSystem.WarRelevantSystem && (starSystem.RefreshedWarRelevantSystem || newThargoidLevel != StarSystemThargoidLevelState.None))
-                {
-                    starSystem.WarRelevantSystem = true;
-                    await dbContext.SaveChangesAsync(cancellationToken);
-                }
-            }
-        }
-
-        private async Task<(StarSystemThargoidLevelState level, ThargoidMaelstrom? maelstrom)> AnalyzeThargoidLevelForSystem(StarSystem starSystem, EdDbContext dbContext, CancellationToken cancellationToken)
-        {
-            StarSystemThargoidLevelState thargoidLevel = StarSystemThargoidLevelState.None;
-            // We check if the system is within range of a Maelstrom
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .Include(t => t.StarSystem)
                 .Where(t =>
@@ -411,36 +250,9 @@ namespace EDOverwatch
                         t.StarSystem!.LocationY >= starSystem.LocationY - MaelstromMaxDistanceLy && t.StarSystem!.LocationY <= starSystem.LocationY + MaelstromMaxDistanceLy &&
                         t.StarSystem!.LocationZ >= starSystem.LocationZ - MaelstromMaxDistanceLy && t.StarSystem!.LocationZ <= starSystem.LocationZ + MaelstromMaxDistanceLy)
                 .ToListAsync(cancellationToken);
-            ThargoidMaelstrom? maelstrom = maelstroms
+            return maelstroms
                 .OrderBy(m => m.StarSystem?.DistanceTo(starSystem) ?? 999)
                 .FirstOrDefault();
-            if (maelstrom != null)
-            {
-                // We ignore everything 24 hours after the last tick since there is too much bad data within those 24 hours
-                // Considering to remove EDDN data to define system Thargoid state entirely
-                DateTimeOffset signalsMaxAge = WeeklyTick.GetLastTick().AddDays(1);
-                IQueryable<StarSystemFssSignal> signalQuery = dbContext.StarSystemFssSignals.Where(s => s.StarSystem == starSystem && s.LastSeen > signalsMaxAge);
-                if (starSystem.Allegiance?.IsThargoid ?? false)
-                {
-                    if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.Maelstrom, cancellationToken))
-                    {
-                        thargoidLevel = StarSystemThargoidLevelState.Maelstrom;
-                    }
-                    else
-                    {
-                        thargoidLevel = StarSystemThargoidLevelState.Controlled;
-                    }
-                }
-                else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.AXCZ, cancellationToken))
-                {
-                    thargoidLevel = StarSystemThargoidLevelState.Invasion;
-                }
-                else if (await signalQuery.AnyAsync(s => s.Type == StarSystemFssSignalType.ThargoidActivity, cancellationToken))
-                {
-                    thargoidLevel = StarSystemThargoidLevelState.Alert;
-                }
-            }
-            return (thargoidLevel, maelstrom);
         }
 
         private async Task<bool> UpdateStarSystemThargoidLevel(
@@ -483,7 +295,7 @@ namespace EDOverwatch
                     }
                 }
 
-                if (isManualUpdate || thargoidLevel == null || thargoidLevel.State < newThargoidLevel)
+                if ((isManualUpdate && thargoidLevel?.State != newThargoidLevel) || thargoidLevel == null || thargoidLevel.State < newThargoidLevel)
                 {
                     if (thargoidLevel != null)
                     {
@@ -548,6 +360,10 @@ namespace EDOverwatch
                 if (isManualUpdate)
                 {
                     thargoidLevel.ManualUpdateCycle = currentThargoidCycle;
+                }
+                if (!starSystem.WarRelevantSystem && (starSystem.RefreshedWarRelevantSystem || newThargoidLevel != StarSystemThargoidLevelState.None))
+                {
+                    starSystem.WarRelevantSystem = true;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
 

@@ -152,11 +152,13 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     changed = true;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
+                /*
                 if (changed)
                 {
                     StationUpdated stationUpdated = new(MarketID, SystemAddress);
                     await journalParameters.SendMqMessage(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, cancellationToken);
                 }
+                */
             }
             journalParameters.Commander.System = starSystem;
             journalParameters.Commander.Station = station;

@@ -11,7 +11,7 @@
             List<StarSystem> starSystems = await dbContext.StarSystems
                 .AsNoTracking()
                 .AsSplitQuery()
-                .Include(s => s.Stations!.Where(s => RelevantAssetTypes.Contains(s.Type!.Name)))
+                .Include(s => s.Stations!.Where(s => StationType.WarRelevantAssetTypes.Contains(s.Type!.Name)))
                 .ThenInclude(s => s.Type)
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.StateExpires)
@@ -73,7 +73,7 @@
                             {
                                 if (s != null)
                                 {
-                                    bool isGroundAsset = GroundAssetTypes.Contains(s.Type!.Name);
+                                    bool isGroundAsset = s.Type?.IsWarGroundAsset ?? false;
                                     double multiplier = 0;
                                     if (s.DistanceFromStarLS <= 2500)
                                     {
@@ -101,7 +101,7 @@
                             {
                                 if (s != null)
                                 {
-                                    bool isGroundAsset = GroundAssetTypes.Contains(s.Type!.Name);
+                                    bool isGroundAsset = s.Type?.IsWarGroundAsset ?? false;
                                     double multiplier = 0;
                                     if (s.DistanceFromStarLS <= 2000)
                                     {
@@ -129,7 +129,7 @@
                             {
                                 if (s != null)
                                 {
-                                    bool isGroundAsset = GroundAssetTypes.Contains(s.Type!.Name);
+                                    bool isGroundAsset = s.Type?.IsWarGroundAsset ?? false;
                                     double multiplier = 0;
                                     if (s.DistanceFromStarLS <= 2000)
                                     {
@@ -164,24 +164,7 @@
             return Math.Pow(A, 1.0 / N);
         }
 
-        private static List<string> RelevantAssetTypes { get; } = new()
-        {
-            "Bernal",
-            "Orbis",
-            "Coriolis",
-            "CraterOutpost",
-            "MegaShip",
-            "Outpost",
-            "CraterPort",
-            "Ocellus",
-            "AsteroidBase",
-        };
 
-        private static List<string> GroundAssetTypes { get; } = new()
-        {
-            "CraterOutpost",
-            "CraterPort",
-        };
     }
 
     public class SystemDefenseScore

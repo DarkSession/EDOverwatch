@@ -27,9 +27,9 @@
             {
                 State = "Unknown";
             }
-            if (station.Body?.Gravity != null)
+            if (station.Body?.Gravity is decimal gravity)
             {
-                Gravity = station.Body.Gravity / 0.980665m;
+                Gravity = Math.Round(gravity / 0.980665m, 4);
             }
             OdysseyOnly = (station.Body?.OdysseyOnly == true);
             if (rescueShips.Any())

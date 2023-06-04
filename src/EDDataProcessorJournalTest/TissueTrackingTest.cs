@@ -12,7 +12,7 @@ namespace EDDataProcessorJournalTest
         {
             string journalFilePath = Path.Join("journals", journalName);
             string journal = await File.ReadAllTextAsync(journalFilePath);
-            Commander commander = new(default, "Test", default, true, default, default, default, default, default, CommanderOAuthStatus.Active, string.Empty, string.Empty, string.Empty);
+            Commander commander = new(default, "Test", default, true, default, default, default, default, default, CommanderOAuthStatus.Active, string.Empty, string.Empty, string.Empty, CommanderFleetHasFleetCarrier.Unknown);
             DbContext.Commanders.Add(commander);
 
             if (!await DbContext.Stations.AnyAsync(s => s.MarketId == 129019263))

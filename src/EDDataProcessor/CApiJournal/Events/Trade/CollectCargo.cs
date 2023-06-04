@@ -32,7 +32,7 @@
                             }
                             break;
                         }
-                    case "ThargoidTissueSampleType1":
+                    case "ThargoidTissueSampleType1 ":
                     case "ThargoidTissueSampleType2":
                     case "ThargoidTissueSampleType3":
                     case "ThargoidTissueSampleType4":
