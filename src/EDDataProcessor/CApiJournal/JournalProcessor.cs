@@ -1,4 +1,5 @@
 ﻿using EDCApi;
+using EDDatabase;
 using EDDataProcessor.CApiJournal.Events;
 using Newtonsoft.Json.Linq;
 using System.Data;
@@ -189,58 +190,51 @@ namespace EDDataProcessor.CApiJournal
                         }
                         else if (fleetCarrier.Cargo != null)
                         {
+                            commander.HasFleetCarrier = CommanderFleetHasFleetCarrier.Yes;
                             List<CommanderFleetCarrierCargoItem> commanderFleetCarrierCargoItems = await dbContext.CommanderFleetCarrierCargoItems
                                 .Where(c => c.Commander == commander)
                                 .Include(c => c.Commodity)
                                 .Include(c => c.SourceStarSystem)
                                 .ToListAsync(cancellationToken);
 
-                            var fleetCarrierCargo = fleetCarrier.Cargo.GroupBy(c => new
+                            IEnumerable<FleetCarrierCargo> fcCargo = fleetCarrier.Cargo.Where(c => !string.IsNullOrEmpty(c.Commodity) && c.OriginSystem != null);
+                            List<StarSystem> sourceSystems;
+                            List<Commodity> commodities;
                             {
-                                c.Commodity,
-                                c.OriginSystem
-                            })
-                                .Select(c => new
+                                List<string> cargoCommodities = fcCargo.Select(c => c.Commodity).Distinct().ToList()!;
+                                commodities = await dbContext.Commodities.Where(c => cargoCommodities.Contains(c.Name)).ToListAsync(cancellationToken);
+
+                                List<long> cargoSystems = fcCargo.Select(c => (long)c.OriginSystem!).Distinct().ToList()!;
+                                sourceSystems = await dbContext.StarSystems.Where(s => cargoSystems.Contains(s.SystemAddress)).ToListAsync(cancellationToken);
+                            }
+
+                            foreach (FleetCarrierCargo fleetCarrierCargoEntry in fcCargo)
+                            {
+                                string? commodityName = fleetCarrierCargoEntry.Commodity?.ToLower();
+                                if (commanderFleetCarrierCargoItems.FirstOrDefault(c =>
+                                    c.Commodity?.Name.ToLower() == commodityName && 
+                                    c.SourceStarSystem?.SystemAddress == fleetCarrierCargoEntry.OriginSystem &&
+                                    c.Amount == fleetCarrierCargoEntry.Qty) is CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem)
                                 {
-                                    c.Key.Commodity,
-                                    c.Key.OriginSystem,
-                                    Total = c.Sum(x => x.Qty),
-                                });
-                            foreach (var fleetCarrierCargoEntry in fleetCarrierCargo)
-                            {
-                                if (string.IsNullOrEmpty(fleetCarrierCargoEntry.Commodity))
+                                    commanderFleetCarrierCargoItems.Remove(commanderFleetCarrierCargoItem);
+                                    continue;
+                                }
+                                StarSystem? starSystem = sourceSystems.FirstOrDefault(s => s.SystemAddress == fleetCarrierCargoEntry.OriginSystem);
+                                Commodity? commodity = commodities.FirstOrDefault(c => c.Name.ToLower() == commodityName);
+                                if (starSystem == null || commodity == null)
                                 {
                                     continue;
                                 }
-                                if (commanderFleetCarrierCargoItems.FirstOrDefault(c => c.Commodity?.Name.ToLower() == fleetCarrierCargoEntry.Commodity.ToLower() && c.SourceStarSystem?.SystemAddress == fleetCarrierCargoEntry.OriginSystem) is CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem)
+
+                                CommanderFleetCarrierCargoItem newCommanderFleetCarrierCargoItem = new(0, fleetCarrierCargoEntry.Qty)
                                 {
-                                    commanderFleetCarrierCargoItem.Amount = fleetCarrierCargoEntry.Total;
-                                    commanderFleetCarrierCargoItems.Remove(commanderFleetCarrierCargoItem);
-                                }
-                                else
-                                {
-                                    StarSystem? starSystem = null;
-                                    if (fleetCarrierCargoEntry.OriginSystem != null)
-                                    {
-                                        starSystem = await dbContext.StarSystems.FirstOrDefaultAsync(s => s.SystemAddress == fleetCarrierCargoEntry.OriginSystem, cancellationToken);
-                                        if (starSystem == null)
-                                        {
-                                            continue;
-                                        }
-                                    }
-                                    CommanderFleetCarrierCargoItem newCommanderFleetCarrierCargoItem = new(0, fleetCarrierCargoEntry.Total)
-                                    {
-                                        SourceStarSystem = starSystem,
-                                        Commander = commander,
-                                        Commodity = await Commodity.GetCommodity(fleetCarrierCargoEntry.Commodity, dbContext, cancellationToken),
-                                    };
-                                    dbContext.CommanderFleetCarrierCargoItems.Add(newCommanderFleetCarrierCargoItem);
-                                }
+                                    SourceStarSystem = starSystem,
+                                    Commander = commander,
+                                    Commodity = commodity,
+                                };
+                                dbContext.CommanderFleetCarrierCargoItems.Add(newCommanderFleetCarrierCargoItem);
                             }
-                            foreach (CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem in commanderFleetCarrierCargoItems)
-                            {
-                                dbContext.CommanderFleetCarrierCargoItems.Remove(commanderFleetCarrierCargoItem);
-                            }
+                            dbContext.CommanderFleetCarrierCargoItems.RemoveRange(commanderFleetCarrierCargoItems);
                         }
                     }
                 }

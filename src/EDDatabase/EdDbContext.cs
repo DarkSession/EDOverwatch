@@ -52,45 +52,9 @@ namespace EDDatabase
 
         public DbSet<WarEffort> WarEfforts { get; set; }
 
-        /*
-        private string ConnectionString { get; }
-
-        public EdDbContext(IConfiguration configuration)
-        {
-            ConnectionString = configuration.GetValue<string>("ConnectionString") ?? string.Empty;
-        }
-
-        internal EdDbContext(string connectionString)
-        {
-            ConnectionString = connectionString;
-        }
-        */
-
         public EdDbContext(DbContextOptions<EdDbContext> options) : base(options)
         {
-            // ConnectionString = string.Empty;
         }
-
-        /*
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseMySql(ConnectionString,
-                    new MariaDbServerVersion(new Version(10, 3, 25)),
-                    options =>
-                    {
-                        options.EnableRetryOnFailure();
-                        options.CommandTimeout(60 * 10 * 1000);
-                    })
-#if DEBUG
-                    .EnableSensitiveDataLogging()
-                    .LogTo(Console.WriteLine)
-#endif
-                    ;
-            }
-        }
-        */
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

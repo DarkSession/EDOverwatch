@@ -77,10 +77,12 @@ namespace EDDatabase
             { WarEffortType.TissueSampleMedusa, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleHydra, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleOrthrus, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleGlaive, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleTitan, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleTitanMaw, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.KillThargoidGlaive, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidRevenant, WarEffortTypeGroup.Kills },
             { WarEffortType.MissionCompletionThargoidControlledSettlementReboot, WarEffortTypeGroup.Mission },
-
         };
     }
 
@@ -163,6 +165,15 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid controlled settlement reboot mission")]
         MissionCompletionThargoidControlledSettlementReboot,
+
+        [EnumMember(Value = "Thargoid Glaive tissue sample collection")]
+        TissueSampleGlaive,
+
+        [EnumMember(Value = "Thargoid Titan tissue sample collection")]
+        TissueSampleTitan,
+
+        [EnumMember(Value = "Thargoid Titan maw sample collection")]
+        TissueSampleTitanMaw,
     }
 
     public enum WarEffortTypeGroup : byte
