@@ -29,7 +29,7 @@
             <table mat-table [dataSource]="cargoEntries" matSort matSortActive="Commodity" matSortDirection="asc"
                 matSortDisableClear>
                 <ng-container matColumnDef="Commodity">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Commodity</th>
                     <td mat-cell *matCellDef="let row">
                         {{ row.Commodity }}
                     </td>
