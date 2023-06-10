@@ -41,5 +41,30 @@
 
         [NotMapped]
         public bool IsFleetCarrier => Name == FleetCarrierStationType;
+
+        [NotMapped]
+        public bool IsWarRelevant => WarRelevantAssetTypes.Contains(Name);
+
+        [NotMapped]
+        public bool IsWarGroundAsset => WarGroundAssetTypes.Contains(Name);
+
+        public static List<string> WarRelevantAssetTypes { get; } = new()
+        {
+            "Bernal",
+            "Orbis",
+            "Coriolis",
+            "CraterOutpost",
+            "MegaShip",
+            "Outpost",
+            "CraterPort",
+            "Ocellus",
+            "AsteroidBase",
+        };
+
+        public static List<string> WarGroundAssetTypes { get; } = new()
+        {
+            "CraterOutpost",
+            "CraterPort",
+        };
     }
 }

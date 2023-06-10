@@ -11,7 +11,7 @@ namespace EDDataProcessor.Inara
         private string BaseUrl { get; }
         private IBrowsingContext IBrowsingContext { get; }
         private Regex PathRegex { get; } = PathRegexGen();
-        private DateTimeOffset LastRequest { get; set; } = DateTimeOffset.Now;
+        private DateTimeOffset LastRequest { get; set; } = DateTimeOffset.UtcNow;
         private int RequestsSent { get; set; }
         private ILogger Log { get; }
         private CookieContainer CookieContainer { get; } = new();
@@ -31,12 +31,12 @@ namespace EDDataProcessor.Inara
                 UseCookies = true,
             };
             HttpClient = new(ClientHandler);
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36");
+            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
             HttpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
             HttpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
             HttpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
             HttpClient.DefaultRequestHeaders.Add("Cache-Control", "max-age=0");
-            HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-CH-UA", @"""Google Chrome"";v=""113"", ""Chromium"";v=""113"", ""Not-A.Brand"";v=""24""");
+            HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-CH-UA", @"""Not.A/Brand"";v=""8"", ""Chromium"";v=""114"", ""Google Chrome"";v=""114""");
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-CH-UA-Platform", @"""Windows""");
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-CH-UA-Mobile", "?0");
             HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Sec-Fetch-Dest", "document");
@@ -233,14 +233,14 @@ namespace EDDataProcessor.Inara
         {
             Random rnd = new();
             int d = rnd.Next(30, 60);
-            TimeSpan nextRequestWait = LastRequest.AddSeconds(d) - DateTimeOffset.Now;
+            TimeSpan nextRequestWait = LastRequest.AddSeconds(d) - DateTimeOffset.UtcNow;
             if (nextRequestWait.TotalMilliseconds > 0)
             {
                 await Task.Delay(nextRequestWait);
             }
             using HttpResponseMessage response = await HttpClient.GetAsync(BaseUrl + path);
             RequestsSent++;
-            LastRequest = DateTimeOffset.Now;
+            LastRequest = DateTimeOffset.UtcNow;
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();

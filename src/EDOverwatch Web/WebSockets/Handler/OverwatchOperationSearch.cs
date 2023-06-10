@@ -32,10 +32,6 @@ namespace EDOverwatch_Web.WebSockets.Handler
             }
         }
 
-        public OverwatchOperationSearch()
-        {
-        }
-
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms

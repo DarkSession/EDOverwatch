@@ -4,10 +4,6 @@
     {
         protected override Type? MessageDataType => null;
 
-        public CommanderApiKeys()
-        {
-        }
-
         class CommanderApiKeysResponse
         {
             public Guid? ApiKey { get; }

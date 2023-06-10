@@ -4,10 +4,6 @@
     {
         protected override Type? MessageDataType => typeof(CommanderApiKeyClaimRequest);
 
-        public CommanderApiKeyClaim()
-        {
-        }
-
         class CommanderApiKeyClaimRequest
         {
             public string Key { get; set; }

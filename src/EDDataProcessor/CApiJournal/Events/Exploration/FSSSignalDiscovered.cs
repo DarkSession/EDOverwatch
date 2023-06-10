@@ -61,11 +61,13 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
                                 changed = true;
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);
+                            /*
                             if (changed)
                             {
                                 StationUpdated stationUpdated = new(station.MarketId, SystemAddress);
                                 await journalParameters.SendMqMessage(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, cancellationToken);
                             }
+                            */
                         }
                     }
                 }
@@ -141,11 +143,13 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
                 starSystemSignalsUpdated.Add(starSystem.SystemAddress);
             }
 
+            /*
             if (starSystemSignalsUpdated.Any())
             {
                 StarSystemFssSignalsUpdated starSystemFssSignalsUpdated = new(SystemAddress);
                 await journalParameters.SendMqMessage(StarSystemFssSignalsUpdated.QueueName, StarSystemFssSignalsUpdated.Routing, starSystemFssSignalsUpdated.Message, cancellationToken);
             }
+            */
         }
 
         [GeneratedRegex("^(.*?) ([A-Z0-9]{3}\\-[A-Z0-9]{3})$", RegexOptions.IgnoreCase)]

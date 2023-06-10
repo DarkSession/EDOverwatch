@@ -62,7 +62,7 @@ namespace EDOverwatch_Web.Controllers.V1
                         d.Type == model.Type, cancellationToken);
             if (dcohFactionOperation == null)
             {
-                dcohFactionOperation = new(0, model.Type, DcohFactionOperationStatus.Active, DateTimeOffset.Now, null)
+                dcohFactionOperation = new(0, model.Type, DcohFactionOperationStatus.Active, DateTimeOffset.UtcNow, null)
                 {
                     StarSystem = starSystem,
                     Faction = faction,

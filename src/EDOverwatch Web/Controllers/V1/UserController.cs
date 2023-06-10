@@ -30,8 +30,7 @@ namespace EDOverwatch_Web.Controllers.V1
             EdDbContext dbContext,
             FDevOAuth fDevOAuth,
             ActiveMqMessageProducer producer,
-            WebSocketServer webSocketServer
-            )
+            WebSocketServer webSocketServer)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -83,11 +82,12 @@ namespace EDOverwatch_Web.Controllers.V1
                             DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).Date),
                             0,
                             DateTimeOffset.UtcNow.AddDays(-14).Date,
-                            DateTimeOffset.Now,
+                            DateTimeOffset.UtcNow,
                             CommanderOAuthStatus.Inactive,
                             string.Empty,
                             string.Empty,
-                            string.Empty)
+                            string.Empty,
+                            CommanderFleetHasFleetCarrier.Unknown)
                 {
                     User = user
                 };
@@ -145,11 +145,12 @@ namespace EDOverwatch_Web.Controllers.V1
                             DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).Date),
                             0,
                             DateTimeOffset.UtcNow.AddDays(-14).Date,
-                            DateTimeOffset.Now,
+                            DateTimeOffset.UtcNow,
                             CommanderOAuthStatus.Active,
                             oAuthenticationResult.Credentials.AccessToken,
                             oAuthenticationResult.Credentials.RefreshToken,
-                            oAuthenticationResult.Credentials.TokenType)
+                            oAuthenticationResult.Credentials.TokenType,
+                            CommanderFleetHasFleetCarrier.Unknown)
                         {
                             User = user
                         };
@@ -193,7 +194,7 @@ namespace EDOverwatch_Web.Controllers.V1
         public async Task<ActionResult<OAuthGetStateResponse>> OAuthGetUrl(CancellationToken cancellationToken)
         {
             OAuthAuthorizeUrl oAuthAuthorizeUrl = FDevOAuth.CreateAuthorizeUrl();
-            DbContext.OAuthCodes.Add(new(oAuthAuthorizeUrl.State, oAuthAuthorizeUrl.CodeVerifier, DateTimeOffset.Now));
+            DbContext.OAuthCodes.Add(new(oAuthAuthorizeUrl.State, oAuthAuthorizeUrl.CodeVerifier, DateTimeOffset.UtcNow));
             await DbContext.SaveChangesAsync(cancellationToken);
             return new OAuthGetStateResponse(oAuthAuthorizeUrl.Url);
         }

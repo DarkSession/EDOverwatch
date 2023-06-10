@@ -9,10 +9,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Include="..\EDCApi\edcapi.json" Link="edcapi.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="ArtemisNetClient" Version="2.12.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
@@ -24,7 +20,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="NetMQ" Version="4.0.1.11" />
+		<PackageReference Include="NetMQ" Version="4.0.1.12" />
 		<PackageReference Include="SharpZipLib" Version="1.4.2" />
 	</ItemGroup>
 

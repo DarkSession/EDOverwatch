@@ -15,22 +15,26 @@
   <ItemGroup>
     <PackageReference Include="ArtemisNetClient.Extensions.DependencyInjection" Version="2.12.0" />
     <PackageReference Include="ArtemisNetClient.Extensions.Hosting" Version="2.12.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4">
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NJsonSchema" Version="10.8.0" />
+    <PackageReference Include="NJsonSchema" Version="10.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="WebSockets\Actions\**" />
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="WebSockets\Actions\**" />
+    <EmbeddedResource Remove="WebSockets\Actions\**" />
     <None Remove="$(SpaRoot)**" />
+    <None Remove="WebSockets\Actions\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
@@ -39,10 +43,6 @@
     <ProjectReference Include="..\EDDatabase\EDDatabase.csproj" />
     <ProjectReference Include="..\EDUtils\EDUtils.csproj" />
     <ProjectReference Include="..\Messages\Messages.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="WebSockets\Actions\" />
   </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

@@ -81,11 +81,13 @@ namespace EDDataProcessor.EDDN
                                     changed = true;
                                 }
                                 await dbContext.SaveChangesAsync(cancellationToken);
+                                /*
                                 if (changed)
                                 {
                                     StationUpdated stationUpdated = new(station.MarketId, Message.SystemAddress);
                                     await activeMqProducer.SendAsync(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, activeMqTransaction, cancellationToken);
                                 }
+                                */
                             }
                         }
                     }
@@ -161,11 +163,13 @@ namespace EDDataProcessor.EDDN
                     starSystemSignalsUpdated.Add(starSystem.SystemAddress);
                 }
             }
+            /*
             if (starSystemSignalsUpdated.Any())
             {
                 StarSystemFssSignalsUpdated starSystemFssSignalsUpdated = new(Message.SystemAddress);
                 await activeMqProducer.SendAsync(StarSystemFssSignalsUpdated.QueueName, StarSystemFssSignalsUpdated.Routing, starSystemFssSignalsUpdated.Message, activeMqTransaction, cancellationToken);
             }
+            */
         }
     }
 

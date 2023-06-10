@@ -142,7 +142,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     foreach (StarSystemUpdateQueueItem starSystemUpdateQueueItem in starSystemUpdateQueueItems)
                     {
                         starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.PendingNotification;
-                        starSystemUpdateQueueItem.Completed = DateTimeOffset.Now;
+                        starSystemUpdateQueueItem.Completed = DateTimeOffset.UtcNow;
                         starSystemUpdateQueueItem.Result = StarSystemUpdateQueueItemResult.NotUpdated;
                         starSystemUpdateQueueItem.ResultBy = StarSystemUpdateQueueItemResultBy.Automatic;
 

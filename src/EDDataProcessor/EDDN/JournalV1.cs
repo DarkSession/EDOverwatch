@@ -320,11 +320,13 @@ namespace EDDataProcessor.EDDN
                                 station.MinorFaction = await MinorFaction.GetByName(Message.StationFaction.Name, dbContext, cancellationToken);
                             }
                             await dbContext.SaveChangesAsync(cancellationToken);
+                            /*
                             if (changed)
                             {
                                 StationUpdated stationUpdated = new(Message.MarketID, Message.SystemAddress);
                                 await activeMqProducer.SendAsync(StationUpdated.QueueName, StationUpdated.Routing, stationUpdated.Message, activeMqTransaction, cancellationToken);
                             }
+                            */
                         }
                         break;
                     }

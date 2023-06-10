@@ -1,6 +1,6 @@
 ﻿namespace EDOverwatch_Web.WebSockets.Handler
 {
-    public class CommanderMe : WebSocketHandler
+    public class CommanderFleetCarrierCargo : WebSocketHandler
     {
         protected override Type? MessageDataType => null;
 
@@ -17,7 +17,8 @@
             {
                 throw new Exception("commander is null");
             }
-            return new WebSocketHandlerResultSuccess(new Models.User(user.Commander), null);
+
+            return new WebSocketHandlerResultSuccess(Models.CommanderFleetCarrierCargo.Create(dbContext, user.Commander, cancellationToken), null);
         }
     }
 }
