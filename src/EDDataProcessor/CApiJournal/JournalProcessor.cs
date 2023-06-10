@@ -204,7 +204,19 @@ namespace EDDataProcessor.CApiJournal
                                 .Include(c => c.SourceStarSystem)
                                 .ToListAsync(cancellationToken);
 
-                            IEnumerable<FleetCarrierCargo> fcCargo = fleetCarrier.Cargo.Where(c => !string.IsNullOrEmpty(c.Commodity) && c.OriginSystem != null);
+                            int stackNumber = 0;
+
+                            var fcCargo = fleetCarrier.Cargo
+                                .Select(c => new
+                                {
+                                    StackNumber = stackNumber++,
+                                    c.Commodity,
+                                    c.OriginSystem,
+                                    c.Qty,
+                                })
+                                .Where(c => !string.IsNullOrEmpty(c.Commodity) && c.OriginSystem != null)
+                                .ToList();
+
                             List<StarSystem> sourceSystems;
                             List<Commodity> commodities;
                             {
@@ -215,7 +227,7 @@ namespace EDDataProcessor.CApiJournal
                                 sourceSystems = await dbContext.StarSystems.Where(s => cargoSystems.Contains(s.SystemAddress)).ToListAsync(cancellationToken);
                             }
 
-                            foreach (FleetCarrierCargo fleetCarrierCargoEntry in fcCargo)
+                            foreach (var fleetCarrierCargoEntry in fcCargo)
                             {
                                 string? commodityName = fleetCarrierCargoEntry.Commodity?.ToLower();
                                 if (commanderFleetCarrierCargoItems.FirstOrDefault(c =>
@@ -223,6 +235,11 @@ namespace EDDataProcessor.CApiJournal
                                     c.SourceStarSystem?.SystemAddress == fleetCarrierCargoEntry.OriginSystem &&
                                     c.Amount == fleetCarrierCargoEntry.Qty) is CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem)
                                 {
+                                    commanderFleetCarrierCargoItem.StackNumber = fleetCarrierCargoEntry.StackNumber;
+                                    if (commanderFleetCarrierCargoItem.CreatedUpdated == default)
+                                    {
+                                        commanderFleetCarrierCargoItem.CreatedUpdated = DateTimeOffset.UtcNow;
+                                    }
                                     commanderFleetCarrierCargoItems.Remove(commanderFleetCarrierCargoItem);
                                     continue;
                                 }
@@ -233,7 +250,7 @@ namespace EDDataProcessor.CApiJournal
                                     continue;
                                 }
 
-                                CommanderFleetCarrierCargoItem newCommanderFleetCarrierCargoItem = new(0, fleetCarrierCargoEntry.Qty)
+                                CommanderFleetCarrierCargoItem newCommanderFleetCarrierCargoItem = new(0, fleetCarrierCargoEntry.Qty, fleetCarrierCargoEntry.StackNumber, DateTimeOffset.UtcNow)
                                 {
                                     SourceStarSystem = starSystem,
                                     Commander = commander,

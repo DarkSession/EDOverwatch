@@ -39,9 +39,10 @@ export class SystemListComponent implements OnInit, OnChanges {
   @Input() optionalColumns: string[] = [];
   public pageSize: number = 50;
   public dataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
-  public sortColumn: string = "FactionOperations";
+  public sortColumn: string = "Progress";
   public sortDirection: SortDirection = "desc";
-  public progressShowPercentage = false;
+  public progressShowPercentage = true;
+  public filterApplied = false;
 
   public constructor(
     private readonly appService: AppService,
@@ -62,7 +63,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   private async updateSettings(): Promise<void> {
     const sort = await this.appService.getTableSort("SystemList", this.sortColumn, this.sortDirection);
     const pageSizeSetting = await this.appService.getSetting("SystemListPageSize");
-    this.progressShowPercentage = (await this.appService.getSetting("SystemListProgressShowPercentage") === "1");
+    this.progressShowPercentage = !(await this.appService.getSetting("SystemListProgressShowPercentage") === "0");
     this.sortColumn = sort.Column;
     this.sortDirection = sort.Direction;
     if (pageSizeSetting) {
@@ -99,6 +100,7 @@ export class SystemListComponent implements OnInit, OnChanges {
       (systemNameFilter === "" || d.Name.toUpperCase().includes(systemNameFilter)) &&
       (d.PopulationOriginal > 0 || !this.hideUnpopulated) &&
       (d.Progress !== 100 || !this.hideCompleted));
+    this.filterApplied = data.length < this.systems.length;
     if (this.sort?.active) {
       data = this.dataSource.sortData(data, this.sort);
     }
@@ -149,9 +151,10 @@ export class SystemListComponent implements OnInit, OnChanges {
     this.appService.saveSetting("SystemListProgressShowPercentage", this.progressShowPercentage ? "1" : "0");
   }
 
-  public exportToCsv(): void {
+  public exportToCsv(all: boolean): void {
     const data = [];
-    for (const system of this.systems) {
+    const systems = all ? this.systems : this.dataSource.data;
+    for (const system of systems) {
       data.push({
         Name: system.Name,
         SystemAddress: system.SystemAddress,

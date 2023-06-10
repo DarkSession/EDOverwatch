@@ -20,6 +20,9 @@
         {
             Commander commander = await dbContext.Commanders.FindAsync(commanderId, cancellationToken) ?? throw new Exception("Invalid commander");
             List<CommanderFleetCarrierCargoItem> fleetCarrierCargoItems = await dbContext.CommanderFleetCarrierCargoItems
+                .AsNoTracking()
+                .Include(c => c.Commodity)
+                .Include(c => c.SourceStarSystem)
                 .Where(c => c.Commander == commander)
                 .ToListAsync(cancellationToken);
 
@@ -33,6 +36,8 @@
         public string Commodity { get; }
         public OverwatchStarSystemMin StarSystem { get; }
         public int Quantity { get; set; }
+        public int StackNumber { get; }
+        public DateTimeOffset Changed { get; }
 
         public CommanderFleetCarrierCargoEntry(CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem)
         {
@@ -43,6 +48,8 @@
             Commodity = commanderFleetCarrierCargoItem.Commodity.NameEnglish ?? "Localisation missing: " + commanderFleetCarrierCargoItem.Commodity.Name;
             StarSystem = new(commanderFleetCarrierCargoItem.SourceStarSystem ?? throw new Exception("SourceStarSystem cannot be null"));
             Quantity = commanderFleetCarrierCargoItem.Amount;
+            StackNumber = commanderFleetCarrierCargoItem.StackNumber;
+            Changed = commanderFleetCarrierCargoItem.CreatedUpdated;
         }
     }
 }

@@ -3,3 +3,13 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.thead {
+    background-color: #272727;
+}
+
+.options-right {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}

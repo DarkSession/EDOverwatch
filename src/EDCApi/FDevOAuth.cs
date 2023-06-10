@@ -120,7 +120,7 @@ namespace EDCApi
             }, cancellationToken);
             if (!response.IsError)
             {
-                oAuthCredentials.TokenUpdated(response.AccessToken, response.RefreshToken);
+                oAuthCredentials.TokenUpdated(response.AccessToken ?? string.Empty, response.RefreshToken ?? string.Empty);
                 return true;
             }
             oAuthCredentials.TokenUpdateFailed();
@@ -140,7 +140,7 @@ namespace EDCApi
             TokenResponse = tokenResponse;
             UserInfoResponse = userInfoResponse;
             CustomerId = customerId;
-            Credentials = new(tokenResponse.TokenType, tokenResponse.AccessToken, tokenResponse.RefreshToken);
+            Credentials = new(tokenResponse.TokenType ?? string.Empty, tokenResponse.AccessToken ?? string.Empty, tokenResponse.RefreshToken ?? string.Empty);
         }
     }
 

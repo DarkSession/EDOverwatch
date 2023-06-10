@@ -18,7 +18,7 @@
                 throw new Exception("commander is null");
             }
 
-            return new WebSocketHandlerResultSuccess(Models.CommanderFleetCarrierCargo.Create(dbContext, user.Commander, cancellationToken), null);
+            return new WebSocketHandlerResultSuccess(await Models.CommanderFleetCarrierCargo.Create(dbContext, user.Commander, cancellationToken), null);
         }
     }
 }

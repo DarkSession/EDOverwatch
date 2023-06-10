@@ -1,7 +1,7 @@
 <div class="overwatch-content-container">
     <div class="overwatch-content-large">
         <div class="title">
-            My contributions
+            My Contributions
         </div>
         <div class="content-box">
             <div class="chart-container">
@@ -38,7 +38,7 @@
                         {{ row.Amount }}
                     </td>
                 </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
             <div *ngIf="dataSource.data.length === 0" class="empty-table">

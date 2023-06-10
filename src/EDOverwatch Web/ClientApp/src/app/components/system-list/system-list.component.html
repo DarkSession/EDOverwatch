@@ -140,10 +140,21 @@
         <mat-paginator [pageSizeOptions]="[25, 50, 100]" [pageSize]="pageSize" [showFirstLastButtons]="true"
             (page)="handlePageEvent($event)" aria-label="Select page of systems"></mat-paginator>
     </div>
-    <div class="options-bottom">
-        <span (click)="exportToCsv()" class="clickable">
+    <div class="options-bottom" *ngIf="!filterApplied">
+        <span (click)="exportToCsv(true)" class="clickable">
             <fa-icon [icon]="faFileCsv"></fa-icon>
             Export as CSV
+        </span>
+    </div>
+    <div class="options-bottom" *ngIf="filterApplied">
+        <span (click)="exportToCsv(true)" class="clickable">
+            <fa-icon [icon]="faFileCsv"></fa-icon>
+            Export all as CSV
+        </span>
+        <br>
+        <span (click)="exportToCsv(false)" class="clickable">
+            <fa-icon [icon]="faFileCsv"></fa-icon>
+            Export current view as CSV
         </span>
     </div>
 </div>

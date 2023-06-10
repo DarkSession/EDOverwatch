@@ -1,17 +1,33 @@
 <div class="overwatch-content-container">
     <div class="overwatch-content-large">
         <div class="title">
-            Fleet carrier cargo
+            Fleet Carrier Cargo Origin
         </div>
-        <div lass="content-box" *ngIf="fleetCarrierCargo && !fleetCarrierCargo.HasFleetCarrier">
-            You don't seem to have a fleet carrier.
-        </div>
-        <div class="content-box" *ngIf="fleetCarrierCargo">
-            <div>
-                Last imported from Frontier servers: {{ fleetCarrierCargo.LastUpdated | date }}
+        <div class="content-box">
+            <ng-container *ngIf="fleetCarrierCargo">
+                <div>
+                    Last import from Frontier servers: {{ fleetCarrierCargo.LastUpdated | timeago:true }}
+                </div>
+                <br>
+                <div *ngIf="fleetCarrierCargo.HasFleetCarrier">
+                    <b>Important!</b><br>
+                    This is not a comprehensive overview of your fleet carrier cargo storage.
+                    Only commodities which have an explicit origin in your fleet carrier cargo hold are shown.
+                    <br>
+                    While your fleet carrier cargo has been imported about
+                    {{ fleetCarrierCargo.LastUpdated | timeago:true }} from Frontier servers,
+                    the data received from their servers might lag behind. If you are missing something, wait 30 - 60
+                    minutes and it should appear.
+                    <br>
+                </div>
+            </ng-container>
+            <div *ngIf="fleetCarrierCargo?.HasFleetCarrier" class="options-right">
+                <mat-slide-toggle [(ngModel)]="showDetailedStacks" (ngModelChange)="detailedStacksToggle()">
+                    Show detailed cargo stacks
+                </mat-slide-toggle>
             </div>
-            <table *ngIf="cargoEntries" mat-table [dataSource]="cargoEntries" matSort matSortActive="Commodity"
-                matSortDirection="asc" matSortDisableClear>
+            <table mat-table [dataSource]="cargoEntries" matSort matSortActive="Commodity" matSortDirection="asc"
+                matSortDisableClear>
                 <ng-container matColumnDef="Commodity">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
                     <td mat-cell *matCellDef="let row">
@@ -19,7 +35,7 @@
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="SystemName">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Origin</th>
                     <td mat-cell *matCellDef="let row">
                         <span class="clickable" [routerLink]="['/system', row.StarSystem.SystemAddress]">
                             {{ row.StarSystem.Name }}
@@ -32,22 +48,36 @@
                         {{ row.Quantity }}
                     </td>
                 </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <ng-container matColumnDef="StackNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Stack Number</th>
+                    <td mat-cell *matCellDef="let row">
+                        {{ row.StackNumber }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="Changed">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Last observed change</th>
+                    <td mat-cell *matCellDef="let row">
+                        {{ row.Changed | date: 'medium' }}
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
             <div *ngIf="!cargoEntries || cargoEntries.data.length === 0" class="empty-table">
                 No records found.
             </div>
+            <div *ngIf="fleetCarrierCargo && !fleetCarrierCargo.HasFleetCarrier" class="empty-table">
+                You don't seem to own a fleet carrier.
+            </div>
             <mat-paginator [pageSizeOptions]="[25, 50, 100]" [pageSize]="pageSize" [showFirstLastButtons]="true"
                 aria-label="Select page"></mat-paginator>
-            <!--
-                <div class="options-bottom">
+            <br>
+            <div class="options-bottom">
                 <span (click)="exportToCsv()" class="clickable">
                     <fa-icon [icon]="faFileCsv"></fa-icon>
                     Export as CSV
                 </span>
             </div>
-            -->
         </div>
     </div>
 </div>

@@ -70,6 +70,7 @@ import * as duration from 'dayjs/plugin/duration';
 import * as utc from 'dayjs/plugin/utc';
 import * as dayjs from 'dayjs';
 import { CommanderFcCargoComponent } from './components/commander-fc-cargo/commander-fc-cargo.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
@@ -143,6 +144,7 @@ export const httpInterceptorProviders = [
     MatPaginatorModule,
     MatCheckboxModule,
     MatMenuModule,
+    MatSlideToggleModule,
     RouterModule.forRoot([
       {
         path: 'about',

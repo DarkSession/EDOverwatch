@@ -61,9 +61,6 @@
       <div>
         <div routerLink="systems" class="clickable">Systems</div>
       </div>
-      <div *ngIf="appService.user">
-        <div routerLink="my-efforts" class="clickable">My war contributions</div>
-      </div>
       <div>
         <div routerLink="contribute" class="clickable">Contribute</div>
       </div>
@@ -73,6 +70,15 @@
       <div>
         <div routerLink="stats" class="clickable">Stats</div>
       </div>
+      <ng-container *ngIf="appService.user">
+        <hr>
+        <div>
+          <div routerLink="my-efforts" class="clickable">My war contributions</div>
+        </div>
+        <div>
+          <div routerLink="commander/fleet-carrier-cargo" class="clickable">Fleet carrier cargo</div>
+        </div>
+      </ng-container>
       <hr>
       <div class="hide-on-mobile">
         <div>
