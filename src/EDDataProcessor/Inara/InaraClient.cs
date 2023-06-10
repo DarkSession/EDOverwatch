@@ -11,7 +11,7 @@ namespace EDDataProcessor.Inara
         private string BaseUrl { get; }
         private IBrowsingContext IBrowsingContext { get; }
         private Regex PathRegex { get; } = PathRegexGen();
-        private DateTimeOffset LastRequest { get; set; } = DateTimeOffset.Now;
+        private DateTimeOffset LastRequest { get; set; } = DateTimeOffset.UtcNow;
         private int RequestsSent { get; set; }
         private ILogger Log { get; }
         private CookieContainer CookieContainer { get; } = new();
@@ -233,14 +233,14 @@ namespace EDDataProcessor.Inara
         {
             Random rnd = new();
             int d = rnd.Next(30, 60);
-            TimeSpan nextRequestWait = LastRequest.AddSeconds(d) - DateTimeOffset.Now;
+            TimeSpan nextRequestWait = LastRequest.AddSeconds(d) - DateTimeOffset.UtcNow;
             if (nextRequestWait.TotalMilliseconds > 0)
             {
                 await Task.Delay(nextRequestWait);
             }
             using HttpResponseMessage response = await HttpClient.GetAsync(BaseUrl + path);
             RequestsSent++;
-            LastRequest = DateTimeOffset.Now;
+            LastRequest = DateTimeOffset.UtcNow;
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();

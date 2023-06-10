@@ -4,10 +4,6 @@
     {
         protected override Type? MessageDataType => null;
 
-        public CommanderApiKeyGenerate()
-        {
-        }
-
         class CommanderApiKeyGenerateResponse
         {
             public Guid ApiKey { get; }
@@ -35,7 +31,7 @@
             }
             if (user.Commander.ApiKey == null)
             {
-                user.Commander.ApiKey = new(0, Guid.NewGuid(), DateTimeOffset.Now, CommanderApiKeyStatus.Active);
+                user.Commander.ApiKey = new(0, Guid.NewGuid(), DateTimeOffset.UtcNow, CommanderApiKeyStatus.Active);
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
 

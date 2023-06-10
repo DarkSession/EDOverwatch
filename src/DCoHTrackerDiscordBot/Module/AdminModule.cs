@@ -77,7 +77,7 @@ namespace DCoHTrackerDiscordBot.Module
                 return;
             }
 
-            DcohFactionOperation factionOperation = new(0, type, DcohFactionOperationStatus.Active, DateTimeOffset.Now, null)
+            DcohFactionOperation factionOperation = new(0, type, DcohFactionOperationStatus.Active, DateTimeOffset.UtcNow, null)
             {
                 CreatedBy = null,
                 StarSystem = starSystem,

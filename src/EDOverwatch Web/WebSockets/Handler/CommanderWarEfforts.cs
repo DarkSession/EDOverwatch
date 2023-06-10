@@ -6,10 +6,6 @@ namespace EDOverwatch_Web.WebSockets.Handler
     {
         protected override Type? MessageDataType => null;
 
-        public CommanderWarEffortsV2()
-        {
-        }
-
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             if (user is null)

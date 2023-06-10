@@ -52,6 +52,7 @@ namespace EDDataProcessor.Journal
                         StateExpires = null, // tbd
                     };
                     changed = true;
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 if (currentState != StarSystemThargoidLevelState.None && (starSystem.ThargoidLevel.Progress == null || fsdJumpThargoidWar.WarProgressInternal >= starSystem.ThargoidLevel.Progress))
                 {

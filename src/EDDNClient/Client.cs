@@ -11,7 +11,7 @@ namespace EDDNClient
     {
         private IConfiguration Configuration { get; }
         private ILogger Log { get; }
-        public DateTimeOffset LastMessageReceived { get; private set; } = DateTimeOffset.Now;
+        public DateTimeOffset LastMessageReceived { get; private set; } = DateTimeOffset.UtcNow;
 
         public Client(IConfiguration configuration, ILogger<Client> log)
         {
@@ -57,7 +57,7 @@ namespace EDDNClient
                 try
                 {
                     (byte[] bytes, _) = await client.ReceiveFrameBytesAsync(cancellationToken);
-                    LastMessageReceived = DateTimeOffset.Now;
+                    LastMessageReceived = DateTimeOffset.UtcNow;
                     await using MemoryStream ms = new(bytes);
                     await using InflaterInputStream inputStream = new(ms);
                     await using MemoryStream outputStream = new();

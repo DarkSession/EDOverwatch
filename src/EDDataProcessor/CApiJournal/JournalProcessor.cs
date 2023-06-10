@@ -1,5 +1,4 @@
 ﻿using EDCApi;
-using EDDatabase;
 using EDDataProcessor.CApiJournal.Events;
 using Newtonsoft.Json.Linq;
 using System.Data;
@@ -181,14 +180,22 @@ namespace EDDataProcessor.CApiJournal
 
                 if (commander.HasFleetCarrier != CommanderFleetHasFleetCarrier.No)
                 {
-                    (bool success, FleetCarrier? fleetCarrier) = await capi.GetFleetCarrier(oAuthCredentials, cancellationToken);
+                    (bool success, bool hasFleetCarrier, FleetCarrier? fleetCarrier) = await capi.GetFleetCarrier(oAuthCredentials, cancellationToken);
                     if (success)
                     {
-                        if (fleetCarrier == null)
+                        if (!hasFleetCarrier)
                         {
                             commander.HasFleetCarrier = CommanderFleetHasFleetCarrier.No;
                         }
-                        else if (fleetCarrier.Cargo != null)
+                        else if (fleetCarrier == null)
+                        {
+                            Log.LogWarning("GetFleetCarrier returned successful but fleet carrier is NULL");
+                        }
+                        else if (fleetCarrier.Cargo == null)
+                        {
+                            Log.LogWarning("GetFleetCarrier returned a fleet carrier but cargo is NULL");
+                        }
+                        else
                         {
                             commander.HasFleetCarrier = CommanderFleetHasFleetCarrier.Yes;
                             List<CommanderFleetCarrierCargoItem> commanderFleetCarrierCargoItems = await dbContext.CommanderFleetCarrierCargoItems
@@ -237,15 +244,19 @@ namespace EDDataProcessor.CApiJournal
                             dbContext.CommanderFleetCarrierCargoItems.RemoveRange(commanderFleetCarrierCargoItems);
                         }
                     }
+                    else
+                    {
+                        Log.LogWarning("GetFleetCarrier request failed.");
+                    }
                 }
-                commander.JournalLastProcessed = DateTimeOffset.Now;
+                commander.JournalLastProcessed = DateTimeOffset.UtcNow;
 
                 CommanderUpdated commanderUpdated = new(commander.FDevCustomerId);
                 await activeMqProducer.SendAsync(CommanderUpdated.QueueName, CommanderUpdated.Routing, commanderUpdated.Message, activeMqTransaction, cancellationToken);
             }
             else
             {
-                commander.JournalLastProcessed = DateTimeOffset.Now;
+                commander.JournalLastProcessed = DateTimeOffset.UtcNow;
             }
             if (oAuthCredentials.Status == OAuthCredentialsStatus.Expired)
             {

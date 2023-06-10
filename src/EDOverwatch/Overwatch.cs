@@ -216,7 +216,7 @@ namespace EDOverwatch
                                 foreach (StarSystemUpdateQueueItem starSystemUpdateQueueItem in starSystemUpdateQueueItems)
                                 {
                                     starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.PendingNotification;
-                                    starSystemUpdateQueueItem.Completed = DateTimeOffset.Now;
+                                    starSystemUpdateQueueItem.Completed = DateTimeOffset.UtcNow;
                                     starSystemUpdateQueueItem.Result = changed ? StarSystemUpdateQueueItemResult.Updated : StarSystemUpdateQueueItemResult.NotUpdated;
                                     starSystemUpdateQueueItem.ResultBy = StarSystemUpdateQueueItemResultBy.Automatic;
 

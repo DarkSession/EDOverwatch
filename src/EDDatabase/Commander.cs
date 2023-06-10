@@ -59,7 +59,7 @@
         public CommanderFleetHasFleetCarrier HasFleetCarrier { get; set; }
 
         [NotMapped]
-        public bool CanProcessCApiJournal => OAuthStatus == CommanderOAuthStatus.Active && JournalLastProcessed < DateTimeOffset.Now.AddMinutes(-5);
+        public bool CanProcessCApiJournal => OAuthStatus == CommanderOAuthStatus.Active && JournalLastProcessed < DateTimeOffset.UtcNow.AddMinutes(-5);
 
         public IEnumerable<CommanderApiKeyClaim>? ApiKeyClaims { get; set; }
 

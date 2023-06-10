@@ -132,7 +132,7 @@ namespace DCoHTrackerDiscordBot.Module
                 return;
             }
 
-            DcohFactionOperation factionOperation = new(0, type, DcohFactionOperationStatus.Active, DateTimeOffset.Now, meetingPoint)
+            DcohFactionOperation factionOperation = new(0, type, DcohFactionOperationStatus.Active, DateTimeOffset.UtcNow, meetingPoint)
             {
                 CreatedBy = user,
                 StarSystem = starSystem,
@@ -352,7 +352,7 @@ namespace DCoHTrackerDiscordBot.Module
                 return (false, $"System **{Format.Sanitize(starSystem.Name)}** has already been requested and is still pending.");
             }
 
-            StarSystemUpdateQueueItem starSystemUpdateQueueItem = new(default, discordUserId, discordChannelId, StarSystemUpdateQueueItemStatus.PendingAutomaticReview, StarSystemUpdateQueueItemResult.Pending, default, DateTimeOffset.Now, null)
+            StarSystemUpdateQueueItem starSystemUpdateQueueItem = new(default, discordUserId, discordChannelId, StarSystemUpdateQueueItemStatus.PendingAutomaticReview, StarSystemUpdateQueueItemResult.Pending, default, DateTimeOffset.UtcNow, null)
             {
                 StarSystem = starSystem,
             };
@@ -361,7 +361,7 @@ namespace DCoHTrackerDiscordBot.Module
             if (await dbContext.StarSystemUpdateQueueItems.AnyAsync(s =>
                             s.StarSystem == starSystem &&
                             s.Status == StarSystemUpdateQueueItemStatus.Completed &&
-                            s.Completed >= DateTimeOffset.Now.AddDays(-1) &&
+                            s.Completed >= DateTimeOffset.UtcNow.AddDays(-1) &&
                             s.Result != StarSystemUpdateQueueItemResult.Pending))
             {
                 starSystemUpdateQueueItem.Status = StarSystemUpdateQueueItemStatus.PendingManualReview;
