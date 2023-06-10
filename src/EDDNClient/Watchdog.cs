@@ -33,7 +33,7 @@
         {
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                TimeSpan timeSinceLastMessage = (DateTimeOffset.Now - client.LastMessageReceived);
+                TimeSpan timeSinceLastMessage = (DateTimeOffset.UtcNow - client.LastMessageReceived);
                 if (timeSinceLastMessage.TotalMinutes >= 5)
                 {
                     Log.LogWarning("Client Watchdog: EDDN client did not process or receive a message for more than 5 minutes.");

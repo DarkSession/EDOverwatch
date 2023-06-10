@@ -19,10 +19,6 @@ namespace EDOverwatch_Web.WebSockets.Handler
 
         public override bool AllowAnonymous => true;
 
-        public OverwatchMaelstrom()
-        {
-        }
-
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             OverwatchMaelstromRequest? data = message.Data?.ToObject<OverwatchMaelstromRequest>();

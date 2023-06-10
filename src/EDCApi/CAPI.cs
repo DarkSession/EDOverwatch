@@ -12,7 +12,7 @@ namespace EDCApi
         private IConfiguration Configuration { get; }
         private ILogger Log { get; }
         private FDevOAuth FDevOAuth { get; }
-        private static DateTimeOffset LastRequest { get; set; } = DateTimeOffset.Now.AddMinutes(-1);
+        private static DateTimeOffset LastRequest { get; set; } = DateTimeOffset.UtcNow.AddMinutes(-1);
 
         public CAPI(IConfiguration configuration, ILogger<CAPI> log, FDevOAuth fDevOAuth)
         {
@@ -29,7 +29,7 @@ namespace EDCApi
 
         protected async Task<(HttpStatusCode httpStatusCode, string? content)> GetUrl(string url, OAuthCredentials oAuthCredentials, CancellationToken cancellationToken)
         {
-            TimeSpan timeSinceLastRequest = DateTimeOffset.Now - LastRequest;
+            TimeSpan timeSinceLastRequest = DateTimeOffset.UtcNow - LastRequest;
             if (timeSinceLastRequest < TimeSpan.FromMilliseconds(500))
             {
                 TimeSpan waitTime = TimeSpan.FromMilliseconds(500) - timeSinceLastRequest;
@@ -40,7 +40,7 @@ namespace EDCApi
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Method = HttpMethod.Get;
             using HttpResponseMessage response = await HttpClient.SendAsync(request, cancellationToken);
-            LastRequest = DateTimeOffset.Now;
+            LastRequest = DateTimeOffset.UtcNow;
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 if (await FDevOAuth.TokenRefresh(oAuthCredentials, cancellationToken))
@@ -100,8 +100,8 @@ namespace EDCApi
                         }
                     case HttpStatusCode.PartialContent:
                         {
-                            Log.LogWarning("GetJournal returned PartialContent. Waiting 5 seconds...");
-                            await Task.Delay(TimeSpan.FromSeconds(4), cancellationToken);
+                            Log.LogWarning("GetJournal returned PartialContent. Waiting 2 seconds...");
+                            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
                             break;
                         }
                     default:
@@ -114,20 +114,20 @@ namespace EDCApi
             return (false, null);
         }
 
-        public async Task<(bool success, FleetCarrier? fleetCarrier)> GetFleetCarrier(OAuthCredentials oAuthCredentials, CancellationToken cancellationToken)
+        public async Task<(bool success, bool hasFleetCarrier, FleetCarrier? fleetCarrier)> GetFleetCarrier(OAuthCredentials oAuthCredentials, CancellationToken cancellationToken)
         {
             string fleetCarrierUrl = Configuration.GetValue<string>("CApi:FleetCarrierUrl") ?? throw new Exception("CApi:FleetCarrierUrl is not configured");
             (HttpStatusCode httpStatusCode, string? fleetCarrierData) = await GetUrl(fleetCarrierUrl, oAuthCredentials, cancellationToken);
             if (httpStatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(fleetCarrierData))
             {
                 FleetCarrier? fleetCarrier = JsonConvert.DeserializeObject<FleetCarrier>(fleetCarrierData);
-                return (true, fleetCarrier);
+                return (true, true, fleetCarrier);
             }
-            else if (httpStatusCode == HttpStatusCode.NotFound)
+            if (httpStatusCode == HttpStatusCode.NotFound)
             {
-                return (true, null);
+                return (true, false, null);
             }
-            return (false, null);
+            return (false, false, null);
         }
     }
 }

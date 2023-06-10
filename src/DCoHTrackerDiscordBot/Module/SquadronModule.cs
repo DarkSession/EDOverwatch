@@ -77,7 +77,7 @@ namespace DCoHTrackerDiscordBot.Module
 
             if (user == null)
             {
-                user = new(0, Context.User.Id, DateTimeOffset.Now)
+                user = new(0, Context.User.Id, DateTimeOffset.UtcNow)
                 {
                     Faction = faction,
                 };
@@ -156,13 +156,13 @@ namespace DCoHTrackerDiscordBot.Module
 
             squadronName = new CultureInfo("en").TextInfo.ToTitleCase(squadronName);
 
-            DcohFaction faction = new(0, squadronName, squadronId, false, DateTimeOffset.Now);
+            DcohFaction faction = new(0, squadronName, squadronId, false, DateTimeOffset.UtcNow);
             DbContext.Add(faction);
             await DbContext.SaveChangesAsync();
 
             if (user == null)
             {
-                user = new(0, Context.User.Id, DateTimeOffset.Now)
+                user = new(0, Context.User.Id, DateTimeOffset.UtcNow)
                 {
                     Faction = faction,
                 };
@@ -171,7 +171,7 @@ namespace DCoHTrackerDiscordBot.Module
             else
             {
                 user.Faction = faction;
-                user.FactionJoined = DateTimeOffset.Now;
+                user.FactionJoined = DateTimeOffset.UtcNow;
             }
             faction.CreatedBy = user;
             await DbContext.SaveChangesAsync();

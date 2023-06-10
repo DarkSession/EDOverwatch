@@ -14,10 +14,6 @@ namespace EDOverwatch_Web.WebSockets.Handler
 
         public override bool AllowAnonymous => true;
 
-        public OverwatchSystemsHistoricalCycle()
-        {
-        }
-
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             OverwatchSystemsHistoricalCycleRequest? data = message.Data?.ToObject<OverwatchSystemsHistoricalCycleRequest>();

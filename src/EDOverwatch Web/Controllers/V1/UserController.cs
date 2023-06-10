@@ -82,7 +82,7 @@ namespace EDOverwatch_Web.Controllers.V1
                             DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).Date),
                             0,
                             DateTimeOffset.UtcNow.AddDays(-14).Date,
-                            DateTimeOffset.Now,
+                            DateTimeOffset.UtcNow,
                             CommanderOAuthStatus.Inactive,
                             string.Empty,
                             string.Empty,
@@ -145,7 +145,7 @@ namespace EDOverwatch_Web.Controllers.V1
                             DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).Date),
                             0,
                             DateTimeOffset.UtcNow.AddDays(-14).Date,
-                            DateTimeOffset.Now,
+                            DateTimeOffset.UtcNow,
                             CommanderOAuthStatus.Active,
                             oAuthenticationResult.Credentials.AccessToken,
                             oAuthenticationResult.Credentials.RefreshToken,
@@ -194,7 +194,7 @@ namespace EDOverwatch_Web.Controllers.V1
         public async Task<ActionResult<OAuthGetStateResponse>> OAuthGetUrl(CancellationToken cancellationToken)
         {
             OAuthAuthorizeUrl oAuthAuthorizeUrl = FDevOAuth.CreateAuthorizeUrl();
-            DbContext.OAuthCodes.Add(new(oAuthAuthorizeUrl.State, oAuthAuthorizeUrl.CodeVerifier, DateTimeOffset.Now));
+            DbContext.OAuthCodes.Add(new(oAuthAuthorizeUrl.State, oAuthAuthorizeUrl.CodeVerifier, DateTimeOffset.UtcNow));
             await DbContext.SaveChangesAsync(cancellationToken);
             return new OAuthGetStateResponse(oAuthAuthorizeUrl.Url);
         }

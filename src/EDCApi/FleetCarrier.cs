@@ -22,8 +22,8 @@ namespace EDCApi
 
         [JsonProperty("vanityName")]
         public string? VanityName { get; set; }
-        [JsonProperty("filteredVanityName")]
 
+        [JsonProperty("filteredVanityName")]
         public string? FilteredVanityName { get; set; }
 
         [JsonIgnore]

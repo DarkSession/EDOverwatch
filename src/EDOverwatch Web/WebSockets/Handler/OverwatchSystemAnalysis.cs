@@ -15,10 +15,6 @@ namespace EDOverwatch_Web.WebSockets.Handler
 
         public override bool AllowAnonymous => true;
 
-        public OverwatchSystemAnalysis()
-        {
-        }
-
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             OverwatchSystemAnalysisRequest? data = message.Data?.ToObject<OverwatchSystemAnalysisRequest>();
