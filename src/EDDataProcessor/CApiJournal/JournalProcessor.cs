@@ -120,7 +120,8 @@ namespace EDDataProcessor.CApiJournal
                 return;
             }
             CAPI capi = serviceScope.ServiceProvider.GetRequiredService<CAPI>();
-            DateOnly journalDay = DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(-14).DateTime);
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            DateOnly journalDay = DateOnly.FromDateTime(now.AddDays(-14).DateTime);
             int journalLastLine = 0;
             if (commander.JournalDay > journalDay)
             {
@@ -132,7 +133,7 @@ namespace EDDataProcessor.CApiJournal
             if (profile?.Commander != null)
             {
                 commander.Name = profile.Commander.Name;
-                DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
+                DateOnly today = DateOnly.FromDateTime(now.DateTime);
                 do
                 {
                     (bool success, string? journal) = await capi.GetJournal(oAuthCredentials, journalDay, cancellationToken);
@@ -149,7 +150,9 @@ namespace EDDataProcessor.CApiJournal
                         int currentLine = 0;
                         try
                         {
-                            await ProcessCommanderJournal(journal, journalLastLine, commander, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                            JournalProcessResult journalProcessResult = await ProcessCommanderJournal(journal, journalLastLine, commander, dbContext, activeMqProducer, activeMqTransaction, cancellationToken);
+                            currentLine = journalProcessResult.CurrentLine;
+                            warEffortsUpdatedSystemAddresses.AddRange(journalProcessResult.WarEffortsUpdatedSystemAddresses);
                         }
                         catch (Exception e)
                         {
@@ -158,10 +161,14 @@ namespace EDDataProcessor.CApiJournal
                         commander.JournalLastLine = currentLine;
                         commander.JournalDay = journalDay;
                     }
-                    else if (today != journalDay || DateTimeOffset.UtcNow.Hour > 0 || DateTimeOffset.UtcNow.Minute >= 15)
+                    else
                     {
-                        commander.JournalLastLine = 0;
-                        commander.JournalDay = journalDay;
+                        int daysDifference = today.DayNumber - journalDay.DayNumber;
+                        if (daysDifference > 1 || (daysDifference == 1 && (now.Hour > 0 || now.Minute >= 15)))
+                        {
+                            commander.JournalLastLine = 0;
+                            commander.JournalDay = journalDay;
+                        }
                     }
                     if (warEffortsUpdatedSystemAddresses.Any())
                     {

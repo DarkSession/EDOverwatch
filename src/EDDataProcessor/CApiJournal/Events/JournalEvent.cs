@@ -31,7 +31,7 @@
             {
                 Commander = journalParameters.Commander,
             });
-
+            
             WarEffort? warEffort = await dbContext.WarEfforts
                 .FirstOrDefaultAsync(w =>
                         w.Commander == journalParameters.Commander &&
@@ -39,10 +39,10 @@
                         w.Type == type &&
                         w.Side == side &&
                         w.StarSystem == starSystem &&
-                        w.Source == WarEffortSource.OverwatchCAPI, cancellationToken);
+                        w.Source == journalParameters.Source, cancellationToken);
             if (warEffort == null)
             {
-                warEffort = new(0, type, Day, amount, side, WarEffortSource.OverwatchCAPI)
+                warEffort = new(0, type, Day, amount, side, journalParameters.Source)
                 {
                     Commander = journalParameters.Commander,
                     StarSystem = starSystem,
