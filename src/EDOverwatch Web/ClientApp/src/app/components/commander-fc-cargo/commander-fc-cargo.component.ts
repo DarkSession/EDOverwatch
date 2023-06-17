@@ -39,7 +39,8 @@ export class CommanderFcCargoComponent implements OnInit {
 
   private async updateSettings(): Promise<void> {
     this.showDetailedStacks = (await this.appService.getSetting("FleetCarrierCargoShowStacks") === "1");
-    this.changeDetectorRef.markForCheck();
+    this.updateCargoEntries();
+    this.changeDetectorRef.detectChanges();
   }
 
   private async getFcCargo(): Promise<void> {
