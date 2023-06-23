@@ -123,7 +123,10 @@ namespace EDOverwatch_Web
             }
 
             app.UseWebSockets(webSocketOptions);
+#if !DEBUG
             app.UseHttpsRedirection();
+
+#endif
             app.UseStaticFiles();
             app.UseRouting();
             app.MapControllers();

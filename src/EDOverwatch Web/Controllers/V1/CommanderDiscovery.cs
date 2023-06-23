@@ -23,13 +23,7 @@ namespace EDOverwatch_Web.Controllers.V1
                 .AddFilter("AwardingFaction", @"^\$faction_PilotsFederation;$")
                 .AddFilter("VictimFaction", @"^\$faction_Thargoid;$");
             apiDiscovery.AddEvent("CollectCargo")
-                .AddFilter("Type", "UnknownArtifact2|ThargoidTissueSampleType1|ThargoidTissueSampleType2|ThargoidTissueSampleType3|ThargoidTissueSampleType4|ThargoidTissueSampleType5|ThargoidScoutTissueSample|USSCargoBlackBox|OccupiedCryoPod|DamagedEscapePod");
-            apiDiscovery.AddEvent("EjectCargo")
-                .AddFilter("Type", "UnknownArtifact2|ThargoidTissueSampleType1|ThargoidTissueSampleType2|ThargoidTissueSampleType3|ThargoidTissueSampleType4|ThargoidTissueSampleType5|ThargoidScoutTissueSample|USSCargoBlackBox|OccupiedCryoPod|DamagedEscapePod");
-            apiDiscovery.AddEvent("MarketSell")
-                .AddFilter("Type", "UnknownArtifact2|ThargoidTissueSampleType1|ThargoidTissueSampleType2|ThargoidTissueSampleType3|ThargoidTissueSampleType4|ThargoidTissueSampleType5|ThargoidScoutTissueSample|USSCargoBlackBox|OccupiedCryoPod|DamagedEscapePod");
-            apiDiscovery.AddEvent("SearchAndRescue")
-                .AddFilter("Name", "UnknownArtifact2|ThargoidTissueSampleType1|ThargoidTissueSampleType2|ThargoidTissueSampleType3|ThargoidTissueSampleType4|ThargoidTissueSampleType5|ThargoidScoutTissueSample|USSCargoBlackBox|OccupiedCryoPod|DamagedEscapePod");
+                .AddFilter("Type", "UnknownArtifact2|ThargoidTissueSampleType1|ThargoidTissueSampleType2|ThargoidTissueSampleType3|ThargoidTissueSampleType4|ThargoidTissueSampleType5|ThargoidTissueSampleType6|ThargoidTissueSampleType9a|ThargoidTissueSampleType9b|ThargoidTissueSampleType9c|ThargoidTissueSampleType10a|ThargoidTissueSampleType10b|ThargoidTissueSampleType10c|ThargoidScoutTissueSample|USSCargoBlackBox|OccupiedCryoPod|DamagedEscapePod");
             apiDiscovery.AddEvent("Cargo");
             apiDiscovery.Endpoints.AddEventsEndpoint("api/v1/Commander/Events", 15, 20);
 
