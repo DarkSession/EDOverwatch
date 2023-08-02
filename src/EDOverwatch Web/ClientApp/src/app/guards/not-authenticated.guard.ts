@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { ConnectionStatus, WebsocketService } from '../services/websocket.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class NotAuthenticatedGuard implements CanActivate {
+export class NotAuthenticatedGuard  {
   public constructor(
     private readonly websocketService: WebsocketService,
     private readonly router: Router

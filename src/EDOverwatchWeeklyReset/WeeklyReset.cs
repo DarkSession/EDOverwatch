@@ -28,7 +28,7 @@ namespace EDDataProcessor
                         (s.ThargoidLevel!.StateExpires!.End <= newThargoidCycle.Start ||
                         (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
                         s.ThargoidLevel.Progress != 100 &&
-                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Maelstrom && // Systems with a maelstrom
+                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Titan && // Systems with a maelstrom
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // We do not yet know what happens if we fail to complete systems in recovery
                         )
                     .ToListAsync(cancellationToken);

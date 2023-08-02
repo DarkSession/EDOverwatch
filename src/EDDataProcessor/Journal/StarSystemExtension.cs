@@ -17,7 +17,7 @@ namespace EDDataProcessor.Journal
                 "Thargoid_Probing" => StarSystemThargoidLevelState.Alert,
                 "Thargoid_Harvest" => StarSystemThargoidLevelState.Invasion,
                 "Thargoid_Controlled" => StarSystemThargoidLevelState.Controlled,
-                "Thargoid_Stronghold" => StarSystemThargoidLevelState.Maelstrom,
+                "Thargoid_Stronghold" => StarSystemThargoidLevelState.Titan,
                 "Thargoid_Recovery" => StarSystemThargoidLevelState.Recovery,
                 _ => default,
             };

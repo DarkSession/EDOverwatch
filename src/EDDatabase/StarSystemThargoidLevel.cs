@@ -72,7 +72,7 @@ namespace EDDatabase
         Alert = 20,
         Invasion = 30,
         Controlled = 40,
-        Maelstrom = 50,
+        Titan = 50,
         // Recapture = 60,
         Recovery = 70,
     }

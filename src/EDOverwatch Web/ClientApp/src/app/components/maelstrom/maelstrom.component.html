@@ -1,7 +1,7 @@
 <div class="overwatch-content-container">
     <div class="overwatch-content-large">
         <div class="title" *ngIf="maelstrom">
-            Maelstrom {{ maelstrom.Name }}
+             {{ maelstrom.Name }} Titan
         </div>
         <div class="content-box" *ngIf="maelstrom">
             <div class="content-flex">
@@ -10,7 +10,9 @@
                         <tr>
                             <td><b>System</b></td>
                             <td>
-                                {{ maelstrom.SystemName }}
+                                <span class="clickable" [routerLink]="['/system', maelstrom.SystemAddress]">
+                                    {{ maelstrom.SystemName }}
+                                </span>
                             </td>
                         </tr>
                     </tbody>

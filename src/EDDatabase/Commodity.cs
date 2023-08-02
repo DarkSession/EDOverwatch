@@ -32,6 +32,7 @@
             return commodity;
         }
 
+        /*
         public static List<string> ThargoidWarRelatedCommodities { get; } = new()
         {
             "UnknownArtifact2",
@@ -53,5 +54,6 @@
             "ThargoidTissueSampleType10b",
             "ThargoidTissueSampleType10c",
         };
+        */
     }
 }

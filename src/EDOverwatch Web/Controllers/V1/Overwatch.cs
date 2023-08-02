@@ -74,9 +74,12 @@ namespace EDOverwatch_Web.Controllers.V1
             return result!;
         }
 
+        [HttpGet]
+        public Task<OverwatchMaelstroms> Maelstroms(CancellationToken cancellationToken) => Titans(cancellationToken);
+
         private const string MaelstromsCacheKey = "OverwatchMaelstroms";
         [HttpGet]
-        public async Task<OverwatchMaelstroms> Maelstroms(CancellationToken cancellationToken)
+        public async Task<OverwatchMaelstroms> Titans(CancellationToken cancellationToken)
         {
             if (!MemoryCache.TryGetValue(MaelstromsCacheKey, out OverwatchMaelstroms? result))
             {

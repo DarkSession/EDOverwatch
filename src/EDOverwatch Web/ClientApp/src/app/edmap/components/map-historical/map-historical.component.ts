@@ -67,8 +67,8 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
         name: "Controlled (New)",
         color: "80d75b"
       },
-      "Maelstrom": {
-        name: "Maelstrom",
+      "Titan": {
+        name: "Titan",
         color: "4d0000"
       },
       "Recovery": {
@@ -113,7 +113,7 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
       },
     },
   };
-  private defaultActiveCategories = ["ClearNew", "AlertNew", "Invasion", "InvasionNew", "Controlled", "ControlledNew", "Maelstrom", "Recovery", "RecoveryNew"];
+  private defaultActiveCategories = ["ClearNew", "AlertNew", "Invasion", "InvasionNew", "Controlled", "ControlledNew", "Titan", "Recovery", "RecoveryNew"];
   public date: string = "";
   public dateSelectionDisabled = true;
   private paraLoaded = false;
@@ -174,7 +174,7 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
         const description =
           `<b>State</b>: ${data.ThargoidLevel.Name}<br>` +
           `<b>Previous state</b>: ${data.PreviousThargoidLevel.Name}<br>` +
-          `<b>Maelstrom</b>: ${data.Maelstrom.Name}<br>`;
+          `<b>Titan</b>: ${data.Maelstrom.Name}<br>`;
         const poiSite = {
           name: data.Name,
           description: description,

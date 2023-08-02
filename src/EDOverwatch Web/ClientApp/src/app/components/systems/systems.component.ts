@@ -167,7 +167,7 @@ export class SystemsComponent implements OnInit, OnDestroy {
     await this.appService.deleteSetting("Maelstroms");
     await this.appService.deleteSetting("ThargoidLevels");
     await this.appService.deleteSetting("SystemListHideUnpopulated");
-    await this.appService.deleteSetting("SystemListHideUnpopulated");
+    await this.appService.deleteSetting("SystemListHideCompleted");
   }
 }
 

@@ -35,7 +35,7 @@
                         StarSystemThargoidLevelState.Alert => OverwatchStarSystemsHistoricalSystemState.AlertNew,
                         StarSystemThargoidLevelState.Invasion => OverwatchStarSystemsHistoricalSystemState.InvasionNew,
                         StarSystemThargoidLevelState.Controlled => OverwatchStarSystemsHistoricalSystemState.ControlledNew,
-                        StarSystemThargoidLevelState.Maelstrom => OverwatchStarSystemsHistoricalSystemState.Maelstrom,
+                        StarSystemThargoidLevelState.Titan => OverwatchStarSystemsHistoricalSystemState.Titan,
                         StarSystemThargoidLevelState.Recovery => OverwatchStarSystemsHistoricalSystemState.RecoveryNew,
                         _ => OverwatchStarSystemsHistoricalSystemState.Clear,
                     };
@@ -48,7 +48,7 @@
                         StarSystemThargoidLevelState.Alert => OverwatchStarSystemsHistoricalSystemState.AlertNew,
                         StarSystemThargoidLevelState.Invasion => OverwatchStarSystemsHistoricalSystemState.Invasion,
                         StarSystemThargoidLevelState.Controlled => OverwatchStarSystemsHistoricalSystemState.Controlled,
-                        StarSystemThargoidLevelState.Maelstrom => OverwatchStarSystemsHistoricalSystemState.Maelstrom,
+                        StarSystemThargoidLevelState.Titan => OverwatchStarSystemsHistoricalSystemState.Titan,
                         StarSystemThargoidLevelState.Recovery => OverwatchStarSystemsHistoricalSystemState.Recovery,
                         _ => OverwatchStarSystemsHistoricalSystemState.Clear,
                     };
@@ -73,6 +73,6 @@
         ControlledNew,
         Recovery,
         RecoveryNew,
-        Maelstrom,
+        Titan,
     }
 }

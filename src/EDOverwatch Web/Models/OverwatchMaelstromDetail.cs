@@ -131,7 +131,7 @@
                 }
                 if (systems.Any(s =>
                     ((s.StarSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && (s.StarSystem.ThargoidLevel!.Progress < 100 || s.StarSystem.ThargoidLevel!.Progress == null)) ||
-                    s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Maelstrom) &&
+                    s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Titan) &&
                     s.StarSystem.DistanceTo(systemAtRisk) <= 10.02f))
                 {
                     systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population));
@@ -140,7 +140,7 @@
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
                 .AsNoTracking()
-                .Where(t => t.State != StarSystemThargoidLevelState.Maelstrom && t.Maelstrom == maelstrom)
+                .Where(t => t.State != StarSystemThargoidLevelState.Titan && t.Maelstrom == maelstrom)
                 .Include(t => t.Cycle)
                 .Include(t => t.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)

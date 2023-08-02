@@ -73,7 +73,7 @@
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
                 .AsNoTracking()
-                .Where(t => t.State != StarSystemThargoidLevelState.Maelstrom)
+                .Where(t => t.State != StarSystemThargoidLevelState.Titan)
                 .Include(t => t.Cycle)
                 .Include(t => t.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)
@@ -85,7 +85,7 @@
                     s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion ||
                     s.ThargoidLevel!.State == StarSystemThargoidLevelState.Alert ||
                     s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled ||
-                    s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom ||
+                    s.ThargoidLevel!.State == StarSystemThargoidLevelState.Titan ||
                     s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recovery)
                 .GroupBy(s => s.ThargoidLevel!.State)
                 .Select(s => new
@@ -100,7 +100,7 @@
                     s.WarRelevantSystem &&
                     (s.Population > 0 ||
                         (s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled ||
-                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom)))
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Titan)))
                 .CountAsync(cancellationToken);
             if (relevantSystemCount == 0)
             {
@@ -152,7 +152,7 @@
                     .Where(s =>
                         s.WarRelevantSystem &&
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Controlled &&
-                        s.ThargoidLevel!.State != StarSystemThargoidLevelState.Maelstrom &&
+                        s.ThargoidLevel!.State != StarSystemThargoidLevelState.Titan &&
                         s.Population > 0)
                     .CountAsync(cancellationToken);
 

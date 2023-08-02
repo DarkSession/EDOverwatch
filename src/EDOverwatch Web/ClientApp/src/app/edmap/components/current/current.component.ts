@@ -47,7 +47,7 @@ export class CurrentComponent implements OnInit, AfterViewInit {
         color: "38761d"
       },
       "50": {
-        name: "Maelstrom",
+        name: "Titan",
         color: "cc0000"
       },
       "70": {
@@ -126,7 +126,7 @@ export class CurrentComponent implements OnInit, AfterViewInit {
       for (const data of this.systems) {
         let description =
           `<b>State</b>: ${data.ThargoidLevel.Name}<br>` +
-          `<b>Maelstrom</b>: ${data.Maelstrom.Name}<br>`;
+          `<b>Titan</b>: ${data.Maelstrom.Name}<br>`;
         if (data.Progress) {
           description += `<b>Progress</b>: ${data.Progress} %<br>`;
         }

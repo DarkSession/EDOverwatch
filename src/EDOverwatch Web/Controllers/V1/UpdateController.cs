@@ -24,7 +24,7 @@ namespace EDOverwatch_Web.Controllers.V1
         {
             List<StarSystem> allThargoidControlledSystems = await DbContext.StarSystems
                 .AsNoTracking()
-                .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Maelstrom || s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
+                .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Titan || s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
                 .Include(s => s.ThargoidLevel)
                 .ToListAsync(cancellationToken);
 

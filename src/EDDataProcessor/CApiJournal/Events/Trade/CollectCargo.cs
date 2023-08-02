@@ -34,13 +34,14 @@
                     "thargoidtissuesampletype10a" => WarEffortType.TissueSampleTitanMaw,
                     "thargoidtissuesampletype10b" => WarEffortType.TissueSampleTitanMaw,
                     "thargoidtissuesampletype10c" => WarEffortType.TissueSampleTitanMaw,
+                    "unknownsack" => WarEffortType.ProtectiveMembraneScrap,
                     "usscargoblackbox" => WarEffortType.Recovery,
                     "occupiedcryopod" => WarEffortType.Recovery,
                     "damagedescapepod" => WarEffortType.Recovery,
                     "wreckagecomponents" => WarEffortType.Recovery,
                     _ => default,
                 };
-                if (warEffort is WarEffortType warEffortType)
+                if (warEffort is WarEffortType warEffortType && warEffortType != default)
                 {
                     await AddOrUpdateWarEffort(journalParameters, warEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
                 }

@@ -92,9 +92,9 @@ namespace EDOverwatch
                             if (maelstrom?.StarSystem != null)
                             {
                                 using AsyncLockInstance l = await Lock(cancellationToken);
-                                if (maelstrom.StarSystem.ThargoidLevel?.State != StarSystemThargoidLevelState.Maelstrom)
+                                if (maelstrom.StarSystem.ThargoidLevel?.State != StarSystemThargoidLevelState.Titan)
                                 {
-                                    await UpdateStarSystemThargoidLevel(maelstrom.StarSystem, false, null, TimeSpan.Zero, StarSystemThargoidLevelState.Maelstrom, maelstrom, dbContext, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
+                                    await UpdateStarSystemThargoidLevel(maelstrom.StarSystem, false, null, TimeSpan.Zero, StarSystemThargoidLevelState.Titan, maelstrom, dbContext, starSystemThargoidLevelChangedProducer, transaction, cancellationToken);
                                     await dbContext.SaveChangesAsync(cancellationToken);
                                 }
                             }

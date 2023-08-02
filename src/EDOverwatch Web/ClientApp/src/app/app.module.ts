@@ -190,7 +190,15 @@ export const httpInterceptorProviders = [
         component: MaelstromComponent,
       },
       {
+        path: 'titan/:name',
+        component: MaelstromComponent,
+      },
+      {
         path: 'maelstroms',
+        component: MaelstromsComponent,
+      },
+      {
+        path: 'titans',
         component: MaelstromsComponent,
       },
       {

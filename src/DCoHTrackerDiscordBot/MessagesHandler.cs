@@ -209,7 +209,7 @@ namespace DCoHTrackerDiscordBot
                                     embed.AddField("System Name", Format.Sanitize(starSystem?.Name ?? result.SystemName));
                                     if (starSystem?.ThargoidLevel?.Maelstrom != null)
                                     {
-                                        embed.AddField("Maelstrom", starSystem.ThargoidLevel.Maelstrom.Name ?? "-");
+                                        embed.AddField("Titan", starSystem.ThargoidLevel.Maelstrom.Name ?? "-");
                                     }
                                     embed.AddField("System State", result.SystemStatus.GetEnumMemberValue(), true);
                                     embed.AddField("Progress", result.Progress + "%", true);

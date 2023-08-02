@@ -27,7 +27,7 @@
                                 placeholder="Filter by system name">
                         </mat-form-field>
                         <mat-form-field appearance="outline">
-                            <mat-label>Maelstroms</mat-label>
+                            <mat-label>Titans</mat-label>
                             <mat-select [(ngModel)]="maelstromsSelected" (ngModelChange)="settingChanged()" multiple>
                                 <mat-option *ngFor="let maelstrom of maelstroms" [value]="maelstrom">
                                     {{ maelstrom.Name }}
