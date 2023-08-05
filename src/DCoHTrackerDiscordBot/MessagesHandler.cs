@@ -62,8 +62,8 @@ namespace DCoHTrackerDiscordBot
                                     StarSystem? starSystem = await DbContext.StarSystems
                                         .Include(s => s.ThargoidLevel)
                                         .ThenInclude(t => t!.Maelstrom)
-                                        .Include(s => s.ThargoidLevel.StateExpires)
-                                        .Include(s => s.ThargoidLevel.CurrentProgress)
+                                        .Include(s => s.ThargoidLevel!.StateExpires)
+                                        .Include(s => s.ThargoidLevel!.CurrentProgress)
                                         .FirstOrDefaultAsync(s =>
                                             EF.Functions.Like(s.Name, result.SystemName.Replace("%", string.Empty)) &&
                                             s.ThargoidLevel != null &&
@@ -91,7 +91,7 @@ namespace DCoHTrackerDiscordBot
                                                 starSystem = await DbContext.StarSystems
                                                                                         .Include(s => s.ThargoidLevel)
                                                                                         .ThenInclude(t => t!.Maelstrom)
-                                                                                        .Include(s => s.ThargoidLevel.StateExpires)
+                                                                                        .Include(s => s.ThargoidLevel!.StateExpires)
                                                                                         .FirstOrDefaultAsync(s =>
                                                                                             EF.Functions.Like(s.Name, starSystemName) &&
                                                                                             s.ThargoidLevel != null &&

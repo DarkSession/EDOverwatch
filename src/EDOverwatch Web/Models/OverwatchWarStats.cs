@@ -165,7 +165,7 @@
                     WarEffortType.KillThargoidMedusa,
                     WarEffortType.KillThargoidHydra,    
                     WarEffortType.KillThargoidOrthrus,
-                    WarEffortType.KillThargoidGlaive,
+                    WarEffortType.KillThargoidHunter,
                     WarEffortType.KillThargoidRevenant,
                 };
 

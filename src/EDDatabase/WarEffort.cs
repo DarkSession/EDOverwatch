@@ -81,7 +81,7 @@ namespace EDDatabase
             { WarEffortType.TissueSampleTitan, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleTitanMaw, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.ProtectiveMembraneScrap, WarEffortTypeGroup.RecoveryAndProbing },
-            { WarEffortType.KillThargoidGlaive, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidHunter, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidRevenant, WarEffortTypeGroup.Kills },
             { WarEffortType.MissionCompletionThargoidControlledSettlementReboot, WarEffortTypeGroup.Mission },
         };
@@ -158,8 +158,8 @@ namespace EDDatabase
         [EnumMember(Value = "Thargoid Orthrus tissue sample collection")]
         TissueSampleOrthrus,
 
-        [EnumMember(Value = "Thargoid Glaive kill")]
-        KillThargoidGlaive,
+        [EnumMember(Value = "Thargoid Hunter kill")]
+        KillThargoidHunter,
 
         [EnumMember(Value = "Thargoid Revenant kill")]
         KillThargoidRevenant,

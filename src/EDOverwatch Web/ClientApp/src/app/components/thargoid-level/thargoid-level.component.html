@@ -4,4 +4,10 @@
         'height.px': size
     }"></span>
     {{ thargoidLevel.Name }}
+    <ng-container *ngIf="barnacleMatrixInSystem">
+        &nbsp;
+        <span matTooltip="Barnacle matrix present in the system. Progress is locked.">
+            <fa-icon [icon]="faFan"></fa-icon>
+        </span>
+    </ng-container>
 </div>

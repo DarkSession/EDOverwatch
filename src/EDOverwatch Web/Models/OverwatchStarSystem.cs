@@ -20,6 +20,7 @@
         public OverwatchStarSystemStateExpires? StateExpiration { get; }
         public OverwatchStarSystemStateProgress StateProgress { get; }
         public double DistanceToMaelstrom { get; }
+        public bool BarnacleMatrixInSystem { get; }
 
         public OverwatchStarSystem(
                     StarSystem starSystem,
@@ -42,6 +43,7 @@
             {
                 DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 2);
             }
+            BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
             EffortFocus = effortFocus;
             FactionOperations = (factionAxOperations + factionGeneralOperations + factionRescueOperations + factionLogisticsOperations);
             FactionAxOperations = factionAxOperations;

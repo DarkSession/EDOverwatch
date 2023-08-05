@@ -60,6 +60,7 @@ namespace EDDataProcessor.EDDN
                                 population,
                                 false,
                                 false,
+                                false,
                                 Message.Timestamp,
                                 Message.Timestamp)
                             {

@@ -56,6 +56,9 @@ namespace EDDatabase
         public bool WarRelevantSystem { get; set; }
 
         [Column]
+        public bool BarnacleMatrixInSystem { get; set; }
+
+        [Column]
         public DateTimeOffset Created { get; set; }
 
         [Column]
@@ -83,6 +86,7 @@ namespace EDDatabase
             long populationMin,
             bool warAffected,
             bool warRelevantSystem,
+            bool barnacleMatrixInSystem,
             DateTimeOffset created,
             DateTimeOffset updated)
         {
@@ -97,6 +101,7 @@ namespace EDDatabase
             PopulationMin = populationMin;
             WarAffected = warAffected;
             WarRelevantSystem = warRelevantSystem;
+            BarnacleMatrixInSystem = barnacleMatrixInSystem;
             Created = created;
             Updated = updated;
         }

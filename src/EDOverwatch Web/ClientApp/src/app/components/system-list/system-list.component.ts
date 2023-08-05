@@ -178,6 +178,7 @@ export class SystemListComponent implements OnInit, OnChanges {
         StationsUnderRepair: system.StationsUnderRepair,
         StationsDamaged: system.StationsDamaged,
         StationsUnderAttack: system.StationsUnderAttack,
+        BarnacleMatrixInSystem: system.BarnacleMatrixInSystem,
       });
     }
 
@@ -221,6 +222,7 @@ export interface OverwatchStarSystem {
   StateProgress: StateProgress;
   Population: number;
   DistanceToMaelstrom: number;
+  BarnacleMatrixInSystem: boolean;
 }
 
 export interface OverwatchStarSystemCoordinates {

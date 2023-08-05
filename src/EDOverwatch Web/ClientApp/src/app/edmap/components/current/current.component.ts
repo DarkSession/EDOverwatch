@@ -27,12 +27,6 @@ export class CurrentComponent implements OnInit, AfterViewInit {
   private ed3dMap: ED3DMap | null = null;
   private mapLoaded = false;
   private readonly categories = {
-    "Systems": {
-      "00": {
-        name: "Sol",
-        color: "78b7f6",
-      },
-    },
     "States": {
       "20": {
         name: "Alert",
@@ -72,6 +66,10 @@ export class CurrentComponent implements OnInit, AfterViewInit {
         name: "Unknown Site",
         color: "2E4840"
       },
+      "Barnacle Matrix": {
+        name: "Barnacle Matrix",
+        color: "d3f8d3"
+      },
     },
     "Various POI": {
       "Abandoned Base": {
@@ -86,9 +84,15 @@ export class CurrentComponent implements OnInit, AfterViewInit {
         name: "Engineer (Odyssey)",
         color: "3498db",
       },
-    }
+    },
+    "Systems": {
+      "00": {
+        name: "Sol",
+        color: "78b7f6",
+      },
+    },
   }
-  private readonly defaultActiveCategories = ["20", "30", "40", "50", "70"];
+  private readonly defaultActiveCategories = ["20", "30", "40", "50", "70", "Barnacle Matrix"];
   private systems: OverwatchStarSystem[] = [];
 
   public constructor(
@@ -142,10 +146,15 @@ export class CurrentComponent implements OnInit, AfterViewInit {
         if (data.StateExpiration?.StateExpires) {
           description += `<b>Time remaining</b>: ${dateAgoPipe.transform(data.StateExpiration.StateExpires)}<br>`;
         }
+        const categories = [];
+        if (data.BarnacleMatrixInSystem) {
+          categories.push("Barnacle Matrix");
+        }
+        categories.push(data.ThargoidLevel.Level.toString());
         const poiSite = {
           name: data.Name,
           description: description,
-          categories: [data.ThargoidLevel.Level.toString()],
+          categories: categories,
           coordinates: { x: data.Coordinates.X, y: data.Coordinates.Y, z: data.Coordinates.Z },
         }
         systems.push(poiSite);
