@@ -1,0 +1,24 @@
+.thead {
+    background-color: #272727;
+}
+
+.table {
+    min-height: 300px;
+}
+
+div.load-more {
+    background-color: #393939;
+    width: 100%;
+    color: rgba(255, 255, 255, 0.87);
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+}
+
+.alert-likely {
+    background-color: rgb(241, 194, 50, 0.2);
+}
+
+.alert-likely:hover {
+    background-color: rgb(241, 194, 50, 0.1) !important;
+}

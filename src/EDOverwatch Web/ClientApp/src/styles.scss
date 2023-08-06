@@ -298,19 +298,19 @@ div.overwatch-content-large {
     font-weight: bold;
     font-size: 16pt;
   }
-
-  div.subtitle {
-    font-weight: bold;
-    font-size: 12pt;
-    margin-bottom: 4px;
-    margin-top: 4px;
-    color: #ffefdf;
-  }
-
   div.content-box {
     border-top: 2px solid var(--primary-color);
   }
 }
+
+div.subtitle {
+  font-weight: bold;
+  font-size: 12pt;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  color: #ffefdf;
+}
+
 
 div.overwatch-content-small {
   width: 600px;

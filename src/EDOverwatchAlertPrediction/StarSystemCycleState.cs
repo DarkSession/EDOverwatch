@@ -107,6 +107,10 @@ namespace EDOverwatchAlertPrediction
             {
                 return false;
             }
+            if (ThargoidLevel != null && ThargoidLevel.State == StarSystemThargoidLevelState.Controlled && ThargoidLevel.Completed)
+            {
+                return false;
+            }
             return true;
         }
 

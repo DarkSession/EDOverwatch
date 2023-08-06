@@ -35,6 +35,9 @@ export class ThargoidLevelComponent implements OnChanges {
         this.dotClass = "thargoid-recovery";
         break;
       }
+      default: {
+        this.dotClass = "thargoid-clear";
+      }
     }
   }
 }
@@ -42,7 +45,6 @@ export class ThargoidLevelComponent implements OnChanges {
 export interface OverwatchThargoidLevel {
   Level: number;
   Name: string;
-  IsInvisibleState: boolean;
 }
 
 enum StarSystemThargoidLevelState {

@@ -1,0 +1,24 @@
+.content-container {
+    height: calc(100% - 24px);
+    display: flex;
+    margin: 12px;
+    min-width: 250px;
+}
+
+.cycle-container {
+    background-color: var(--accent-darker-color);
+    padding: 8px;
+    min-width: 200px;
+
+    div.states {
+        div {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}
+
+.svg {
+    fill: var(--accent-darker-color);
+}
+

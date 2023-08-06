@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
@@ -11,7 +9,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchOverviewMaelstromHistoricalSummary, OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
-import { OverwatchStarSystemMin } from '../station-name/station-name.component';
+import { OverwatchMaelstromDetailAlertPrediction } from '../alert-prediction/alert-prediction.component';
 
 @UntilDestroy()
 @Component({
@@ -21,11 +19,8 @@ import { OverwatchStarSystemMin } from '../station-name/station-name.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MaelstromComponent implements OnInit {
-  public readonly faClipboard = faClipboard;
   public maelstrom: OverwatchMaelstromDetail | null = null;
-  public alertPredictions: MatTableDataSource<OverwatchMaelstromDetailAlertPrediction> = new MatTableDataSource<OverwatchMaelstromDetailAlertPrediction>();
-  public readonly alertPredictionColumns = ['Name', 'Population', 'Distance', 'Attackers'];
-  @ViewChild(MatSort, { static: false }) sort!: MatSort;
+  public alertPredictions: OverwatchMaelstromDetailAlertPrediction[] = [];
   public chartConfig: ChartConfiguration = {
     type: 'bar',
     data: {
@@ -60,8 +55,7 @@ export class MaelstromComponent implements OnInit {
   public constructor(
     private readonly route: ActivatedRoute,
     private readonly websocketService: WebsocketService,
-    private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly matSnackBar: MatSnackBar
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {
   }
 
@@ -82,24 +76,14 @@ export class MaelstromComponent implements OnInit {
         if (message && message.Data) {
           const data = message.Data;
           this.maelstrom = data;
-          const sortedAlertPredictions = (this.sort) ? this.alertPredictions.sortData(data.AlertPredictions, this.sort) : data.AlertPredictions;
-          this.alertPredictions = new MatTableDataSource<OverwatchMaelstromDetailAlertPrediction>(sortedAlertPredictions);
-          this.alertPredictions.sortingDataAccessor = (system: OverwatchMaelstromDetailAlertPrediction, columnName: string): string => {
-            return system[columnName as keyof OverwatchMaelstromDetailAlertPrediction] as unknown as string;
-          }
-          this.alertPredictions.sort = this.sort;
+          this.alertPredictions = data.AlertPredictions;
           this.processChartData();
           this.changeDetectorRef.markForCheck();
         }
       });
   }
 
-  public copySystemName(starSystem: OverwatchMaelstromDetailAlertPrediction): void {
-    navigator.clipboard.writeText(starSystem.StarSystem.Name);
-    this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
-      duration: 2000,
-    });
-  }
+
 
   private processChartData(): void {
     if (this.maelstrom && this.maelstrom.ThargoidCycles && this.maelstrom.MaelstromHistory) {
@@ -232,13 +216,3 @@ interface OverwatchMaelstromDetail extends OverwatchMaelstrom {
   ThargoidCycles: OverwatchThargoidCycle[];
 }
 
-interface OverwatchMaelstromDetailAlertPrediction {
-  StarSystem: OverwatchStarSystemMin;
-  Distance: number;
-  Attackers: OverwatchMaelstromDetailAlertPredictionAttacker[];
-}
-
-interface OverwatchMaelstromDetailAlertPredictionAttacker {
-  StarSystem: OverwatchStarSystem;
-  Distance: number;
-}

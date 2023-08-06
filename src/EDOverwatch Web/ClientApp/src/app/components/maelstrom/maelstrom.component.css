@@ -4,14 +4,6 @@ table.system-information {
     margin-right: 8px;
 }
 
-.thead {
-    background-color: #272727;
-}
-
-.table {
-    min-height: 300px;
-}
-
 .maelstrom-summary-container {
     display: flex;
     flex-direction: column;

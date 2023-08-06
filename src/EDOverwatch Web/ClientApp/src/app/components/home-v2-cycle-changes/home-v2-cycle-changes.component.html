@@ -1,0 +1,67 @@
+<div class="content-container">
+    <svg viewBox="0 0 54.8 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+        style="height: 100%; width: auto;">
+        <path d="M 204.659 6.613 L 204.659 61.46 L 104.243 61.46 L 204.659 6.613 Z"
+            style="transform-box: fill-box; transform-origin: 50% 50%;"
+            transform="matrix(0, -1, 1, 0, -127.042606, 16.153447)" class="svg" />
+        <path d="M 47.508 130.609 L 47.508 185.456 L -52.908 185.456 L 47.508 130.609 Z"
+            style="transform-origin: 154.451px 34.037px;" transform="matrix(0, 1, 1, 0, -251.024119, 272.912547)"
+            class="svg" />
+    </svg>
+    <div class="cycle-changes-container">
+        <div class="subtitle">{{ title }}</div>
+        <ng-container *ngIf="cycleChange">
+            <b>Humanity</b>
+            <div class="numbers">
+                <div class="thargoid-alert" *ngIf="cycleChange.AlertsDefended">
+                    <span>
+                        Alerts defended:
+                    </span>
+                    <span>
+                        {{ cycleChange.AlertsDefended }}
+                    </span>
+                </div>
+                <div class="thargoid-invasion" *ngIf="cycleChange.InvasionsDefended">
+                    <span>
+                        Invasions defended:
+                    </span>
+                    <span>
+                        {{ cycleChange.InvasionsDefended }}
+                    </span>
+                </div>
+                <div class="thargoid-controlled" *ngIf="cycleChange.ControlsDefended">
+                    <span>
+                        Controls cleared:
+                    </span>
+                    <span>
+                        {{ cycleChange.ControlsDefended }}
+                    </span>
+                </div>
+            </div>
+            <br>
+            <b>Thargoids</b>
+            <div class="numbers">
+                <div class="thargoid-controlled">
+                    <span>
+                        Control gained:
+                    </span>
+                    <span>
+                        {{ cycleChange.ThargoidsGained }}
+                    </span>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="!cycleChange">
+            <b>Humanity</b>
+            <ngx-skeleton-loader count="2" appearance="line" pulse="true"></ngx-skeleton-loader>
+            <br>
+            <b>Thargoids</b>
+            <ngx-skeleton-loader count="1" appearance="line" pulse="true"></ngx-skeleton-loader>
+        </ng-container>
+    </div>
+    <svg viewBox="0 0 54.8 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+        style="height: 100%; width: auto;">
+        <polygon points="-72.693 72.693 27.309 127.308 127.307 72.693" class="svg"
+            style="transform-box: fill-box; transform-origin: 50% 50%;" transform="matrix(0, -1, 1, 0, 0.0, 0.0)" />
+    </svg>
+</div>

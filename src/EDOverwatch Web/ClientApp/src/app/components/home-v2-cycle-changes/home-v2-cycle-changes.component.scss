@@ -1,0 +1,44 @@
+.content-container {
+    height: calc(100% - 24px);
+    display: flex;
+    margin: 12px;
+    align-items: stretch;
+    min-width: 250px;
+}
+
+.cycle-changes-container {
+    background-color: var(--accent-darker-color);
+    padding: 8px;
+    min-width: 200px;
+
+    div.numbers {
+        div {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}
+
+.svg {
+    fill: var(--accent-darker-color);
+}
+
+.thargoid-alert {
+    color: rgb(241, 194, 50);
+}
+
+.thargoid-invasion {
+    color: rgb(255, 132, 75);
+}
+
+.thargoid-controlled {
+    color: rgb(134, 189, 111);
+}
+
+.thargoid-maelstrom {
+    color: rgb(204, 0, 0);
+}
+
+.thargoid-recovery {
+    color: rgb(159, 27, 255);
+}

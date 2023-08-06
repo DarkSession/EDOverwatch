@@ -6,7 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, isDevMode } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
@@ -65,12 +65,18 @@ import { Chart } from 'chart.js';
 import { StatsComponent } from './components/stats/stats.component';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Annotation from 'chartjs-plugin-annotation';
-import { SystemsDefenceScoreComponent } from './components/systems-defence-score/systems-defence-score.component';
 import * as duration from 'dayjs/plugin/duration';
 import * as utc from 'dayjs/plugin/utc';
 import * as dayjs from 'dayjs';
 import { CommanderFcCargoComponent } from './components/commander-fc-cargo/commander-fc-cargo.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { AlertPredictionAttackersComponent } from './components/alert-prediction-attackers/alert-prediction-attackers.component';
+import { AlertPredictionComponent } from './components/alert-prediction/alert-prediction.component';
+import { AppRouteReuseStrategy } from './app-route-reuse.strategy';
+import { HomeV2Component } from './components/home-v2/home-v2.component';
+import { HomeV2CycleComponent } from './components/home-v2-cycle/home-v2-cycle.component';
+import { HomeV2CycleChangesComponent } from './components/home-v2-cycle-changes/home-v2-cycle-changes.component';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
@@ -117,8 +123,12 @@ export const httpInterceptorProviders = [
     CommanderApiKeysComponent,
     SystemContributionSummaryComponent,
     StatsComponent,
-    SystemsDefenceScoreComponent,
     CommanderFcCargoComponent,
+    AlertPredictionAttackersComponent,
+    AlertPredictionComponent,
+    HomeV2Component,
+    HomeV2CycleComponent,
+    HomeV2CycleChangesComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -145,6 +155,14 @@ export const httpInterceptorProviders = [
     MatCheckboxModule,
     MatMenuModule,
     MatSlideToggleModule,
+    NgxSkeletonLoaderModule.forRoot({
+      theme: {
+        // Enabliong theme combination
+        extendsFromRoot: true,
+        // ... list of CSS theme attributes
+        height: '16px',
+      },
+    }),
     RouterModule.forRoot([
       {
         path: 'about',
@@ -188,18 +206,30 @@ export const httpInterceptorProviders = [
       {
         path: 'maelstrom/:name',
         component: MaelstromComponent,
+        data: {
+          reuseRoute: true,
+        },
       },
       {
         path: 'titan/:name',
         component: MaelstromComponent,
+        data: {
+          reuseRoute: true,
+        },
       },
       {
         path: 'maelstroms',
         component: MaelstromsComponent,
+        data: {
+          reuseRoute: true,
+        },
       },
       {
         path: 'titans',
         component: MaelstromsComponent,
+        data: {
+          reuseRoute: true,
+        },
       },
       {
         path: 'edmap',
@@ -232,19 +262,18 @@ export const httpInterceptorProviders = [
       },
       {
         path: 'system/:id',
-        component: SystemComponent
+        component: SystemComponent,
       },
       {
         path: 'systems',
-        component: SystemsComponent
-      },
-      {
-        path: 'sdc',
-        component: SystemsDefenceScoreComponent,
+        component: HomeV2Component,
+        data: {
+          reuseRoute: true,
+        },
       },
       {
         path: '**',
-        component: HomeComponent
+        component: HomeV2Component,
       },
     ]),
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -254,7 +283,14 @@ export const httpInterceptorProviders = [
       registrationStrategy: 'registerWhenStable:30000'
     }),
   ],
-  providers: [httpInterceptorProviders],
-  bootstrap: [AppComponent]
+  providers: [
+    httpInterceptorProviders,
+    {
+      provide: RouteReuseStrategy,
+      useClass: AppRouteReuseStrategy,
+    },
+  ],
+  bootstrap: [AppComponent],
+
 })
 export class AppModule { }

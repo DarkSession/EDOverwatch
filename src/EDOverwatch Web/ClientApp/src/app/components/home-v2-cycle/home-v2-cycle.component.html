@@ -1,0 +1,56 @@
+<div class="content-container">
+    <svg viewBox="0 0 54.8 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+        style="height: 100%; width: auto;">
+        <path d="M 204.659 6.613 L 204.659 61.46 L 104.243 61.46 L 204.659 6.613 Z"
+            style="transform-box: fill-box; transform-origin: 50% 50%;"
+            transform="matrix(0, -1, 1, 0, -127.042606, 16.153447)" class="svg" />
+        <path d="M 47.508 130.609 L 47.508 185.456 L -52.908 185.456 L 47.508 130.609 Z"
+            style="transform-origin: 154.451px 34.037px;" transform="matrix(0, 1, 1, 0, -251.024119, 272.912547)"
+            class="svg" />
+    </svg>
+    <div class="cycle-container">
+        <div class="subtitle">{{ title }}</div>
+        <ng-container *ngIf="cycle">
+            <div><i>{{ cycle.CycleStart | date: 'MMM dd' : '0' }} - {{ cycle.CycleEnd | date: 'MMM dd' : '0' }}</i>
+            </div>
+            <div class="states">
+                <div *ngIf="cycle.Alerts">
+                    <app-thargoid-level [thargoidLevel]="stateAlert"></app-thargoid-level>
+                    {{ cycle.Alerts }}
+                </div>
+                <div *ngIf="cycle.Invasions">
+                    <app-thargoid-level [thargoidLevel]="stateInvasion"></app-thargoid-level>
+                    {{ cycle.Invasions }}
+                </div>
+                <div *ngIf="cycle.Controls">
+                    <app-thargoid-level [thargoidLevel]="stateControlled"></app-thargoid-level>
+                    {{ cycle.Controls }}
+                </div>
+                <div *ngIf="cycle.Titans">
+                    <app-thargoid-level [thargoidLevel]="stateTitan"></app-thargoid-level>
+                    {{ cycle.Titans }}
+                </div>
+                <div *ngIf="cycle.Recovery">
+                    <app-thargoid-level [thargoidLevel]="stateRecovery"></app-thargoid-level>
+                    {{ cycle.Recovery }}
+                </div>
+            </div>
+            <div *ngIf="information" class="information">
+                <br>
+                <i>{{ information }}</i>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="!cycle">
+            <ngx-skeleton-loader count="4" appearance="line" pulse="true"></ngx-skeleton-loader>
+            <div *ngIf="information" class="information">
+                <br>
+                <ngx-skeleton-loader count="1" appearance="line" pulse="true"></ngx-skeleton-loader>
+            </div>
+        </ng-container>
+    </div>
+    <svg viewBox="0 0 54.8 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+        style="height: 100%; width: auto;">
+        <polygon points="-72.693 72.693 27.309 127.308 127.307 72.693" class="svg"
+            style="transform-box: fill-box; transform-origin: 50% 50%;" transform="matrix(0, -1, 1, 0, 0.0, 0.0)" />
+    </svg>
+</div>

@@ -1,9 +1,9 @@
 ﻿using EDOverwatch_Web.Models;
-using EDOverwatch_Web.WebSockets.EventListener.NotTracked;
+using EDOverwatch_Web.WebSockets.EventListener.Home;
 
 namespace EDOverwatch_Web.WebSockets.Handler
 {
-    public class OverwatchSystemDefenseScore : WebSocketHandler
+    public class OverwatchHomeV2 : WebSocketHandler
     {
         protected override Type? MessageDataType => null;
 
@@ -11,7 +11,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
 
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            return new WebSocketHandlerResultSuccess(await OverwatchSystemDefenseScores.Create(dbContext, cancellationToken), new NotTrackedObject());
+            return new WebSocketHandlerResultSuccess(await OverwatchOverviewV2.Create(dbContext, cancellationToken), new HomeObject());
         }
     }
 }

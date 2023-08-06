@@ -12,6 +12,10 @@
     align-items: center;
 }
 
+.thargoid-clear {
+    background-color: #bbb;
+}
+
 .thargoid-alert {
     background-color: rgb(241, 194, 50);
 }

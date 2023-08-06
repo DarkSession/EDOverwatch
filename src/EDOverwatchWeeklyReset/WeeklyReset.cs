@@ -198,7 +198,7 @@ namespace EDDataProcessor
 
             dbContext.ChangeTracker.Clear();
 
-            // Last update the progress for all systems except systems in recovery
+            // Now we update the progress for all systems except systems in recovery
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);

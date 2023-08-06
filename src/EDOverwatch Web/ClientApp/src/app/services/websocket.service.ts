@@ -30,6 +30,8 @@ export class WebsocketService {
     private connectionAttempt = 0;
     private cacheDb: IDBPDatabase<CacheDb> | null = null;
     private wasConnected = false;
+    private serverResponsesReceived: string[] = [];
+
     public constructor() {
         this.initDb();
         this.initalize();
@@ -184,6 +186,9 @@ export class WebsocketService {
     }
 
     private async processMessage(message: WebSocketResponseMessage, isCached: boolean): Promise<void> {
+        if (!isCached) {
+            this.serverResponsesReceived.push(message.MessageId);
+        }
         if (message.Name === "Authentication") {
             const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
             if (this.connectionIsAuthenticated !== authenticationData.IsAuthenticated) {
@@ -285,6 +290,9 @@ export class WebsocketService {
                 message: message,
                 callback: callback,
             });
+            if (this.connectionStatus == ConnectionStatus.Closed) {
+                this.ensureConnected();
+            }
         }
         await this.checkMessageCache(message, !!callback);
         this.triggerMessageBacklogEvent();
@@ -293,15 +301,21 @@ export class WebsocketService {
     private async checkMessageCache(message: WebSocketRequestMessage, hasCallback: boolean): Promise<void> {
         if (message.CacheId) {
             this.wsRequests[message.MessageId] = message.CacheId;
-            if (!hasCallback && this.cacheDb) {
-                const cachedMessage: WebSocketResponseMessage | undefined = await this.cacheDb.get('ws', message.CacheId);
-                if (cachedMessage) {
-                    if (!environment.production) {
-                        console.log("Using cached message", cachedMessage);
-                    }
-                    cachedMessage.MessageId = "00000000-0000-0000-0000-000000000000";
-                    await this.processMessage(cachedMessage, false);
+            setTimeout(async () => {
+                await this.respondWithMessageFromCache(message, hasCallback);
+            }, 1000);
+        }
+    }
+
+    private async respondWithMessageFromCache(message: WebSocketRequestMessage, hasCallback: boolean): Promise<void> {
+        if (message.CacheId && !hasCallback && this.cacheDb && !this.serverResponsesReceived.includes(message.MessageId)) {
+            const cachedMessage: WebSocketResponseMessage | undefined = await this.cacheDb.get('ws', message.CacheId);
+            if (cachedMessage) {
+                if (!environment.production) {
+                    console.log("Using cached message", cachedMessage);
                 }
+                cachedMessage.MessageId = "00000000-0000-0000-0000-000000000000";
+                await this.processMessage(cachedMessage, false);
             }
         }
     }

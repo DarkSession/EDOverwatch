@@ -137,7 +137,7 @@
             foreach (AlertPrediction alertPrediction in dbAlertPredictions.OrderBy(a => maelstrom!.StarSystem!.DistanceTo(a.StarSystem!)))
             {
                 double distance = Math.Round(maelstrom!.StarSystem!.DistanceTo(alertPrediction.StarSystem!), 2);
-                alertPredictions.Add(new OverwatchMaelstromDetailAlertPrediction(alertPrediction.StarSystem!, maelstrom, distance, alertPrediction.Attackers!));
+                alertPredictions.Add(new OverwatchMaelstromDetailAlertPrediction(alertPrediction.StarSystem!, maelstrom, distance, alertPrediction.Attackers!, alertPrediction.AlertLikely));
             }
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries

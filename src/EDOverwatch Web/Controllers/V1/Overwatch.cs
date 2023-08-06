@@ -25,10 +25,23 @@ namespace EDOverwatch_Web.Controllers.V1
         public async Task<OverwatchOverview> Overview(CancellationToken cancellationToken)
         {
             if (!MemoryCache.TryGetValue(OverviewCacheKey, out OverwatchOverview? result))
-            {
+            {   
                 result = await OverwatchOverview.LoadOverwatchOverview(DbContext, cancellationToken);
                 MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
                 MemoryCache.Set(OverviewCacheKey, result, cacheEntryOptions);
+            }
+            return result!;
+        }
+
+        private const string OverviewV2CacheKey = "OverwatchOverviewV2";
+        [HttpGet]
+        public async Task<OverwatchOverviewV2> OverviewV2(CancellationToken cancellationToken)
+        {
+            if (!MemoryCache.TryGetValue(OverviewV2CacheKey, out OverwatchOverviewV2? result))
+            {
+                result = await OverwatchOverviewV2.Create(DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+                MemoryCache.Set(OverviewV2CacheKey, result, cacheEntryOptions);
             }
             return result!;
         }
