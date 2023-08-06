@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { OverwatchStarSystemMin } from '../station-name/station-name.component';
-import { OverwatchMaelstromDetailAlertPredictionAttacker } from '../alert-prediction-attackers/alert-prediction-attackers.component';
+import { OverwatchAlertPredictionSystemAttacker } from '../alert-prediction-attackers/alert-prediction-attackers.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { MatTableDataSource } from '@angular/material/table';
@@ -15,8 +15,8 @@ import { faBullseye } from '@fortawesome/free-solid-svg-icons';
 export class AlertPredictionComponent implements OnChanges {
   public readonly faClipboard = faClipboard;
   public readonly faBullseye = faBullseye;
-  @Input() alertPredictions: OverwatchMaelstromDetailAlertPrediction[] = [];
-  public sortedAlertPredictions: MatTableDataSource<OverwatchMaelstromDetailAlertPrediction> = new MatTableDataSource<OverwatchMaelstromDetailAlertPrediction>();
+  @Input() alertPredictions: OverwatchAlertPredictionSystem[] = [];
+  public sortedAlertPredictions: MatTableDataSource<OverwatchAlertPredictionSystem> = new MatTableDataSource<OverwatchAlertPredictionSystem>();
   public readonly alertPredictionColumns = ['Name', 'Population', 'Distance', 'Attackers'];
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
   public showAll = false;
@@ -27,8 +27,8 @@ export class AlertPredictionComponent implements OnChanges {
   public ngOnChanges(): void {
     const alertPredictions = (this.showAll || this.alertPredictions.length < 12) ? this.alertPredictions : this.alertPredictions.splice(0, 10);
 
-    this.sortedAlertPredictions = new MatTableDataSource<OverwatchMaelstromDetailAlertPrediction>(alertPredictions);
-    this.sortedAlertPredictions.sortingDataAccessor = (system: OverwatchMaelstromDetailAlertPrediction, columnName: string): string | number => {
+    this.sortedAlertPredictions = new MatTableDataSource<OverwatchAlertPredictionSystem>(alertPredictions);
+    this.sortedAlertPredictions.sortingDataAccessor = (system: OverwatchAlertPredictionSystem, columnName: string): string | number => {
       switch (columnName) {
         case "Name": {
           return system.StarSystem.Name;
@@ -45,7 +45,7 @@ export class AlertPredictionComponent implements OnChanges {
     this.sortedAlertPredictions.sort = this.sort;
   }
 
-  public copySystemName(starSystem: OverwatchMaelstromDetailAlertPrediction): void {
+  public copySystemName(starSystem: OverwatchAlertPredictionSystem): void {
     navigator.clipboard.writeText(starSystem.StarSystem.Name);
     this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
       duration: 2000,
@@ -58,9 +58,9 @@ export class AlertPredictionComponent implements OnChanges {
   }
 }
 
-export interface OverwatchMaelstromDetailAlertPrediction {
+export interface OverwatchAlertPredictionSystem {
   StarSystem: OverwatchStarSystemMin;
   Distance: number;
-  Attackers: OverwatchMaelstromDetailAlertPredictionAttacker[];
+  Attackers: OverwatchAlertPredictionSystemAttacker[];
   PrimaryTarget: boolean;
 }

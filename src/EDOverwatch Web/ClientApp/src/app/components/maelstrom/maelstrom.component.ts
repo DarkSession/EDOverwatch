@@ -1,6 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
@@ -9,7 +7,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchOverviewMaelstromHistoricalSummary, OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
-import { OverwatchMaelstromDetailAlertPrediction } from '../alert-prediction/alert-prediction.component';
+import { OverwatchAlertPredictionSystem } from '../alert-prediction/alert-prediction.component';
 
 @UntilDestroy()
 @Component({
@@ -20,7 +18,7 @@ import { OverwatchMaelstromDetailAlertPrediction } from '../alert-prediction/ale
 })
 export class MaelstromComponent implements OnInit {
   public maelstrom: OverwatchMaelstromDetail | null = null;
-  public alertPredictions: OverwatchMaelstromDetailAlertPrediction[] = [];
+  public alertPredictions: OverwatchAlertPredictionSystem[] = [];
   public chartConfig: ChartConfiguration = {
     type: 'bar',
     data: {
@@ -82,8 +80,6 @@ export class MaelstromComponent implements OnInit {
         }
       });
   }
-
-
 
   private processChartData(): void {
     if (this.maelstrom && this.maelstrom.ThargoidCycles && this.maelstrom.MaelstromHistory) {
@@ -211,7 +207,7 @@ export class MaelstromComponent implements OnInit {
 
 interface OverwatchMaelstromDetail extends OverwatchMaelstrom {
   Systems: OverwatchStarSystem[];
-  AlertPredictions: OverwatchMaelstromDetailAlertPrediction[];
+  AlertPredictions: OverwatchAlertPredictionSystem[];
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];
 }

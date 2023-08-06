@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Threading;
 
 namespace EDOverwatch_Web.Controllers.V1
 {
@@ -112,6 +114,19 @@ namespace EDOverwatch_Web.Controllers.V1
                 result = await OverwatchThargoidCycle.GetThargoidCycles(DbContext, cancellationToken);
                 MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
                 MemoryCache.Set(ThargoidCyclesCacheKey, result, cacheEntryOptions);
+            }
+            return result!;
+        }
+
+        private const string AlertPredictionsCacheKey = "AlertPredictions";
+        [HttpGet]
+        public async Task<OverwatchAlertPredictions> AlertPredictions(CancellationToken cancellationToken)
+        {
+            if (!MemoryCache.TryGetValue(AlertPredictionsCacheKey, out OverwatchAlertPredictions? result))
+            {
+                result = await Models.OverwatchAlertPredictions.Create(DbContext, cancellationToken);
+                MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                MemoryCache.Set(MaelstromsCacheKey, result, cacheEntryOptions);
             }
             return result!;
         }

@@ -10,8 +10,8 @@ import { faFan, faPerson } from '@fortawesome/free-solid-svg-icons';
 export class AlertPredictionAttackersComponent implements OnChanges {
   public readonly faFan = faFan;
   public readonly faPerson = faPerson;
-  @Input() attackers?: OverwatchMaelstromDetailAlertPredictionAttacker[];
-  public visibleAttackers: OverwatchMaelstromDetailAlertPredictionAttacker[] = [];
+  @Input() attackers?: OverwatchAlertPredictionSystemAttacker[];
+  public visibleAttackers: OverwatchAlertPredictionSystemAttacker[] = [];
   public additionalEntries = 0;
   public limitVisibleAttackers = true;
 
@@ -45,7 +45,7 @@ export class AlertPredictionAttackersComponent implements OnChanges {
   }
 }
 
-export interface OverwatchMaelstromDetailAlertPredictionAttacker {
+export interface OverwatchAlertPredictionSystemAttacker {
   StarSystem: OverwatchStarSystem;
   Distance: number;
 }

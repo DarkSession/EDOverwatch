@@ -1,0 +1,22 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-large">
+        <div class="title">
+            Alert Predictions
+        </div>
+        <div class="content-box" *ngIf="predictions && predictions.Maelstroms">
+            <p>
+                Below you find the predicted alerts for the next cycle.
+                <br>
+                If nothing changes and the prediction is correct is means that the highlighted systems will be in alert in the next upcoming cycle.<br>
+                If a highlighted system has all its attacking systems cleared or is skipped for any other reason it usually means the next not highlighted system is used instead.
+            </p>
+            <ng-container *ngFor="let maelstrom of predictions.Maelstroms">
+                <div class="subtitle">
+                    {{ maelstrom.Maelstrom.Name }}
+                </div>
+                <app-alert-prediction [alertPredictions]="maelstrom.Systems"></app-alert-prediction>
+                <br>
+            </ng-container>
+        </div>
+    </div>
+</div>

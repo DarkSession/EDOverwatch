@@ -3,14 +3,14 @@
     public class OverwatchMaelstromDetail : OverwatchMaelstrom
     {
         public List<OverwatchStarSystem> Systems { get; }
-        public List<OverwatchMaelstromDetailAlertPrediction> SystemsAtRisk { get; } = new(); // We keep this for compatibility reasons for now
-        public List<OverwatchMaelstromDetailAlertPrediction> AlertPredictions { get; } = new();
+        public List<OverwatchAlertPredictionSystem> SystemsAtRisk { get; } = new(); // We keep this for compatibility reasons for now
+        public List<OverwatchAlertPredictionSystem> AlertPredictions { get; } = new();
         public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }
 
         protected OverwatchMaelstromDetail(
             ThargoidMaelstrom thargoidMaelstrom, List<OverwatchStarSystem> systems,
-            List<OverwatchMaelstromDetailAlertPrediction> alertPredictions,
+            List<OverwatchAlertPredictionSystem> alertPredictions,
             List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory,
             List<OverwatchThargoidCycle> thargoidCycles) :
             base(thargoidMaelstrom)
@@ -111,33 +111,20 @@
                     system.StationsUnderAttack));
             }
 
-            List<OverwatchMaelstromDetailAlertPrediction> alertPredictions = new();
+            List<OverwatchAlertPredictionSystem> alertPredictions = new();
             ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
             List<AlertPrediction> dbAlertPredictions = await dbContext.AlertPredictions
                 .AsNoTracking()
                 .AsSplitQuery()
-                .Include(a => a.StarSystem)
                 .Include(a => a.Attackers!)
-                .ThenInclude(a => a.StarSystem!)
-                .ThenInclude(s => s.ThargoidLevel!)
-                .ThenInclude(t => t.Maelstrom!)
-                .ThenInclude(m => m.StarSystem)
-                .Include(a => a.Attackers!)
-                .ThenInclude(a => a.StarSystem!)
-                .ThenInclude(s => s.ThargoidLevel!.CycleStart)
-                .Include(a => a.Attackers!)
-                .ThenInclude(a => a.StarSystem!)
-                .ThenInclude(s => s.ThargoidLevel!.CycleEnd)
-                .Include(a => a.Attackers!)
-                .ThenInclude(a => a.StarSystem!)
-                .ThenInclude(s => s.ThargoidLevel!.StateExpires)
+                .ThenInclude(a => a.StarSystem!.ThargoidLevel)
                 .Where(a => a.Maelstrom == maelstrom && a.Cycle == nextThargoidCycle)
                 .ToListAsync(cancellationToken);
 
             foreach (AlertPrediction alertPrediction in dbAlertPredictions.OrderBy(a => maelstrom!.StarSystem!.DistanceTo(a.StarSystem!)))
             {
                 double distance = Math.Round(maelstrom!.StarSystem!.DistanceTo(alertPrediction.StarSystem!), 2);
-                alertPredictions.Add(new OverwatchMaelstromDetailAlertPrediction(alertPrediction.StarSystem!, maelstrom, distance, alertPrediction.Attackers!, alertPrediction.AlertLikely));
+                alertPredictions.Add(new OverwatchAlertPredictionSystem(alertPrediction.StarSystem!, maelstrom, distance, alertPrediction.Attackers!, alertPrediction.AlertLikely));
             }
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries

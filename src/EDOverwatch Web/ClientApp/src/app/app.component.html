@@ -53,13 +53,10 @@
   <mat-sidenav-container style="min-height: calc(100vh - 80px)">
     <mat-sidenav #sidenav mode="side" [opened]="appService.isMenuOpen" class="side-nav">
       <div>
-        <div routerLink="/" class="clickable">Overview</div>
+        <div routerLink="/" class="clickable">Systems</div>
       </div>
       <div>
-        <div routerLink="titans" class="clickable">Titans/Maelstroms</div>
-      </div>
-      <div>
-        <div routerLink="systems" class="clickable">Systems</div>
+        <div routerLink="titans" class="clickable">Titans</div>
       </div>
       <div>
         <div routerLink="contribute" class="clickable">Contribute</div>
@@ -69,6 +66,9 @@
       </div>
       <div>
         <div routerLink="stats" class="clickable">Stats</div>
+      </div>
+      <div>
+        <div routerLink="alert-predictions" class="clickable">Alert Predictions</div>
       </div>
       <ng-container *ngIf="appService.user">
         <hr>

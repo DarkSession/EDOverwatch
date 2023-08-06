@@ -68,6 +68,42 @@ namespace EDDatabase
             modelBuilder.Entity<StarSystemThargoidLevel>()
                 .HasMany(s => s.ProgressHistory)
                 .WithOne(s => s.ThargoidLevel);
+
+            modelBuilder.Entity<AlertPrediction>()
+                .Navigation(a => a.StarSystem)
+                .AutoInclude();
+
+            modelBuilder.Entity<AlertPrediction>()
+                .Navigation(a => a.Maelstrom)
+                .AutoInclude();
+
+            modelBuilder.Entity<AlertPredictionAttacker>()
+                .Navigation(a => a.StarSystem)
+                .AutoInclude();
+
+            modelBuilder.Entity<StarSystemThargoidLevel>()
+                .Navigation(s => s.CycleStart)
+                .AutoInclude();
+
+            modelBuilder.Entity<StarSystemThargoidLevel>()
+                .Navigation(s => s.CycleEnd)
+                .AutoInclude();
+
+            modelBuilder.Entity<StarSystemThargoidLevel>()
+                .Navigation(s => s.StateExpires)
+                .AutoInclude();
+
+            modelBuilder.Entity<StarSystemThargoidLevel>()
+                .Navigation(s => s.CurrentProgress)
+                .AutoInclude();
+
+            modelBuilder.Entity<StarSystemThargoidLevel>()
+                .Navigation(s => s.Maelstrom)
+                .AutoInclude();
+
+            modelBuilder.Entity<ThargoidMaelstrom>()
+                .Navigation(t => t.StarSystem)
+                .AutoInclude();
         }
 
         public Task<ThargoidCycle> GetThargoidCycle(CancellationToken cancellationToken) => GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);

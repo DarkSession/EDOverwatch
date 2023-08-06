@@ -56,7 +56,6 @@ namespace EDOverwatchAlertPrediction
             List<EDDatabase.AlertPrediction> alertPredictions = await dbContext.AlertPredictions
                 .AsSplitQuery()
                 .Include(a => a.Attackers!)
-                .ThenInclude(a => a.StarSystem)
                 .Where(a => a.Cycle == thargoidCycle)
                 .ToListAsync(cancellationToken);
             List<EDDatabase.AlertPrediction> usedAlertPredictions = new();
