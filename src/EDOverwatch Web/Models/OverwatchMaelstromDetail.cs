@@ -3,19 +3,20 @@
     public class OverwatchMaelstromDetail : OverwatchMaelstrom
     {
         public List<OverwatchStarSystem> Systems { get; }
-        public List<OverwatchMaelstromDetailSystemAtRisk> SystemsAtRisk { get; }
+        public List<OverwatchMaelstromDetailAlertPrediction> SystemsAtRisk { get; } = new(); // We keep this for compatibility reasons for now
+        public List<OverwatchMaelstromDetailAlertPrediction> AlertPredictions { get; } = new();
         public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }
 
         protected OverwatchMaelstromDetail(
             ThargoidMaelstrom thargoidMaelstrom, List<OverwatchStarSystem> systems,
-            List<OverwatchMaelstromDetailSystemAtRisk> systemAtRisks,
+            List<OverwatchMaelstromDetailAlertPrediction> alertPredictions,
             List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory,
             List<OverwatchThargoidCycle> thargoidCycles) :
             base(thargoidMaelstrom)
         {
             Systems = systems;
-            SystemsAtRisk = systemAtRisks;
+            AlertPredictions = alertPredictions;
             MaelstromHistory = maelstromHistory;
             ThargoidCycles = thargoidCycles;
         }
@@ -110,32 +111,33 @@
                     system.StationsUnderAttack));
             }
 
-            List<OverwatchMaelstromDetailSystemAtRisk> systemsAtRiskResult = new();
-            decimal systemsAtRiskSphere = maelstrom.InfluenceSphere + 10.02m;
-            List<StarSystem> systemsAtRisk = await dbContext.StarSystems
+            List<OverwatchMaelstromDetailAlertPrediction> alertPredictions = new();
+            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+            List<AlertPrediction> dbAlertPredictions = await dbContext.AlertPredictions
                 .AsNoTracking()
-                .Where(s =>
-                    s.LocationX >= maelstrom.StarSystem.LocationX - systemsAtRiskSphere && s.LocationX <= maelstrom.StarSystem.LocationX + systemsAtRiskSphere &&
-                    s.LocationY >= maelstrom.StarSystem.LocationY - systemsAtRiskSphere && s.LocationY <= maelstrom.StarSystem.LocationY + systemsAtRiskSphere &&
-                    s.LocationZ >= maelstrom.StarSystem.LocationZ - systemsAtRiskSphere && s.LocationZ <= maelstrom.StarSystem.LocationZ + systemsAtRiskSphere &&
-                    s.Population > 0 &&
-                    (s.ThargoidLevel == null || s.ThargoidLevel.State == StarSystemThargoidLevelState.None))
-                .Take(250)
+                .AsSplitQuery()
+                .Include(a => a.StarSystem)
+                .Include(a => a.Attackers!)
+                .ThenInclude(a => a.StarSystem!)
+                .ThenInclude(s => s.ThargoidLevel!)
+                .ThenInclude(t => t.Maelstrom!)
+                .ThenInclude(m => m.StarSystem)
+                .Include(a => a.Attackers!)
+                .ThenInclude(a => a.StarSystem!)
+                .ThenInclude(s => s.ThargoidLevel!.CycleStart)
+                .Include(a => a.Attackers!)
+                .ThenInclude(a => a.StarSystem!)
+                .ThenInclude(s => s.ThargoidLevel!.CycleEnd)
+                .Include(a => a.Attackers!)
+                .ThenInclude(a => a.StarSystem!)
+                .ThenInclude(s => s.ThargoidLevel!.StateExpires)
+                .Where(a => a.Maelstrom == maelstrom && a.Cycle == nextThargoidCycle)
                 .ToListAsync(cancellationToken);
-            foreach (StarSystem systemAtRisk in systemsAtRisk)
+
+            foreach (AlertPrediction alertPrediction in dbAlertPredictions.OrderBy(a => maelstrom!.StarSystem!.DistanceTo(a.StarSystem!)))
             {
-                double distance = Math.Round(maelstrom.StarSystem.DistanceTo(systemAtRisk), 2);
-                if (distance > (double)systemsAtRiskSphere)
-                {
-                    continue;
-                }
-                if (systems.Any(s =>
-                    ((s.StarSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && (s.StarSystem.ThargoidLevel!.Progress < 100 || s.StarSystem.ThargoidLevel!.Progress == null)) ||
-                    s.StarSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Titan) &&
-                    s.StarSystem.DistanceTo(systemAtRisk) <= 10.02f))
-                {
-                    systemsAtRiskResult.Add(new OverwatchMaelstromDetailSystemAtRisk(systemAtRisk.Name, distance, systemAtRisk.Population));
-                }
+                double distance = Math.Round(maelstrom!.StarSystem!.DistanceTo(alertPrediction.StarSystem!), 2);
+                alertPredictions.Add(new OverwatchMaelstromDetailAlertPrediction(alertPrediction.StarSystem!, maelstrom, distance, alertPrediction.Attackers!));
             }
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
@@ -147,7 +149,7 @@
                 .ToListAsync(cancellationToken);
             List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory = maelstromHistoricalSummaries.Select(m => new OverwatchOverviewMaelstromHistoricalSummary(m)).ToList();
             List<OverwatchThargoidCycle> thargoidCycles = await OverwatchThargoidCycle.GetThargoidCycles(dbContext, cancellationToken);
-            return new OverwatchMaelstromDetail(maelstrom, resultStarSystems, systemsAtRiskResult, maelstromHistory, thargoidCycles);
+            return new OverwatchMaelstromDetail(maelstrom, resultStarSystems, alertPredictions, maelstromHistory, thargoidCycles);
         }
     }
 }

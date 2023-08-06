@@ -238,7 +238,7 @@ namespace EDDataProcessor.CApiJournal
                             {
                                 string? commodityName = fleetCarrierCargoEntry.Commodity?.ToLower();
                                 if (commanderFleetCarrierCargoItems.FirstOrDefault(c =>
-                                    c.Commodity?.Name.ToLower() == commodityName && 
+                                    c.Commodity?.Name.ToLower() == commodityName &&
                                     c.SourceStarSystem?.SystemAddress == fleetCarrierCargoEntry.OriginSystem &&
                                     c.Amount == fleetCarrierCargoEntry.Qty) is CommanderFleetCarrierCargoItem commanderFleetCarrierCargoItem)
                                 {

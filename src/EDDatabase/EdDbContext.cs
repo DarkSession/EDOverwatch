@@ -7,6 +7,9 @@ namespace EDDatabase
 {
     public class EdDbContext : DbContext
     {
+        public DbSet<AlertPrediction> AlertPredictions { get; set; }
+        public DbSet<AlertPredictionCycleAttacker> AlertPredictionCycleAttackers { get; set; }
+
         public DbSet<ApiKey> ApiKeys { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Commander> Commanders { get; set; }

@@ -31,7 +31,7 @@
             {
                 Commander = journalParameters.Commander,
             });
-            
+
             WarEffort? warEffort = await dbContext.WarEfforts
                 .FirstOrDefaultAsync(w =>
                         w.Commander == journalParameters.Commander &&

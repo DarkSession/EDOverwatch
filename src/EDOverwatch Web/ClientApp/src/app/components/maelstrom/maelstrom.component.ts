@@ -11,6 +11,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchOverviewMaelstromHistoricalSummary, OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { OverwatchStarSystemMin } from '../station-name/station-name.component';
 
 @UntilDestroy()
 @Component({
@@ -22,8 +23,8 @@ import { OverwatchStarSystem } from '../system-list/system-list.component';
 export class MaelstromComponent implements OnInit {
   public readonly faClipboard = faClipboard;
   public maelstrom: OverwatchMaelstromDetail | null = null;
-  public systemsAtRisk: MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk> = new MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk>();
-  public readonly systemsAtRiskColumns = ['Name', 'Population', 'Distance'];
+  public alertPredictions: MatTableDataSource<OverwatchMaelstromDetailAlertPrediction> = new MatTableDataSource<OverwatchMaelstromDetailAlertPrediction>();
+  public readonly alertPredictionColumns = ['Name', 'Population', 'Distance', 'Attackers'];
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
   public chartConfig: ChartConfiguration = {
     type: 'bar',
@@ -81,20 +82,20 @@ export class MaelstromComponent implements OnInit {
         if (message && message.Data) {
           const data = message.Data;
           this.maelstrom = data;
-          const sortedSystemsAtRisk = (this.sort) ? this.systemsAtRisk.sortData(data.SystemsAtRisk, this.sort) : data.SystemsAtRisk;
-          this.systemsAtRisk = new MatTableDataSource<OverwatchMaelstromDetailSystemAtRisk>(sortedSystemsAtRisk);
-          this.systemsAtRisk.sortingDataAccessor = (system: OverwatchMaelstromDetailSystemAtRisk, columnName: string): string => {
-            return system[columnName as keyof OverwatchMaelstromDetailSystemAtRisk] as string;
+          const sortedAlertPredictions = (this.sort) ? this.alertPredictions.sortData(data.AlertPredictions, this.sort) : data.AlertPredictions;
+          this.alertPredictions = new MatTableDataSource<OverwatchMaelstromDetailAlertPrediction>(sortedAlertPredictions);
+          this.alertPredictions.sortingDataAccessor = (system: OverwatchMaelstromDetailAlertPrediction, columnName: string): string => {
+            return system[columnName as keyof OverwatchMaelstromDetailAlertPrediction] as unknown as string;
           }
-          this.systemsAtRisk.sort = this.sort;
+          this.alertPredictions.sort = this.sort;
           this.processChartData();
           this.changeDetectorRef.markForCheck();
         }
       });
   }
 
-  public copySystemName(starSystem: OverwatchMaelstromDetailSystemAtRisk): void {
-    navigator.clipboard.writeText(starSystem.Name);
+  public copySystemName(starSystem: OverwatchMaelstromDetailAlertPrediction): void {
+    navigator.clipboard.writeText(starSystem.StarSystem.Name);
     this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
       duration: 2000,
     });
@@ -226,13 +227,18 @@ export class MaelstromComponent implements OnInit {
 
 interface OverwatchMaelstromDetail extends OverwatchMaelstrom {
   Systems: OverwatchStarSystem[];
-  SystemsAtRisk: OverwatchMaelstromDetailSystemAtRisk[];
+  AlertPredictions: OverwatchMaelstromDetailAlertPrediction[];
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];
 }
 
-interface OverwatchMaelstromDetailSystemAtRisk {
-  Name: string;
+interface OverwatchMaelstromDetailAlertPrediction {
+  StarSystem: OverwatchStarSystemMin;
   Distance: number;
-  Population: number;
+  Attackers: OverwatchMaelstromDetailAlertPredictionAttacker[];
+}
+
+interface OverwatchMaelstromDetailAlertPredictionAttacker {
+  StarSystem: OverwatchStarSystem;
+  Distance: number;
 }

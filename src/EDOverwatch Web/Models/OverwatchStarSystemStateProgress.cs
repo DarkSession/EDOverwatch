@@ -14,14 +14,7 @@
             IsCompleted = ProgressPercent >= 1;
             if (IsCompleted)
             {
-                StarSystemThargoidLevelState nextSystemState = currentSystemState switch
-                {
-                    StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.None,
-                    StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Recovery,
-                    StarSystemThargoidLevelState.Controlled when starSystem.OriginalPopulation > 0 => StarSystemThargoidLevelState.Recovery,
-                    StarSystemThargoidLevelState.Recovery => StarSystemThargoidLevelState.None,
-                    _ => StarSystemThargoidLevelState.None,
-                };
+                StarSystemThargoidLevelState nextSystemState = StarSystemThargoidLevel.GetNextThargoidState(currentSystemState, starSystem.OriginalPopulation > 0, true);
                 NextSystemState = new(nextSystemState);
                 SystemStateChanges = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
             }

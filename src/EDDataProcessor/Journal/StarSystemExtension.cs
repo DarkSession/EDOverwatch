@@ -75,7 +75,7 @@ namespace EDDataProcessor.Journal
                     }
                     if (starSystem.ThargoidLevel.CurrentProgress != null && starSystem.ThargoidLevel.CurrentProgress.LastChecked < updateTime)
                     {
-						starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
+                        starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
                     }
                     if (starSystem.ThargoidLevel.StateExpires == null && fsdJumpThargoidWar.RemainingDays is int remainingDays && remainingDays > 0)
                     {
@@ -94,7 +94,7 @@ namespace EDDataProcessor.Journal
             return false;
         }
 
-       private static async Task<ThargoidMaelstrom?> GetMaelstrom(StarSystem starSystem , EdDbContext dbContext, CancellationToken cancellationToken)
+        private static async Task<ThargoidMaelstrom?> GetMaelstrom(StarSystem starSystem, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .Include(t => t.StarSystem)

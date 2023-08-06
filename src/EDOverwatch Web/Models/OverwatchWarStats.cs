@@ -163,7 +163,7 @@
                     WarEffortType.KillThargoidCyclops,
                     WarEffortType.KillThargoidBasilisk,
                     WarEffortType.KillThargoidMedusa,
-                    WarEffortType.KillThargoidHydra,    
+                    WarEffortType.KillThargoidHydra,
                     WarEffortType.KillThargoidOrthrus,
                     WarEffortType.KillThargoidHunter,
                     WarEffortType.KillThargoidRevenant,

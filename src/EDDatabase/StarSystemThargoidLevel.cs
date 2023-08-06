@@ -63,6 +63,30 @@ namespace EDDatabase
             Created = created;
             IsInvisibleState = isInvisibleState;
         }
+
+        public static StarSystemThargoidLevelState GetNextThargoidState(StarSystemThargoidLevelState currentState, bool populated, bool completed)
+        {
+            if (completed)
+            {
+                return currentState switch
+                {
+                    StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.None,
+                    StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Recovery,
+                    StarSystemThargoidLevelState.Controlled when populated => StarSystemThargoidLevelState.Recovery,
+                    StarSystemThargoidLevelState.Recovery => StarSystemThargoidLevelState.None,
+                    _ => StarSystemThargoidLevelState.None,
+                };
+            }
+
+            return currentState switch
+            {
+                StarSystemThargoidLevelState.Alert when populated => StarSystemThargoidLevelState.Invasion,
+                StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.Controlled,
+                StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Controlled,
+                StarSystemThargoidLevelState.Controlled => StarSystemThargoidLevelState.Controlled,
+                _ => StarSystemThargoidLevelState.None,
+            };
+        }
     }
 
     public enum StarSystemThargoidLevelState : byte

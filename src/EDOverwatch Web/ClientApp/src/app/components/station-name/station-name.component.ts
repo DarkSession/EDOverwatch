@@ -31,7 +31,8 @@ interface OverwatchStationRescueShip {
   DistanceLy: number;
 }
 
-interface OverwatchStarSystemMin {
+export interface OverwatchStarSystemMin {
   SystemAddress: number;
   Name: string;
+  Population: number;
 }

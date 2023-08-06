@@ -33,15 +33,18 @@
                         <app-system-list [systems]="maelstrom.Systems"></app-system-list>
                     </ng-template>
                 </mat-tab>
-                <mat-tab label="Unaffected systems at risk">
+                <mat-tab label="Alert predictions">
                     <div class="table-container">
                         <div class="table">
-                            <table mat-table [dataSource]="systemsAtRisk" matSort matSortActive="Distance"
+                            <table mat-table [dataSource]="alertPredictions" matSort matSortActive="Distance"
                                 matSortDirection="asc" matSortDisableClear>
                                 <ng-container matColumnDef="Name">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
                                     <td mat-cell *matCellDef="let row" class="nowrap">
-                                        {{ row.Name }}
+                                        <span class="clickable"
+                                            [routerLink]="['/system', row.StarSystem.SystemAddress]">
+                                            {{ row.StarSystem.Name }}
+                                        </span>
                                         <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
                                             (click)="copySystemName(row)"></fa-icon>
                                     </td>
@@ -49,7 +52,7 @@
                                 <ng-container matColumnDef="Population">
                                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Population</th>
                                     <td mat-cell *matCellDef="let row">
-                                        {{ row.Population | numberSuffix:1 }}
+                                        {{ row.StarSystem.Population | numberSuffix:1 }}
                                     </td>
                                 </ng-container>
                                 <ng-container matColumnDef="Distance">
@@ -58,11 +61,24 @@
                                         {{ row.Distance }} Ly
                                     </td>
                                 </ng-container>
-                                <tr mat-header-row *matHeaderRowDef="systemsAtRiskColumns; sticky: true" class="thead">
+                                <ng-container matColumnDef="Attackers">
+                                    <th mat-header-cell *matHeaderCellDef>Attackers</th>
+                                    <td mat-cell *matCellDef="let row">
+                                        <div *ngFor="let attacker of row.Attackers">
+                                            <span class="clickable"
+                                                [routerLink]="['/system', attacker.StarSystem.SystemAddress]">
+                                                {{ attacker.StarSystem.Name }}
+                                            </span>
+                                            ({{ attacker.Distance }} Ly)
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="alertPredictionColumns; sticky: true"
+                                    class="thead">
                                 </tr>
-                                <tr mat-row *matRowDef="let row; columns: systemsAtRiskColumns;"></tr>
+                                <tr mat-row *matRowDef="let row; columns: alertPredictionColumns;"></tr>
                             </table>
-                            <div *ngIf="systemsAtRisk.data.length === 0" class="empty-table">
+                            <div *ngIf="alertPredictions.data.length === 0" class="empty-table">
                                 No records found.
                             </div>
                         </div>
