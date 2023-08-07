@@ -22,3 +22,7 @@ div.load-more {
 .alert-likely:hover {
     background-color: rgb(241, 194, 50, 0.1) !important;
 }
+
+table {
+    table-layout: fixed;
+}

@@ -212,16 +212,10 @@ export const httpInterceptorProviders = [
       {
         path: 'maelstrom/:name',
         component: MaelstromComponent,
-        data: {
-          reuseRoute: true,
-        },
       },
       {
         path: 'titan/:name',
         component: MaelstromComponent,
-        data: {
-          reuseRoute: true,
-        },
       },
       {
         path: 'maelstroms',
