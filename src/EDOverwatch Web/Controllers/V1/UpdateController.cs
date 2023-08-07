@@ -1,4 +1,5 @@
-﻿using EDOverwatch_Web.Models;
+﻿using EDDatabase;
+using EDOverwatch_Web.Models;
 using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +23,24 @@ namespace EDOverwatch_Web.Controllers.V1
         [HttpGet]
         public async Task<List<OverwatchStarSystemMin>> PossibleNewSystems(CancellationToken cancellationToken)
         {
+            List<OverwatchStarSystemMin> result = new();
+            ThargoidCycle thargoidCycle = await DbContext.GetThargoidCycle(cancellationToken);
+
+            List<AlertPrediction> alertPredictions = await DbContext.AlertPredictions
+                .Where(a => a.Cycle == thargoidCycle)
+                .OrderByDescending(a => a.AlertLikely)
+                .ToListAsync(cancellationToken);
+            foreach (AlertPrediction alertPrediction in alertPredictions)
+            {
+                result.Add(new(alertPrediction.StarSystem!));
+            }
+
             List<StarSystem> allThargoidControlledSystems = await DbContext.StarSystems
                 .AsNoTracking()
                 .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Titan || s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
                 .Include(s => s.ThargoidLevel)
                 .ToListAsync(cancellationToken);
 
-            List<OverwatchStarSystemMin> result = new();
             List<ThargoidMaelstrom> thargoidMaelstroms = await DbContext.ThargoidMaelstroms
                 .AsNoTracking()
                 .Include(t => t.StarSystem)
@@ -53,7 +65,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     .ToListAsync(cancellationToken);
                 foreach (StarSystem starSystem in starSystems)
                 {
-                    if (maelstromControlledSystems.Any(s => s.DistanceTo(starSystem) <= 10.02f))
+                    if (maelstromControlledSystems.Any(s => s.DistanceTo(starSystem) <= 10.02f) && !result.Any(r => r.SystemAddress == starSystem.SystemAddress))
                     {
                         result.Add(new(starSystem));
                     }

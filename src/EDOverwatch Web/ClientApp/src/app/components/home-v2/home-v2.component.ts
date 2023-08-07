@@ -3,7 +3,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchOverviewV2Cycle } from '../home-v2-cycle/home-v2-cycle.component';
 import { OverwatchOverviewV2CycleChange } from '../home-v2-cycle-changes/home-v2-cycle-changes.component';
-import { faArrowUpRightFromSquare, faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpRightFromSquare, faCircleXmark, faFilter, faGears } from '@fortawesome/free-solid-svg-icons';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-list.component';
@@ -19,6 +19,8 @@ export class HomeV2Component implements OnInit, AfterViewInit {
   public readonly faArrowUpRightFromSquare = faArrowUpRightFromSquare;
   public readonly faFilter = faFilter;
   public readonly faCircleXmark = faCircleXmark;
+  public readonly OverviewDataStatus = OverviewDataStatus;
+  public readonly faGears = faGears;
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
   public hideUnpopulated: boolean = false;
   public hideCompleted: boolean = false;
@@ -187,4 +189,11 @@ interface OverwatchOverviewV2 {
   Levels: OverwatchThargoidLevel[];
   Systems: OverwatchStarSystem[];
   NextTick: string;
+  Status: OverviewDataStatus;
+}
+
+enum OverviewDataStatus {
+  Default,
+  TickInProgress,
+  UpdatePending,
 }

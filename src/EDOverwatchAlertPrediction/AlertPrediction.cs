@@ -35,7 +35,6 @@ namespace EDOverwatchAlertPrediction
 
                 List<AlertPredictionCycleAttacker> alertPredictionCycleAttackers = await dbContext.AlertPredictionCycleAttackers
                     .AsNoTracking()
-                    .Include(a => a.AttackerStarSystem)
                     .Where(a => a.Cycle == previousThargoidCycle)
                     .ToListAsync(cancellationToken);
 
@@ -84,6 +83,10 @@ namespace EDOverwatchAlertPrediction
                 {
                     int attackCost = attack.VictimSystem.AttackCost();
                     bool alertLikely = attackingCredits >= attackCost;
+                    if (alertLikely && !attack.Attackers!.Any(a => !primaryAttackerSystems.Contains(a)))
+                    {
+                        alertLikely = false;
+                    }
                     if (alertLikely)
                     {
                         attackingCredits -= attackCost;
@@ -133,6 +136,56 @@ namespace EDOverwatchAlertPrediction
             dbContext.AlertPredictions.RemoveRange(alertPredictions.Where(a => !usedAlertPredictions.Contains(a)));
 
             await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public static async Task UpdateAttackersForCycle(EdDbContext dbContext, ThargoidCycle thargoidCycle, CancellationToken cancellationToken)
+        {
+            List<StarSystemThargoidLevel> starSystemThargoidLevels = await dbContext.StarSystemThargoidLevels
+                .Where(s => s.State == StarSystemThargoidLevelState.Alert && s.CycleEnd == null && s.StateExpires == thargoidCycle)
+                .ToListAsync(cancellationToken);
+
+            List<EDDatabase.AlertPrediction> alertPredictions = await dbContext.AlertPredictions
+                .Include(a => a.Attackers)
+                .Where(a => a.Cycle == thargoidCycle)
+                .ToListAsync(cancellationToken);
+
+            List<AlertPredictionCycleAttacker> alertPredictionCycleAttackers = await dbContext.AlertPredictionCycleAttackers
+                .Include(a => a.VictimStarSystem)
+                .Where(a => a.Cycle == thargoidCycle)
+                .ToListAsync(cancellationToken);
+
+            List<StarSystem> usedAttackers = new();
+
+            foreach (EDDatabase.AlertPrediction alertPrediction in alertPredictions)
+            {
+                if (starSystemThargoidLevels.Any(s => s.StarSystem == alertPrediction.StarSystem))
+                {
+                    StarSystem? attackingSystem = alertPrediction.Attackers?
+                        .OrderBy(a => a.Order)
+                        .Select(a => a.StarSystem)
+                        .FirstOrDefault(s => !usedAttackers.Contains(s!));
+                    if (attackingSystem != null)
+                    {
+                        usedAttackers.Add(attackingSystem);
+                        AlertPredictionCycleAttacker? alertPredictionCycleAttacker = alertPredictionCycleAttackers.FirstOrDefault(a => a.VictimStarSystem == alertPrediction.StarSystem);
+                        if (alertPredictionCycleAttacker != null)
+                        {
+                            alertPredictionCycleAttackers.Remove(alertPredictionCycleAttacker);
+                            alertPredictionCycleAttacker.AttackerStarSystem = attackingSystem;
+                        }
+                        else
+                        {
+                            alertPredictionCycleAttacker = new(0)
+                            {
+                                Cycle = thargoidCycle,
+                                AttackerStarSystem = attackingSystem,
+                                VictimStarSystem = alertPrediction.StarSystem,
+                            };
+                            dbContext.AlertPredictionCycleAttackers.Add(alertPredictionCycleAttacker);
+                        }
+                    }
+                }
+            }
         }
     }
 }

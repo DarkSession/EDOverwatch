@@ -14,8 +14,17 @@
             .ToList();
         public List<OverwatchStarSystem> Systems { get; }
         public DateTimeOffset NextTick => WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
+        public OverviewDataStatus Status { get; }
 
-        public OverwatchOverviewV2(OverwatchOverviewV2Cycle previousCycle, OverwatchOverviewV2CycleChange previousCycleChanges, OverwatchOverviewV2Cycle currentCycle, OverwatchOverviewV2CycleChange nextCycleChanges, OverwatchOverviewV2Cycle nextCyclePrediction, List<ThargoidMaelstrom> thargoidMaelstroms, List<OverwatchStarSystem> systems)
+        public OverwatchOverviewV2(
+            OverwatchOverviewV2Cycle previousCycle,
+            OverwatchOverviewV2CycleChange previousCycleChanges,
+            OverwatchOverviewV2Cycle currentCycle,
+            OverwatchOverviewV2CycleChange nextCycleChanges,
+            OverwatchOverviewV2Cycle nextCyclePrediction,
+            List<ThargoidMaelstrom> thargoidMaelstroms,
+            List<OverwatchStarSystem> systems,
+            OverviewDataStatus status)
         {
             PreviousCycle = previousCycle;
             PreviousCycleChanges = previousCycleChanges;
@@ -24,16 +33,18 @@
             NextCyclePrediction = nextCyclePrediction;
             Maelstroms = thargoidMaelstroms.Select(t => new OverwatchMaelstrom(t)).ToList();
             Systems = systems;
+            Status = status;
         }
 
         public static async Task<OverwatchOverviewV2> Create(EdDbContext dbContext, CancellationToken cancellationToken)
         {
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+            DateTimeOffset now = DateTimeOffset.UtcNow;
 
             OverwatchOverviewV2Cycle overviewPreviousCycle;
             OverwatchOverviewV2CycleChange overviewPreviousCycleChanges;
             {
-                ThargoidCycle previousCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
+                ThargoidCycle previousCycle = await dbContext.GetThargoidCycle(now, cancellationToken, -1);
                 var previousCycleSum = await dbContext.ThargoidMaelstromHistoricalSummaries
                     .AsNoTracking()
                     .Where(t => t.Cycle == previousCycle)
@@ -90,7 +101,7 @@
             OverwatchOverviewV2CycleChange overviewNextCycleChanges;
             OverwatchOverviewV2Cycle overviewNextCyclePrediction;
             {
-                ThargoidCycle nextCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+                ThargoidCycle nextCycle = await dbContext.GetThargoidCycle(now, cancellationToken, 1);
 
                 var currentCycleSum = await dbContext.ThargoidMaelstromHistoricalSummaries
                     .AsNoTracking()
@@ -147,7 +158,7 @@
                 int invasionsPredicted = invasionCount - invasionsDefended + currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation > 0) - currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Invasion);
                 int controlledPredicted = controlledCount - controlsDefended + thargoidsGain;
                 int titanPredicted = titanCount;
-                int recoveryPredicted = recoveryCount - currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Recovery && p.Progress >= 100) + currentCycleStates.Count(p => p.Progress >= 100 && (p.State == StarSystemThargoidLevelState.Invasion || p.State  == StarSystemThargoidLevelState.Controlled) && p.StarSystem?.OriginalPopulation > 0);
+                int recoveryPredicted = recoveryCount - currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Recovery && p.Progress >= 100) + currentCycleStates.Count(p => p.Progress >= 100 && (p.State == StarSystemThargoidLevelState.Invasion || p.State == StarSystemThargoidLevelState.Controlled) && p.StarSystem?.OriginalPopulation > 0);
                 overviewNextCyclePrediction = new(nextCycle.Start, nextCycle.End, alertsPredicted, invasionsPredicted, controlledPredicted, titanPredicted, recoveryPredicted);
             }
 
@@ -243,8 +254,28 @@
                     system.StationsUnderAttack));
             }
 
-            return new OverwatchOverviewV2(overviewPreviousCycle, overviewPreviousCycleChanges, overviewCurrentCycle, overviewNextCycleChanges, overviewNextCyclePrediction, maelstroms, overwatchStarSystems);
+            OverviewDataStatus status = OverviewDataStatus.Default;
+            if (now.DayOfWeek == DayOfWeek.Thursday)
+            {
+                if (now.Hour == 7 && now.Minute < 30)
+                {
+                    status = OverviewDataStatus.TickInProgress;
+                }
+                else if (now.Hour >= 7 && now.Hour < 12)
+                {
+                    status = OverviewDataStatus.UpdatePending;
+                }
+            }
+
+            return new OverwatchOverviewV2(overviewPreviousCycle, overviewPreviousCycleChanges, overviewCurrentCycle, overviewNextCycleChanges, overviewNextCyclePrediction, maelstroms, overwatchStarSystems, status);
         }
+    }
+
+    public enum OverviewDataStatus
+    {
+        Default,
+        TickInProgress,
+        UpdatePending,
     }
 
     public class OverwatchOverviewV2Cycle

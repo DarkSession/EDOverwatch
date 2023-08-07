@@ -5,7 +5,7 @@
         {{ attacker.StarSystem.Name }}
     </span>
     <fa-icon [icon]="faPerson" *ngIf="attacker.StarSystem.PopulationOriginal > 0"
-        matTooltip="Previously populated"></fa-icon>
+        matTooltip="Formerly populated"></fa-icon>
     <ng-container *ngIf="attacker.StarSystem.BarnacleMatrixInSystem">
         <span matTooltip="Barnacle matrix present in the system. Progress is locked.">
             <fa-icon [icon]="faFan"></fa-icon>

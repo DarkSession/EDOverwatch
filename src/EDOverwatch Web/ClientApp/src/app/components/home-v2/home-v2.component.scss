@@ -61,3 +61,15 @@ mat-form-field {
         min-width: 300px;
     }
 }
+
+.information-message {
+    border: 1px solid #e95e03;
+    padding: 8px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    div {
+        padding: 4px;
+    }
+}

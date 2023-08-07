@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AppService } from './services/app.service';
 import { WebsocketService } from './services/websocket.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @UntilDestroy()
 @Component({
@@ -11,7 +12,7 @@ import { WebsocketService } from './services/websocket.service';
   styleUrls: ['app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   public loading = false;
 
   /*
@@ -25,8 +26,23 @@ export class AppComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     public readonly appService: AppService,
     private readonly swUpdate: SwUpdate,
-    private readonly websocketService: WebsocketService
+    private readonly websocketService: WebsocketService,
+    private readonly matSnackBar: MatSnackBar
   ) {
+  }
+
+  public ngAfterViewInit(): void {
+    this.checkAppUpdated(); 
+  }
+
+  private async checkAppUpdated(): Promise<void> {
+    const appUpdated = await this.appService.getSetting("appUpdated");
+    if (appUpdated === "1") {
+      await this.appService.deleteSetting("appUpdated");
+      this.matSnackBar.open("Overwatch has been updated!", "Dismiss", {
+        duration: 6000,
+      });
+    }
   }
 
   public ngOnInit(): void {
@@ -52,7 +68,8 @@ export class AppComponent implements OnInit {
             }
             case 'VERSION_READY': {
               console.log(`New app version ready for use: ${evt.latestVersion.hash}`);
-              this.swUpdate.activateUpdate().then(() => {
+              this.swUpdate.activateUpdate().then(async () => {
+                await this.appService.saveSetting("appUpdated", "1");
                 document.location.reload();
               });
               break;

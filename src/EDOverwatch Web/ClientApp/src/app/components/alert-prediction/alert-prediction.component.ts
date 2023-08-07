@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { OverwatchStarSystemMin } from '../station-name/station-name.component';
 import { OverwatchAlertPredictionSystemAttacker } from '../alert-prediction-attackers/alert-prediction-attackers.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,7 +12,7 @@ import { faBullseye } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './alert-prediction.component.html',
   styleUrls: ['./alert-prediction.component.css']
 })
-export class AlertPredictionComponent implements OnChanges {
+export class AlertPredictionComponent implements OnChanges, AfterViewInit {
   public readonly faClipboard = faClipboard;
   public readonly faBullseye = faBullseye;
   @Input() alertPredictions: OverwatchAlertPredictionSystem[] = [];
@@ -25,9 +25,9 @@ export class AlertPredictionComponent implements OnChanges {
   }
   
   public ngOnChanges(): void {
-    const alertPredictions = (this.showAll || this.alertPredictions.length < 12) ? this.alertPredictions : this.alertPredictions.splice(0, 10);
-
+    const alertPredictions = (this.showAll || this.alertPredictions.length < 12) ? this.alertPredictions : [...this.alertPredictions].splice(0, 10);
     this.sortedAlertPredictions = new MatTableDataSource<OverwatchAlertPredictionSystem>(alertPredictions);
+    this.sortedAlertPredictions.sort = this.sort;
     this.sortedAlertPredictions.sortingDataAccessor = (system: OverwatchAlertPredictionSystem, columnName: string): string | number => {
       switch (columnName) {
         case "Name": {
@@ -42,7 +42,10 @@ export class AlertPredictionComponent implements OnChanges {
       }
       return "";
     }
-    this.sortedAlertPredictions.sort = this.sort;
+  }
+
+  public ngAfterViewInit(): void {
+    this.ngOnChanges();
   }
 
   public copySystemName(starSystem: OverwatchAlertPredictionSystem): void {

@@ -52,7 +52,7 @@ namespace EDOverwatch
 
                 _ = ThargoidMaelstromCreatedUpdatedEventConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
                 _ = StarSystemThargoidManualUpdateConsumer(connection, starSystemThargoidLevelChangedProducer, cancellationToken);
-                _ = UpdateMaelstromTotals(cancellationToken);
+                _ = QueueUpdates(cancellationToken);
 
                 Log.LogInformation("Overwatch started");
 
@@ -394,58 +394,86 @@ namespace EDOverwatch
             return false;
         }
 
-        private async Task UpdateMaelstromTotals(CancellationToken cancellationToken)
+        private async Task QueueUpdates(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
-                    EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                    ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
-                    var maelstromTotals = await dbContext.StarSystemThargoidLevels
-                        .Where(s => s.State > StarSystemThargoidLevelState.None &&
-                            (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start) &&
-                            (
-                                (s.CycleStart!.Start <= thargoidCycle.Start && s.CycleEnd == null) ||
-                                (s.CycleStart!.Start <= thargoidCycle.Start && s.CycleEnd!.Start >= thargoidCycle.Start) ||
-                                (s.CycleStart!.Start >= thargoidCycle.Start && s.CycleEnd!.Start <= thargoidCycle.Start)
-                            ))
-                        .GroupBy(s => new { s.MaelstromId, s.State })
-                        .Select(s => new
-                        {
-                            s.Key.MaelstromId,
-                            s.Key.State,
-                            Count = s.Count(),
-                        })
-                        .ToListAsync(cancellationToken);
-                    foreach (var maelstromTotal in maelstromTotals)
-                    {
-                        ThargoidMaelstrom maelstrom = await dbContext.ThargoidMaelstroms.FirstAsync(t => t.Id == maelstromTotal.MaelstromId, cancellationToken);
-                        ThargoidMaelstromHistoricalSummary? thargoidMaelstromHistoricalSummary = await dbContext.ThargoidMaelstromHistoricalSummaries
-                            .FirstOrDefaultAsync(t => t.Maelstrom == maelstrom && t.State == maelstromTotal.State && t.Cycle == thargoidCycle, cancellationToken);
-                        if (thargoidMaelstromHistoricalSummary == null)
-                        {
-                            thargoidMaelstromHistoricalSummary = new(0, maelstromTotal.State, maelstromTotal.Count)
-                            {
-                                Maelstrom = maelstrom,
-                                Cycle = thargoidCycle,
-                            };
-                            dbContext.ThargoidMaelstromHistoricalSummaries.Add(thargoidMaelstromHistoricalSummary);
-                        }
-                        else
-                        {
-                            thargoidMaelstromHistoricalSummary.Amount = maelstromTotal.Count;
-                        }
-                        await dbContext.SaveChangesAsync(cancellationToken);
-                    }
+                    await UpdateMaelstromTotals(cancellationToken);
                 }
                 catch (Exception e)
                 {
-                    Log.LogError(e, "UpdateMaelstromTotals exception");
+                    Log.LogError(e, "QueueUpdates exception");
                 }
-                await Task.Delay(TimeSpan.FromHours(1), cancellationToken);
+                try
+                {
+                    await UpdateAlertPredictions(cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    Log.LogError(e, "QueueUpdates exception");
+                }
+                await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
             }
+        }
+
+        private async Task UpdateMaelstromTotals(CancellationToken cancellationToken)
+        {
+            await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
+            EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+            ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+            var maelstromTotals = await dbContext.StarSystemThargoidLevels
+                .Where(s => s.State > StarSystemThargoidLevelState.None &&
+                    (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start) &&
+                    (
+                        (s.CycleStart!.Start <= thargoidCycle.Start && s.CycleEnd == null) ||
+                        (s.CycleStart!.Start <= thargoidCycle.Start && s.CycleEnd!.Start >= thargoidCycle.Start) ||
+                        (s.CycleStart!.Start >= thargoidCycle.Start && s.CycleEnd!.Start <= thargoidCycle.Start)
+                    ))
+                .GroupBy(s => new { s.MaelstromId, s.State })
+                .Select(s => new
+                {
+                    s.Key.MaelstromId,
+                    s.Key.State,
+                    Count = s.Count(),
+                })
+                .ToListAsync(cancellationToken);
+            foreach (var maelstromTotal in maelstromTotals)
+            {
+                ThargoidMaelstrom maelstrom = await dbContext.ThargoidMaelstroms.FirstAsync(t => t.Id == maelstromTotal.MaelstromId, cancellationToken);
+                ThargoidMaelstromHistoricalSummary? thargoidMaelstromHistoricalSummary = await dbContext.ThargoidMaelstromHistoricalSummaries
+                    .FirstOrDefaultAsync(t => t.Maelstrom == maelstrom && t.State == maelstromTotal.State && t.Cycle == thargoidCycle, cancellationToken);
+                if (thargoidMaelstromHistoricalSummary == null)
+                {
+                    thargoidMaelstromHistoricalSummary = new(0, maelstromTotal.State, maelstromTotal.Count)
+                    {
+                        Maelstrom = maelstrom,
+                        Cycle = thargoidCycle,
+                    };
+                    dbContext.ThargoidMaelstromHistoricalSummaries.Add(thargoidMaelstromHistoricalSummary);
+                }
+                else
+                {
+                    thargoidMaelstromHistoricalSummary.Amount = maelstromTotal.Count;
+                }
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        private async Task UpdateAlertPredictions(CancellationToken cancellationToken)
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            if (now.DayOfWeek == DayOfWeek.Thursday && now.Hour >= 7 && now.Hour <= 10)
+            {
+                return;
+            }
+
+            await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
+            EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(now, cancellationToken, 1);
+
+            await EDOverwatchAlertPrediction.AlertPrediction.PredictionForCycle(dbContext, nextThargoidCycle, cancellationToken);
         }
     }
 }

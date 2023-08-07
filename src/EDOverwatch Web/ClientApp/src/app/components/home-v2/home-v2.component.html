@@ -1,5 +1,22 @@
 <div class="overwatch-content-container">
     <div class="overwatch-content-large">
+        <div *ngIf="overview?.Status == OverviewDataStatus.TickInProgress" class="information-message">
+            <div>
+                <fa-icon [icon]="faGears"></fa-icon>
+            </div>
+            <div>
+                Elite Dangerous servers weekly tick in progress.
+            </div>
+        </div>
+        <div *ngIf="overview?.Status == OverviewDataStatus.UpdatePending" class="information-message">
+            <div>
+                <fa-icon [icon]="faGears"></fa-icon>
+            </div>
+            <div>
+                <b>Data update in progress</b><br>
+                Overwatch is currently updating system data from the recent server tick.
+            </div>
+        </div>
         <div class="state-containers-parent">
             <div class="state-containers" #stateContainers>
                 <app-home-v2-cycle [cycle]="overview?.PreviousCycle" title="Previous cycle"></app-home-v2-cycle>

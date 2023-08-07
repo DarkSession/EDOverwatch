@@ -77,8 +77,16 @@ namespace EDDatabase
                 .Navigation(a => a.Maelstrom)
                 .AutoInclude();
 
+            modelBuilder.Entity<AlertPrediction>()
+                .Navigation(a => a.Cycle)
+                .AutoInclude();
+
             modelBuilder.Entity<AlertPredictionAttacker>()
                 .Navigation(a => a.StarSystem)
+                .AutoInclude();
+
+            modelBuilder.Entity<AlertPredictionCycleAttacker>()
+                .Navigation(a => a.AttackerStarSystem)
                 .AutoInclude();
 
             modelBuilder.Entity<StarSystemThargoidLevel>()
