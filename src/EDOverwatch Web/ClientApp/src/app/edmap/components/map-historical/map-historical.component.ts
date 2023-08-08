@@ -4,10 +4,7 @@ import { ED3DMap } from 'canonned3d-map/lib/ED3DMap';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { ammoniaWorlds } from '../../data/ammonia-worlds';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { OverwatchMaelstrom } from 'src/app/components/maelstrom-name/maelstrom-name.component';
-import { OverwatchThargoidLevel } from 'src/app/components/thargoid-level/thargoid-level.component';
 import { solSite } from '../../data/sol';
-import { OverwatchStarSystemCoordinates } from 'src/app/components/system-list/system-list.component';
 import { AppService } from 'src/app/services/app.service';
 import { OverwatchThargoidCycle } from 'src/app/components/home/home.component';
 import { SystemConfiguration } from 'canonned3d-map/lib/System';
@@ -17,6 +14,7 @@ import { thargoidSites } from '../../data/thargoid-sites';
 import { unknownBarnacleSites } from '../../data/unknown-barnacle-sites';
 import { horizonEngineers, odysseyEngineers } from '../../data/engineers';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { OverwatchStarSystemsHistorical } from 'src/app/components/systems-historical-cycle/systems-historical-cycle.component';
 
 @UntilDestroy()
 @Component({
@@ -256,19 +254,3 @@ export class MapHistoricalComponent implements OnInit, AfterViewInit {
   }
 }
 
-interface OverwatchStarSystemsHistorical {
-  Maelstroms: OverwatchMaelstrom[];
-  Levels: OverwatchThargoidLevel[];
-  Systems: OverwatchStarSystemsHistoricalSystem[];
-}
-
-interface OverwatchStarSystemsHistoricalSystem {
-  SystemAddress: number;
-  Name: string;
-  Coordinates: OverwatchStarSystemCoordinates;
-  Maelstrom: OverwatchMaelstrom;
-  Population: number;
-  ThargoidLevel: OverwatchThargoidLevel;
-  PreviousThargoidLevel: OverwatchThargoidLevel;
-  State: string;
-}

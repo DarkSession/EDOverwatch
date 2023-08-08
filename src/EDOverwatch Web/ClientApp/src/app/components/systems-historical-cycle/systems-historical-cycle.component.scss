@@ -1,0 +1,51 @@
+.thead {
+    background-color: #272727;
+}
+
+.progress-completed {
+    width: 12px;
+    color: green;
+    margin-left: 8px;
+}
+
+.progress-cell {
+    display: flex;
+    align-items: center;
+}
+
+.systems-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.systems-filter {
+    padding-bottom: 12px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+
+    mat-form-field {
+        width: 300px;
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+}
+
+.filtered-view {
+    background-color: #e95e03;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.options-bottom {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
+}

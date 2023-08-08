@@ -1,5 +1,6 @@
 ﻿using EDOverwatch_Web.Models;
 using EDOverwatch_Web.WebSockets.EventListener.NotTracked;
+using Newtonsoft.Json;
 
 namespace EDOverwatch_Web.WebSockets.Handler
 {
@@ -8,6 +9,12 @@ namespace EDOverwatch_Web.WebSockets.Handler
         class OverwatchSystemsHistoricalCycleRequest
         {
             public DateOnly? Cycle { get; set; }
+
+            [JsonProperty(Required = Required.Default)]
+            public int DefaultWeek { get; set; }
+
+            [JsonProperty(Required = Required.Default)]
+            public bool IgnoreClear { get; set; }
         }
 
         protected override Type? MessageDataType => typeof(OverwatchSystemsHistoricalCycleRequest);
@@ -19,12 +26,16 @@ namespace EDOverwatch_Web.WebSockets.Handler
             OverwatchSystemsHistoricalCycleRequest? data = message.Data?.ToObject<OverwatchSystemsHistoricalCycleRequest>();
             if (data != null)
             {
-                DateOnly cycle = data.Cycle ?? DateOnly.FromDateTime(DateTime.UtcNow);
+                DateOnly cycle = data.Cycle ?? DateOnly.FromDateTime(DateTime.UtcNow).AddDays(data.DefaultWeek * 7);
                 if (cycle > DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date) || !await dbContext.ThargoidCycleExists(cycle, cancellationToken))
                 {
                     cycle = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
                 }
                 OverwatchStarSystemsHistorical result = await OverwatchStarSystemsHistorical.Create(cycle, dbContext, cancellationToken);
+                if (data.IgnoreClear)
+                {
+                    result.Systems = result.Systems.Where(s => s.ThargoidLevel.Level != StarSystemThargoidLevelState.None).ToList();
+                }
                 return new WebSocketHandlerResultSuccess(result, new NotTrackedObject());
             }
             return new WebSocketHandlerResultError();

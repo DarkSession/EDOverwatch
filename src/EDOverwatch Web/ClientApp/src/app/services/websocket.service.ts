@@ -68,7 +68,7 @@ export class WebsocketService {
             });
             if (this.cacheDb) {
                 for (const queueItem of this.messageQueue) {
-                    await this.checkMessageCache(queueItem.message, !!queueItem.callback);
+                    this.checkMessageCache(queueItem.message, !!queueItem.callback);
                 }
             }
         }
@@ -294,11 +294,11 @@ export class WebsocketService {
                 this.ensureConnected();
             }
         }
-        await this.checkMessageCache(message, !!callback);
+        this.checkMessageCache(message, !!callback);
         this.triggerMessageBacklogEvent();
     }
 
-    private async checkMessageCache(message: WebSocketRequestMessage, hasCallback: boolean): Promise<void> {
+    private checkMessageCache(message: WebSocketRequestMessage, hasCallback: boolean): void {
         if (message.CacheId) {
             this.wsRequests[message.MessageId] = message.CacheId;
             setTimeout(async () => {
@@ -321,7 +321,7 @@ export class WebsocketService {
     }
 
     private triggerMessageBacklogEvent(): void {
-        const backlog = Object.keys(this.wsRequests).length + this.messageQueue.length;
+        const backlog = Object.keys(this.wsRequests).length + this.messageQueue.length + Object.keys(this.responseCallbacks).length;
         this.messageBacklogChanged.emit(backlog);
     }
 

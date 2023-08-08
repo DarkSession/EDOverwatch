@@ -164,6 +164,7 @@ export class AppService {
 
   private updateNetworkLoading(): void {
     const networkLoading = (this.httpLoading || this.webSocketLoading);
+    console.log(this.httpLoading, this.webSocketLoading);
     if (networkLoading != this.networkLoading) {
       this.networkLoading = networkLoading;
       this.networkLoadingChanged.emit(this.networkLoading);

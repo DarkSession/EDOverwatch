@@ -5,13 +5,22 @@
         public OverwatchThargoidLevel ThargoidLevel { get; }
         public OverwatchThargoidLevel PreviousThargoidLevel { get; }
         public string State { get; }
+        public long PopulationOriginal { get; }
+        public double DistanceToMaelstrom { get; }
+        public bool BarnacleMatrixInSystem { get; }
+        public int? Progress { get; }
+        public bool ProgressIsCompleted { get; }
+        public DateTimeOffset? StateExpires { get; }
 
-        public OverwatchStarSystemsHistoricalSystem(StarSystem starSystem, ThargoidCycle thargoidCycle, ThargoidCycle previousThargoidCycle) : base(starSystem)
+        public OverwatchStarSystemsHistoricalSystem(StarSystem starSystem, ThargoidCycle thargoidCycle) : base(starSystem)
         {
             if (starSystem.ThargoidLevelHistory == null || !starSystem.ThargoidLevelHistory.Any())
             {
                 throw new Exception("starSystem.ThargoidLevelHistory cannot be null");
             }
+
+            PopulationOriginal = starSystem.OriginalPopulation;
+            BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
 
             try
             {
@@ -54,6 +63,18 @@
                     };
                 }
                 State = state.GetEnumMemberValue();
+
+                DistanceToMaelstrom = thargoidLevel.Maelstrom?.StarSystem?.DistanceTo(starSystem) ?? 0;
+                if (thargoidLevel.Progress == 100 && thargoidLevel.CycleEndId == thargoidLevel.Id)
+                {
+                    Progress = 100;
+                }
+                else if (thargoidLevel.ProgressHistory?.FirstOrDefault() is StarSystemThargoidLevelProgress progress && progress.Updated != default)
+                {
+                    Progress = progress.Progress;
+                }
+                ProgressIsCompleted = Progress is int p && p >= 100;
+                StateExpires = thargoidLevel.StateExpires?.End;
             }
             catch (Exception e)
             {

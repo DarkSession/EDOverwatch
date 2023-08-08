@@ -123,13 +123,14 @@ export class SystemComponent implements OnInit {
           let previousProgress = 0;
           const progress: number[] = [];
           for (const label of labels) {
-            const maxNumber = Math.max(...this.starSystem.ProgressDetails.filter(p => p.Date === label).map(p => p.Progress));
-            if (isNaN(maxNumber) || maxNumber === Infinity || maxNumber === -Infinity) {
-              progress.push(previousProgress);
+            const lastDate = this.starSystem.ProgressDetails.filter(p => p.Date === label).sort((a, b) => (a.DateTime < b.DateTime) ? 1 : -1);
+            if (lastDate.length > 0) {
+              const endOfDayProgress = lastDate[0].Progress ?? 0;
+              progress.push(endOfDayProgress);
+              previousProgress = endOfDayProgress;
             }
             else {
-              progress.push(maxNumber);
-              previousProgress = maxNumber;
+              progress.push(previousProgress);
             }
           }
 

@@ -1,5 +1,6 @@
 import { RouteReuseStrategy, UrlSegment } from '@angular/router/';
 import { ActivatedRouteSnapshot, DetachedRouteHandle } from '@angular/router';
+import { environment } from 'src/environments/environment';
 export class AppRouteReuseStrategy implements RouteReuseStrategy {
 
     private storedRoutes: { [key: string]: RouteStorageObject } = {};
@@ -24,10 +25,12 @@ export class AppRouteReuseStrategy implements RouteReuseStrategy {
         const paramsMatch = this.compareObjects(route.params, storedObject.snapshot.params);
         const queryParamsMatch = this.compareObjects(route.queryParams, storedObject.snapshot.queryParams);
 
-        console.log('deciding to attach...', route, 'does it match?');
-        console.log('param comparison:', paramsMatch);
-        console.log('query param comparison', queryParamsMatch);
-        console.log(storedObject.snapshot, 'return: ', paramsMatch && queryParamsMatch);
+        if (!environment.production) {
+            console.log('deciding to attach...', route, 'does it match?');
+            console.log('param comparison:', paramsMatch);
+            console.log('query param comparison', queryParamsMatch);
+            console.log(storedObject.snapshot, 'return: ', paramsMatch && queryParamsMatch);
+        }
 
         return paramsMatch && queryParamsMatch;
     }

@@ -1,0 +1,133 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-large">
+        <div class="title">
+            Systems
+            <span *ngIf="activeCycle">- Cycle from {{ activeCycle.Start | date: 'MMM dd' : '0' }} to {{ activeCycle.End | date: 'MMM dd yyyy' : '0' }}</span>
+        </div>
+        <div class="content-box systems-container">
+            <div style="height: 24px;"></div>
+            <div class="content-top-container">
+                <div class="systems-filter">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Cycle</mat-label>
+                        <mat-select [(ngModel)]="date" (ngModelChange)="dateChanged()">
+                            <mat-option *ngFor="let thargoidCycle of thargoidCycles" [value]="thargoidCycle.Cycle">
+                                {{ thargoidCycle.Start | date: 'MMM dd' : '0' }} -
+                                {{ thargoidCycle.End | date: 'MMM dd yyyy' : '0' }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="systems-filter">
+                    <mat-form-field appearance="outline" floatLabel="always">
+                        <mat-label>System Name</mat-label>
+                        <input matInput [(ngModel)]="systemNameFilter" (ngModelChange)="updateDataSource()"
+                            placeholder="Filter by system name">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Titans</mat-label>
+                        <mat-select [(ngModel)]="maelstromsSelected" (ngModelChange)="settingChanged()" multiple>
+                            <mat-option *ngFor="let maelstrom of maelstroms" [value]="maelstrom">
+                                {{ maelstrom.Name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Thargoid State</mat-label>
+                        <mat-select [(ngModel)]="thargoidLevelsSelected" (ngModelChange)="settingChanged()" multiple>
+                            <mat-option *ngFor="let thargoidLevel of thargoidLevels" [value]="thargoidLevel">
+                                {{ thargoidLevel.Name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div *ngIf="filterApplied" class="filtered-view">
+                <div>
+                    <fa-icon [icon]="faFilter"></fa-icon>
+                    Filtered view
+                </div>
+                <div class="clickable" (click)="resetFilter()">
+                    <fa-icon [icon]="faCircleXmark"></fa-icon>
+                    Reset filter
+                </div>
+            </div>
+            <div class="table-container">
+                <div class="table">
+                    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)"
+                        [matSortActive]="sortColumn" [matSortDirection]="sortDirection" matSortDisableClear>
+                        <ng-container matColumnDef="Name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
+                                    {{ row.Name }}
+                                </span>
+                                <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                                    (click)="copySystemName(row)"></fa-icon>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="ThargoidLevel">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"
+                                    [barnacleMatrixInSystem]="row.BarnacleMatrixInSystem"></app-thargoid-level>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="PopulationOriginal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Population (Original)</th>
+                            <td mat-cell *matCellDef="let row" class="cell-right">
+                                {{ row.PopulationOriginal | numberSuffix:1 }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Maelstrom">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Titan</th>
+                            <td mat-cell *matCellDef="let row">
+                                <app-maelstrom-name [maelstrom]="row.Maelstrom"></app-maelstrom-name>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="DistanceToMaelstrom">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance to Titan</th>
+                            <td mat-cell *matCellDef="let row">
+                                {{ row.DistanceToMaelstrom }} Ly
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Progress">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                <div class="progress-cell" *ngIf="row.Progress !== null">
+                                    <span>
+                                        {{ row.Progress }} %
+                                    </span>
+                                    <div class="progress-completed">
+                                        <fa-icon [icon]="faCircleCheck" *ngIf="row.Progress == 100"
+                                            matTooltip="Completed"></fa-icon>
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="StateExpires">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>State End</th>
+                            <td mat-cell *matCellDef="let row">
+                                <div *ngIf="row.StateExpires">
+                                    {{ row.StateExpires | date }}
+                                </div>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                    <div *ngIf="dataSource.data.length === 0" class="empty-table">
+                        No records found.
+                    </div>
+                    <mat-paginator [pageSizeOptions]="[25, 50, 100]" [pageSize]="pageSize" [showFirstLastButtons]="true"
+                        (page)="handlePageEvent($event)" aria-label="Select page of systems"></mat-paginator>
+                </div>
+                <div class="options-bottom">
+                    <span (click)="exportToCsv()" class="clickable">
+                        <fa-icon [icon]="faFileCsv"></fa-icon>
+                        Export as CSV
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
