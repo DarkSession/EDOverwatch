@@ -77,10 +77,6 @@ namespace EDOverwatchAlertPrediction
                     }
                 }
 
-                if (maelstrom.Name == "Leigong")
-                {
-                }
-
                 List<StarSystemCycleState> primaryAttackerSystems = new();
                 int attackingCredits = 20;
                 foreach (Attack attack in possibleAttacks.OrderBy(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!)))

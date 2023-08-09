@@ -41,7 +41,8 @@ namespace EDOverwatchAlertPrediction
             LocationZ = dbStarSystem.LocationZ;
             WasPopulated = dbStarSystem.OriginalPopulation > 0;
             List<StarSystemCycleStateThargoidLevel> systemStates = dbStarSystem.ThargoidLevelHistory!.Select(t => new StarSystemCycleStateThargoidLevel(t)).ToList();
-            if (systemStates.FirstOrDefault(s => s.EndCycle == null) is StarSystemCycleStateThargoidLevel currentThargoidLevel && currentThargoidLevel.Expires is int expiresCycle && expiresCycle < cycle)
+            if (systemStates.FirstOrDefault(s => s.EndCycle == null) is StarSystemCycleStateThargoidLevel currentThargoidLevel && currentThargoidLevel.Expires is int expiresCycle && expiresCycle < cycle && 
+                (currentThargoidLevel.State != StarSystemThargoidLevelState.Controlled || currentThargoidLevel.Completed))
             {
                 currentThargoidLevel.EndCycle = expiresCycle;
                 bool completed = currentThargoidLevel.Completed || currentThargoidLevel.State == StarSystemThargoidLevelState.Recovery;
@@ -86,11 +87,11 @@ namespace EDOverwatchAlertPrediction
                     return false;
                 }
             }
-            if (LastAlertCycle > 0 && (Cycle - LastAlertCycle) < 2)
+            if (LastAlertCycle > 0 && (Cycle - LastAlertCycle) <= 2)
             {
                 return false;
             }
-            if (LastControlCycle > 0 && (Cycle - LastControlCycle) < 4)
+            if (LastControlCycle > 0 && (Cycle - LastControlCycle) <= 4)
             {
                 return false;
             }
