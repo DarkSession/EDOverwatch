@@ -1,6 +1,6 @@
 ﻿namespace EDOverwatch_Web.Models
 {
-    public class OverwatchStarSystemDetail : OverwatchStarSystem
+    public class OverwatchStarSystemFullDetail : OverwatchStarSystemFull
     {
         public DateTimeOffset LastTickTime { get; }
         public DateOnly LastTickDate { get; }
@@ -18,7 +18,7 @@
         public List<OverwatchStarSystemWarEffortCycle> WarEffortSummaries { get; }
         public List<DateOnly> DaysSincePreviousTick { get; }
 
-        protected OverwatchStarSystemDetail(
+        protected OverwatchStarSystemFullDetail(
             StarSystem starSystem,
             decimal effortFocus,
             List<OverwatchStarSystemWarEffort> warEfforts,
@@ -28,9 +28,11 @@
             List<StarSystemThargoidLevel> stateHistory,
             List<OverwatchStarSystemWarEffortCycle> warEffortSummaries,
             List<DateOnly> daysSincePreviousTick,
-            List<Station> rescueShips
-            ) :
-            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0)
+            List<Station> rescueShips,
+            bool odysseySettlements,
+            bool federalFaction,
+            bool imperialFaction) :
+            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction)
         {
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;
@@ -47,9 +49,9 @@
             DaysSincePreviousTick = daysSincePreviousTick;
         }
 
-        public static async Task<OverwatchStarSystemDetail?> Create(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
+        public static async Task<OverwatchStarSystemFullDetail?> Create(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            StarSystem? starSystem = await dbContext.StarSystems
+            var systemData = await dbContext.StarSystems
                 .AsNoTracking()
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
@@ -57,9 +59,18 @@
                 .Include(s => s.ThargoidLevel!.CycleStart)
                 .Include(s => s.ThargoidLevel!.StateExpires)
                 .Include(s => s.ThargoidLevel!.CurrentProgress)
-                .FirstOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
-            if (starSystem?.ThargoidLevel != null)
+                .Where(s => s.SystemAddress == systemAddress)
+                .Select(s => new
+                {
+                    StarSystem = s,
+                    OdysseySettlements = s.Stations!.Any(s => s.Type!.Name == StationType.OdysseySettlementType),
+                    FederalFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Federation),
+                    EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+            if (systemData?.StarSystem?.ThargoidLevel != null)
             {
+                StarSystem starSystem = systemData.StarSystem;
                 Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
                 DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
 
@@ -181,7 +192,7 @@
                      .Where(s => s.StarSystem == starSystem && (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start))
                      .ToListAsync(cancellationToken);
 
-                return new OverwatchStarSystemDetail(
+                return new OverwatchStarSystemFullDetail(
                     starSystem,
                     effortFocus,
                     warEfforts,
@@ -191,7 +202,10 @@
                     thargoidLevelHistory,
                     warEffortSummaries,
                     daysSincePreviousTick,
-                    rescueShips);
+                    rescueShips,
+                    systemData.OdysseySettlements,
+                    systemData.FederalFaction,
+                    systemData.EmpireFaction);
             }
             return null;
         }

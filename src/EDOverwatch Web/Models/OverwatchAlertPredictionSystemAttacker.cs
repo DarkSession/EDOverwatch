@@ -7,7 +7,7 @@
 
         public OverwatchAlertPredictionSystemAttacker(AlertPredictionAttacker alertPredictionAttacker, double distance)
         {
-            StarSystem = new(alertPredictionAttacker.StarSystem!, 0, 0, 0, 0, 0, new(), 0, 0, 0);
+            StarSystem = new(alertPredictionAttacker.StarSystem!);
             Distance = distance;
         }
     }

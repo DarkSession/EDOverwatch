@@ -3,6 +3,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchAlertPredictionSystem } from '../alert-prediction/alert-prediction.component';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { OverwatchThargoidCycle } from '../home/home.component';
 
 @UntilDestroy()
 @Component({
@@ -45,4 +46,5 @@ interface OverwatchAlertPredictions {
 interface OverwatchAlertPredictionMaelstrom {
   Maelstrom: OverwatchMaelstrom;
   Systems: OverwatchAlertPredictionSystem[];
+  Cycle: OverwatchThargoidCycle;
 }

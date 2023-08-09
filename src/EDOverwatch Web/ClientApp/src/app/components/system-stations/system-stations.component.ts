@@ -2,7 +2,7 @@ import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { OverwatchStation } from '../station-name/station-name.component';
-import { OverwatchStarSystemDetail } from '../system/system.component';
+import { OverwatchStarSystemFullDetail } from '../system/system.component';
 
 @Component({
   selector: 'app-system-stations',
@@ -14,7 +14,7 @@ export class SystemStationsComponent implements OnChanges, AfterViewInit {
   public readonly stationsDisplayedColumns = ['Name', 'State', 'RescueShip', 'DistanceFromStarLS'];
   @ViewChild(MatSort) sort!: MatSort;
 
-  @Input() starSystem!: OverwatchStarSystemDetail;
+  @Input() starSystem!: OverwatchStarSystemFullDetail;
 
   public ngOnChanges(): void {
     this.stations = new MatTableDataSource<OverwatchStation>(this.starSystem.Stations);

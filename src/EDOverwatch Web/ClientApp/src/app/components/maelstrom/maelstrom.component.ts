@@ -6,7 +6,7 @@ import { Context } from 'chartjs-plugin-datalabels';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchOverviewMaelstromHistoricalSummary, OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
-import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchAlertPredictionSystem } from '../alert-prediction/alert-prediction.component';
 
 @UntilDestroy()
@@ -206,7 +206,7 @@ export class MaelstromComponent implements OnInit {
 }
 
 interface OverwatchMaelstromDetail extends OverwatchMaelstrom {
-  Systems: OverwatchStarSystem[];
+  Systems: OverwatchStarSystemFull[];
   AlertPredictions: OverwatchAlertPredictionSystem[];
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];

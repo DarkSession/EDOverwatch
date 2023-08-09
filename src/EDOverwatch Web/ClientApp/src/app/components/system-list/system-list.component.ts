@@ -25,11 +25,11 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faPlus = faPlus;
   public readonly faTruck = faTruck;
   public readonly faCircle = faCircle;
-  private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Progress', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
+  private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Progress', 'Features', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
   public displayedColumns: string[] = [];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
-  @Input() systems: OverwatchStarSystem[] = [];
+  @Input() systems: OverwatchStarSystemFull[] = [];
   @Input() maelstromsSelected: OverwatchMaelstrom[] | null = null;
   @Input() thargoidLevelsSelected: OverwatchThargoidLevel[] | null = null;
   @Input() systemNameFilter: string | null = null;
@@ -38,7 +38,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   @Input() hideCompleted: boolean = false;
   @Input() optionalColumns: string[] = [];
   public pageSize: number = 50;
-  public dataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
+  public dataSource: MatTableDataSource<OverwatchStarSystemFull> = new MatTableDataSource<OverwatchStarSystemFull>();
   public sortColumn: string = "Progress";
   public sortDirection: SortDirection = "desc";
   public progressShowPercentage = true;
@@ -108,10 +108,10 @@ export class SystemListComponent implements OnInit, OnChanges {
     this.changeDetectorRef.detectChanges();
   }
 
-  private initDataSource(data: OverwatchStarSystem[]) {
-    this.dataSource = new MatTableDataSource<OverwatchStarSystem>(data);
+  private initDataSource(data: OverwatchStarSystemFull[]) {
+    this.dataSource = new MatTableDataSource<OverwatchStarSystemFull>(data);
     this.dataSource.paginator = this.paginator;
-    this.dataSource.sortingDataAccessor = (system: OverwatchStarSystem, columnName: string): string | number => {
+    this.dataSource.sortingDataAccessor = (system: OverwatchStarSystemFull, columnName: string): string | number => {
       switch (columnName) {
         case "ThargoidLevel": {
           return system.ThargoidLevel.Level;
@@ -132,6 +132,9 @@ export class SystemListComponent implements OnInit, OnChanges {
         }
         case "StateExpiration": {
           return (system.StateExpiration?.StateExpires ?? "");
+        }
+        case "Features": {
+          return system.Features?.length ?? 0;
         }
       }
       return system[columnName as keyof OverwatchStarSystem] as string | number;
@@ -208,6 +211,14 @@ export interface OverwatchStarSystem {
   ThargoidLevel: OverwatchThargoidLevel;
   Progress: number | null;
   ProgressPercent: number | null;
+  StateExpiration: OverwatchStarSystemStateExpires | null;
+  StateProgress: StateProgress;
+  Population: number;
+  DistanceToMaelstrom: number;
+  BarnacleMatrixInSystem: boolean;
+}
+
+export interface OverwatchStarSystemFull extends OverwatchStarSystem {
   EffortFocus: number;
   FactionOperations: number;
   FactionAxOperations: number;
@@ -218,11 +229,7 @@ export interface OverwatchStarSystem {
   StationsUnderRepair: number;
   StationsDamaged: number;
   StationsUnderAttack: number;
-  StateExpiration: OverwatchStarSystemStateExpires | null;
-  StateProgress: StateProgress;
-  Population: number;
-  DistanceToMaelstrom: number;
-  BarnacleMatrixInSystem: boolean;
+  Features: string[];
 }
 
 export interface OverwatchStarSystemCoordinates {

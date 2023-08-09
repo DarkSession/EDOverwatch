@@ -18,11 +18,11 @@ namespace EDOverwatchAlertPrediction
         {
             State = starSystemThargoidLevel.State;
             StartCycle = (int)(starSystemThargoidLevel.CycleStart!.Start - AlertPrediction.CycleZero).TotalDays / 7;
-            if (starSystemThargoidLevel.CycleEnd?.End is DateTimeOffset cycleEndDate)
+            if (starSystemThargoidLevel.CycleEnd?.Start is DateTimeOffset cycleEndDate)
             {
                 EndCycle = (int)(cycleEndDate - AlertPrediction.CycleZero).TotalDays / 7;
             }
-            if (starSystemThargoidLevel.StateExpires?.End is DateTimeOffset stateExpiresDate)
+            if (starSystemThargoidLevel.StateExpires?.Start is DateTimeOffset stateExpiresDate)
             {
                 Expires = (int)(stateExpiresDate - AlertPrediction.CycleZero).TotalDays / 7;
             }

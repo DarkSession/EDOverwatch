@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { FactionOperation, OverwatchStarSystemDetail } from '../system/system.component';
+import { FactionOperation, OverwatchStarSystemFullDetail } from '../system/system.component';
 
 @Component({
   selector: 'app-system-operations',
@@ -12,7 +12,7 @@ export class SystemOperationsComponent implements OnChanges, AfterViewInit {
   public factionOperations: MatTableDataSource<FactionOperation> = new MatTableDataSource<FactionOperation>();
   public readonly factionOperationsDisplayedColumns = ['Faction', 'Type', 'MeetingPoint', 'Started'];
   @ViewChild(MatSort) sort!: MatSort;
-  @Input() starSystem!: OverwatchStarSystemDetail;
+  @Input() starSystem!: OverwatchStarSystemFullDetail;
 
   public ngOnChanges(): void {
     this.factionOperations = new MatTableDataSource<FactionOperation>(this.starSystem.FactionOperationDetails);

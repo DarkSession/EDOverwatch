@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { OverwatchStarSystemFull } from '../system-list/system-list.component';
 
 @Component({
   selector: 'app-system-starport-status',
@@ -7,5 +7,5 @@ import { OverwatchStarSystem } from '../system-list/system-list.component';
   styleUrls: ['./system-starport-status.component.css']
 })
 export class SystemStarportStatusComponent {
-  @Input() starSystem!: OverwatchStarSystem;
+  @Input() starSystem!: OverwatchStarSystemFull;
 }

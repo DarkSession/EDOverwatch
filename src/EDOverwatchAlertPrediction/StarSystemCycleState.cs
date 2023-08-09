@@ -49,7 +49,7 @@ namespace EDOverwatchAlertPrediction
                 StarSystemCycleStateThargoidLevel newThargoidLevel = new(newThargoidLevelState, expiresCycle + 1, null, null, false);
                 systemStates.Add(newThargoidLevel);
             }
-            ThargoidLevel = systemStates.FirstOrDefault(s => s.StartCycle <= cycle && (s.EndCycle is not int endCycle || endCycle >= cycle));
+            ThargoidLevel = systemStates.SingleOrDefault(s => s.StartCycle <= cycle && (s.EndCycle is not int endCycle || endCycle >= cycle));
             Maelstrom = dbStarSystem.ThargoidLevelHistory!.Where(t => t.State != StarSystemThargoidLevelState.None).FirstOrDefault()?.Maelstrom!.Name ?? string.Empty;
             Cycle = cycle;
             LastAlertCycle = systemStates

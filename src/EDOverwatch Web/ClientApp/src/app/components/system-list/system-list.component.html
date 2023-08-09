@@ -89,6 +89,12 @@
                     {{ row.EffortFocus | percent }}
                 </td>
             </ng-container>
+            <ng-container matColumnDef="Features">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Features</th>
+                <td mat-cell *matCellDef="let row">
+                    <app-system-features [starSystem]="row"></app-system-features>
+                </td>
+            </ng-container>
             <ng-container matColumnDef="FactionOperations">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Operations</th>
                 <td mat-cell *matCellDef="let row">

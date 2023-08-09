@@ -33,5 +33,8 @@
 
         [NotMapped]
         public static string FactionAllegianceThargoidName => "Thargoid";
+
+        public const string Federation = "Federation";
+        public const string Empire = "Empire";
     }
 }

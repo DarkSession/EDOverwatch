@@ -79,6 +79,7 @@ import { HomeV2CycleChangesComponent } from './components/home-v2-cycle-changes/
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { AlertPredictionOverviewComponent } from './components/alert-prediction-overview/alert-prediction-overview.component';
 import { SystemsHistoricalCycleComponent } from './components/systems-historical-cycle/systems-historical-cycle.component';
+import { SystemFeaturesComponent } from './components/system-features/system-features.component';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
@@ -133,6 +134,7 @@ export const httpInterceptorProviders = [
     HomeV2CycleChangesComponent,
     AlertPredictionOverviewComponent,
     SystemsHistoricalCycleComponent,
+    SystemFeaturesComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

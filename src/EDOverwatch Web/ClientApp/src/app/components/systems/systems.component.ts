@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
-import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-list.component';
+import { OverwatchStarSystemFull, SystemListComponent } from '../system-list/system-list.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { AppService } from 'src/app/services/app.service';
 import { faArrowUpRightFromSquare, faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
@@ -20,7 +20,7 @@ export class SystemsComponent implements OnInit, OnDestroy {
   public readonly faArrowUpRightFromSquare = faArrowUpRightFromSquare;
   public readonly faFilter = faFilter;
   public readonly faCircleXmark = faCircleXmark;
-  public dataRaw: OverwatchStarSystem[] = [];
+  public dataRaw: OverwatchStarSystemFull[] = [];
   public hideUnpopulated: boolean = false;
   public hideCompleted: boolean = false;
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
@@ -174,7 +174,7 @@ export class SystemsComponent implements OnInit, OnDestroy {
 export interface OverwatchSystems {
   Maelstroms: OverwatchMaelstrom[];
   Levels: OverwatchThargoidLevel[];
-  Systems: OverwatchStarSystem[];
+  Systems: OverwatchStarSystemFull[];
   NextTick: string;
 }
 

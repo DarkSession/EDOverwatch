@@ -1,5 +1,4 @@
-﻿using EDDatabase;
-using EDOverwatch_Web.Models;
+﻿using EDOverwatch_Web.Models;
 using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

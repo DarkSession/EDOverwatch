@@ -6,7 +6,7 @@ import { OverwatchOverviewV2CycleChange } from '../home-v2-cycle-changes/home-v2
 import { faArrowUpRightFromSquare, faCircleXmark, faFilter, faGears } from '@fortawesome/free-solid-svg-icons';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
-import { OverwatchStarSystem, SystemListComponent } from '../system-list/system-list.component';
+import { OverwatchStarSystemFull, SystemListComponent } from '../system-list/system-list.component';
 import { AppService } from 'src/app/services/app.service';
 
 @UntilDestroy()
@@ -52,7 +52,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         value: "Reported progress completion",
       },
     ];
-  public dataRaw: OverwatchStarSystem[] = [];
+  public dataRaw: OverwatchStarSystemFull[] = [];
   @ViewChild("stateContainers") stateContainers: ElementRef | null = null;
 
   public constructor(
@@ -187,7 +187,7 @@ interface OverwatchOverviewV2 {
   NextCyclePrediction: OverwatchOverviewV2Cycle;
   Maelstroms: OverwatchMaelstrom[];
   Levels: OverwatchThargoidLevel[];
-  Systems: OverwatchStarSystem[];
+  Systems: OverwatchStarSystemFull[];
   NextTick: string;
   Status: OverviewDataStatus;
 }

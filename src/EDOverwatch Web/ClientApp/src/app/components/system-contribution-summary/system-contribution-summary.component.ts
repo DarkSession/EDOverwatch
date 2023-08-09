@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { OverwatchStarSystemDetail, OverwatchStarSystemWarEffortCycle } from '../system/system.component';
+import { OverwatchStarSystemFullDetail, OverwatchStarSystemWarEffortCycle } from '../system/system.component';
 
 @Component({
   selector: 'app-system-contribution-summary',
@@ -11,7 +11,7 @@ import { OverwatchStarSystemDetail, OverwatchStarSystemWarEffortCycle } from '..
 })
 export class SystemContributionSummaryComponent implements OnChanges, AfterViewInit {
   @ViewChild('summarySort') summarySort!: MatSort;
-  @Input() starSystem!: OverwatchStarSystemDetail;
+  @Input() starSystem!: OverwatchStarSystemFullDetail;
   @Input() summary!: OverwatchStarSystemWarEffortCycle;
   public warEffortsSummeriesDisplayedColumns = ['Type'];
   public contributions: MatTableDataSource<Contribution> = new MatTableDataSource<Contribution>();

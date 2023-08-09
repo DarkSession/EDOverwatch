@@ -12,7 +12,8 @@
         public bool ProgressIsCompleted { get; }
         public DateTimeOffset? StateExpires { get; }
 
-        public OverwatchStarSystemsHistoricalSystem(StarSystem starSystem, ThargoidCycle thargoidCycle) : base(starSystem)
+        public OverwatchStarSystemsHistoricalSystem(StarSystem starSystem, ThargoidCycle thargoidCycle) :
+            base(starSystem)
         {
             if (starSystem.ThargoidLevelHistory == null || !starSystem.ThargoidLevelHistory.Any())
             {

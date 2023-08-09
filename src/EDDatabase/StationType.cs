@@ -66,5 +66,7 @@
             "CraterOutpost",
             "CraterPort",
         };
+
+        public const string OdysseySettlementType = "OnFootSettlement";
     }
 }

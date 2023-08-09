@@ -4,7 +4,7 @@ import { OverwatchSystems } from 'src/app/components/systems/systems.component';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { solSite } from '../../data/sol';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { OverwatchStarSystem } from 'src/app/components/system-list/system-list.component';
+import { OverwatchStarSystemFull } from 'src/app/components/system-list/system-list.component';
 import { ammoniaWorlds } from '../../data/ammonia-worlds';
 import { DateAgoPipe } from 'src/app/pipes/date-ago.pipe';
 import { AppService } from 'src/app/services/app.service';
@@ -93,7 +93,7 @@ export class CurrentComponent implements OnInit, AfterViewInit {
     },
   }
   private readonly defaultActiveCategories = ["20", "30", "40", "50", "70", "Barnacle Matrix"];
-  private systems: OverwatchStarSystem[] = [];
+  private systems: OverwatchStarSystemFull[] = [];
 
   public constructor(
     private readonly websocketService: WebsocketService,

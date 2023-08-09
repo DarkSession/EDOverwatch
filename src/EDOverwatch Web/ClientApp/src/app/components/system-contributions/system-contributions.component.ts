@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { OverwatchStarSystemDetail } from '../system/system.component';
+import { OverwatchStarSystemFullDetail } from '../system/system.component';
 
 @Component({
   selector: 'app-system-contributions',
@@ -16,7 +16,7 @@ export class SystemContributionsComponent implements OnChanges, AfterViewInit {
   public sources: string[] = [];
   @ViewChild(MatSort) detailsSort!: MatSort;
 
-  @Input() starSystem!: OverwatchStarSystemDetail;
+  @Input() starSystem!: OverwatchStarSystemFullDetail;
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef

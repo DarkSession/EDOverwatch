@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { faFan } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-thargoid-level',
@@ -11,7 +10,6 @@ export class ThargoidLevelComponent implements OnChanges {
   @Input() barnacleMatrixInSystem: boolean = false;
   @Input() size?: number = 12;
   public dotClass = "";
-  public readonly faFan = faFan;
 
   public ngOnChanges(): void {
     switch (this.thargoidLevel?.Level) {

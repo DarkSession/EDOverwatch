@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
-import { faFan, faPerson } from '@fortawesome/free-solid-svg-icons';
+import { faPerson } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-alert-prediction-attackers',
@@ -8,7 +8,6 @@ import { faFan, faPerson } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./alert-prediction-attackers.component.css']
 })
 export class AlertPredictionAttackersComponent implements OnChanges {
-  public readonly faFan = faFan;
   public readonly faPerson = faPerson;
   @Input() attackers?: OverwatchAlertPredictionSystemAttacker[];
   public visibleAttackers: OverwatchAlertPredictionSystemAttacker[] = [];

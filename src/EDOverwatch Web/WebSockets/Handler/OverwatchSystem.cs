@@ -19,7 +19,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
             OverwatchSystemRequest? data = message.Data?.ToObject<OverwatchSystemRequest>();
             if (data != null)
             {
-                OverwatchStarSystemDetail? overwatchStarSystemDetail = await OverwatchStarSystemDetail.Create(data.SystemAddress, dbContext, cancellationToken);
+                OverwatchStarSystemFullDetail? overwatchStarSystemDetail = await OverwatchStarSystemFullDetail.Create(data.SystemAddress, dbContext, cancellationToken);
                 if (overwatchStarSystemDetail != null)
                 {
                     return new WebSocketHandlerResultSuccess(overwatchStarSystemDetail, new SystemObject(data.SystemAddress));

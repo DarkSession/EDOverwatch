@@ -5,7 +5,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchStation } from '../station-name/station-name.component';
 import { ChartConfiguration, ChartDataset, ChartType, Color } from 'chart.js';
 
@@ -22,7 +22,7 @@ import { Context } from 'chartjs-plugin-datalabels';
 })
 export class SystemComponent implements OnInit {
   public readonly faClipboard = faClipboard;
-  public starSystem: OverwatchStarSystemDetail | null = null;
+  public starSystem: OverwatchStarSystemFullDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [],
     labels: [],
@@ -95,7 +95,7 @@ export class SystemComponent implements OnInit {
           });
         }
       });
-    this.websocketService.on<OverwatchStarSystemDetail>("OverwatchSystem")
+    this.websocketService.on<OverwatchStarSystemFullDetail>("OverwatchSystem")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
         if (message && message.Data) {
@@ -194,7 +194,7 @@ export class SystemComponent implements OnInit {
   }
 }
 
-export interface OverwatchStarSystemDetail extends OverwatchStarSystem {
+export interface OverwatchStarSystemFullDetail extends OverwatchStarSystemFull {
   WarEfforts: OverwatchStarSystemWarEffort[];
   ProgressDetails: OverwatchStarSystemDetailProgress[];
   FactionOperationDetails: FactionOperation[];

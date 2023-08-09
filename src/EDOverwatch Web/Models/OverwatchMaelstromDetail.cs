@@ -61,6 +61,9 @@
                     StationsUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack).Count(),
                     StationsDamaged = s.Stations!.Where(s => s.Updated > stationMaxAge && (s.State == StationState.Damaged)).Count(),
                     StationsUnderRepair = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderRepairs).Count(),
+                    OdysseySettlements = s.Stations!.Any(s => s.Type!.Name == StationType.OdysseySettlementType),
+                    FederalFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Federation),
+                    EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -98,7 +101,7 @@
                 List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
                     .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
                     .ToList();
-                resultStarSystems.Add(new OverwatchStarSystem(
+                resultStarSystems.Add(new OverwatchStarSystemFull(
                     starSystem,
                     effortFocus,
                     factionAxOperations: system.FactionAxOperations,
@@ -108,7 +111,10 @@
                     specialFactionOperations,
                     system.StationsUnderRepair,
                     system.StationsDamaged,
-                    system.StationsUnderAttack));
+                    system.StationsUnderAttack,
+                    system.OdysseySettlements,
+                    system.FederalFaction,
+                    system.EmpireFaction));
             }
 
             List<OverwatchAlertPredictionSystem> alertPredictions = new();

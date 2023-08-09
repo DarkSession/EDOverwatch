@@ -2,10 +2,12 @@
 {
     public class OverwatchAlertPredictions
     {
+        public OverwatchThargoidCycle Cycle { get; }
         public List<OverwatchAlertPredictionMaelstrom> Maelstroms { get; set; }
 
-        public OverwatchAlertPredictions(List<ThargoidMaelstrom> maelstroms, List<AlertPrediction> alertPredictions)
+        public OverwatchAlertPredictions(ThargoidCycle thargoidCycle, List<ThargoidMaelstrom> maelstroms, List<AlertPrediction> alertPredictions)
         {
+            Cycle = new(thargoidCycle);
             Maelstroms = new();
             foreach (ThargoidMaelstrom maelstrom in maelstroms)
             {
@@ -34,7 +36,7 @@
                 .Where(a => a.Cycle == nextThargoidCycle)
                 .ToListAsync(cancellationToken);
 
-            return new OverwatchAlertPredictions(maelstroms, alertPredictions);
+            return new OverwatchAlertPredictions(nextThargoidCycle, maelstroms, alertPredictions);
         }
     }
 }

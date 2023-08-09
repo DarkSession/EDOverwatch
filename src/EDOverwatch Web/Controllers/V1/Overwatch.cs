@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System.Threading;
 
 namespace EDOverwatch_Web.Controllers.V1
 {
@@ -27,7 +25,7 @@ namespace EDOverwatch_Web.Controllers.V1
         public async Task<OverwatchOverview> Overview(CancellationToken cancellationToken)
         {
             if (!MemoryCache.TryGetValue(OverviewCacheKey, out OverwatchOverview? result))
-            {   
+            {
                 result = await OverwatchOverview.LoadOverwatchOverview(DbContext, cancellationToken);
                 MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
                 MemoryCache.Set(OverviewCacheKey, result, cacheEntryOptions);
@@ -77,12 +75,12 @@ namespace EDOverwatch_Web.Controllers.V1
 
         private const string SystemCacheKey = "OverwatchSystem";
         [HttpGet("{systemAddress}")]
-        public async Task<OverwatchStarSystemDetail?> System(long systemAddress, CancellationToken cancellationToken)
+        public async Task<OverwatchStarSystemFullDetail?> System(long systemAddress, CancellationToken cancellationToken)
         {
             string cacheKey = SystemCacheKey + systemAddress.ToString();
-            if (!MemoryCache.TryGetValue(cacheKey, out OverwatchStarSystemDetail? result))
+            if (!MemoryCache.TryGetValue(cacheKey, out OverwatchStarSystemFullDetail? result))
             {
-                result = await OverwatchStarSystemDetail.Create(systemAddress, DbContext, cancellationToken);
+                result = await OverwatchStarSystemFullDetail.Create(systemAddress, DbContext, cancellationToken);
                 MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
                 MemoryCache.Set(cacheKey, result, cacheEntryOptions);
             }
