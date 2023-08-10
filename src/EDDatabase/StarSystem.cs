@@ -59,6 +59,9 @@ namespace EDDatabase
         public bool BarnacleMatrixInSystem { get; set; }
 
         [Column]
+        public bool ReactivationMissionsNearby { get; set; }
+
+        [Column]
         public DateTimeOffset Created { get; set; }
 
         [Column]
@@ -87,6 +90,7 @@ namespace EDDatabase
             bool warAffected,
             bool warRelevantSystem,
             bool barnacleMatrixInSystem,
+            bool reactivationMissionsNearby,
             DateTimeOffset created,
             DateTimeOffset updated)
         {
@@ -102,6 +106,7 @@ namespace EDDatabase
             WarAffected = warAffected;
             WarRelevantSystem = warRelevantSystem;
             BarnacleMatrixInSystem = barnacleMatrixInSystem;
+            ReactivationMissionsNearby = reactivationMissionsNearby;
             Created = created;
             Updated = updated;
         }

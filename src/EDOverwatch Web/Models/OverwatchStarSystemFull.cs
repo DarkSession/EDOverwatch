@@ -59,6 +59,10 @@
                     Features.Add(OverwatchStarSystemFeature.ImperialFaction.ToString());
                 }
             }
+            if (ThargoidLevel.Level == StarSystemThargoidLevelState.Alert && starSystem.ReactivationMissionsNearby)
+            {
+                Features.Add(OverwatchStarSystemFeature.ThargoidControlledReactivationMissions.ToString());
+            }
         }
     }
 
@@ -68,5 +72,6 @@
         OdysseySettlements,
         FederalFaction,
         ImperialFaction,
+        ThargoidControlledReactivationMissions,
     }
 }

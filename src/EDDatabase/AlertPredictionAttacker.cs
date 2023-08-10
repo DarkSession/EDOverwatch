@@ -14,11 +14,20 @@
         [Column]
         public int Order { get; set; }
 
-        public AlertPredictionAttacker(int id, long? starSystemId, int order)
+        [Column]
+        public AlertPredictionAttackerStatus Status { get; set; }
+
+        public AlertPredictionAttacker(int id, long? starSystemId, int order, AlertPredictionAttackerStatus status)
         {
             Id = id;
             StarSystemId = starSystemId;
             Order = order;
+            Status = status;
         }
+    }
+
+    public enum AlertPredictionAttackerStatus : byte
+    {
+        Default = 0,
     }
 }

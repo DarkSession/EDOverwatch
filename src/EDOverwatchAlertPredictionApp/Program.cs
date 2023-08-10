@@ -52,9 +52,10 @@ namespace EDOverwatchAlertPredictionApp
 
             CancellationToken cancellationToken = CancellationToken.None;
 
-            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+            await EDOverwatchAlertPrediction.AlertPrediction.UpdateAttackersForCycle(dbContext, currentThargoidCycle, cancellationToken);
 
-            await EDOverwatchAlertPrediction.AlertPrediction.UpdateAttackersForCycle(dbContext, nextThargoidCycle, cancellationToken);
+            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
 
             await EDOverwatchAlertPrediction.AlertPrediction.PredictionForCycle(dbContext, nextThargoidCycle, cancellationToken);
         }

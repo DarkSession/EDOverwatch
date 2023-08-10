@@ -95,7 +95,7 @@ namespace EDOverwatchAlertPrediction
                     EDDatabase.AlertPrediction? systemAlertPrediction = alertPredictions.FirstOrDefault(a => a.StarSystemId == attack.VictimSystem.Id);
                     if (systemAlertPrediction == null)
                     {
-                        systemAlertPrediction = new(0, attack.VictimSystem.Id, alertLikely)
+                        systemAlertPrediction = new(0, attack.VictimSystem.Id, alertLikely, AlertPredictionStatus.Default)
                         {
                             Cycle = thargoidCycle,
                             Maelstrom = maelstrom,
@@ -121,7 +121,7 @@ namespace EDOverwatchAlertPrediction
                         AlertPredictionAttacker? alertPredictionAttacker = systemAlertPrediction.Attackers!.FirstOrDefault(a => a.StarSystemId == attacker.Id);
                         if (alertPredictionAttacker == null)
                         {
-                            alertPredictionAttacker = new(0, attacker.Id, order);
+                            alertPredictionAttacker = new(0, attacker.Id, order, AlertPredictionAttackerStatus.Default);
                             systemAlertPrediction.Attackers!.Add(alertPredictionAttacker);
                         }
                         alertPredictionAttacker.Order = order;

@@ -57,6 +57,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     false,
                     false,
                     false,
+                    false,
                     Timestamp,
                     Timestamp)
                 {

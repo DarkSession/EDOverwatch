@@ -1,4 +1,5 @@
-﻿using EDUtils;
+﻿using EDDatabase;
+using EDUtils;
 using Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -414,6 +415,14 @@ namespace EDOverwatch
                 {
                     Log.LogError(e, "QueueUpdates exception");
                 }
+                try
+                {
+                    await UpdateSystemWithReactivationMissions(cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    Log.LogError(e, "QueueUpdates exception");
+                }
                 await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
             }
         }
@@ -481,9 +490,50 @@ namespace EDOverwatch
 
             await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(now, cancellationToken, 1);
 
+            {
+                ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+                if (!await dbContext.AlertPredictionCycleAttackers.AnyAsync(a => a.Cycle == currentThargoidCycle, cancellationToken))
+                {
+                    await EDOverwatchAlertPrediction.AlertPrediction.UpdateAttackersForCycle(dbContext, currentThargoidCycle, cancellationToken);
+                }
+            }
+
+            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(now, cancellationToken, 1);
             await EDOverwatchAlertPrediction.AlertPrediction.PredictionForCycle(dbContext, nextThargoidCycle, cancellationToken);
+        }
+
+        private async Task UpdateSystemWithReactivationMissions(CancellationToken cancellationToken)
+        {
+            await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
+            EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+
+            List<StarSystem> thargoidControlledWithMilitarySettlements = await dbContext.StarSystems
+                .AsNoTracking()
+                .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && s.Stations!.Any(s => s.Type!.Name == StationType.OdysseySettlementType && s.PrimaryEconomy!.Name == Economy.Military))
+                .ToListAsync(cancellationToken);
+
+            List<long> applicableSystems = new();
+            decimal maxDistance = 20m;
+
+            foreach (StarSystem thargoidControlledWithMilitarySettlement in thargoidControlledWithMilitarySettlements)
+            {
+                List<StarSystem> nearbyStarSystems = await dbContext.StarSystems
+                    .Where(s => s.WarAffected && s.ThargoidLevel != null && s.ThargoidLevel.State != StarSystemThargoidLevelState.None && s.OriginalPopulation > 0)
+                    .Where(s => s.LocationX >= thargoidControlledWithMilitarySettlement.LocationX - maxDistance && s.LocationX <= thargoidControlledWithMilitarySettlement.LocationX + maxDistance &&
+                                s.LocationY >= thargoidControlledWithMilitarySettlement.LocationY - maxDistance && s.LocationY <= thargoidControlledWithMilitarySettlement.LocationY + maxDistance &&
+                                s.LocationZ >= thargoidControlledWithMilitarySettlement.LocationZ - maxDistance && s.LocationZ <= thargoidControlledWithMilitarySettlement.LocationZ + maxDistance)
+                    .ToListAsync(cancellationToken);
+                foreach (StarSystem nearbyStarSystem in nearbyStarSystems)
+                {
+                    nearbyStarSystem.ReactivationMissionsNearby = true;
+                    applicableSystems.Add(nearbyStarSystem.SystemAddress);
+                }
+            }
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.StarSystems
+                .Where(s => s.ReactivationMissionsNearby && !applicableSystems.Contains(s.SystemAddress))
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.ReactivationMissionsNearby, false), cancellationToken);
         }
     }
 }

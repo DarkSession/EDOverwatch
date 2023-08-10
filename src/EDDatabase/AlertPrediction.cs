@@ -21,13 +21,22 @@
         [Column]
         public bool AlertLikely { get; set; }
 
+        [Column]
+        public AlertPredictionStatus Status { get; set; }
+
         public List<AlertPredictionAttacker>? Attackers { get; set; }
 
-        public AlertPrediction(int id, long? starSystemId, bool alertLikely)
+        public AlertPrediction(int id, long? starSystemId, bool alertLikely, AlertPredictionStatus status)
         {
             Id = id;
             StarSystemId = starSystemId;
             AlertLikely = alertLikely;
+            Status = status;
         }
+    }
+
+    public enum AlertPredictionStatus : byte
+    {
+        Default = 0,
     }
 }

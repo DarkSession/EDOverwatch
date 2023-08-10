@@ -54,5 +54,7 @@ namespace EDDatabase
             }
             return null;
         }
+
+        public const string Military = "Military";
     }
 }
