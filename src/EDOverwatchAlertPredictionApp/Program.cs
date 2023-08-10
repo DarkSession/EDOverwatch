@@ -54,6 +54,8 @@ namespace EDOverwatchAlertPredictionApp
 
             ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
 
+            await EDOverwatchAlertPrediction.AlertPrediction.UpdateAttackersForCycle(dbContext, nextThargoidCycle, cancellationToken);
+
             await EDOverwatchAlertPrediction.AlertPrediction.PredictionForCycle(dbContext, nextThargoidCycle, cancellationToken);
         }
     }

@@ -7,7 +7,7 @@ namespace EDDataProcessor.Journal
         public static async Task<bool> UpdateThargoidWar(this StarSystem starSystem, DateTimeOffset updateTime, FSDJumpThargoidWar fsdJumpThargoidWar, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
-            if (updateTime <= currentThargoidCycle.Start || updateTime >= currentThargoidCycle.End || starSystem.ThargoidLevel?.ManualUpdateCycleId == currentThargoidCycle.Id)
+            if (updateTime <= currentThargoidCycle.Start || updateTime >= currentThargoidCycle.End || starSystem.ThargoidLevel?.ManualUpdateCycleId == currentThargoidCycle.Id || (updateTime.DayOfWeek == DayOfWeek.Thursday && updateTime.Hour == 7))
             {
                 return false;
             }

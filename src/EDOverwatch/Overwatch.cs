@@ -423,6 +423,10 @@ namespace EDOverwatch
             await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
             ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+            List<ThargoidMaelstromHistoricalSummary> thargoidMaelstromHistoricalCycleSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
+                .Include(t => t.Maelstrom)
+                .Where(t => t.Cycle == thargoidCycle)
+                .ToListAsync(cancellationToken);
             var maelstromTotals = await dbContext.StarSystemThargoidLevels
                 .Where(s => s.State > StarSystemThargoidLevelState.None &&
                     (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start) &&
@@ -442,8 +446,7 @@ namespace EDOverwatch
             foreach (var maelstromTotal in maelstromTotals)
             {
                 ThargoidMaelstrom maelstrom = await dbContext.ThargoidMaelstroms.FirstAsync(t => t.Id == maelstromTotal.MaelstromId, cancellationToken);
-                ThargoidMaelstromHistoricalSummary? thargoidMaelstromHistoricalSummary = await dbContext.ThargoidMaelstromHistoricalSummaries
-                    .FirstOrDefaultAsync(t => t.Maelstrom == maelstrom && t.State == maelstromTotal.State && t.Cycle == thargoidCycle, cancellationToken);
+                ThargoidMaelstromHistoricalSummary? thargoidMaelstromHistoricalSummary = thargoidMaelstromHistoricalCycleSummaries.FirstOrDefault(t => t.Maelstrom?.Id == maelstrom.Id && t.State == maelstromTotal.State);
                 if (thargoidMaelstromHistoricalSummary == null)
                 {
                     thargoidMaelstromHistoricalSummary = new(0, maelstromTotal.State, maelstromTotal.Count)
@@ -456,9 +459,16 @@ namespace EDOverwatch
                 else
                 {
                     thargoidMaelstromHistoricalSummary.Amount = maelstromTotal.Count;
+                    thargoidMaelstromHistoricalCycleSummaries.Remove(thargoidMaelstromHistoricalSummary);
                 }
-                await dbContext.SaveChangesAsync(cancellationToken);
             }
+
+            if (thargoidMaelstromHistoricalCycleSummaries.Any())
+            {
+                dbContext.ThargoidMaelstromHistoricalSummaries.RemoveRange(thargoidMaelstromHistoricalCycleSummaries);
+            }
+
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task UpdateAlertPredictions(CancellationToken cancellationToken)

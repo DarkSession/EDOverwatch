@@ -186,6 +186,8 @@ namespace EDOverwatchAlertPrediction
                     }
                 }
             }
+
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

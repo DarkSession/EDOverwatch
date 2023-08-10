@@ -5,7 +5,7 @@
                 <fa-icon [icon]="faGears"></fa-icon>
             </div>
             <div>
-                Elite Dangerous servers weekly tick in progress.
+                Elite Dangerous weekly tick in progress.
             </div>
         </div>
         <div *ngIf="overview?.Status == OverviewDataStatus.UpdatePending" class="information-message">
@@ -14,7 +14,7 @@
             </div>
             <div>
                 <b>Data update in progress</b><br>
-                Overwatch is currently updating system data from the recent server tick.
+                Overwatch is currently updating system data from the recent weekly server tick.
             </div>
         </div>
         <div class="state-containers-parent">
@@ -25,7 +25,7 @@
                 <app-home-v2-cycle [cycle]="overview?.CurrentCycle" title="This cycle"
                     information="Cycle ends in {{ nextTick | dateAgo }}"></app-home-v2-cycle>
                 <app-home-v2-cycle-changes [cycleChange]="overview?.NextCycleChanges"
-                    title="Intermediate Result"></app-home-v2-cycle-changes>
+                    title="Intermediate result"></app-home-v2-cycle-changes>
                 <app-home-v2-cycle [cycle]="overview?.NextCyclePrediction" title="Next cycle"
                     information="Based on intermediate result"></app-home-v2-cycle>
             </div>
