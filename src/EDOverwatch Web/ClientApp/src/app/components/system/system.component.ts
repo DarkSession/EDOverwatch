@@ -12,6 +12,7 @@ import { ChartConfiguration, ChartDataset, ChartType, Color } from 'chart.js';
 import { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { Context } from 'chartjs-plugin-datalabels';
+import { faBolt } from '@fortawesome/free-solid-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -22,11 +23,17 @@ import { Context } from 'chartjs-plugin-datalabels';
 })
 export class SystemComponent implements OnInit {
   public readonly faClipboard = faClipboard;
+  public readonly faBolt = faBolt;
   public starSystem: OverwatchStarSystemFullDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [],
     labels: [],
   };
+  public barnacleMatrix = false;
+  public odysseySettlement = false;
+  public federation = false;
+  public empire = false;
+  public thargoidControlledReactivationMissions = false;
 
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
@@ -173,6 +180,13 @@ export class SystemComponent implements OnInit {
           if (this.chartLoaded) {
             this.lineChartOptions!.animation = false;
           }
+
+          this.barnacleMatrix = this.starSystem?.Features?.includes("BarnacleMatrix") ?? false;
+          this.odysseySettlement = this.starSystem?.Features?.includes("OdysseySettlements") ?? false;
+          this.federation = this.starSystem?.Features?.includes("FederalFaction") ?? false;
+          this.empire = this.starSystem?.Features?.includes("ImperialFaction") ?? false;
+          this.thargoidControlledReactivationMissions = this.starSystem?.Features?.includes("ThargoidControlledReactivationMissions") ?? false;
+
           this.changeDetectorRef.markForCheck();
           this.chartLoaded = true;
         }

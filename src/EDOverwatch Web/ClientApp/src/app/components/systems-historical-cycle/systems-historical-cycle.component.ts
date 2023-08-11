@@ -152,30 +152,10 @@ export class SystemsHistoricalCycleComponent implements OnInit {
       else {
         this.thargoidLevelsSelected = data.Levels;
       }
-      this.initDataSource(response.Data.Systems);
+      this.updateDataSource();
     }
     this.loading = true;
     this.changeDetectorRef.detectChanges();
-  }
-
-  private initDataSource(data: OverwatchStarSystemsHistoricalSystem[]) {
-    this.dataSource = new MatTableDataSource<OverwatchStarSystemsHistoricalSystem>(data);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sortingDataAccessor = (system: OverwatchStarSystemsHistoricalSystem, columnName: string): string | number => {
-      switch (columnName) {
-        case "ThargoidLevel": {
-          return system.ThargoidLevel.Level;
-        }
-        case "Maelstrom": {
-          return system.Maelstrom.Name;
-        }
-        case "StateExpires": {
-          return (system.StateExpires ?? "");
-        }
-      }
-      return system[columnName as keyof OverwatchStarSystemsHistoricalSystem] as string | number;
-    }
-    this.dataSource.sort = this.sort;
   }
 
   public exportToCsv(): void {
@@ -226,7 +206,23 @@ export class SystemsHistoricalCycleComponent implements OnInit {
     if (this.sort?.active) {
       data = this.dataSource.sortData(data, this.sort);
     }
-    this.initDataSource(data);
+    this.dataSource = new MatTableDataSource<OverwatchStarSystemsHistoricalSystem>(data);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sortingDataAccessor = (system: OverwatchStarSystemsHistoricalSystem, columnName: string): string | number => {
+      switch (columnName) {
+        case "ThargoidLevel": {
+          return system.ThargoidLevel.Level;
+        }
+        case "Maelstrom": {
+          return system.Maelstrom.Name;
+        }
+        case "StateExpires": {
+          return (system.StateExpires ?? "");
+        }
+      }
+      return system[columnName as keyof OverwatchStarSystemsHistoricalSystem] as string | number;
+    }
+    this.dataSource.sort = this.sort;
     this.changeDetectorRef.detectChanges();
   }
 

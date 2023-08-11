@@ -21,7 +21,8 @@
                         <tr>
                             <td class="t">Thargoid State</td>
                             <td>
-                                <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel" [barnacleMatrixInSystem]="starSystem.BarnacleMatrixInSystem"></app-thargoid-level>
+                                <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"
+                                    [barnacleMatrixInSystem]="starSystem.BarnacleMatrixInSystem"></app-thargoid-level>
                             </td>
                         </tr>
                         <tr>
@@ -44,9 +45,9 @@
                                 </div>
                                 <div class="small" *ngIf="starSystem.Population != starSystem.PopulationOriginal"
                                     [ngClass]="{
-                                  'population-decrease': (starSystem.Population < starSystem.PopulationOriginal),
-                                  'population-increase': (starSystem.Population > starSystem.PopulationOriginal)
-                                }">
+                                      'population-decrease': (starSystem.Population < starSystem.PopulationOriginal),
+                                      'population-increase': (starSystem.Population > starSystem.PopulationOriginal)
+                                    }">
                                     {{ (starSystem.Population - starSystem.PopulationOriginal) | number }}
                                 </div>
                             </td>
@@ -80,6 +81,30 @@
                     <a href="https://www.edsm.net/en/system?systemID64={{ starSystem.SystemAddress }}" target="_blank"
                         rel="noreferrer">
                         EDSM</a>
+                </div>
+            </div>
+            <div *ngIf="starSystem?.Features && starSystem.Features.length > 0">
+                <br>
+                <div *ngIf="barnacleMatrix" class="feature">
+                    <img class="feature-icon" src="assets/barnacles_logo.svg" matTooltip="Barnacle Matrix present" />
+                    Barnacle Matrix present
+                </div>
+                <div *ngIf="odysseySettlement" class="feature">
+                    <img class="feature-icon" src="assets/settlement_o.svg"
+                        matTooltip="Odyssey settlement(s) present" /> Odyssey settlement(s) present
+                </div>
+                <div *ngIf="federation" class="feature">
+                    <img class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />
+                    Federal faction(s) present
+                </div>
+                <div *ngIf="empire" class="feature">
+                    <img class="feature-icon" src="assets/empire.svg" matTooltip="Imperial faction(s) present" />
+                    Imperial faction(s) present
+                </div>
+                <div *ngIf="thargoidControlledReactivationMissions" class="feature">
+                    <fa-icon class="feature-icon" [icon]="faBolt" size="xl"
+                        matTooltip="AX reactivation missions available"></fa-icon> AX reactivation
+                    missions available
                 </div>
             </div>
             <br>

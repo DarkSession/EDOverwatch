@@ -4,8 +4,9 @@
     {
         public OverwatchThargoidCycle Cycle { get; }
         public List<OverwatchAlertPredictionMaelstrom> Maelstroms { get; set; }
+        public List<OverwatchStarSystemMin> CurrentCycleAttackers { get; }
 
-        public OverwatchAlertPredictions(ThargoidCycle thargoidCycle, List<ThargoidMaelstrom> maelstroms, List<AlertPrediction> alertPredictions)
+        public OverwatchAlertPredictions(ThargoidCycle thargoidCycle, List<ThargoidMaelstrom> maelstroms, List<AlertPrediction> alertPredictions, List<AlertPredictionCycleAttacker> alertPredictionCycleAttackers)
         {
             Cycle = new(thargoidCycle);
             Maelstroms = new();
@@ -17,11 +18,13 @@
                 OverwatchAlertPredictionMaelstrom maelstromEntry = new(maelstrom, systems);
                 Maelstroms.Add(maelstromEntry);
             }
+            CurrentCycleAttackers = alertPredictionCycleAttackers.Select(a => new OverwatchStarSystemMin(a.AttackerStarSystem!)).ToList();
         }
 
         public static async Task<OverwatchAlertPredictions> Create(EdDbContext dbContext, CancellationToken cancellationToken)
         {
             ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
@@ -36,7 +39,12 @@
                 .Where(a => a.Cycle == nextThargoidCycle)
                 .ToListAsync(cancellationToken);
 
-            return new OverwatchAlertPredictions(nextThargoidCycle, maelstroms, alertPredictions);
+            List<AlertPredictionCycleAttacker> alertPredictionCycleAttackers = await dbContext.AlertPredictionCycleAttackers
+                .AsNoTracking()
+                .Where(a => a.Cycle == currentThargoidCycle)
+                .ToListAsync(cancellationToken);
+
+            return new OverwatchAlertPredictions(nextThargoidCycle, maelstroms, alertPredictions, alertPredictionCycleAttackers);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using EDDatabase;
-using EDUtils;
+﻿using EDUtils;
 using Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
