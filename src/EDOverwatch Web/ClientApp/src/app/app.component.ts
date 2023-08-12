@@ -1,9 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AppService } from './services/app.service';
 import { WebsocketService } from './services/websocket.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDrawerMode } from '@angular/material/sidenav';
 
 @UntilDestroy()
 @Component({
@@ -14,13 +15,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class AppComponent implements OnInit, AfterViewInit {
   public loading = false;
-
+  public sideNavMode: MatDrawerMode = "side";
   /*
   @HostListener('window:focus', ['$event'])
   onFocus(event: any): void {
     this.websocketService.ensureConnected();
   }
   */
+
+  @HostListener('window:resize', ['$event'])
+  onFocus(event: any): void {
+    this.updateSideNavMode();
+  }
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -31,8 +37,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   ) {
   }
 
+  private updateSideNavMode() {
+    const newValue: MatDrawerMode = window.innerWidth < 1000 ? "over" : "side";
+    this.sideNavMode = newValue;
+  }
+
   public ngAfterViewInit(): void {
-    this.checkAppUpdated(); 
+    this.checkAppUpdated();
   }
 
   private async checkAppUpdated(): Promise<void> {
@@ -45,7 +56,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
+  public menuOpenChanged(isOpen: boolean) {
+    if (isOpen != this.appService.isMenuOpen) {
+      this.appService.toggleIsMenuOpen();
+    }
+  }
+
   public ngOnInit(): void {
+    this.updateSideNavMode();
     this.appService.onUserChanged
       .pipe(untilDestroyed(this))
       .subscribe(() => {

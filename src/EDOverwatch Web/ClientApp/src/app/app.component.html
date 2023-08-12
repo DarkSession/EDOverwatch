@@ -51,7 +51,8 @@
     </div>
   </mat-toolbar>
   <mat-sidenav-container style="min-height: calc(100vh - 80px)">
-    <mat-sidenav #sidenav mode="side" [opened]="appService.isMenuOpen" class="side-nav">
+    <mat-sidenav #sidenav mode="side" [opened]="appService.isMenuOpen" (openedChange)="menuOpenChanged($event)" [mode]="sideNavMode" class="side-nav">
+      <div class="side-nav-title" style="margin-top: 0px;">The War</div>
       <div>
         <div routerLink="/" class="clickable">Systems</div>
       </div>
@@ -64,20 +65,26 @@
       <div>
         <div routerLink="stats" class="clickable">Stats</div>
       </div>
-      <hr>
+      <div class="hide-on-mobile">
+        <div routerLink="edmap/current" class="clickable">Map (current situation)</div>
+      </div>
+      <div class="side-nav-title">Community</div>
       <div>
         <div routerLink="contribute" class="clickable">Contribute</div>
         <div routerLink="join-the-fight" class="clickable">Join the fight!</div>
       </div>
-      <hr>
-      <div>
-        <div routerLink="alert-predictions" class="clickable">Alert Predictions</div>
-      </div>
+      <div class="side-nav-title">Past &amp; Future</div>
       <div>
         <div routerLink="systems-cycle" class="clickable">Past Cycles</div>
       </div>
+      <div>
+        <div routerLink="alert-predictions" class="clickable">Alert Predictions</div>
+      </div>
+      <div class="hide-on-mobile">
+        <div routerLink="edmap/historical" class="clickable">Map (historical)</div>
+      </div>
       <ng-container *ngIf="appService.user">
-        <hr>
+        <div class="side-nav-title">My Commander</div>
         <div>
           <div routerLink="my-efforts" class="clickable">My war contributions</div>
         </div>
@@ -85,16 +92,7 @@
           <div routerLink="commander/fleet-carrier-cargo" class="clickable">Fleet carrier cargo</div>
         </div>
       </ng-container>
-      <hr>
-      <div class="hide-on-mobile">
-        <div>
-          <div routerLink="edmap/current" class="clickable">Map (current situation)</div>
-        </div>
-        <div>
-          <div routerLink="edmap/historical" class="clickable">Map (historical)</div>
-        </div>
-        <hr>
-      </div>
+      <div class="side-nav-title">Boring stuff</div>
       <div>
         <div routerLink="consumer-api" class="clickable">API</div>
       </div>

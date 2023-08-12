@@ -41,9 +41,17 @@
             <br>
             <b>Thargoids</b>
             <div class="numbers">
+                <div class="thargoid-invasion" *ngIf="cycleChange.ThargoidInvasionStarted">
+                    <span>
+                        {{ future ? 'Start of invasion' : 'Systems invaded' }}:
+                    </span>
+                    <span>
+                        {{ cycleChange.ThargoidInvasionStarted }}
+                    </span>
+                </div>
                 <div class="thargoid-controlled">
                     <span>
-                        Control gained:
+                        {{ future ? 'Gain control' : 'Control gained' }}:
                     </span>
                     <span>
                         {{ cycleChange.ThargoidsGained }}

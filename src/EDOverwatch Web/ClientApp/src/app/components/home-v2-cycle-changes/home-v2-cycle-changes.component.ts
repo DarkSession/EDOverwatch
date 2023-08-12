@@ -8,11 +8,13 @@ import { Component, Input } from '@angular/core';
 export class HomeV2CycleChangesComponent {
   @Input() cycleChange: OverwatchOverviewV2CycleChange | null | undefined = null;
   @Input() title = "";
+  @Input() future = false;
 }
 
 export interface OverwatchOverviewV2CycleChange {
   AlertsDefended: number;
   InvasionsDefended: number;
   ControlsDefended: number;
+  ThargoidInvasionStarted: number;
   ThargoidsGained: number;
 }

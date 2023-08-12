@@ -110,9 +110,10 @@ namespace EDOverwatch_Web.Models
                 int alertsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && p.Progress >= 100);
                 int invasionsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Invasion && p.Progress >= 100);
                 int controlsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && p.Progress >= 100);
+                int thargoidInvasionStarted = previousCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && (p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0));
                 int thargoidsGained = previousCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && (p.State == StarSystemThargoidLevelState.Invasion || (p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0)));
 
-                overviewPreviousCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, thargoidsGained);
+                overviewPreviousCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, thargoidInvasionStarted, thargoidsGained);
             }
 
             OverwatchOverviewV2Cycle overviewCurrentCycle;
@@ -168,9 +169,10 @@ namespace EDOverwatch_Web.Models
                 int alertsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && p.Progress >= 100);
                 int invasionsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Invasion && p.Progress >= 100);
                 int controlsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && p.Progress >= 100);
+                int thargoidInvasionStart = currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0);
                 int thargoidsGain = currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && (p.State == StarSystemThargoidLevelState.Invasion || (p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0)));
 
-                overviewNextCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, thargoidsGain);
+                overviewNextCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, thargoidInvasionStart, thargoidsGain);
 
                 int alertsPredicted = await dbContext.AlertPredictions.CountAsync(a => a.Cycle == nextCycle && a.AlertLikely, cancellationToken);
                 int invasionsPredicted = invasionCount - invasionsDefended + currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation > 0) - currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Invasion);
@@ -329,13 +331,15 @@ namespace EDOverwatch_Web.Models
         public int AlertsDefended { get; }
         public int InvasionsDefended { get; }
         public int ControlsDefended { get; }
+        public int ThargoidInvasionStarted { get; }
         public int ThargoidsGained { get; }
 
-        public OverwatchOverviewV2CycleChange(int alertsDefended, int invasionsDefended, int controlsDefended, int thargoidsGained)
+        public OverwatchOverviewV2CycleChange(int alertsDefended, int invasionsDefended, int controlsDefended, int thargoidInvasionStarted, int thargoidsGained)
         {
             AlertsDefended = alertsDefended;
             InvasionsDefended = invasionsDefended;
             ControlsDefended = controlsDefended;
+            ThargoidInvasionStarted = thargoidInvasionStarted;
             ThargoidsGained = thargoidsGained;
         }
     }

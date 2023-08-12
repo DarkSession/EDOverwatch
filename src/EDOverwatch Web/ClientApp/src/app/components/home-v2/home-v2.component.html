@@ -24,7 +24,7 @@
                     title="Results"></app-home-v2-cycle-changes>
                 <app-home-v2-cycle [cycle]="overview?.CurrentCycle" title="Current cycle"
                     information="Cycle ends in {{ nextTick | dateAgo }}"></app-home-v2-cycle>
-                <app-home-v2-cycle-changes [cycleChange]="overview?.NextCycleChanges"
+                <app-home-v2-cycle-changes [future]="true" [cycleChange]="overview?.NextCycleChanges"
                     title="Intermediate result"></app-home-v2-cycle-changes>
                 <app-home-v2-cycle [cycle]="overview?.NextCyclePrediction" title="Next cycle"
                     information="Based on intermediate result"></app-home-v2-cycle>
