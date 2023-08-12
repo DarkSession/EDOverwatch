@@ -3,12 +3,14 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { faCircleQuestion, faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { faCircle, faCircleCheck, faCrosshairs, faFileCsv, faPlus, faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faClipboard } from '@fortawesome/pro-light-svg-icons';
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { AppService } from 'src/app/services/app.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { ExportToCsv, Options } from 'export-to-csv';
+import { faFileCsv, faCircleQuestion, faTruck, faKitMedical } from '@fortawesome/pro-duotone-svg-icons';
+import { faCrosshairs, faHandshake } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
   selector: 'app-system-list',
@@ -22,9 +24,9 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faFileCsv = faFileCsv;
   public readonly faCircleQuestion = faCircleQuestion;
   public readonly faCrosshairs = faCrosshairs;
-  public readonly faPlus = faPlus;
+  public readonly faKitMedical = faKitMedical;
   public readonly faTruck = faTruck;
-  public readonly faCircle = faCircle;
+  public readonly faHandshake = faHandshake;
   private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Progress', 'Features', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
   public displayedColumns: string[] = [];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;

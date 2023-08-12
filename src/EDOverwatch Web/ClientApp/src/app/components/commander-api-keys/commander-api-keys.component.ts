@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { faClipboard } from '@fortawesome/pro-light-svg-icons';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
 
 @UntilDestroy()

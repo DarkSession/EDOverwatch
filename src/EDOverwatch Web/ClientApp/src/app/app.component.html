@@ -51,53 +51,98 @@
     </div>
   </mat-toolbar>
   <mat-sidenav-container style="min-height: calc(100vh - 80px)">
-    <mat-sidenav #sidenav mode="side" [opened]="appService.isMenuOpen" (openedChange)="menuOpenChanged($event)" [mode]="sideNavMode" class="side-nav">
+    <mat-sidenav #sidenav mode="side" [opened]="appService.isMenuOpen" (openedChange)="menuOpenChanged($event)"
+      [mode]="sideNavMode" class="side-nav">
       <div class="side-nav-title" style="margin-top: 0px;">The War</div>
-      <div>
-        <div routerLink="/" class="clickable">Systems</div>
+      <div routerLink="/" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faSolarSystem" size="xl"></fa-icon>
+        </div>
+        <div>Systems</div>
       </div>
-      <div>
-        <div routerLink="titans" class="clickable">Titans</div>
+      <div routerLink="titans" class="clickable">
+        <div class="side-nav-icon">
+          <img src="assets/galaxy_m.svg" style="width: 20px; height: 20px; fill: #fff" />
+        </div>
+        <div>Titans</div>
       </div>
-      <div>
-        <div routerLink="operations" class="clickable">Active operations</div>
+      <div routerLink="operations" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faHandshake" size="xl"></fa-icon>
+        </div>
+        <div>Active operations</div>
       </div>
-      <div>
-        <div routerLink="stats" class="clickable">Stats</div>
+      <div routerLink="stats" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faChartSimple" size="xl"></fa-icon>
+        </div>
+        <div>Stats</div>
       </div>
-      <div class="hide-on-mobile">
-        <div routerLink="edmap/current" class="clickable">Map (current situation)</div>
+      <div class="hide-on-mobile" routerLink="edmap/current" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faMapLocation" size="xl"></fa-icon>
+        </div>
+        <div>Map (current situation)</div>
       </div>
       <div class="side-nav-title">Community</div>
-      <div>
-        <div routerLink="contribute" class="clickable">Contribute</div>
-        <div routerLink="join-the-fight" class="clickable">Join the fight!</div>
+      <div routerLink="contribute" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faHandsHoldingDiamond" size="xl"></fa-icon>
+        </div>
+        <div>Contribute</div>
+      </div>
+      <div routerLink="join-the-fight" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faUsers" size="xl"></fa-icon>
+        </div>
+        <div>Join the fight!</div>
       </div>
       <div class="side-nav-title">Past &amp; Future</div>
-      <div>
-        <div routerLink="systems-cycle" class="clickable">Past Cycles</div>
+      <div routerLink="systems-cycle" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faTimelineArrow" size="xl"></fa-icon>
+        </div>
+        <div>Past Cycles</div>
       </div>
-      <div>
-        <div routerLink="alert-predictions" class="clickable">Alert Predictions</div>
+      <div routerLink="alert-predictions" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faCrystalBall" size="xl"></fa-icon>
+        </div>
+        <div>Alert Predictions</div>
       </div>
-      <div class="hide-on-mobile">
-        <div routerLink="edmap/historical" class="clickable">Map (historical)</div>
+      <div class="hide-on-mobile" routerLink="edmap/historical" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faMapLocation" size="xl"></fa-icon>
+        </div>
+        <div>Map (historical)</div>
       </div>
       <ng-container *ngIf="appService.user">
         <div class="side-nav-title">My Commander</div>
-        <div>
-          <div routerLink="my-efforts" class="clickable">My war contributions</div>
+        <div routerLink="my-efforts" class="clickable">
+          <div class="side-nav-icon">
+            <fa-icon [icon]="faSwords" size="xl"></fa-icon>
+          </div>
+          <div>War contributions</div>
         </div>
-        <div>
-          <div routerLink="commander/fleet-carrier-cargo" class="clickable">Fleet carrier cargo</div>
+        <div routerLink="commander/fleet-carrier-cargo" class="clickable">
+          <div class="side-nav-icon">
+            <fa-icon [icon]="faContainerStorage" size="xl"></fa-icon>
+          </div>
+          <div>Fleet carrier cargo</div>
         </div>
       </ng-container>
       <div class="side-nav-title">Boring stuff</div>
-      <div>
-        <div routerLink="consumer-api" class="clickable">API</div>
+      <div routerLink="consumer-api" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faChartNetwork" size="xl"></fa-icon>
+        </div>
+        <div>API</div>
       </div>
-      <div>
-        <div routerLink="about" class="clickable">About</div>
+      <div routerLink="about" class="clickable">
+        <div class="side-nav-icon">
+          <fa-icon [icon]="faHandWave" size="xl"></fa-icon>
+        </div>
+        <div>About</div>
       </div>
     </mat-sidenav>
     <mat-sidenav-content>

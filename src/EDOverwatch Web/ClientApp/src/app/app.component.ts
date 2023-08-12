@@ -5,6 +5,8 @@ import { AppService } from './services/app.service';
 import { WebsocketService } from './services/websocket.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDrawerMode } from '@angular/material/sidenav';
+import { faChartNetwork, faChartSimple, faContainerStorage, faCrystalBall, faGalaxy, faHandsHoldingDiamond, faHandshake, faSolarSystem, faSwords, faTimelineArrow, faUsers } from '@fortawesome/pro-duotone-svg-icons';
+import { faHandWave, faMapLocation } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -14,6 +16,19 @@ import { MatDrawerMode } from '@angular/material/sidenav';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, AfterViewInit {
+  public readonly faTimelineArrow = faTimelineArrow;
+  public readonly faSolarSystem = faSolarSystem;
+  public readonly faHandshake = faHandshake;
+  public readonly faChartSimple = faChartSimple;
+  public readonly faGalaxy = faGalaxy;
+  public readonly faMapLocation = faMapLocation;
+  public readonly faCrystalBall = faCrystalBall;
+  public readonly faChartNetwork = faChartNetwork;
+  public readonly faUsers = faUsers;
+  public readonly faHandsHoldingDiamond = faHandsHoldingDiamond;
+  public readonly faHandWave = faHandWave;
+  public readonly faSwords = faSwords;
+  public readonly faContainerStorage = faContainerStorage;
   public loading = false;
   public sideNavMode: MatDrawerMode = "side";
   /*

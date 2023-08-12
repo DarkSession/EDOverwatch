@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AppService } from 'src/app/services/app.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { faHandHoldingHeart } from '@fortawesome/pro-duotone-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -10,6 +11,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 })
 export class ContributeDataComponent implements OnInit {
   public loginDisabled = false;
+  public readonly faHandHoldingHeart = faHandHoldingHeart;
 
   public constructor(
     private readonly appService: AppService,

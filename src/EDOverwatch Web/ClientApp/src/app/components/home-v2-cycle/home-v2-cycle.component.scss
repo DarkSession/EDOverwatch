@@ -3,6 +3,11 @@
     display: flex;
     margin: 12px;
     min-width: 250px;
+
+    svg {
+        height: 100%;
+        width: auto;
+    }
 }
 
 .cycle-container {
@@ -21,4 +26,3 @@
 .svg {
     fill: var(--accent-darker-color);
 }
-

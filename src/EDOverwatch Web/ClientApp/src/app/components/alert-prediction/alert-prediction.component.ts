@@ -2,10 +2,10 @@ import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/
 import { OverwatchStarSystemMin } from '../station-name/station-name.component';
 import { OverwatchAlertPredictionSystemAttacker } from '../alert-prediction-attackers/alert-prediction-attackers.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { faBullseye } from '@fortawesome/free-solid-svg-icons';
+import { faBullseyeArrow } from '@fortawesome/pro-duotone-svg-icons';
+import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
   selector: 'app-alert-prediction',
@@ -14,7 +14,7 @@ import { faBullseye } from '@fortawesome/free-solid-svg-icons';
 })
 export class AlertPredictionComponent implements OnChanges, AfterViewInit {
   public readonly faClipboard = faClipboard;
-  public readonly faBullseye = faBullseye;
+  public readonly faBullseyeArrow = faBullseyeArrow;
   @Input() alertPredictions: OverwatchAlertPredictionSystem[] = [];
   public sortedAlertPredictions: MatTableDataSource<OverwatchAlertPredictionSystem> = new MatTableDataSource<OverwatchAlertPredictionSystem>();
   public readonly alertPredictionColumns = ['Name', 'Population', 'Distance', 'Attackers'];

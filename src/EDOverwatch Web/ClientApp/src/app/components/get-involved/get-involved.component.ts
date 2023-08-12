@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpRightFromSquare } from '@fortawesome/pro-duotone-svg-icons';
 
 @Component({
   selector: 'app-get-involved',

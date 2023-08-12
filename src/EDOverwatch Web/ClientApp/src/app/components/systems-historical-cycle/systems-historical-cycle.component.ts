@@ -6,14 +6,15 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { AppService } from 'src/app/services/app.service';
 import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
+import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { faCircleCheck, faCircleXmark, faFileCsv, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { ExportToCsv, Options } from 'export-to-csv';
 import { OverwatchThargoidCycle } from '../home/home.component';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { faFilters, faFileCsv, faCircleXmark } from '@fortawesome/pro-duotone-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -25,7 +26,7 @@ export class SystemsHistoricalCycleComponent implements OnInit {
   public readonly faClipboard = faClipboard;
   public readonly faCircleCheck = faCircleCheck;
   public readonly faFileCsv = faFileCsv;
-  public readonly faFilter = faFilter;
+  public readonly faFilters = faFilters;
   public readonly faCircleXmark = faCircleXmark;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;

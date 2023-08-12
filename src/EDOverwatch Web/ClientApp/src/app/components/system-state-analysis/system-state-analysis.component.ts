@@ -3,7 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
+import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';

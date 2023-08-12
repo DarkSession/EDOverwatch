@@ -33,8 +33,9 @@ namespace EDOverwatch_Web.Models
             List<Station> rescueShips,
             bool odysseySettlements,
             bool federalFaction,
-            bool imperialFaction) :
-            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction)
+            bool imperialFaction,
+            bool axConflictZones) :
+            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction, axConflictZones)
         {
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;
@@ -72,6 +73,9 @@ namespace EDOverwatch_Web.Models
 
         private static async Task<OverwatchStarSystemFullDetail?> CreateInternal(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            DateTimeOffset lastTick = WeeklyTick.GetLastTick();
+            DateTimeOffset signalMaxAge = lastTick.AddDays(-7);
+
             var systemData = await dbContext.StarSystems
                 .AsNoTracking()
                 .Include(s => s.ThargoidLevel)
@@ -87,6 +91,7 @@ namespace EDOverwatch_Web.Models
                     OdysseySettlements = s.Stations!.Any(s => s.Type!.Name == StationType.OdysseySettlementType),
                     FederalFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Federation),
                     EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
+                    AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
                 })
                 .FirstOrDefaultAsync(cancellationToken);
             if (systemData?.StarSystem?.ThargoidLevel != null)
@@ -226,7 +231,8 @@ namespace EDOverwatch_Web.Models
                     rescueShips,
                     systemData.OdysseySettlements,
                     systemData.FederalFaction,
-                    systemData.EmpireFaction);
+                    systemData.EmpireFaction,
+                    systemData.AXConflictZones);
             }
             return null;
         }

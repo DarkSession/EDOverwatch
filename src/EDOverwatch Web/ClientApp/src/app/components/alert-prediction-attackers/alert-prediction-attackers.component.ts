@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
-import { faPeopleGroup } from '@fortawesome/free-solid-svg-icons';
+import { faPeopleGroup } from '@fortawesome/pro-duotone-svg-icons';
 
 @Component({
   selector: 'app-alert-prediction-attackers',

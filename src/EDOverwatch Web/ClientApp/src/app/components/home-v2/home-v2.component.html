@@ -5,7 +5,7 @@
                 <fa-icon [icon]="faGears"></fa-icon>
             </div>
             <div>
-                Elite Dangerous weekly tick in progress.
+                Elite Dangerous weekly server tick in progress.
             </div>
         </div>
         <div *ngIf="overview?.Status == OverviewDataStatus.UpdatePending" class="information-message">
@@ -84,7 +84,7 @@
             <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length || hideUnpopulated || hideCompleted"
                 class="filtered-view">
                 <div>
-                    <fa-icon [icon]="faFilter"></fa-icon>
+                    <fa-icon [icon]="faFilters"></fa-icon>
                     Filtered view
                 </div>
                 <div class="clickable" (click)="resetFilter()">

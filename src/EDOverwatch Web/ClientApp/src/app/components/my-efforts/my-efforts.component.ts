@@ -4,11 +4,11 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
-import { faFileCsv } from '@fortawesome/free-solid-svg-icons';
 import { ExportToCsv, Options } from 'export-to-csv';
 import { OverwatchThargoidCycle } from '../home/home.component';
 import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
+import { faFileCsv } from '@fortawesome/pro-duotone-svg-icons';
 
 @UntilDestroy()
 @Component({

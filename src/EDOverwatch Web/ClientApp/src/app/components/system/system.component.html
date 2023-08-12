@@ -103,8 +103,13 @@
                 </div>
                 <div *ngIf="thargoidControlledReactivationMissions" class="feature">
                     <fa-icon class="feature-icon" [icon]="faBolt" size="xl"
-                        matTooltip="AX reactivation missions available"></fa-icon> AX reactivation
-                    missions available
+                        matTooltip="AX reactivation missions available"></fa-icon>
+                    AX reactivation missions available
+                </div>
+                <div *ngIf="aXConflictZones" class="feature">
+                    <fa-icon class="feature-icon" [icon]="faCrosshairs" size="xl"
+                        matTooltip="AX conflict zones"></fa-icon>
+                    AX conflict zones
                 </div>
             </div>
             <br>

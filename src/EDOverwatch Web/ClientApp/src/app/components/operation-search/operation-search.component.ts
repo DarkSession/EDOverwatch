@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
+import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { FactionOperation } from '../system/system.component';

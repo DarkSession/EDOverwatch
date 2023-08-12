@@ -4,15 +4,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { faClipboard } from '@fortawesome/free-regular-svg-icons';
+import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 import { OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchStation } from '../station-name/station-name.component';
-import { ChartConfiguration, ChartDataset, ChartType, Color } from 'chart.js';
-
+import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
 import { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { Context } from 'chartjs-plugin-datalabels';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
+import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -24,6 +24,7 @@ import { faBolt } from '@fortawesome/free-solid-svg-icons';
 export class SystemComponent implements OnInit {
   public readonly faClipboard = faClipboard;
   public readonly faBolt = faBolt;
+  public readonly faCrosshairs = faCrosshairs;
   public starSystem: OverwatchStarSystemFullDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [],
@@ -34,6 +35,7 @@ export class SystemComponent implements OnInit {
   public federation = false;
   public empire = false;
   public thargoidControlledReactivationMissions = false;
+  public aXConflictZones = false;
 
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
@@ -186,7 +188,7 @@ export class SystemComponent implements OnInit {
           this.federation = this.starSystem?.Features?.includes("FederalFaction") ?? false;
           this.empire = this.starSystem?.Features?.includes("ImperialFaction") ?? false;
           this.thargoidControlledReactivationMissions = this.starSystem?.Features?.includes("ThargoidControlledReactivationMissions") ?? false;
-
+          this.aXConflictZones = this.starSystem?.Features?.includes("AXConflictZones") ?? false;
           this.changeDetectorRef.markForCheck();
           this.chartLoaded = true;
         }

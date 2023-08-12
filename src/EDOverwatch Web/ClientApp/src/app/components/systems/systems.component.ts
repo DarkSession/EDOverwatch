@@ -5,9 +5,10 @@ import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystemFull, SystemListComponent } from '../system-list/system-list.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { AppService } from 'src/app/services/app.service';
-import { faArrowUpRightFromSquare, faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faCircleXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { OnDestroy } from '@angular/core';
 import { ChangeDetectionStrategy } from '@angular/core';
+import { faArrowUpRightFromSquare } from '@fortawesome/pro-duotone-svg-icons';
 
 @UntilDestroy()
 @Component({

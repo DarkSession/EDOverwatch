@@ -1,23 +1,23 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchOverviewV2Cycle } from '../home-v2-cycle/home-v2-cycle.component';
 import { OverwatchOverviewV2CycleChange } from '../home-v2-cycle-changes/home-v2-cycle-changes.component';
-import { faArrowUpRightFromSquare, faCircleXmark, faFilter, faGears } from '@fortawesome/free-solid-svg-icons';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { OverwatchStarSystemFull, SystemListComponent } from '../system-list/system-list.component';
 import { AppService } from 'src/app/services/app.service';
+import { faFilters, faCircleXmark, faGears } from '@fortawesome/pro-duotone-svg-icons';
 
 @UntilDestroy()
 @Component({
   selector: 'app-home-v2',
   templateUrl: './home-v2.component.html',
-  styleUrls: ['./home-v2.component.scss']
+  styleUrls: ['./home-v2.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeV2Component implements OnInit, AfterViewInit {
-  public readonly faArrowUpRightFromSquare = faArrowUpRightFromSquare;
-  public readonly faFilter = faFilter;
+  public readonly faFilters = faFilters;
   public readonly faCircleXmark = faCircleXmark;
   public readonly OverviewDataStatus = OverviewDataStatus;
   public readonly faGears = faGears;
@@ -52,6 +52,35 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         value: "Reported progress completion",
       },
     ];
+  public availableFeatures: {
+    key: string;
+    value: string;
+  }[] = [
+      {
+        key: "BarnacleMatrix",
+        value: "Barnacle matrix",
+      },
+      {
+        key: "OdysseySettlements",
+        value: "Odyssey settlements",
+      },
+      {
+        key: "FederalFaction",
+        value: "Federal faction(s) present",
+      },
+      {
+        key: "ImperialFaction",
+        value: "Imperial faction(s) present",
+      },
+      {
+        key: "ThargoidControlledReactivationMissions",
+        value: "AX reactivation missions available",
+      },
+      {
+        key: "AXConflictZones",
+        value: "AX conflict zones",
+      },
+    ];
   public dataRaw: OverwatchStarSystemFull[] = [];
   @ViewChild("stateContainers") stateContainers: ElementRef | null = null;
 
@@ -68,7 +97,6 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
         this.update(message.Data);
-        this.changeDetectorRef.detectChanges();
       });
     this.webSocketService
       .onReady

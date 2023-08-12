@@ -27,7 +27,8 @@
                     int stationsUnderAttack,
                     bool odysseySettlements,
                     bool federalFaction,
-                    bool imperialFaction)
+                    bool imperialFaction,
+                    bool axConflictZones)
             : base(starSystem)
         {
             EffortFocus = effortFocus;
@@ -63,6 +64,10 @@
             {
                 Features.Add(OverwatchStarSystemFeature.ThargoidControlledReactivationMissions.ToString());
             }
+            if (axConflictZones && ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled && (StateProgress.ProgressPercent ?? 0) < 1m)
+            {
+                Features.Add(OverwatchStarSystemFeature.AXConflictZones.ToString());
+            }
         }
     }
 
@@ -73,5 +78,6 @@
         FederalFaction,
         ImperialFaction,
         ThargoidControlledReactivationMissions,
+        AXConflictZones,
     }
 }

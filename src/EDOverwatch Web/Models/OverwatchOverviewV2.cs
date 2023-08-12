@@ -184,6 +184,7 @@ namespace EDOverwatch_Web.Models
 
             DateTimeOffset lastTick = WeeklyTick.GetLastTick();
             DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
+            DateTimeOffset signalMaxAge = lastTick.AddDays(-7);
             if (lastTick < stationMaxAge)
             {
                 stationMaxAge = lastTick;
@@ -221,6 +222,7 @@ namespace EDOverwatch_Web.Models
                     OdysseySettlements = s.Stations!.Any(s => s.Type!.Name == StationType.OdysseySettlementType),
                     FederalFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Federation),
                     EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
+                    AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -277,7 +279,8 @@ namespace EDOverwatch_Web.Models
                     system.StationsUnderAttack,
                     system.OdysseySettlements,
                     system.FederalFaction,
-                    system.EmpireFaction));
+                    system.EmpireFaction,
+                    system.AXConflictZones));
             }
 
             OverviewDataStatus status = OverviewDataStatus.Default;
