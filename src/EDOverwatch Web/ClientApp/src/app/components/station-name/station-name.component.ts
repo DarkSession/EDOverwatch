@@ -23,6 +23,7 @@ export interface OverwatchStation {
   Gravity: number | null;
   OdysseyOnly: boolean;
   RescueShip: OverwatchStationRescueShip | null;
+  BodyName: string | null;
 }
 
 interface OverwatchStationRescueShip {

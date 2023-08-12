@@ -22,6 +22,7 @@
         Medium
     </span>
     <span *ngIf="station.Gravity" class="badge badge-gray" matTooltip="Planet gravity">
+        <span *ngIf="station.BodyName">Body {{ station.BodyName }}:</span>
         {{ (station.Gravity / 10) | number:'0.0-2' }} G
     </span>
     <span *ngIf="station.OdysseyOnly" class="badge badge-blue" matTooltip="Odyssey required">

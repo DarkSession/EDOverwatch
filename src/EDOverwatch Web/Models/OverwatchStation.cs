@@ -11,6 +11,7 @@
         public decimal? Gravity { get; }
         public bool OdysseyOnly { get; }
         public OverwatchStationRescueShip? RescueShip { get; }
+        public string? BodyName { get; }
 
         public OverwatchStation(Station station, List<Station> rescueShips, StarSystemThargoidLevel thargoidLevel)
         {
@@ -54,6 +55,7 @@
                     }
                 }
             }
+            BodyName = station.Body?.Name.Replace(station.StarSystem?.Name ?? string.Empty, string.Empty);
         }
     }
 
