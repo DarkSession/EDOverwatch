@@ -1,3 +1,11 @@
+<div class="table-top">
+    <div>
+        <span class="dot thargoid-alert"></span>Predicted alerts: {{ expectedAlerts }}
+    </div>
+    <div>
+        Possible targets: {{ alertPredictions.length }}
+    </div>
+</div>
 <div class="table-container">
     <div class="table">
         <table mat-table [dataSource]="sortedAlertPredictions" matSort matSortActive="Distance" matSortDirection="asc"
@@ -14,7 +22,8 @@
                     </span>
                     <span>
                         &nbsp;
-                        <fa-icon [icon]="faBullseyeArrow" *ngIf="row.PrimaryTarget" matTooltip="Primary target"></fa-icon>
+                        <fa-icon [icon]="faBullseyeArrow" *ngIf="row.PrimaryTarget"
+                            matTooltip="Primary target"></fa-icon>
                     </span>
                 </td>
             </ng-container>

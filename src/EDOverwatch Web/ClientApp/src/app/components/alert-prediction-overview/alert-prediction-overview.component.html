@@ -14,7 +14,7 @@
                 <div class="subtitle">
                     {{ maelstrom.Maelstrom.Name }}
                 </div>
-                <app-alert-prediction [alertPredictions]="maelstrom.Systems"></app-alert-prediction>
+                <app-alert-prediction [alertPredictions]="maelstrom.Systems" [expectedAlerts]="maelstrom.ExpectedAlerts"></app-alert-prediction>
                 <br>
             </ng-container>
         </div>

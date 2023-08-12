@@ -7,6 +7,7 @@
         public List<OverwatchAlertPredictionSystem> AlertPredictions { get; } = new();
         public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }
+        public int ExpectedAlerts { get; }
 
         protected OverwatchMaelstromDetail(
             ThargoidMaelstrom thargoidMaelstrom, List<OverwatchStarSystem> systems,
@@ -17,6 +18,7 @@
         {
             Systems = systems;
             AlertPredictions = alertPredictions;
+            ExpectedAlerts = alertPredictions.Count(a => a.PrimaryTarget);
             MaelstromHistory = maelstromHistory;
             ThargoidCycles = thargoidCycles;
         }

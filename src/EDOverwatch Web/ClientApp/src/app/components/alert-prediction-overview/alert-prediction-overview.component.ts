@@ -47,4 +47,5 @@ interface OverwatchAlertPredictionMaelstrom {
   Maelstrom: OverwatchMaelstrom;
   Systems: OverwatchAlertPredictionSystem[];
   Cycle: OverwatchThargoidCycle;
+  ExpectedAlerts: number;
 }

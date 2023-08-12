@@ -16,6 +16,7 @@ export class AlertPredictionComponent implements OnChanges, AfterViewInit {
   public readonly faClipboard = faClipboard;
   public readonly faBullseyeArrow = faBullseyeArrow;
   @Input() alertPredictions: OverwatchAlertPredictionSystem[] = [];
+  @Input() expectedAlerts: number = 0;
   public sortedAlertPredictions: MatTableDataSource<OverwatchAlertPredictionSystem> = new MatTableDataSource<OverwatchAlertPredictionSystem>();
   public readonly alertPredictionColumns = ['Name', 'Population', 'Distance', 'Attackers'];
   @ViewChild(MatSort, { static: false }) sort!: MatSort;

@@ -210,5 +210,6 @@ interface OverwatchMaelstromDetail extends OverwatchMaelstrom {
   AlertPredictions: OverwatchAlertPredictionSystem[];
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];
+  ExpectedAlerts: number;
 }
 
