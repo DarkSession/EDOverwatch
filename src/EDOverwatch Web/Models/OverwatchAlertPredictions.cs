@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchAlertPredictions
     {
@@ -21,7 +23,23 @@
             CurrentCycleAttackers = alertPredictionCycleAttackers.Select(a => new OverwatchStarSystemMin(a.AttackerStarSystem!)).ToList();
         }
 
-        public static async Task<OverwatchAlertPredictions> Create(EdDbContext dbContext, CancellationToken cancellationToken)
+        private const string CacheKey = "OverwatchAlertPredictions";
+
+        public static void DeleteMemoryEntry(IMemoryCache memoryCache)
+        {
+            memoryCache.Remove(CacheKey);
+        }
+
+        public static Task<OverwatchAlertPredictions> Create(EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        {
+            return memoryCache.GetOrCreateAsync(CacheKey, (cacheEntry) =>
+            {
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                return CreateInternal(dbContext, cancellationToken);
+            })!;
+        }
+
+        private static async Task<OverwatchAlertPredictions> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
         {
             ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);

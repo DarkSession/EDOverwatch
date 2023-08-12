@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchMaelstroms
     {
@@ -9,7 +11,23 @@
             Maelstroms = maelstroms;
         }
 
-        public static async Task<OverwatchMaelstroms> Create(EdDbContext dbContext, CancellationToken cancellationToken)
+        private const string CacheKey = "OverwatchMaelstroms";
+
+        public static void DeleteMemoryEntry(IMemoryCache memoryCache)
+        {
+            memoryCache.Remove(CacheKey);
+        }
+
+        public static Task<OverwatchMaelstroms> Create(EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        {
+            return memoryCache.GetOrCreateAsync(CacheKey, (cacheEntry) =>
+            {
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                return CreateInternal(dbContext, cancellationToken);
+            })!;
+        }
+
+        private static async Task<OverwatchMaelstroms> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
         {
             var maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()

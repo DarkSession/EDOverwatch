@@ -1,5 +1,6 @@
 ﻿using ActiveMQ.Artemis.Client;
 using Messages;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 
 namespace EDOverwatch_Web.WebSockets.EventListener.Systems
@@ -13,6 +14,13 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
             (WarEffortUpdated.QueueName, WarEffortUpdated.Routing),
         };
 
+        private IMemoryCache MemoryCache { get; }
+
+        public SystemsObjectEvents(IMemoryCache memoryCache)
+        {
+            MemoryCache = memoryCache;
+        }
+
         public async ValueTask ProcessEvent(string queueName, JObject json, WebSocketServer webSocketServer, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             SystemsObject systemsObject = new();
@@ -25,7 +33,8 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
                 {
                     return;
                 }
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystems), await Models.OverwatchStarSystems.Create(dbContext, cancellationToken));
+                Models.OverwatchStarSystems.DeleteMemoryEntry(MemoryCache);
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystems), await Models.OverwatchStarSystems.Create(dbContext, MemoryCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

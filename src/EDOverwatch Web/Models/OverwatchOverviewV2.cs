@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchOverviewV2
     {
@@ -36,7 +38,23 @@
             Status = status;
         }
 
-        public static async Task<OverwatchOverviewV2> Create(EdDbContext dbContext, CancellationToken cancellationToken)
+        private const string CacheKey = "OverwatchOverviewV2";
+
+        public static void DeleteMemoryEntry(IMemoryCache memoryCache)
+        {
+            memoryCache.Remove(CacheKey);
+        }
+
+        public static Task<OverwatchOverviewV2> Create(EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        {
+            return memoryCache.GetOrCreateAsync(CacheKey, (cacheEntry) =>
+            {
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+                return CreateInternal(dbContext, cancellationToken);
+            })!;
+        }
+
+        private static async Task<OverwatchOverviewV2> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
         {
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
             DateTimeOffset now = DateTimeOffset.UtcNow;

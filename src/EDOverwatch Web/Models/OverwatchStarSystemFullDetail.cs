@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchStarSystemFullDetail : OverwatchStarSystemFull
     {
@@ -49,7 +51,26 @@
             DaysSincePreviousTick = daysSincePreviousTick;
         }
 
-        public static async Task<OverwatchStarSystemFullDetail?> Create(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
+        private static string CacheKey(long systemAddress)
+        {
+            return $"OverwatchStarSystemFullDetail-{systemAddress}";
+        }
+
+        public static void DeleteMemoryEntry(IMemoryCache memoryCache, long systemAddress)
+        {
+            memoryCache.Remove(CacheKey(systemAddress));
+        }
+
+        public static Task<OverwatchStarSystemFullDetail?> Create(long systemAddress, EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        {
+            return memoryCache.GetOrCreateAsync(CacheKey(systemAddress), (cacheEntry) =>
+            {
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+                return CreateInternal(systemAddress, dbContext, cancellationToken);
+            })!;
+        }
+
+        private static async Task<OverwatchStarSystemFullDetail?> CreateInternal(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             var systemData = await dbContext.StarSystems
                 .AsNoTracking()

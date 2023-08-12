@@ -1,6 +1,7 @@
 ﻿using ActiveMQ.Artemis.Client;
 using EDOverwatch_Web.Models;
 using Messages;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 
 namespace EDOverwatch_Web.WebSockets.EventListener.Home
@@ -15,6 +16,13 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Home
             (WarEffortUpdated.QueueName, WarEffortUpdated.Routing),
         };
 
+        private IMemoryCache MemoryCache { get; }
+
+        public HomeObjectEvents(IMemoryCache memoryCache)
+        {
+            MemoryCache = memoryCache;
+        }
+
         public async ValueTask ProcessEvent(string queueName, JObject json, WebSocketServer webSocketServer, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             HomeObject homeObject = new();
@@ -27,7 +35,8 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Home
                 {
                     return;
                 }
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchHome), await OverwatchOverview.LoadOverwatchOverview(dbContext, cancellationToken));
+                OverwatchOverview.DeleteMemoryEntry(MemoryCache);
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchHome), await OverwatchOverview.Create(dbContext, MemoryCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

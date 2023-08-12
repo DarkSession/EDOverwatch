@@ -65,7 +65,7 @@ namespace EDOverwatch_Web.WebSockets
                 foreach (Type type in GetType().Assembly.GetTypes()
                     .Where(t => !t.IsAbstract && t.IsClass && typeof(IEventListener).IsAssignableFrom(t)))
                 {
-                    if (Activator.CreateInstance(type) is not IEventListener eventListener)
+                    if (ActivatorUtilities.CreateInstance(ServiceProvider, type) is not IEventListener eventListener)
                     {
                         continue;
                     }

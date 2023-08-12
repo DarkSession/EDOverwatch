@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchStarSystemsHistorical
     {
@@ -17,10 +19,21 @@
             Cycle = new(thargoidCycle);
         }
 
-        public static async Task<OverwatchStarSystemsHistorical> Create(DateOnly? cycle, EdDbContext dbContext, CancellationToken cancellationToken)
+        private static string CacheKey(DateTimeOffset tickTime)
+        {
+            return $"OverwatchStarSystemsHistorical-{tickTime}";
+        }
+
+        public static void DeleteMemoryEntry(IMemoryCache memoryCache, DateOnly cycle)
+        {
+            DateTimeOffset tickTime = GetTickTime(cycle);
+            memoryCache.Remove(CacheKey(tickTime));
+        }
+
+        private static DateTimeOffset GetTickTime(DateOnly? cycle)
         {
             DateOnly date;
-            if (cycle == null || cycle >= DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date) || !await dbContext.ThargoidCycleExists((DateOnly)cycle, cancellationToken))
+            if (cycle == null || cycle >= DateOnly.FromDateTime(DateTimeOffset.UtcNow.Date))
             {
                 date = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
             }
@@ -28,8 +41,21 @@
             {
                 date = (DateOnly)cycle;
             }
+            return WeeklyTick.GetTickTime(date);
+        }
 
-            DateTimeOffset tickTime = WeeklyTick.GetTickTime(date);
+        public static Task<OverwatchStarSystemsHistorical> Create(DateOnly? cycle, EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        {
+            DateTimeOffset tickTime = GetTickTime(cycle);
+            return memoryCache.GetOrCreateAsync(CacheKey(tickTime), (cacheEntry) =>
+            {
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                return CreateInternal(tickTime, dbContext, cancellationToken);
+            })!;
+        }
+
+        private static async Task<OverwatchStarSystemsHistorical> CreateInternal(DateTimeOffset tickTime, EdDbContext dbContext, CancellationToken cancellationToken)
+        {
             ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken);
             ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken, -1);
 

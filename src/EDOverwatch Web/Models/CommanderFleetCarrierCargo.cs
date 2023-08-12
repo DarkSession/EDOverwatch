@@ -18,7 +18,7 @@
 
         public static async Task<CommanderFleetCarrierCargo> Create(EdDbContext dbContext, int commanderId, CancellationToken cancellationToken)
         {
-            Commander commander = await dbContext.Commanders.FindAsync(commanderId, cancellationToken) ?? throw new Exception("Invalid commander");
+            Commander commander = await dbContext.Commanders.FindAsync(new object?[] { commanderId }, cancellationToken: cancellationToken) ?? throw new Exception("Invalid commander");
             List<CommanderFleetCarrierCargoItem> fleetCarrierCargoItems = await dbContext.CommanderFleetCarrierCargoItems
                 .AsNoTracking()
                 .Include(c => c.Commodity)

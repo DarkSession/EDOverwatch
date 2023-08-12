@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchStarSystems
     {
@@ -15,7 +17,23 @@
             Maelstroms = thargoidMaelstroms.Select(t => new OverwatchMaelstrom(t)).ToList();
         }
 
-        public static async Task<OverwatchStarSystems> Create(EdDbContext dbContext, CancellationToken cancellationToken)
+        private const string CacheKey = "OverwatchStarSystems";
+
+        public static void DeleteMemoryEntry(IMemoryCache memoryCache)
+        {
+            memoryCache.Remove(CacheKey);
+        }
+
+        public static Task<OverwatchStarSystems> Create(EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        {
+            return memoryCache.GetOrCreateAsync(CacheKey, (cacheEntry) =>
+            {
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+                return CreateInternal(dbContext, cancellationToken);
+            })!;
+        }
+
+        private static async Task<OverwatchStarSystems> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
         {
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 

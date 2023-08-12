@@ -1,5 +1,6 @@
 ﻿using EDOverwatch_Web.Models;
 using EDOverwatch_Web.WebSockets.EventListener.NotTracked;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
 namespace EDOverwatch_Web.WebSockets.Handler
@@ -21,6 +22,13 @@ namespace EDOverwatch_Web.WebSockets.Handler
 
         public override bool AllowAnonymous => true;
 
+        private IMemoryCache MemoryCache { get; }
+
+        public OverwatchSystemsHistoricalCycle(IMemoryCache memoryCache)
+        {
+            MemoryCache = memoryCache;
+        }
+
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             OverwatchSystemsHistoricalCycleRequest? data = message.Data?.ToObject<OverwatchSystemsHistoricalCycleRequest>();
@@ -31,7 +39,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
                 {
                     cycle = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow).DateTime);
                 }
-                OverwatchStarSystemsHistorical result = await OverwatchStarSystemsHistorical.Create(cycle, dbContext, cancellationToken);
+                OverwatchStarSystemsHistorical result = await OverwatchStarSystemsHistorical.Create(cycle, dbContext, MemoryCache, cancellationToken);
                 if (data.IgnoreClear)
                 {
                     result.Systems = result.Systems.Where(s => s.ThargoidLevel.Level != StarSystemThargoidLevelState.None).ToList();

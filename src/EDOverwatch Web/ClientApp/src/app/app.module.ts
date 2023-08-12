@@ -209,6 +209,10 @@ export const httpInterceptorProviders = [
         component: GetInvolvedComponent
       },
       {
+        path: 'join-the-fight',
+        component: GetInvolvedComponent
+      },
+      {
         path: 'login',
         component: LoginComponent,
         canActivate: [NotAuthenticatedGuard],
