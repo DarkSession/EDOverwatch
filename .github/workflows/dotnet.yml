@@ -20,6 +20,10 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
+    - name: Configure NPM
+      run: |
+        npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+        npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}"
     - name: Restore dependencies
       working-directory: ./src
       run: dotnet restore
@@ -28,9 +32,6 @@ jobs:
       run: |
         dotnet build -c Release --no-restore
         dotnet publish -c Release
-#    - name: Test
-#      working-directory: ./src
-#      run: dotnet test --no-build --verbosity normal
     - uses: actions/upload-artifact@v3
       with:
         name: Web-UI
