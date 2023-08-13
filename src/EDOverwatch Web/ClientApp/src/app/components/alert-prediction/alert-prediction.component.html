@@ -30,13 +30,25 @@
             <ng-container matColumnDef="Population">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Population</th>
                 <td mat-cell *matCellDef="let row" class="nowrap">
-                    {{ row.StarSystem.Population | numberSuffix:1 }}
+                    <div class="number-cell">
+                        <div class="number">
+                            {{ row.StarSystem.Population | numberSuffix:1 }}
+                        </div>
+                        <div>
+                        </div>
+                    </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Distance">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance to Titan</th>
                 <td mat-cell *matCellDef="let row" class="nowrap">
-                    {{ row.Distance }} Ly
+                    <div class="number-cell">
+                        <div class="number">
+                            {{ row.Distance | numberSuffix:2 }} Ly
+                        </div>
+                        <div>
+                        </div>
+                    </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Attackers">

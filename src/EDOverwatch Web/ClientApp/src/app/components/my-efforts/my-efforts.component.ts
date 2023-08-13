@@ -1,39 +1,23 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
-import { MatPaginator } from '@angular/material/paginator';
-import { ExportToCsv, Options } from 'export-to-csv';
 import { OverwatchThargoidCycle } from '../home/home.component';
-import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
-import { Context } from 'chartjs-plugin-datalabels';
-import { faFileCsv } from '@fortawesome/pro-duotone-svg-icons';
+import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { faAngleLeft, faAngleRight } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
 @Component({
   selector: 'app-my-efforts',
   templateUrl: './my-efforts.component.html',
-  styleUrls: ['./my-efforts.component.css']
+  styleUrls: ['./my-efforts.component.scss']
 })
 export class MyEffortsComponent implements OnInit {
+  public readonly faAngleRight = faAngleRight;
+  public readonly faAngleLeft = faAngleLeft;
   public readonly displayedColumns = ['Date', 'SystemName', 'Type', 'Amount'];
-  public readonly faFileCsv = faFileCsv;
-  public dataSource: MatTableDataSource<CommanderWarEffort> = new MatTableDataSource<CommanderWarEffort>();
-  @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
-  public pageSize: number = 50;
-  public chartConfig: ChartConfiguration = {
-    type: 'bar',
-    data: {
-      datasets: [],
-      labels: [],
-    },
-    options: {
-      responsive: true,
-    },
-  };
-  private chartLoaded: boolean = false;
+  public data: CommanderWarEffortsV3 | null = null;
+  public date: string | null = null;
+  public cycleData: CommandWarEffortCycle | null | undefined = null;
 
   public constructor(
     private readonly webSocketService: WebsocketService,
@@ -43,113 +27,88 @@ export class MyEffortsComponent implements OnInit {
 
   public ngOnInit(): void {
     this.webSocketService
-      .on<CommanderWarEfforts>("CommanderWarEffortsV2")
+      .on<CommanderWarEffortsV3>("CommanderWarEffortsV3")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
         this.updateEfforts(message.Data);
       });
-    this.webSocketService.sendMessage("CommanderWarEffortsV2", {});
+    this.webSocketService.sendMessage("CommanderWarEffortsV3", {});
   }
 
-  private updateEfforts(data: CommanderWarEfforts): void {
-    this.dataSource = new MatTableDataSource<CommanderWarEffort>(data.WarEfforts);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sortingDataAccessor = (warEffort: CommanderWarEffort, columnName: string): string => {
-      return warEffort[columnName as keyof CommanderWarEffort] as string;
+  private updateEfforts(data: CommanderWarEffortsV3): void {
+    this.data = data;
+    if (!this.date) {
+      this.date = data.ThargoidCycles.find(t => t.IsCurrent)?.Cycle ?? null;
     }
-    this.dataSource.sort = this.sort;
-
-    const labels = [];
-    for (const thargoidCycle of data.RecentThargoidCycles) {
-      labels.push(thargoidCycle.StartDate + " to " + thargoidCycle.EndDate);
-    }
-
-    const datasets: ChartDataset<'bar', number[]>[] = [];
-    for (const warEffortTypeGroup of data.WarEffortTypeGroups) {
-      const dataset = {
-        label: warEffortTypeGroup,
-        data: labels.map(t => 0),
-      };
-      datasets.push(dataset);
-      for (const warEffort of data.WarEfforts.filter(w => w.TypeGroup === warEffortTypeGroup)) {
-        const index = data.RecentThargoidCycles.findIndex(t => t.Cycle === warEffort.Cycle);
-        if (index !== -1) {
-          dataset.data[index] += warEffort.Amount;
-        }
-      }
-    }
-
-    this.chartConfig = {
-      type: 'bar',
-      data: {
-        datasets: [...datasets],
-        labels: labels,
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          datalabels: {
-            align: 'center',
-            anchor: 'center',
-            color: 'black',
-            backgroundColor: (context: Context) => {
-              return context.dataset.backgroundColor as Color;
-            },
-            display: (context) => {
-              return !!context.dataset.data[context.dataIndex];
-            },
-            borderRadius: 4,
-          }
-        }
-      },
-    };
-    if (this.chartLoaded) {
-      this.chartConfig.options!.animation = false;
-    }
-    this.chartLoaded = true;
-
+    this.dateChanged();
     this.changeDetectorRef.detectChanges();
   }
 
-  public exportToCsv(): void {
-    const data = [];
-    for (const warEffort of this.dataSource.data) {
-      data.push({
-        Date: warEffort.Date,
-        Type: warEffort.Type,
-        System: warEffort.SystemName,
-        Amount: warEffort.Amount,
-      });
+  public dateChanged(): void {
+    this.cycleData = this.data?.CycleWarEfforts.find(t => t.ThargoidCycle.Cycle == this.date);
+  }
+
+  private getCycleIndex(): number {
+    const currentCycleIndex = this.data?.ThargoidCycles.findIndex(t => t.Cycle == this.date) ?? -1;
+    return currentCycleIndex;
+  }
+
+  public previousCycle(): void {
+    if (!this.data) {
+      return;
     }
+    const currentCycleIndex = this.getCycleIndex();
+    if (currentCycleIndex === -1) {
+      return;
+    }
+    if (currentCycleIndex > 0) {
+      this.date = this.data.ThargoidCycles[(currentCycleIndex - 1)].Cycle;
+      this.dateChanged();
+    }
+  }
 
-    const options: Options = {
-      fieldSeparator: ',',
-      quoteStrings: '"',
-      decimalSeparator: '.',
-      showLabels: true,
-      showTitle: false,
-      filename: "Overwatch War Contributions Export",
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: true,
-    };
-
-    const csvExporter = new ExportToCsv(options);
-    csvExporter.generateCsv(data);
+  public nextCycle(): void {
+    if (!this.data) {
+      return;
+    }
+    const currentCycleIndex = this.getCycleIndex();
+    if (currentCycleIndex === -1) {
+      return;
+    }
+    if (currentCycleIndex < (this.data.ThargoidCycles.length - 1)) {
+      this.date = this.data.ThargoidCycles[(currentCycleIndex + 1)].Cycle;
+      this.dateChanged();
+    }
   }
 }
 
-interface CommanderWarEfforts {
-  WarEfforts: CommanderWarEffort[];
+interface CommanderWarEffortsV3 {
+  CycleWarEfforts: CommandWarEffortCycle[];
   WarEffortTypeGroups: string[];
-  RecentThargoidCycles: OverwatchThargoidCycle[];
+  ThargoidCycles: OverwatchThargoidCycle[];
 }
 
-interface CommanderWarEffort {
+export interface CommandWarEffortCycle {
+  ThargoidCycle: OverwatchThargoidCycle;
+  StarSystems: CommanderWarEffortCycleStarSystem[];
+}
+
+export interface CommanderWarEffortCycleStarSystem {
+  StarSystem: OverwatchStarSystem;
+  WarEfforts: CommanderWarEffortCycleStarSystemWarEffort[];
+}
+
+export interface CommanderWarEffortCycleStarSystemWarEffort {
   Date: string;
   Type: string;
-  TypeGroup: string;
-  SystemName: string;
+  Group: WarEffortTypeGroup;
   Amount: number;
-  Cycle: string;
+}
+
+export enum WarEffortTypeGroup {
+  Kills,
+  Rescue,
+  Supply,
+  Mission,
+  RecoveryAndProbing,
 }

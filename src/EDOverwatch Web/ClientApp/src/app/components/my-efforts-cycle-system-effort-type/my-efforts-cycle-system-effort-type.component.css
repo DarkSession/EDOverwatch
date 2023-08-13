@@ -1,0 +1,13 @@
+.effort-type {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.effort-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 24px;
+}

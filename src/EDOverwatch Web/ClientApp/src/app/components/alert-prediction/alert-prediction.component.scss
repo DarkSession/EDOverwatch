@@ -3,7 +3,7 @@
 }
 
 .table {
-    min-height: 300px;
+    min-height: 150px;
     min-width: 400px;
 }
 
@@ -45,4 +45,14 @@ table {
     display: flex;
     justify-content: space-between;
     margin: 6px;
+}
+
+.number-cell {
+    display: flex;
+    justify-content: space-between;
+
+    .number {
+        width: 100px;
+        text-align: right;
+    }
 }

@@ -10,7 +10,7 @@ import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 @Component({
   selector: 'app-alert-prediction',
   templateUrl: './alert-prediction.component.html',
-  styleUrls: ['./alert-prediction.component.css']
+  styleUrls: ['./alert-prediction.component.scss']
 })
 export class AlertPredictionComponent implements OnChanges, AfterViewInit {
   public readonly faClipboard = faClipboard;

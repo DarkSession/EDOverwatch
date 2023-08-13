@@ -1,0 +1,57 @@
+<div *ngIf="warEffortCycleStarSystem">
+    <div class="subtitle clickable" [routerLink]="[ '/system', warEffortCycleStarSystem.StarSystem.SystemAddress ]">
+        {{ warEffortCycleStarSystem.StarSystem.Name }}
+    </div>
+    <table class="info-table">
+        <tbody>
+            <tr>
+                <td class="t">Current State</td>
+                <td class="state-cell">
+                    <app-thargoid-level
+                        [thargoidLevel]="warEffortCycleStarSystem.StarSystem.ThargoidLevel"></app-thargoid-level>
+                    <span *ngIf="warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent != null">
+                        ({{ warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent | percent }})
+                    </span>
+                </td>
+            </tr>
+            <td class="t">Titan</td>
+            <td>
+                <app-maelstrom-name [maelstrom]="warEffortCycleStarSystem.StarSystem.Maelstrom"></app-maelstrom-name>
+                <span *ngIf="warEffortCycleStarSystem.StarSystem.DistanceToMaelstrom">
+                    ({{ warEffortCycleStarSystem.StarSystem.DistanceToMaelstrom }} Ly)
+                </span>
+            </td>
+        </tbody>
+    </table>
+    <div class="table-container">
+        <div class="table">
+            <table mat-table [dataSource]="dataSource" matSort matSortActive="Date" matSortDirection="desc"
+                matSortDisableClear>
+                <ng-container matColumnDef="Date">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+                    <td mat-cell *matCellDef="let row">
+                        {{ row.Date | date }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="Type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                    <td mat-cell *matCellDef="let row">
+                        <app-my-efforts-cycle-system-effort-type
+                            [effort]="row"></app-my-efforts-cycle-system-effort-type>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="Amount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+                    <td mat-cell *matCellDef="let row">
+                        {{ row.Amount }}
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <div *ngIf="dataSource.data.length === 0" class="empty-table">
+                No records found.
+            </div>
+        </div>
+    </div>
+</div>

@@ -3,54 +3,27 @@
         <div class="title">
             My Contributions
         </div>
-        <div class="content-box">
-            <div class="chart-container">
-                <div style="width: 90vh; height: 30vh;">
-                    <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options"
-                        [type]="chartConfig.type" width="300" height="100"></canvas>
+        <div class="content-box" *ngIf="data">
+            <div style="height: 24px;"></div>
+            <div class="cycle-selection">
+                <div>
+                    <fa-icon [icon]="faAngleLeft" size="2xl" class="clickable" (click)="previousCycle()"></fa-icon>
+                </div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Cycle</mat-label>
+                    <mat-select [(ngModel)]="date" (ngModelChange)="dateChanged()">
+                        <mat-option *ngFor="let thargoidCycle of data.ThargoidCycles" [value]="thargoidCycle.Cycle">
+                            {{ thargoidCycle.Start | date: 'MMM dd' : '0' }} -
+                            {{ thargoidCycle.End | date: 'MMM dd yyyy' : '0' }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div>
+                    <fa-icon [icon]="faAngleRight" size="2xl" class="clickable" (click)="nextCycle()"></fa-icon>
                 </div>
             </div>
-            <table mat-table [dataSource]="dataSource" matSort matSortActive="Date" matSortDirection="desc"
-                matSortDisableClear>
-                <ng-container matColumnDef="Date">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-                    <td mat-cell *matCellDef="let row">
-                        {{ row.Date | date }}
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="SystemName">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
-                    <td mat-cell *matCellDef="let row">
-                        <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
-                            {{ row.SystemName }}
-                        </span>
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="Type">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
-                    <td mat-cell *matCellDef="let row">
-                        {{ row.Type }}
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="Amount">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
-                    <td mat-cell *matCellDef="let row">
-                        {{ row.Amount }}
-                    </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
-            <div *ngIf="dataSource.data.length === 0" class="empty-table">
-                No records found.
-            </div>
-            <mat-paginator [pageSizeOptions]="[25, 50, 100]" [pageSize]="pageSize" [showFirstLastButtons]="true"
-                aria-label="Select page"></mat-paginator>
-            <div class="options-bottom">
-                <span (click)="exportToCsv()" class="clickable">
-                    <fa-icon [icon]="faFileCsv"></fa-icon>
-                    Export as CSV
-                </span>
+            <div *ngIf="cycleData">
+                <app-my-efforts-cycle [cycleWarEffort]="cycleData"></app-my-efforts-cycle>
             </div>
         </div>
     </div>

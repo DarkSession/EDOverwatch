@@ -23,6 +23,16 @@
     fill: var(--accent-darker-color);
 }
 
+.svg-left,
+.svg-right {
+    height: 100%;
+    width: auto;
+}
+
+.svg-left {
+    border-right: 1px solid var(--accent-darker-color);
+}
+
 .thargoid-alert {
     color: rgb(241, 194, 50);
 }

@@ -1,0 +1,15 @@
+.thead {
+    background-color: #272727;
+}
+
+.cycle-selection {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+
+    mat-form-field {
+        width: 300px;
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+}

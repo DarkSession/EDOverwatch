@@ -1,0 +1,25 @@
+.thead {
+    background-color: #272727;
+}
+
+.info-table {
+    width: 400px;
+    table-layout: fixed;
+}
+
+.t {
+    font-weight: bold;
+}
+
+.state-cell {
+    display: flex;
+    gap: 4px;
+}
+
+.table {
+    table-layout: fixed;
+}
+
+.table-container {
+    margin-top: 6px;
+}

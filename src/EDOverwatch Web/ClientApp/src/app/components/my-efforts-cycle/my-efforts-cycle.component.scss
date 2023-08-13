@@ -1,0 +1,12 @@
+.effort-systems {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.effort-system {
+    min-width: 600px;
+    width: 45%;
+    flex-grow: 1;
+}

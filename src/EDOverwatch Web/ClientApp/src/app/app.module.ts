@@ -80,6 +80,9 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { AlertPredictionOverviewComponent } from './components/alert-prediction-overview/alert-prediction-overview.component';
 import { SystemsHistoricalCycleComponent } from './components/systems-historical-cycle/systems-historical-cycle.component';
 import { SystemFeaturesComponent } from './components/system-features/system-features.component';
+import { MyEffortsCycleComponent } from './components/my-efforts-cycle/my-efforts-cycle.component';
+import { MyEffortsCycleSystemComponent } from './components/my-efforts-cycle-system/my-efforts-cycle-system.component';
+import { MyEffortsCycleSystemEffortTypeComponent } from './components/my-efforts-cycle-system-effort-type/my-efforts-cycle-system-effort-type.component';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
@@ -135,6 +138,9 @@ export const httpInterceptorProviders = [
     AlertPredictionOverviewComponent,
     SystemsHistoricalCycleComponent,
     SystemFeaturesComponent,
+    MyEffortsCycleComponent,
+    MyEffortsCycleSystemComponent,
+    MyEffortsCycleSystemEffortTypeComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -210,7 +216,7 @@ export const httpInterceptorProviders = [
       },
       {
         path: 'join-the-fight',
-        component: GetInvolvedComponent
+        component: GetInvolvedComponent,
       },
       {
         path: 'login',
@@ -255,6 +261,9 @@ export const httpInterceptorProviders = [
       {
         path: 'operation-search',
         component: OperationSearchComponent,
+        data: {
+          reuseRoute: true,
+        },
       },
       {
         path: 'operations',
@@ -263,6 +272,9 @@ export const httpInterceptorProviders = [
       {
         path: 'stats',
         component: StatsComponent,
+        data: {
+          reuseRoute: true,
+        },
       },
       {
         path: 'system/:id/analyze/:cycle',

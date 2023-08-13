@@ -1,0 +1,8 @@
+<div *ngIf="cycleWarEffort" class="effort-systems">
+    <div class="effort-system" *ngFor="let cycleWarEffortSystem of cycleWarEffort.StarSystems">
+        <app-my-efforts-cycle-system [warEffortCycleStarSystem]="cycleWarEffortSystem"></app-my-efforts-cycle-system>
+    </div>
+    <div class="effort-system">
+        <!-- Placeholder -->
+    </div>
+</div>
