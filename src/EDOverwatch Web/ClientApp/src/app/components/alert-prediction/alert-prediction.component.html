@@ -1,9 +1,9 @@
-<div class="table-top">
+<div class="table-top" *ngIf="alertPrediction">
     <div>
-        <span class="dot thargoid-alert"></span>Predicted alerts: {{ expectedAlerts }}
+        <span class="dot thargoid-alert"></span>Predicted alerts: {{ alertPrediction.ExpectedAlerts }}
     </div>
     <div>
-        Possible targets: {{ alertPredictions.length }}
+        Possible targets: {{ alertPrediction.Systems.length }}
     </div>
 </div>
 <div class="table-container">
@@ -66,9 +66,9 @@
         <div *ngIf="sortedAlertPredictions.data.length === 0" class="empty-table">
             No records found.
         </div>
-        <div *ngIf="!showAll && alertPredictions.length > sortedAlertPredictions.data.length" (click)="toggleShowAll()"
+        <div *ngIf="!showAll && alertPrediction && alertPrediction.Systems.length > sortedAlertPredictions.data.length" (click)="toggleShowAll()"
             class="clickable load-more">
-            Show {{ alertPredictions.length - sortedAlertPredictions.data.length }} more...
+            Show {{ alertPrediction.Systems.length - sortedAlertPredictions.data.length }} more...
         </div>
     </div>
 </div>

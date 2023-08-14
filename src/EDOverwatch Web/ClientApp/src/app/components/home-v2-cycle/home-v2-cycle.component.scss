@@ -14,6 +14,8 @@
     background-color: var(--accent-darker-color);
     padding: 8px;
     min-width: 200px;
+    margin: 0px;
+    border: none;
 
     div.states {
         div {
@@ -25,6 +27,7 @@
 
 .svg {
     fill: var(--accent-darker-color);
+    stroke-width: 0px;
 }
 
 .svg-left,
@@ -34,5 +37,9 @@
 }
 
 .svg-left {
-    border-right: 1px solid var(--accent-darker-color);
+    margin-right: -2px;
+}
+
+.svg-right {
+    margin-left: -2px;
 }

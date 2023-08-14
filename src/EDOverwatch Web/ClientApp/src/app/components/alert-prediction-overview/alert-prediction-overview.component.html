@@ -7,14 +7,23 @@
             <p>
                 Below you find the predicted alerts for the next cycle.
                 <br>
-                If nothing changes and the prediction is correct it means that the highlighted systems will be in alert in the next upcoming cycle.<br>
-                If a highlighted system has all its attacking systems cleared or is skipped for any other reason it usually means the next not highlighted system is used instead.
+                If nothing changes and the prediction is correct it means that the highlighted systems will be in alert
+                in the next upcoming cycle.<br>
+                If a highlighted system has all its attacking systems cleared or is skipped for any other reason it
+                usually means the next not highlighted system is used instead.
             </p>
             <ng-container *ngFor="let maelstrom of predictions.Maelstroms">
                 <div class="subtitle">
                     {{ maelstrom.Maelstrom.Name }}
                 </div>
-                <app-alert-prediction [alertPredictions]="maelstrom.Systems" [expectedAlerts]="maelstrom.ExpectedAlerts"></app-alert-prediction>
+                <mat-tab-group>
+                    <mat-tab label="Alerts">
+                        <app-alert-prediction [alertPrediction]="maelstrom"></app-alert-prediction>
+                    </mat-tab>
+                    <mat-tab label="Top Attackers">
+                        <app-alert-prediction-top-attackers [alertPrediction]="maelstrom"></app-alert-prediction-top-attackers>
+                    </mat-tab>
+                </mat-tab-group>
                 <br>
             </ng-container>
         </div>

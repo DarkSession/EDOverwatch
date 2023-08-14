@@ -83,6 +83,7 @@ import { SystemFeaturesComponent } from './components/system-features/system-fea
 import { MyEffortsCycleComponent } from './components/my-efforts-cycle/my-efforts-cycle.component';
 import { MyEffortsCycleSystemComponent } from './components/my-efforts-cycle-system/my-efforts-cycle-system.component';
 import { MyEffortsCycleSystemEffortTypeComponent } from './components/my-efforts-cycle-system-effort-type/my-efforts-cycle-system-effort-type.component';
+import { AlertPredictionTopAttackersComponent } from './components/alert-prediction-top-attackers/alert-prediction-top-attackers.component';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
@@ -141,6 +142,7 @@ export const httpInterceptorProviders = [
     MyEffortsCycleComponent,
     MyEffortsCycleSystemComponent,
     MyEffortsCycleSystemEffortTypeComponent,
+    AlertPredictionTopAttackersComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

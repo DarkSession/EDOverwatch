@@ -41,7 +41,7 @@
                             If nothing changes and the prediction is correct it means that the highlighted systems will be in alert in the next upcoming cycle.<br>
                             If a highlighted system has all its attacking systems cleared or is skipped for any other reason it usually means the next not highlighted system is used instead.
                         </p>
-                        <app-alert-prediction [alertPredictions]="alertPredictions" [expectedAlerts]="maelstrom.ExpectedAlerts"></app-alert-prediction>
+                        <app-alert-prediction [alertPrediction]="maelstrom.AlertPrediction"></app-alert-prediction>
                     </ng-template>
                 </mat-tab>
             </mat-tab-group>

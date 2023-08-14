@@ -6,6 +6,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { faBullseyeArrow } from '@fortawesome/pro-duotone-svg-icons';
 import { faClipboard } from '@fortawesome/pro-light-svg-icons';
+import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
+import { OverwatchStarSystem } from '../system-list/system-list.component';
 
 @Component({
   selector: 'app-alert-prediction',
@@ -15,8 +17,7 @@ import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 export class AlertPredictionComponent implements OnChanges, AfterViewInit {
   public readonly faClipboard = faClipboard;
   public readonly faBullseyeArrow = faBullseyeArrow;
-  @Input() alertPredictions: OverwatchAlertPredictionSystem[] = [];
-  @Input() expectedAlerts: number = 0;
+  @Input() alertPrediction: OverwatchAlertPredictionMaelstrom | null = null;
   public sortedAlertPredictions: MatTableDataSource<OverwatchAlertPredictionSystem> = new MatTableDataSource<OverwatchAlertPredictionSystem>();
   public readonly alertPredictionColumns = ['Name', 'Population', 'Distance', 'Attackers'];
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
@@ -26,7 +27,10 @@ export class AlertPredictionComponent implements OnChanges, AfterViewInit {
   }
   
   public ngOnChanges(): void {
-    const alertPredictions = (this.showAll || this.alertPredictions.length < 12) ? this.alertPredictions : [...this.alertPredictions].splice(0, 10);
+    if (!this.alertPrediction) {
+      return;
+    }
+    const alertPredictions = (this.showAll || this.alertPrediction.Systems.length < 12) ? this.alertPrediction.Systems : [...this.alertPrediction.Systems].splice(0, 10);
     this.sortedAlertPredictions = new MatTableDataSource<OverwatchAlertPredictionSystem>(alertPredictions);
     this.sortedAlertPredictions.sort = this.sort;
     this.sortedAlertPredictions.sortingDataAccessor = (system: OverwatchAlertPredictionSystem, columnName: string): string | number => {
@@ -67,4 +71,17 @@ export interface OverwatchAlertPredictionSystem {
   Distance: number;
   Attackers: OverwatchAlertPredictionSystemAttacker[];
   PrimaryTarget: boolean;
+}
+
+
+export interface OverwatchAlertPredictionMaelstrom {
+  Maelstrom: OverwatchMaelstrom;
+  Systems: OverwatchAlertPredictionSystem[];
+  AttackingSystemCount: OverwatchAlertPredictionMaelstromAttackerCount[];
+  ExpectedAlerts: number;
+}
+
+export interface OverwatchAlertPredictionMaelstromAttackerCount {
+  StarSystem: OverwatchStarSystem;
+  Count: number;
 }

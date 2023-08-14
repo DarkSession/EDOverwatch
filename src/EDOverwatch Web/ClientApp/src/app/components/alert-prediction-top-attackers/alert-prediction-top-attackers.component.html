@@ -1,0 +1,48 @@
+<div class="table-container">
+    <div class="table">
+        <table mat-table [dataSource]="data" matSort matSortActive="PossibleAttacks" matSortDirection="asc"
+            matSortDisableClear>
+            <ng-container matColumnDef="Name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <span class="clickable" [routerLink]="['/system', row.StarSystem.SystemAddress]">
+                        {{ row.StarSystem.Name }}
+                    </span>
+                    <span>
+                        <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                            (click)="copySystemName(row)"></fa-icon>
+                    </span>
+                    <ng-container *ngIf="row.StarSystem.BarnacleMatrixInSystem">
+                        <span matTooltip="Barnacle matrix present in the system. Progress is locked.">
+                            <img class="feature-icon" src="assets/barnacles_logo.svg" />
+                        </span>
+                    </ng-container>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Distance">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance to Titan</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <div class="number-cell">
+                        <div class="number">
+                            {{ row.StarSystem.DistanceToMaelstrom | numberSuffix:2 }} Ly
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="PossibleAttacks">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Possible Attacks</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    {{ row.Count }}
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns; sticky: true" class="thead">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: columns;" [ngClass]="{
+                'alert-likely': row.PrimaryTarget
+            }"></tr>
+        </table>
+        <div *ngIf="data.data.length === 0" class="empty-table">
+            No records found.
+        </div>
+    </div>
+</div>

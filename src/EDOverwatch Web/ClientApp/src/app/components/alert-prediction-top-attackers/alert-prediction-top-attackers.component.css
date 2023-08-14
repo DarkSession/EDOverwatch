@@ -1,0 +1,14 @@
+.thead {
+    background-color: #272727;
+}
+
+.table {
+    min-height: 150px;
+    min-width: 400px;
+}
+
+.feature-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 6px;
+}
