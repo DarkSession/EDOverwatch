@@ -1,4 +1,6 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using System.Text.Json.Serialization;
+
+namespace EDOverwatch_Web.Models
 {
     public class CommanderWarEffortsV3
     {
@@ -10,7 +12,9 @@
 
         protected CommanderWarEffortsV3(List<EDDatabase.WarEffort> warEfforts, List<OverwatchThargoidCycle> thargoidCycles)
         {
-            CycleWarEfforts = thargoidCycles.Select(t => new CommandWarEffortCycle(t, warEfforts.Where(w => w.CycleId == t.Id))).ToList();
+            CycleWarEfforts = thargoidCycles
+                .Select(t => new CommandWarEffortCycle(t, warEfforts.Where(w => w.CycleId == t.Id)))
+                .ToList();
             ThargoidCycles = thargoidCycles;
         }
 
@@ -53,7 +57,12 @@
         public CommandWarEffortCycle(OverwatchThargoidCycle thargoidCycle, IEnumerable<EDDatabase.WarEffort> cycleWarEfforts)
         {
             ThargoidCycle = thargoidCycle;
-            StarSystems = cycleWarEfforts.GroupBy(c => c.StarSystemId).Select(c => new CommanderWarEffortCycleStarSystem(c.First().StarSystem!, c)).ToList();
+            StarSystems = cycleWarEfforts
+                .GroupBy(c => c.StarSystemId)
+                .Select(c => new CommanderWarEffortCycleStarSystem(c.First().StarSystem!, c))
+                .OrderByDescending(c => c.WarEfforts.Max(w => w.Date))
+                .ThenByDescending(c => c.WarEfforts.Max(w => w.Id))
+                .ToList();
         }
     }
 
@@ -73,6 +82,8 @@
 
     public class CommanderWarEffortCycleStarSystemWarEffort
     {
+        [JsonIgnore]
+        public int Id { get; }
         public DateOnly Date { get; }
         public string Type { get; }
         public WarEffortTypeGroup Group { get; }
@@ -80,6 +91,7 @@
 
         public CommanderWarEffortCycleStarSystemWarEffort(EDDatabase.WarEffort warEffort)
         {
+            Id = warEffort.Id;
             Date = warEffort.Date;
             Type = warEffort.Type.GetEnumMemberValue();
             Amount = warEffort.Amount;
