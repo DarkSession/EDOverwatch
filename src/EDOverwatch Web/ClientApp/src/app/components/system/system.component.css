@@ -29,3 +29,14 @@
     display: flex;
     align-items: center;
 }
+
+.progress-cell {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.progress-locked {
+    width: 12px;
+    color: red;
+    margin-left: 8px;
+}

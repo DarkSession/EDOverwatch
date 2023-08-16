@@ -21,8 +21,7 @@
                         <tr>
                             <td class="t">Thargoid State</td>
                             <td>
-                                <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"
-                                    [barnacleMatrixInSystem]="starSystem.BarnacleMatrixInSystem"></app-thargoid-level>
+                                <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
                             </td>
                         </tr>
                         <tr>
@@ -61,8 +60,12 @@
                         <tr *ngIf="starSystem.StateProgress">
                             <td class="t">Progress</td>
                             <td class="number">
-                                <div>
+                                <div class="progress-cell">
                                     {{ starSystem.StateProgress.ProgressPercent | percent }}
+                                    <div class="progress-locked" *ngIf="starSystem.BarnacleMatrixInSystem">
+                                        <fa-icon [icon]="faLock"
+                                            matTooltip="Barnacle matrix present in the system. Progress is locked."></fa-icon>
+                                    </div>
                                 </div>
                                 <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
                                     Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}

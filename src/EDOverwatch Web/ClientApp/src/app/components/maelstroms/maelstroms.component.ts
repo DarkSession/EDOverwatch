@@ -5,8 +5,8 @@ import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 import { faClipboard } from '@fortawesome/pro-light-svg-icons';
+import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
 
 @UntilDestroy()
 @Component({

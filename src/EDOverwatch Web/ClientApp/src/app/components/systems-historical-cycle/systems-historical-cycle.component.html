@@ -70,8 +70,7 @@
                         <ng-container matColumnDef="ThargoidLevel">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
                             <td mat-cell *matCellDef="let row" class="nowrap">
-                                <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"
-                                    [barnacleMatrixInSystem]="row.BarnacleMatrixInSystem"></app-thargoid-level>
+                                <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="PopulationOriginal">

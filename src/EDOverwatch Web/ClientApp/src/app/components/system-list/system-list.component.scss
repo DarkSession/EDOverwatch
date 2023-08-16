@@ -8,6 +8,12 @@
     margin-left: 8px;
 }
 
+.progress-locked {
+    width: 12px;
+    color: red;
+    margin-left: 8px;
+}
+
 .progress-cell {
     display: flex;
     align-items: center;
@@ -35,7 +41,6 @@
 .cell-right {
     text-align: right;
 }
-
 
 @media (min-width: 992px) {
     .state-change {

@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { faClipboard } from '@fortawesome/pro-light-svg-icons';
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faLock } from '@fortawesome/free-solid-svg-icons';
 import { AppService } from 'src/app/services/app.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
@@ -27,6 +27,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faKitMedical = faKitMedical;
   public readonly faTruck = faTruck;
   public readonly faHandshake = faHandshake;
+  public readonly faLock = faLock;
   private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Progress', 'Features', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
   public displayedColumns: string[] = [];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;

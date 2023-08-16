@@ -11,7 +11,7 @@ import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
 import { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { Context } from 'chartjs-plugin-datalabels';
-import { faBolt } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
@@ -24,6 +24,7 @@ import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 export class SystemComponent implements OnInit {
   public readonly faClipboard = faClipboard;
   public readonly faBolt = faBolt;
+  public readonly faLock = faLock;
   public readonly faCrosshairs = faCrosshairs;
   public starSystem: OverwatchStarSystemFullDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
