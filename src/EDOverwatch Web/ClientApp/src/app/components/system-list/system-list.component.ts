@@ -35,6 +35,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   @Input() systems: OverwatchStarSystemFull[] = [];
   @Input() maelstromsSelected: OverwatchMaelstrom[] | null = null;
   @Input() thargoidLevelsSelected: OverwatchThargoidLevel[] | null = null;
+  @Input() featuresSelected: string[] | null = null;
   @Input() systemNameFilter: string | null = null;
   @Input() maxHeight: number | null = null;
   @Input() hideUnpopulated: boolean = false;
@@ -102,13 +103,29 @@ export class SystemListComponent implements OnInit, OnChanges {
       (this.thargoidLevelsSelected === null || typeof this.thargoidLevelsSelected.find(t => t.Level === d.ThargoidLevel.Level) !== 'undefined') &&
       (systemNameFilter === "" || d.Name.toUpperCase().includes(systemNameFilter)) &&
       (d.PopulationOriginal > 0 || !this.hideUnpopulated) &&
-      (d.Progress !== 100 || !this.hideCompleted));
+      (d.Progress !== 100 || !this.hideCompleted) &&
+      this.isFeatureFilterSelected(d));
     this.filterApplied = data.length < this.systems.length;
     if (this.sort?.active) {
       data = this.dataSource.sortData(data, this.sort);
     }
     this.initDataSource(data);
     this.changeDetectorRef.detectChanges();
+  }
+
+  private isFeatureFilterSelected(system: OverwatchStarSystemFull): boolean {
+    if (this.featuresSelected === null) {
+      return true;
+    }
+    else if (system.Features.length === 0 && this.featuresSelected.includes("None")) {
+      return true;
+    }
+    for (const featureSelected of this.featuresSelected) {
+      if (system.Features.includes(featureSelected)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private initDataSource(data: OverwatchStarSystemFull[]) {

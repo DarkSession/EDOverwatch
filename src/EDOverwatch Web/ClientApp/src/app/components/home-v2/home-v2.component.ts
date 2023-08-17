@@ -52,17 +52,21 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         value: "Reported progress completion",
       },
     ];
-  public availableFeatures: {
+  public features: {
     key: string;
     value: string;
   }[] = [
       {
+        key: "None",
+        value: "None",
+      },
+      {
         key: "BarnacleMatrix",
-        value: "Barnacle matrix",
+        value: "Barnacle matrix present",
       },
       {
         key: "OdysseySettlements",
-        value: "Odyssey settlements",
+        value: "Odyssey settlement(s)s",
       },
       {
         key: "FederalFaction",
@@ -79,8 +83,8 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       {
         key: "AXConflictZones",
         value: "AX conflict zones",
-      },
-    ];
+      }];
+  public featuresSelected: string[] = this.features.map(f => f.key);
   public dataRaw: OverwatchStarSystemFull[] = [];
   @ViewChild("stateContainers") stateContainers: ElementRef | null = null;
 
@@ -155,6 +159,11 @@ export class HomeV2Component implements OnInit, AfterViewInit {
     if (optionalColumnsSetting) {
       this.optionalColumns = optionalColumnsSetting.split(",");
     }
+    const systemListFeatures = await this.appService.getSetting("SystemListFeatures");
+    console.log(systemListFeatures);
+    if (systemListFeatures) {
+      this.featuresSelected = systemListFeatures.split(",");
+    }
     this.changeDetectorRef.markForCheck();
   }
 
@@ -179,7 +188,13 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       await this.appService.saveSetting("SystemListOptionalColumns", this.optionalColumns.join(","));
     }
     else {
-      this.appService.deleteSetting("SystemListOptionalColumns");
+      await this.appService.deleteSetting("SystemListOptionalColumns");
+    }
+    if (this.featuresSelected.length === this.features.length) {
+      await this.appService.deleteSetting("SystemListFeatures");
+    }
+    else {
+      await this.appService.saveSetting("SystemListFeatures", this.featuresSelected.join(","));
     }
     await this.appService.saveSetting("SystemListHideUnpopulated", this.hideUnpopulated ? "1" : "0");
     await this.appService.saveSetting("SystemListHideCompleted", this.hideCompleted ? "1" : "0");
@@ -195,8 +210,9 @@ export class HomeV2Component implements OnInit, AfterViewInit {
   public async resetFilter(): Promise<void> {
     this.hideUnpopulated = false;
     this.hideCompleted = false;
-    this.maelstromsSelected = this.maelstroms;
-    this.thargoidLevelsSelected = this.thargoidLevels;
+    this.maelstromsSelected = [...this.maelstroms];
+    this.thargoidLevelsSelected = [...this.thargoidLevels];
+    this.featuresSelected = this.features.map(f => f.key);
     if (this.systemList) {
       this.systemList.updateDataSource();
     }
@@ -204,6 +220,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
     await this.appService.deleteSetting("ThargoidLevels");
     await this.appService.deleteSetting("SystemListHideUnpopulated");
     await this.appService.deleteSetting("SystemListHideCompleted");
+    await this.appService.deleteSetting("SystemListFeatures");
   }
 }
 

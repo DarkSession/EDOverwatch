@@ -144,7 +144,7 @@ export class SystemsComponent implements OnInit, OnDestroy {
       await this.appService.saveSetting("SystemListOptionalColumns", this.optionalColumns.join(","));
     }
     else {
-      this.appService.deleteSetting("SystemListOptionalColumns");
+      await this.appService.deleteSetting("SystemListOptionalColumns");
     }
     await this.appService.saveSetting("SystemListHideUnpopulated", this.hideUnpopulated ? "1" : "0");
     await this.appService.saveSetting("SystemListHideCompleted", this.hideCompleted ? "1" : "0");
@@ -160,8 +160,8 @@ export class SystemsComponent implements OnInit, OnDestroy {
   public async resetFilter(): Promise<void> {
     this.hideUnpopulated = false;
     this.hideCompleted = false;
-    this.maelstromsSelected = this.maelstroms;
-    this.thargoidLevelsSelected = this.thargoidLevels;
+    this.maelstromsSelected = [...this.maelstroms];
+    this.thargoidLevelsSelected = [...this.thargoidLevels];
     if (this.systemList) {
       this.systemList.updateDataSource();
     }
@@ -169,6 +169,7 @@ export class SystemsComponent implements OnInit, OnDestroy {
     await this.appService.deleteSetting("ThargoidLevels");
     await this.appService.deleteSetting("SystemListHideUnpopulated");
     await this.appService.deleteSetting("SystemListHideCompleted");
+    await this.appService.deleteSetting("SystemListFeatures");
   }
 }
 

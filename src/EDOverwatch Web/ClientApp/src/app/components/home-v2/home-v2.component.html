@@ -59,6 +59,15 @@
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field appearance="outline">
+                        <mat-label>Features</mat-label>
+                        <mat-select [(ngModel)]="featuresSelected" (ngModelChange)="settingChanged()"
+                            multiple>
+                            <mat-option *ngFor="let feature of features" [value]="feature.key">
+                                {{ feature.value }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
                         <mat-label>Optional columns</mat-label>
                         <mat-select [(ngModel)]="optionalColumns" (ngModelChange)="settingChanged()" multiple>
                             <mat-option *ngFor="let availableOptionalColumn of availableOptionalColumns"
@@ -81,7 +90,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length || hideUnpopulated || hideCompleted"
+            <div *ngIf="hideUnpopulated || hideCompleted || maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length || features.length !== featuresSelected.length"
                 class="filtered-view">
                 <div>
                     <fa-icon [icon]="faFilters"></fa-icon>
@@ -95,7 +104,7 @@
             <app-system-list [systems]="dataRaw" [maelstromsSelected]="maelstromsSelected"
                 [thargoidLevelsSelected]="thargoidLevelsSelected" [hideUnpopulated]="hideUnpopulated"
                 [hideCompleted]="hideCompleted" [systemNameFilter]="systemNameFilter"
-                [optionalColumns]="optionalColumns"></app-system-list>
+                [optionalColumns]="optionalColumns" [featuresSelected]="featuresSelected"></app-system-list>
         </div>
     </div>
 </div>

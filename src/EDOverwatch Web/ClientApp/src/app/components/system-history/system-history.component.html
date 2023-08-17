@@ -4,19 +4,19 @@
             matSortDisableClear>
             <ng-container matColumnDef="ThargoidLevel">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
                 </td>
             </ng-container>
             <ng-container matColumnDef="StateStart">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Start</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     {{ row.StateStart | date }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="StateEnds">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>End</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     <span *ngIf="row.StateEnds">
                         {{ row.StateEnds | date }}
                     </span>
@@ -27,13 +27,13 @@
             </ng-container>
             <ng-container matColumnDef="StateIngameTimerExpires">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>In-game timer expires</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     {{ row.StateIngameTimerExpires | date }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="ProgressPercentage">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let row" class="nowrap">
                     {{ row.ProgressPercentage | percent }}
                     <span *ngIf="row.AllowDetailAnalysisDisplay" class="clickable"
                         [routerLink]="['/system', starSystem.SystemAddress, 'analyze', row.AnalysisCycle]"
