@@ -290,7 +290,7 @@ namespace EDOverwatch_Web.Models
                 {
                     status = OverviewDataStatus.TickInProgress;
                 }
-                else if (now.Hour >= 7 && now.Hour < 12)
+                else if (now.Hour >= 7 && now.Hour < 11)
                 {
                     status = OverviewDataStatus.UpdatePending;
                 }

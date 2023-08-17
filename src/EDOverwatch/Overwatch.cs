@@ -482,7 +482,7 @@ namespace EDOverwatch
         private async Task UpdateAlertPredictions(CancellationToken cancellationToken)
         {
             DateTimeOffset now = DateTimeOffset.UtcNow;
-            if (now.DayOfWeek == DayOfWeek.Thursday && now.Hour >= 7 && now.Hour <= 10)
+            if (now.DayOfWeek == DayOfWeek.Thursday && now.Hour >= 7 && now.Hour <= 8)
             {
                 return;
             }
@@ -525,6 +525,10 @@ namespace EDOverwatch
                     .ToListAsync(cancellationToken);
                 foreach (StarSystem nearbyStarSystem in nearbyStarSystems)
                 {
+                    if (nearbyStarSystem.DistanceTo(thargoidControlledWithMilitarySettlement) > 20f)
+                    {
+                        continue;
+                    }
                     nearbyStarSystem.ReactivationMissionsNearby = true;
                     applicableSystems.Add(nearbyStarSystem.SystemAddress);
                 }
