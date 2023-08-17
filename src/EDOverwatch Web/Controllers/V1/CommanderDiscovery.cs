@@ -7,6 +7,7 @@ namespace EDOverwatch_Web.Controllers.V1
     [ApiController]
     [AllowAnonymous]
     [Route("discovery")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CommanderDiscovery : ControllerBase
     {
         [HttpGet]

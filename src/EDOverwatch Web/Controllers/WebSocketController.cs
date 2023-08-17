@@ -7,6 +7,7 @@ namespace EDOverwatch_Web.Controllers
 {
     [AllowAnonymous]
     [Route("ws")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WebSocketController : ControllerBase
     {
         private UserManager<ApplicationUser> UserManager { get; }

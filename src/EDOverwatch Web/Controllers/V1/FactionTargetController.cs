@@ -9,6 +9,7 @@ namespace EDOverwatch_Web.Controllers.V1
     [Route("api/v1/[controller]/[action]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "ApiKeyAuthentication", Policy = "FactionUpdate")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class FactionTargetController : ControllerBase
     {
         private EdDbContext DbContext { get; }

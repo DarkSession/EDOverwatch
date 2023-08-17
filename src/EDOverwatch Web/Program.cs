@@ -8,6 +8,7 @@ using EDOverwatch_Web.Authentication;
 using EDOverwatch_Web.WebSockets;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.OpenApi.Models;
 
 namespace EDOverwatch_Web
 {
@@ -49,8 +50,16 @@ namespace EDOverwatch_Web
             builder.Services.AddControllers()
                     .AddNewtonsoftJson();
 
-            // builder.Services.AddEndpointsApiExplorer();
-            // builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.EnableAnnotations();
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "DCoH Overwatch API",
+                    Description = "A public API to retrieve data from the DCoH Overwatch application.",
+                });
+            });
 
             List<string> origins = (builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty).Split(",").ToList();
 
@@ -108,10 +117,15 @@ namespace EDOverwatch_Web
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-
-                // app.UseSwagger();
-                // app.UseSwaggerUI();
             }
+            app.UseSwagger(options =>
+            {
+                options.RouteTemplate = "api/swagger/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(options =>
+            {
+                options.RoutePrefix = "api/swagger";
+            });
 
             WebSocketOptions webSocketOptions = new()
             {

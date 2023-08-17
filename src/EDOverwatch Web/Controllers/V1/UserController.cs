@@ -15,6 +15,7 @@ namespace EDOverwatch_Web.Controllers.V1
     [ApiController]
     [Route("api/v1/[controller]/[action]")]
     [AllowAnonymous]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public partial class UserController : ControllerBase
     {
         private UserManager<ApplicationUser> UserManager { get; }

@@ -6,6 +6,7 @@ namespace EDOverwatch_Web.Controllers.V1
     [Route("api/v1/[controller]/[action]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "CommanderApiKeyAuthenticationHandler")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class Commander : ControllerBase
     {
         private EdDbContext DbContext { get; }
