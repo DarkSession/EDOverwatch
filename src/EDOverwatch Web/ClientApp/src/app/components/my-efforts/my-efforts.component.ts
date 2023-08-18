@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
 import { faAngleLeft, faAngleRight } from '@fortawesome/pro-light-svg-icons';
+import { OverwatchThargoidCycle } from '../home-v2/home-v2.component';
 
 @UntilDestroy()
 @Component({

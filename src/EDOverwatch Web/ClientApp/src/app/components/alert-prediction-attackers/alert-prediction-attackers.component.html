@@ -12,7 +12,7 @@
             <img class="feature-icon" src="assets/barnacles_logo.svg" />
         </span>
     </ng-container>
-    ({{ attacker.Distance }} Ly)
+    ({{ attacker.Distance | number:'0.0-2' }} Ly)
 </div>
 <div *ngIf="limitVisibleAttackers && additionalEntries > 0">
     <span class="clickable" (click)="toggleLimitVisibleAttackers()">

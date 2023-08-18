@@ -12,7 +12,7 @@
             Maelstrom = new(thargoidMaelstrom);
             Systems = alertPredictions.Select(a =>
                 {
-                    double distance = Math.Round(a.StarSystem!.DistanceTo(thargoidMaelstrom.StarSystem!), 2);
+                    double distance = Math.Round(a.StarSystem!.DistanceTo(thargoidMaelstrom.StarSystem!), 4);
                     return new OverwatchAlertPredictionSystem(a.StarSystem, thargoidMaelstrom, distance, a.Attackers!, a.AlertLikely);
                 })
                 .OrderBy(a => a.Distance)

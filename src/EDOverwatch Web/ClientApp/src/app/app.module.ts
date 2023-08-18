@@ -30,16 +30,12 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthenticationGuard } from './guards/authentication.guard';
 
 import { AppComponent } from './app.component';
-import { HomeComponent } from './components/home/home.component';
-import { SystemsComponent } from './components/systems/systems.component';
 import { AboutComponent } from './components/about/about.component';
 import { GetInvolvedComponent } from './components/get-involved/get-involved.component';
 import { ConsumerApiComponent } from './components/consumer-api/consumer-api.component';
-import { LoginComponent } from './components/login/login.component';
 import { AuthComponent } from './components/auth/auth.component';
 import { MyEffortsComponent } from './components/my-efforts/my-efforts.component';
 import { SystemComponent } from './components/system/system.component';
-import { NotAuthenticatedGuard } from './guards/not-authenticated.guard';
 import { MaelstromComponent } from './components/maelstrom/maelstrom.component';
 import { MaelstromNameComponent } from './components/maelstrom-name/maelstrom-name.component';
 import { SystemListComponent } from './components/system-list/system-list.component';
@@ -101,12 +97,9 @@ export const httpInterceptorProviders = [
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent,
-    SystemsComponent,
     AboutComponent,
     GetInvolvedComponent,
     ConsumerApiComponent,
-    LoginComponent,
     AuthComponent,
     MyEffortsComponent,
     SystemComponent,
@@ -219,11 +212,6 @@ export const httpInterceptorProviders = [
       {
         path: 'join-the-fight',
         component: GetInvolvedComponent,
-      },
-      {
-        path: 'login',
-        component: LoginComponent,
-        canActivate: [NotAuthenticatedGuard],
       },
       {
         path: 'maelstrom/:name',

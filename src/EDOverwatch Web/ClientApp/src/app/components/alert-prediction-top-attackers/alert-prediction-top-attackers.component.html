@@ -24,7 +24,7 @@
                 <td mat-cell *matCellDef="let row" class="nowrap">
                     <div class="number-cell">
                         <div class="number">
-                            {{ row.StarSystem.DistanceToMaelstrom | numberSuffix:2 }} Ly
+                            {{ row.StarSystem.DistanceToMaelstrom | number:'0.2-2' }} Ly
                         </div>
                     </div>
                 </td>

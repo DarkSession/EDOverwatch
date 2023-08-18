@@ -15,7 +15,7 @@
                 .OrderBy(a => a.Order)
                 .Select(a =>
                 {
-                    double distance = Math.Round(maelstrom.StarSystem!.DistanceTo(a.StarSystem!), 2);
+                    double distance = Math.Round(maelstrom.StarSystem!.DistanceTo(a.StarSystem!), 4);
                     return new OverwatchAlertPredictionSystemAttacker(a, distance);
                 }).ToList();
             PrimaryTarget = primaryTarget;

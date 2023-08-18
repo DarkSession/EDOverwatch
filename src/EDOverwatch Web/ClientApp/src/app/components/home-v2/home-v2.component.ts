@@ -160,7 +160,6 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       this.optionalColumns = optionalColumnsSetting.split(",");
     }
     const systemListFeatures = await this.appService.getSetting("SystemListFeatures");
-    console.log(systemListFeatures);
     if (systemListFeatures) {
       this.featuresSelected = systemListFeatures.split(",");
     }
@@ -241,4 +240,13 @@ enum OverviewDataStatus {
   Default,
   TickInProgress,
   UpdatePending,
+}
+
+export interface OverwatchThargoidCycle {
+  Cycle: string;
+  Start: string;
+  StartDate: string;
+  End: string;
+  EndDate: string;
+  IsCurrent: boolean;
 }

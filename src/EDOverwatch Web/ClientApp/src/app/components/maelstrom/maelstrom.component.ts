@@ -4,10 +4,11 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { OverwatchOverviewMaelstromHistoricalSummary, OverwatchThargoidCycle } from '../home/home.component';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystemFull } from '../system-list/system-list.component';
-import { OverwatchAlertPredictionMaelstrom, OverwatchAlertPredictionSystem } from '../alert-prediction/alert-prediction.component';
+import { OverwatchAlertPredictionMaelstrom } from '../alert-prediction/alert-prediction.component';
+import { OverwatchOverviewMaelstromHistoricalSummary } from '../stats/stats.component';
+import { OverwatchThargoidCycle } from '../home-v2/home-v2.component';
 
 @UntilDestroy()
 @Component({

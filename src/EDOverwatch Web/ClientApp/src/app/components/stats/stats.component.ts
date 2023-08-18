@@ -2,9 +2,10 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
-import { OverwatchOverviewContested, OverwatchOverviewHuman, OverwatchOverviewMaelstromHistoricalSummary, OverwatchOverviewThargoids, OverwatchThargoidCycle } from '../home/home.component';
 import { Context } from 'chartjs-plugin-datalabels';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
+import { OverwatchThargoidCycle } from '../home-v2/home-v2.component';
+import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 
 @UntilDestroy()
 @Component({
@@ -400,4 +401,37 @@ interface StatsCompletdSystemsPerCycle {
   Cycle: string;
   Completed: number;
   State: OverwatchThargoidLevel;
+}
+
+export interface OverwatchOverviewHuman {
+  ControllingPercentage: number;
+  SystemsControlling: number;
+  SystemsRecaptured: number;
+  ThargoidKills: number | null;
+  Rescues: number | null;
+  RescueSupplies: number | null;
+  Missions: number | null;
+  ItemsRecovered: number | null;
+}
+
+export interface OverwatchOverviewThargoids {
+  ControllingPercentage: number;
+  ActiveMaelstroms: number;
+  SystemsControlling: number;
+  CommanderKills: number;
+  RefugeePopulation: number;
+}
+
+export interface OverwatchOverviewContested {
+  SystemsInInvasion: number;
+  SystemsWithAlerts: number;
+  SystemsBeingRecaptured: number;
+  SystemsInRecovery: number;
+}
+
+export interface OverwatchOverviewMaelstromHistoricalSummary {
+  Cycle: OverwatchThargoidCycle;
+  Maelstrom: OverwatchMaelstrom;
+  State: OverwatchThargoidLevel;
+  Amount: number;
 }

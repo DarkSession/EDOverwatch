@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
-import { OverwatchStarSystemCoordinates } from '../system-list/system-list.component';
+import { OverwatchStarSystemCoordinates, OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { AppService } from 'src/app/services/app.service';
@@ -11,10 +11,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { ExportToCsv, Options } from 'export-to-csv';
-import { OverwatchThargoidCycle } from '../home/home.component';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { faFilters, faFileCsv, faCircleXmark } from '@fortawesome/pro-duotone-svg-icons';
+import { OverwatchThargoidCycle } from '../home-v2/home-v2.component';
 
 @UntilDestroy()
 @Component({
@@ -279,4 +279,11 @@ interface OverwatchStarSystemsHistoricalSystem {
   Progress: number | null;
   ProgressIsCompleted: boolean;
   StateExpires: string | null;
+}
+
+export interface OverwatchSystems {
+  Maelstroms: OverwatchMaelstrom[];
+  Levels: OverwatchThargoidLevel[];
+  Systems: OverwatchStarSystemFull[];
+  NextTick: string;
 }

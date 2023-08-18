@@ -56,6 +56,10 @@ namespace EDOverwatch_Web.Models
 
         private static async Task<OverwatchStarSystemsHistorical> CreateInternal(DateTimeOffset tickTime, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            if (!await dbContext.ThargoidCycleExists(DateOnly.FromDateTime(tickTime.Date), cancellationToken))
+            {
+                tickTime = DateTimeOffset.UtcNow;
+            }
             ThargoidCycle thargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken);
             ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(tickTime, cancellationToken, -1);
 

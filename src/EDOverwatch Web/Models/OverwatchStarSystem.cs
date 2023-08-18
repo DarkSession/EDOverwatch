@@ -21,7 +21,7 @@
             ProgressPercent = (Progress != null) ? (decimal)Progress / 100m : null;
             if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem != null)
             {
-                DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 2);
+                DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 4);
             }
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
             StateStartCycle = starSystem.ThargoidLevel?.CycleStart?.Start ?? throw new Exception("Thargoid level must have a cycle property");

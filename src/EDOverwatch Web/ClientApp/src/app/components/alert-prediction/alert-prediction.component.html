@@ -44,7 +44,7 @@
                 <td mat-cell *matCellDef="let row" class="nowrap">
                     <div class="number-cell">
                         <div class="number">
-                            {{ row.Distance | numberSuffix:2 }} Ly
+                            {{ row.Distance | number:'0.2-2' }} Ly
                         </div>
                         <div>
                         </div>

@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ED3DMap } from 'canonned3d-map/lib/ED3DMap';
-import { OverwatchSystems } from 'src/app/components/systems/systems.component';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { solSite } from '../../data/sol';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -14,6 +13,7 @@ import { abandonedBases } from '../../data/abandoned-bases';
 import { thargoidSites } from '../../data/thargoid-sites';
 import { unknownBarnacleSites } from '../../data/unknown-barnacle-sites';
 import { horizonEngineers, odysseyEngineers } from '../../data/engineers';
+import { OverwatchSystems } from 'src/app/components/systems-historical-cycle/systems-historical-cycle.component';
 
 @UntilDestroy()
 @Component({

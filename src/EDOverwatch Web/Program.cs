@@ -53,6 +53,7 @@ namespace EDOverwatch_Web
             builder.Services.AddSwaggerGen(options =>
             {
                 options.EnableAnnotations();
+                options.SupportNonNullableReferenceTypes();
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",

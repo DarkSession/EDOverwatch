@@ -6,7 +6,6 @@ import { ammoniaWorlds } from '../../data/ammonia-worlds';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { solSite } from '../../data/sol';
 import { AppService } from 'src/app/services/app.service';
-import { OverwatchThargoidCycle } from 'src/app/components/home/home.component';
 import { SystemConfiguration } from 'canonned3d-map/lib/System';
 import { barnacleBarbs } from '../../data/barnacle-barbs';
 import { abandonedBases } from '../../data/abandoned-bases';
@@ -15,6 +14,7 @@ import { unknownBarnacleSites } from '../../data/unknown-barnacle-sites';
 import { horizonEngineers, odysseyEngineers } from '../../data/engineers';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { OverwatchStarSystemsHistorical } from 'src/app/components/systems-historical-cycle/systems-historical-cycle.component';
+import { OverwatchThargoidCycle } from 'src/app/components/home-v2/home-v2.component';
 
 @UntilDestroy()
 @Component({
