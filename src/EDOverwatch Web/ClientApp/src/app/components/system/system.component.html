@@ -14,7 +14,7 @@
                             <td>
                                 <app-maelstrom-name [maelstrom]="starSystem.Maelstrom"></app-maelstrom-name>
                                 <span *ngIf="starSystem.DistanceToMaelstrom">
-                                    ({{ starSystem.DistanceToMaelstrom }} Ly)
+                                    ({{ starSystem.DistanceToMaelstrom | number:'0.0-2' }} Ly)
                                 </span>
                             </td>
                         </tr>

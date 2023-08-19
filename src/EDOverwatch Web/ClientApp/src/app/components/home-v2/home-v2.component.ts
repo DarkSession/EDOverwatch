@@ -41,7 +41,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         value: "Focus",
       }, {
         key: "DistanceToMaelstrom",
-        value: "Distance to maelstrom",
+        value: "Distance to Titan",
       },
       {
         key: "PopulationOriginal",
@@ -66,7 +66,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       },
       {
         key: "OdysseySettlements",
-        value: "Odyssey settlement(s)s",
+        value: "Odyssey settlement(s)",
       },
       {
         key: "FederalFaction",

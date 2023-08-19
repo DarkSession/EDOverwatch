@@ -23,3 +23,12 @@
 .table-container {
     margin-top: 6px;
 }
+
+div.load-more {
+    background-color: #393939;
+    width: 100%;
+    color: rgba(255, 255, 255, 0.87);
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+}

@@ -15,7 +15,7 @@
     ({{ attacker.Distance | number:'0.0-2' }} Ly)
 </div>
 <div *ngIf="limitVisibleAttackers && additionalEntries > 0">
-    <span class="clickable" (click)="toggleLimitVisibleAttackers()">
+    <span class="clickable more" (click)="toggleLimitVisibleAttackers()">
         Show {{ additionalEntries }} more systems
     </span>
 </div>

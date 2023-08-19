@@ -17,6 +17,16 @@
 .progress-cell {
     display: flex;
     align-items: center;
+    width: 100%;
+
+    div {
+        flex-grow: 1;
+        width: 50%;
+    }
+
+    div.progress-number {
+        text-align: right;
+    }
 }
 
 .small {

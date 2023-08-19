@@ -18,7 +18,7 @@
             <td>
                 <app-maelstrom-name [maelstrom]="warEffortCycleStarSystem.StarSystem.Maelstrom"></app-maelstrom-name>
                 <span *ngIf="warEffortCycleStarSystem.StarSystem.DistanceToMaelstrom">
-                    ({{ warEffortCycleStarSystem.StarSystem.DistanceToMaelstrom }} Ly)
+                    ({{ warEffortCycleStarSystem.StarSystem.DistanceToMaelstrom | number:'0.0-2' }} Ly)
                 </span>
             </td>
         </tbody>
@@ -51,6 +51,9 @@
             </table>
             <div *ngIf="dataSource.data.length === 0" class="empty-table">
                 No records found.
+            </div>
+            <div *ngIf="!showAll && additionalEntries" (click)="toggleShowAll()" class="clickable load-more">
+                Show {{ additionalEntries }} more...
             </div>
         </div>
     </div>

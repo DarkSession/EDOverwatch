@@ -1,7 +1,11 @@
-<img *ngIf="barnacleMatrix" class="feature-icon" src="assets/barnacles_logo.svg" matTooltip="Barnacle Matrix present" />
-<img *ngIf="odysseySettlement" class="feature-icon" src="assets/settlement_o.svg"
-    matTooltip="Odyssey settlement(s) present" />
-<img *ngIf="federation" class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />
-<img *ngIf="empire" class="feature-icon" src="assets/empire.svg" matTooltip="Imperial faction(s) present" />
-<fa-icon *ngIf="thargoidControlledReactivationMissions" [icon]="faBolt" size="xl" matTooltip="AX reactivation missions available"></fa-icon>
-<fa-icon *ngIf="aXConflictZones" [icon]="faCrosshairs" size="xl" matTooltip="AX conflict zones"></fa-icon>
+<div class="features">
+    <img *ngIf="barnacleMatrix" class="feature-icon" src="assets/barnacles_logo.svg"
+        matTooltip="Barnacle Matrix present" />
+    <img *ngIf="odysseySettlement" class="feature-icon" src="assets/settlement_o.svg"
+        matTooltip="Odyssey settlement(s) present" />
+    <img *ngIf="federation" class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />
+    <img *ngIf="empire" class="feature-icon" src="assets/empire.svg" matTooltip="Imperial faction(s) present" />
+    <fa-icon *ngIf="thargoidControlledReactivationMissions" [icon]="faBolt" size="xl"
+        matTooltip="AX reactivation missions available"></fa-icon>
+    <fa-icon *ngIf="aXConflictZones" [icon]="faCrosshairs" size="xl" matTooltip="AX conflict zones"></fa-icon>
+</div>
