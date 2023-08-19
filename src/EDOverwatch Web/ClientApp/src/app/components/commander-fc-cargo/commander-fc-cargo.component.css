@@ -13,3 +13,13 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.state-cell {
+    display: flex;
+    gap: 4px;
+}
+
+.progress-locked {
+    width: 12px;
+    color: red;
+}

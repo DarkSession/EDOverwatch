@@ -32,3 +32,8 @@ div.load-more {
     justify-content: center;
     padding: 12px;
 }
+
+.progress-locked {
+    width: 12px;
+    color: red;
+}

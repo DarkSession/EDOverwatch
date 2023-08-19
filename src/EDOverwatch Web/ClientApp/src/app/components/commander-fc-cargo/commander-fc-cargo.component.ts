@@ -7,6 +7,8 @@ import { UntilDestroy } from '@ngneat/until-destroy';
 import { ExportToCsv, Options } from 'export-to-csv';
 import { AppService } from 'src/app/services/app.service';
 import { WebsocketService } from 'src/app/services/websocket.service';
+import { OverwatchStarSystem } from '../system-list/system-list.component';
+import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -16,8 +18,9 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 })
 export class CommanderFcCargoComponent implements OnInit {
   public readonly faFileCsv = faFileCsv;
+  public readonly faLock = faLock;
   public pageSize: number = 50;
-  public displayedColumns = ['Commodity', 'SystemName', 'Quantity', 'StackNumber', 'Changed'];
+  public displayedColumns = ['Commodity', 'SystemName', 'SystemState', 'Quantity', 'StackNumber', 'Changed'];
   public loading = false;
   public fleetCarrierCargo: CommanderFleetCarrierCargo | null = null;
   public cargoEntries: MatTableDataSource<CommanderFleetCarrierCargoEntry> = new MatTableDataSource<CommanderFleetCarrierCargoEntry>();
@@ -62,7 +65,7 @@ export class CommanderFcCargoComponent implements OnInit {
     }
     let cargo: CommanderFleetCarrierCargoEntry[] = this.fleetCarrierCargo.Cargo;
     if (!this.showDetailedStacks) {
-      this.displayedColumns = ['Commodity', 'SystemName', 'Quantity'];
+      this.displayedColumns = ['Commodity', 'SystemName', 'SystemState', 'Quantity'];
       cargo = [];
       for (const cargoEntry of this.fleetCarrierCargo.Cargo) {
         const existingEntry = cargo.find(c => c.Commodity == cargoEntry.Commodity && c.StarSystem.SystemAddress == cargoEntry.StarSystem.SystemAddress);
@@ -81,11 +84,19 @@ export class CommanderFcCargoComponent implements OnInit {
       }
     }
     else {
-      this.displayedColumns = ['Commodity', 'SystemName', 'Quantity', 'StackNumber', 'Changed'];
+      this.displayedColumns = ['Commodity', 'SystemName', 'SystemState', 'Quantity', 'StackNumber', 'Changed'];
     }
     this.cargoEntries = new MatTableDataSource<CommanderFleetCarrierCargoEntry>(cargo);
     this.cargoEntries.paginator = this.paginator;
-    this.cargoEntries.sortingDataAccessor = (warEffort: CommanderFleetCarrierCargoEntry, columnName: string): string => {
+    this.cargoEntries.sortingDataAccessor = (warEffort: CommanderFleetCarrierCargoEntry, columnName: string): string | number => {
+      switch (columnName) {
+        case "SystemState": {
+          return warEffort.StarSystem.ThargoidLevel.Level;
+        }
+        case "SystemName": {
+          return warEffort.StarSystem.Name;
+        }
+      }
       return warEffort[columnName as keyof CommanderFleetCarrierCargoEntry] as string;
     }
     this.cargoEntries.sort = this.sort;
@@ -128,11 +139,7 @@ interface CommanderFleetCarrierCargo {
 
 interface CommanderFleetCarrierCargoEntry {
   Commodity: string;
-  StarSystem: 
-  {
-    SystemAddress: number;
-    Name: string;
-  };
+  StarSystem: OverwatchStarSystem;
   Quantity: number;
   StackNumber: number;
   Changed: string;

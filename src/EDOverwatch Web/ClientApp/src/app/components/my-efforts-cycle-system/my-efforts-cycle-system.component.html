@@ -12,6 +12,10 @@
                     <span *ngIf="warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent != null">
                         ({{ warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent | percent }})
                     </span>
+                    <span class="progress-locked" *ngIf="warEffortCycleStarSystem.StarSystem.BarnacleMatrixInSystem">
+                        <fa-icon [icon]="faLock"
+                            matTooltip="Barnacle matrix present in the system. Progress is locked."></fa-icon>
+                    </span>
                 </td>
             </tr>
             <td class="t">Titan</td>

@@ -23,7 +23,10 @@
                 .AsNoTracking()
                 .Include(c => c.Commodity)
                 .Include(c => c.SourceStarSystem)
-                .Where(c => c.Commander == commander)
+                .Include(c => c.SourceStarSystem!.ThargoidLevel)
+                .Include(c => c.SourceStarSystem!.ThargoidLevel!.Maelstrom)
+                .Include(c => c.SourceStarSystem!.ThargoidLevel!.Maelstrom!.StarSystem)
+                .Where(c => c.Commander == commander && c.SourceStarSystem != null && c.SourceStarSystem.ThargoidLevel != null)
                 .ToListAsync(cancellationToken);
 
             CommanderFleetCarrierCargo result = new(commander.HasFleetCarrier == CommanderFleetHasFleetCarrier.Yes, fleetCarrierCargoItems, commander.JournalLastProcessed);
@@ -34,7 +37,7 @@
     public class CommanderFleetCarrierCargoEntry
     {
         public string Commodity { get; }
-        public OverwatchStarSystemMin StarSystem { get; }
+        public OverwatchStarSystem StarSystem { get; }
         public int Quantity { get; set; }
         public int StackNumber { get; }
         public DateTimeOffset Changed { get; }

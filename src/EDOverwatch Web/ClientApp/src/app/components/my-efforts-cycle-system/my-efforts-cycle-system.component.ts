@@ -2,6 +2,7 @@ import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { CommanderWarEffortCycleStarSystem, CommanderWarEffortCycleStarSystemWarEffort } from '../my-efforts/my-efforts.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-my-efforts-cycle-system',
@@ -9,6 +10,7 @@ import { MatSort } from '@angular/material/sort';
   styleUrls: ['./my-efforts-cycle-system.component.css']
 })
 export class MyEffortsCycleSystemComponent implements AfterViewInit {
+  public readonly faLock = faLock;
   public displayedColumns = ["Date", "Type", "Amount"];
   @Input() warEffortCycleStarSystem: CommanderWarEffortCycleStarSystem | null = null;
   @ViewChild(MatSort) sort!: MatSort;
