@@ -38,9 +38,13 @@
             <mat-icon>key</mat-icon>
             <span>API keys</span>
           </button>
-          <button mat-menu-item (click)="appService.oAuthStart()" [disabled]="appService.user.HasActiveToken">
+          <button mat-menu-item (click)="appService.oAuthStart()" *ngIf="!appService.user.HasActiveToken">
             <mat-icon>refresh</mat-icon>
             <span>Refresh journal import</span>
+          </button>
+          <button mat-menu-item (click)="requestJournalImport()" *ngIf="appService.user.HasActiveToken">
+            <mat-icon>update</mat-icon>
+            <span>Request journal import</span>
           </button>
           <button mat-menu-item (click)="appService.logout()">
             <mat-icon>logout</mat-icon>

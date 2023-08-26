@@ -6,6 +6,7 @@ namespace EDWarProgressRequirements
     {
         private static List<WarEffortRequirement> TissueRequirements { get; } = new()
         {
+            new(StarSystemThargoidLevelState.Alert, 15, false, 1390),
             new(StarSystemThargoidLevelState.Controlled, 5, false, 116280),
             new(StarSystemThargoidLevelState.Controlled, 10, false, 11850),
             new(StarSystemThargoidLevelState.Controlled, 15, false, 3100),

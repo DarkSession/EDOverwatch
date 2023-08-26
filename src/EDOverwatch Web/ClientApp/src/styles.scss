@@ -38,9 +38,6 @@ a,
   color: #fbd7b4;
 }
 
-// Foreground Elements
-
-// Light Theme Text
 $dark-text: #000000;
 $dark-primary-text: rgba($dark-text, 0.87);
 $dark-accent-text: rgba($dark-primary-text, 0.54);
@@ -49,13 +46,13 @@ $dark-dividers: rgba($dark-primary-text, 0.12);
 $dark-focused: rgba($dark-primary-text, 0.12);
 
 $mat-light-theme-foreground: (
-  base: black,
+  base: #000000,
   divider: $dark-dividers,
   dividers: $dark-dividers,
   disabled: $dark-disabled-text,
   disabled-button: rgba($dark-text, 0.26),
   disabled-text: $dark-disabled-text,
-  elevation: black,
+  elevation: #000000,
   secondary-text: $dark-accent-text,
   hint-text: $dark-disabled-text,
   accent-text: $dark-accent-text,
@@ -82,7 +79,7 @@ $mat-dark-theme-foreground: (
   disabled: $light-disabled-text,
   disabled-button: rgba($light-text, 0.3),
   disabled-text: $light-disabled-text,
-  elevation: black,
+  elevation: #000000,
   hint-text: $light-disabled-text,
   secondary-text: $light-accent-text,
   accent-text: $light-accent-text,
@@ -243,7 +240,9 @@ $altTheme: (
 // Theme Init
 @include mat.all-component-themes($theme);
 
-body, table, .table {
+body,
+table,
+.table {
   --bs-body-bg: #393939;
   --bs-table-bg: #393939;
   --bs-table-color-state: rgba(255, 255, 255, 0.87);
@@ -298,6 +297,7 @@ div.overwatch-content-large {
     font-weight: bold;
     font-size: 16pt;
   }
+
   div.content-box {
     border-top: 2px solid var(--primary-color);
   }
@@ -310,7 +310,6 @@ div.subtitle {
   margin-top: 4px;
   color: #ffefdf;
 }
-
 
 div.overwatch-content-small {
   width: 600px;

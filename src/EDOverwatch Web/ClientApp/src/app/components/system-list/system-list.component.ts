@@ -45,7 +45,6 @@ export class SystemListComponent implements OnInit, OnChanges {
   public dataSource: MatTableDataSource<OverwatchStarSystemFull> = new MatTableDataSource<OverwatchStarSystemFull>();
   public sortColumn: string = "Progress";
   public sortDirection: SortDirection = "desc";
-  public progressShowPercentage = true;
   public filterApplied = false;
 
   public constructor(
@@ -67,7 +66,6 @@ export class SystemListComponent implements OnInit, OnChanges {
   private async updateSettings(): Promise<void> {
     const sort = await this.appService.getTableSort("SystemList", this.sortColumn, this.sortDirection);
     const pageSizeSetting = await this.appService.getSetting("SystemListPageSize");
-    this.progressShowPercentage = !(await this.appService.getSetting("SystemListProgressShowPercentage") === "0");
     this.sortColumn = sort.Column;
     this.sortDirection = sort.Direction;
     if (pageSizeSetting) {
@@ -167,11 +165,6 @@ export class SystemListComponent implements OnInit, OnChanges {
     this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
       duration: 2000,
     });
-  }
-
-  public toggleProgressShowPercentage(): void {
-    this.progressShowPercentage = !this.progressShowPercentage;
-    this.appService.saveSetting("SystemListProgressShowPercentage", this.progressShowPercentage ? "1" : "0");
   }
 
   public exportToCsv(all: boolean): void {

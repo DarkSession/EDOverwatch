@@ -120,4 +120,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.appService.toggleIsMenuOpen();
     this.changeDetectorRef.markForCheck();
   }
+
+  public async requestJournalImport(): Promise<void> {
+    if (!this.appService.user?.HasActiveToken) {
+      return;
+    }
+    const response = await this.websocketService.sendMessageAndWaitForResponse<CommanderCApiImportRequestResponse>("CommanderCApiImportRequest", {});
+    if (response && response.Data) {
+      const responseData = response.Data;
+      if (responseData.Message) {
+        this.matSnackBar.open(responseData.Message, "Dismiss", {
+          duration: 5000,
+        });
+      }
+    }
+  }
+}
+
+interface CommanderCApiImportRequestResponse {
+  Requested: boolean;
+  Message: string | null;
 }

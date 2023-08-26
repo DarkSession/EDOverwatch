@@ -6,7 +6,6 @@ namespace EDSystemProgressTest
     [TestClass]
     public class ProgressTests
     {
-        // Missing states:  ThargoidControlledRegainedPopulated
         [TestMethod]
         [DataRow("test01.png", "PATOLLU", SystemStatus.RecoveryComplete, 100d, 1)]
         [DataRow("test02.png", "GARONGXIANS", SystemStatus.InvasionInProgress, 66d, 15)]
@@ -62,6 +61,10 @@ namespace EDSystemProgressTest
         [DataRow("test53.png", "BAUDANI", SystemStatus.AlertInProgressPopulated, 60d, 4)]
         [DataRow("test54.png", "COL 285 SECTOR SH-B B14-4", SystemStatus.ThargoidControlled, 0d, 2)]
         [DataRow("test55.png", "KURUMA", SystemStatus.Recovery, 58d, 15)]
+        [DataRow("test56.png", "CEPHEI SECTOR ZE-A C12", SystemStatus.ThargoidControlled, 62d, 1)]
+        [DataRow("test57.png", "IXBAKSHA", SystemStatus.RecoveryComplete, 100d, 6)]
+        [DataRow("test58.png", "IXBAKSHA", SystemStatus.RecoveryComplete, 100d, 6)]
+        [DataRow("test59.png", "HIP 37520", SystemStatus.RecoveryComplete, 100d, 6)]
         public async Task Test(string fileName, string systemName, SystemStatus systemStatus, double progress, int remainingDays)
         {
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>

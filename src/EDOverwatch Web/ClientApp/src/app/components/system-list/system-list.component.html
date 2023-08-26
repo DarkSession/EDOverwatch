@@ -57,13 +57,9 @@
             <ng-container matColumnDef="Progress">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
                 <td mat-cell *matCellDef="let row" class="nowrap">
-                    <div class="progress-cell" *ngIf="row.Progress !== null" (click)="toggleProgressShowPercentage()">
+                    <div class="progress-cell" *ngIf="row.Progress !== null">
                         <div class="progress-number">
-                            <mat-progress-bar mode="determinate" [value]="row.Progress"
-                                [matTooltip]="row.Progress + '%'" *ngIf="!progressShowPercentage"></mat-progress-bar>
-                            <span *ngIf="progressShowPercentage">
-                                {{ row.Progress }} %
-                            </span>
+                            {{ row.Progress }} %
                         </div>
                         <div>
                             <div class="progress-completed" *ngIf="row.Progress == 100">
