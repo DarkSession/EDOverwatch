@@ -52,7 +52,7 @@
                         missionWarEffortType = WarEffortType.MissionCompletionRescue;
                         countWarEffortType = WarEffortType.Rescue;
                     }
-                    else if (Name.StartsWith("Mission_TW_PassengerEvacuation"))
+                    else if (Name.StartsWith("Mission_TW_PassengerEvacuation") || Name.StartsWith("Mission_TW_RefugeeBulk") || Name.StartsWith("Mission_TW_RefugeeVIP"))
                     {
                         missionWarEffortType = WarEffortType.MissionCompletionPassengerEvacuation;
                         countWarEffortType = WarEffortType.Rescue;
