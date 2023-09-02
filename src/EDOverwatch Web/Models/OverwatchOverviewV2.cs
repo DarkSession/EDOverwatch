@@ -163,7 +163,7 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> currentCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Where(s => (s.CycleEnd == null || (s.CycleEnd == currentThargoidCycle && s.CycleStart!.Start <= s.CycleEnd!.Start)) && s.StateExpires == currentThargoidCycle)
+                    .Where(s => s.CycleEnd == null || (s.CycleEnd == currentThargoidCycle && s.CycleStart!.Start <= s.CycleEnd!.Start))
                     .ToListAsync(cancellationToken);
 
                 int alertsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && p.Progress >= 100);
@@ -175,7 +175,7 @@ namespace EDOverwatch_Web.Models
                 overviewNextCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, thargoidInvasionStart, thargoidsGain);
 
                 int alertsPredicted = await dbContext.AlertPredictions.CountAsync(a => a.Cycle == nextCycle && a.AlertLikely, cancellationToken);
-                int invasionsPredicted = invasionCount - invasionsDefended + currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation > 0) - currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Invasion);
+                int invasionsPredicted = invasionCount - invasionsDefended + thargoidInvasionStart;
                 int controlledPredicted = controlledCount - controlsDefended + thargoidsGain;
                 int titanPredicted = titanCount;
                 int recoveryPredicted = recoveryCount - currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Recovery && p.Progress >= 100) + currentCycleStates.Count(p => p.Progress >= 100 && (p.State == StarSystemThargoidLevelState.Invasion || p.State == StarSystemThargoidLevelState.Controlled) && p.StarSystem?.OriginalPopulation > 0);
