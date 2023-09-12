@@ -29,6 +29,8 @@ namespace EDOverwatchAlertPrediction
 
         private int LastAlertCycle { get; }
 
+        private int LastInvasionCycle { get; }
+
         private int LastControlCycle { get; }
 
         public StarSystemCycleState(StarSystem dbStarSystem, int cycle)
@@ -55,6 +57,11 @@ namespace EDOverwatchAlertPrediction
             Cycle = cycle;
             LastAlertCycle = systemStates
                 .Where(s => s.State == StarSystemThargoidLevelState.Alert && s.EndCycle < cycle)
+                .Select(s => s.EndCycle ?? default)
+                .DefaultIfEmpty(int.MinValue)
+                .Max();
+            LastInvasionCycle = systemStates
+                .Where(s => s.State == StarSystemThargoidLevelState.Invasion && s.EndCycle < cycle)
                 .Select(s => s.EndCycle ?? default)
                 .DefaultIfEmpty(int.MinValue)
                 .Max();
@@ -88,6 +95,10 @@ namespace EDOverwatchAlertPrediction
                 }
             }
             if (LastAlertCycle > 0 && (Cycle - LastAlertCycle) <= 2)
+            {
+                return false;
+            }
+            if (LastInvasionCycle > 0 && (Cycle - LastAlertCycle) <= 3)
             {
                 return false;
             }
