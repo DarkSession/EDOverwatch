@@ -98,7 +98,7 @@ namespace EDOverwatchAlertPrediction
             {
                 return false;
             }
-            if (LastInvasionCycle > 0 && (Cycle - LastAlertCycle) <= 3)
+            if (LastInvasionCycle > 0 && (Cycle - LastInvasionCycle) <= 3)
             {
                 return false;
             }
