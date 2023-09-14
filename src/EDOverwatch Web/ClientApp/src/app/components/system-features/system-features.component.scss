@@ -1,0 +1,34 @@
+.feature-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.features {
+    display: flex;
+    gap: 4px;
+}
+
+.multi-icon {
+    position: relative;
+
+    img,
+    div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    img {
+        opacity: 0.5;
+    }
+}
+
+.icon-red {
+    color: red;
+}

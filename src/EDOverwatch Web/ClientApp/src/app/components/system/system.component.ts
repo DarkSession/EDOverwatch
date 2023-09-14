@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { faClipboard } from '@fortawesome/pro-light-svg-icons';
+import { faClipboard, faCrosshairsSimple } from '@fortawesome/pro-light-svg-icons';
 import { OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchStation } from '../station-name/station-name.component';
 import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
@@ -18,7 +18,7 @@ import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 @Component({
   selector: 'app-system',
   templateUrl: './system.component.html',
-  styleUrls: ['./system.component.css'],
+  styleUrls: ['./system.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemComponent implements OnInit {
@@ -26,6 +26,7 @@ export class SystemComponent implements OnInit {
   public readonly faBolt = faBolt;
   public readonly faLock = faLock;
   public readonly faCrosshairs = faCrosshairs;
+  public readonly faCrosshairsSimple = faCrosshairsSimple;
   public starSystem: OverwatchStarSystemFullDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [],
@@ -37,6 +38,7 @@ export class SystemComponent implements OnInit {
   public empire = false;
   public thargoidControlledReactivationMissions = false;
   public aXConflictZones = false;
+  public groundPortAXCZ = false;
 
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
@@ -190,6 +192,7 @@ export class SystemComponent implements OnInit {
           this.empire = this.starSystem?.Features?.includes("ImperialFaction") ?? false;
           this.thargoidControlledReactivationMissions = this.starSystem?.Features?.includes("ThargoidControlledReactivationMissions") ?? false;
           this.aXConflictZones = this.starSystem?.Features?.includes("AXConflictZones") ?? false;
+          this.groundPortAXCZ = this.starSystem?.Features?.includes("GroundPortAXCZ") ?? false;
           this.changeDetectorRef.markForCheck();
           this.chartLoaded = true;
         }

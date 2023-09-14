@@ -35,7 +35,7 @@ namespace EDOverwatch_Web.Models
             bool federalFaction,
             bool imperialFaction,
             bool axConflictZones) :
-            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction, axConflictZones)
+            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction, axConflictZones, stations.Where(s => s.State == StationState.UnderAttack && (s.Type?.IsWarGroundAsset ?? false)).Any())
         {
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;

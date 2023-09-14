@@ -61,12 +61,20 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         value: "None",
       },
       {
+        key: "AXConflictZones",
+        value: "AX conflict zones",
+      },
+      {
+        key: "ThargoidControlledReactivationMissions",
+        value: "AX reactivation missions available",
+      },
+      {
         key: "BarnacleMatrix",
         value: "Barnacle matrix present",
       },
       {
-        key: "OdysseySettlements",
-        value: "Odyssey settlement(s)",
+        key: "GroundPortAXCZ",
+        value: "Ground port under attack",
       },
       {
         key: "FederalFaction",
@@ -77,12 +85,8 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         value: "Imperial faction(s) present",
       },
       {
-        key: "ThargoidControlledReactivationMissions",
-        value: "AX reactivation missions available",
-      },
-      {
-        key: "AXConflictZones",
-        value: "AX conflict zones",
+        key: "OdysseySettlements",
+        value: "Odyssey settlement(s)",
       }];
   public featuresSelected: string[] = this.features.map(f => f.key);
   public dataRaw: OverwatchStarSystemFull[] = [];

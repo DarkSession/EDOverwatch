@@ -28,7 +28,8 @@
                     bool odysseySettlements,
                     bool federalFaction,
                     bool imperialFaction,
-                    bool axConflictZones)
+                    bool axConflictZones,
+                    bool groundPortUnderAttack)
             : base(starSystem)
         {
             EffortFocus = effortFocus;
@@ -68,6 +69,10 @@
             {
                 Features.Add(OverwatchStarSystemFeature.AXConflictZones.ToString());
             }
+            if (groundPortUnderAttack && ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion && (StateProgress.ProgressPercent ?? 0) < 1m)
+            {
+                Features.Add(OverwatchStarSystemFeature.GroundPortAXCZ.ToString());
+            }
         }
     }
 
@@ -79,5 +84,6 @@
         ImperialFaction,
         ThargoidControlledReactivationMissions,
         AXConflictZones,
+        GroundPortAXCZ,
     }
 }

@@ -114,6 +114,15 @@
                         matTooltip="AX conflict zones"></fa-icon>
                     AX conflict zones
                 </div>
+                <div *ngIf="groundPortAXCZ" class="feature">
+                    <div class="multi-icon" matTooltip="Ground port under attack">
+                        <img class="feature-icon" src="assets/surface_port.svg" />
+                        <div class="icon-red">
+                            <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
+                        </div>
+                    </div>
+                    Ground port under attack
+                </div>
             </div>
             <br>
             <div *ngIf="lineChartData && lineChartData.labels && lineChartData.labels.length">

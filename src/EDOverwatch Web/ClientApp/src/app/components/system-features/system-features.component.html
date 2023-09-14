@@ -8,4 +8,10 @@
     <fa-icon *ngIf="thargoidControlledReactivationMissions" [icon]="faBolt" size="xl"
         matTooltip="AX reactivation missions available"></fa-icon>
     <fa-icon *ngIf="aXConflictZones" [icon]="faCrosshairs" size="xl" matTooltip="AX conflict zones"></fa-icon>
+    <div *ngIf="groundPortAXCZ" class="multi-icon" matTooltip="Ground port under attack">
+        <img class="feature-icon" src="assets/surface_port.svg" />
+        <div class="icon-red">
+            <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
+        </div>
+    </div>
 </div>

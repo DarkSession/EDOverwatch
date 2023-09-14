@@ -268,9 +268,9 @@ namespace EDOverwatch_Web.Controllers.V1
     {
         public long SystemAddress { get; set; }
 
-        public SystemUpdateFailedRequest(StarSystem starSystem)
+        public SystemUpdateFailedRequest(long systemAddress)
         {
-            SystemAddress = starSystem.SystemAddress;
+            SystemAddress = systemAddress;
         }
     }
 }

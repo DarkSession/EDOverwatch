@@ -124,7 +124,6 @@ namespace EDOverwatch
                     {
                         Message message = await consumer.ReceiveAsync(cancellationToken);
                         await using Transaction transaction = new();
-                        await consumer.AcceptAsync(message, transaction, cancellationToken);
 
                         string jsonString = message.GetBody<string>();
                         StarSystemThargoidManualUpdate? starSystemThargoidManualUpdate = JsonConvert.DeserializeObject<StarSystemThargoidManualUpdate>(jsonString);
@@ -226,6 +225,8 @@ namespace EDOverwatch
                                 await dbContext.SaveChangesAsync(cancellationToken);
                             }
                         }
+
+                        await consumer.AcceptAsync(message, transaction, cancellationToken);
                         await transaction.CommitAsync(cancellationToken);
                     }
                     catch (Exception e)

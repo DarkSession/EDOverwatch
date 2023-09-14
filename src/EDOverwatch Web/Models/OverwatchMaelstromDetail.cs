@@ -66,6 +66,7 @@
                     FederalFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Federation),
                     EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
                     AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
+                    GroundPortUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack && StationType.WarGroundAssetTypes.Contains(s.Type!.Name)).Any(),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -117,7 +118,8 @@
                     system.OdysseySettlements,
                     system.FederalFaction,
                     system.EmpireFaction,
-                    system.AXConflictZones));
+                    system.AXConflictZones,
+                    system.GroundPortUnderAttack));
             }
 
             ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
