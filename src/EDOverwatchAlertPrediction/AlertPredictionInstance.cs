@@ -138,13 +138,14 @@ namespace EDOverwatchAlertPrediction
                         .DistinctBy(a => a.SystemAddress)
                         .Where(p => !PrimaryAttackerSystems.Contains(p))
                         .OrderBy(a => a.DistanceTo(maelstrom.StarSystem!));
-                    float alertMaxDistance = 0f;
+                    List<long> skippedAttacks = new();
                     foreach (StarSystemCycleState remainingAttacker in remainingAttackers)
                     {
-                        Attack? attack = possibleAttacks
+                        IEnumerable<Attack> attackerAttacks = possibleAttacks
                             .Where(p => p.Attackers.Any(a => a.SystemAddress == remainingAttacker.SystemAddress))
-                            .OrderBy(p => p.VictimSystem.WasPopulated)
-                            .ThenByDescending(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!))
+                            .OrderByDescending(p => p.VictimSystem.WasPopulated)
+                            .ThenByDescending(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!));
+                        Attack? attack = attackerAttacks
                             .FirstOrDefault();
                         if (attack == null)
                         {
@@ -154,7 +155,7 @@ namespace EDOverwatchAlertPrediction
                         int attackCost = attack.VictimSystem.AttackCost();
                         bool alertPossible = attackingCredits >= attackCost;
                         float victimSystemDistanceToMaelstrom = attack.VictimSystem.DistanceTo(maelstrom.StarSystem!);
-                        if (alertPossible && maelstromAlertCount >= 4 && victimSystemDistanceToMaelstrom > alertMaxDistance)
+                        if (alertPossible && maelstromAlertCount >= 4 && !skippedAttacks.Contains(attack.VictimSystem.SystemAddress))
                         {
                             alertPossible = false;
                         }
@@ -162,10 +163,8 @@ namespace EDOverwatchAlertPrediction
                         {
                             attackingCredits -= attackCost;
                             maelstromAlertCount++;
-                            if (victimSystemDistanceToMaelstrom > alertMaxDistance)
-                            {
-                                alertMaxDistance = victimSystemDistanceToMaelstrom;
-                            }
+
+                            skippedAttacks.AddRange(attackerAttacks.Where(a => a.VictimSystem.SystemAddress != attack.VictimSystem.SystemAddress).Select(a => a.VictimSystem.SystemAddress));
                         }
 
                         await ProcessAttack(attack, alertPossible, maelstrom, remainingAttacker, dbContext, cancellationToken);
