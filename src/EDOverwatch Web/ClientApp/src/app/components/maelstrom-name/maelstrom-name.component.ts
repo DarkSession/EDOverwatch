@@ -7,6 +7,7 @@ import { Component, Input } from '@angular/core';
 })
 export class MaelstromNameComponent {
   @Input() maelstrom!: OverwatchMaelstrom;
+  @Input() titanPrefix = false;
 }
 
 export interface OverwatchMaelstrom {

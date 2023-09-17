@@ -14,14 +14,15 @@
             </p>
             <ng-container *ngFor="let maelstrom of predictions.Maelstroms">
                 <div class="subtitle">
-                    {{ maelstrom.Maelstrom.Name }}
+                    <app-maelstrom-name [maelstrom]="maelstrom.Maelstrom" [titanPrefix]="true"></app-maelstrom-name>
                 </div>
                 <mat-tab-group>
                     <mat-tab label="Alerts">
                         <app-alert-prediction [alertPrediction]="maelstrom"></app-alert-prediction>
                     </mat-tab>
                     <mat-tab label="Top Attackers">
-                        <app-alert-prediction-top-attackers [alertPrediction]="maelstrom"></app-alert-prediction-top-attackers>
+                        <app-alert-prediction-top-attackers
+                            [alertPrediction]="maelstrom"></app-alert-prediction-top-attackers>
                     </mat-tab>
                 </mat-tab-group>
                 <br>
