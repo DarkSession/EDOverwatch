@@ -22,6 +22,11 @@
 
 .table-container {
     margin-top: 6px;
+    table-layout: fixed;
+}
+
+table.summary-table {
+    width: 100%;
 }
 
 div.load-more {
@@ -36,4 +41,30 @@ div.load-more {
 .progress-locked {
     width: 12px;
     color: red;
+}
+
+.effort-type {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.effort-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 24px;
+}
+
+.details-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 6px;
+}
+
+.cell-number {
+    text-align: right;
+    width: 80px;
 }

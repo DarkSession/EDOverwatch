@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { CommanderWarEffortCycleStarSystemWarEffort, WarEffortTypeGroup } from '../my-efforts/my-efforts.component';
 import { IconDefinition, faTruckRampBox } from '@fortawesome/pro-duotone-svg-icons';
 import { faCrosshairs, faHandshake } from '@fortawesome/pro-light-svg-icons';
@@ -14,7 +14,7 @@ export class MyEffortsCycleSystemEffortTypeComponent implements OnChanges {
   public icon: IconDefinition = faHandshake;
   @Input() effort: CommanderWarEffortCycleStarSystemWarEffort | null = null;
 
-  public ngOnChanges(changes: SimpleChanges): void {
+  public ngOnChanges(): void {
     switch (this.effort?.Group) {
       case WarEffortTypeGroup.Kills: {
         this.icon = faCrosshairs;

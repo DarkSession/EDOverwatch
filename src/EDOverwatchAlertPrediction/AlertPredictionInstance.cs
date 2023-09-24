@@ -90,10 +90,19 @@ namespace EDOverwatchAlertPrediction
                     }
                 }
 
+                var x = starSystems
+                    .Where(s => s.Maelstrom == maelstrom.Name && s.ThargoidLevel?.State == StarSystemThargoidLevelState.Controlled && !s.ThargoidLevel.Completed && !s.IsNewState)
+                    .Select(s => new
+                    {
+                        distance = s.DistanceTo(maelstrom.StarSystem!),
+                        system = s,
+                    })
+                    .ToList();
+
                 int attackingCredits = 20;
                 AttackMode attackMode = AttackMode.Closest;
                 float maxControlSystemDistance = starSystems
-                    .Where(s => s.Maelstrom == maelstrom.Name && s.ThargoidLevel?.State == StarSystemThargoidLevelState.Controlled && !s.ThargoidLevel.Completed)
+                    .Where(s => s.Maelstrom == maelstrom.Name && s.ThargoidLevel?.State == StarSystemThargoidLevelState.Controlled && !s.ThargoidLevel.Completed && !s.IsNewState)
                     .Select(s => s.DistanceTo(maelstrom.StarSystem!))
                     .DefaultIfEmpty()
                     .Max();
@@ -139,6 +148,7 @@ namespace EDOverwatchAlertPrediction
                         .Where(p => !PrimaryAttackerSystems.Contains(p))
                         .OrderBy(a => a.DistanceTo(maelstrom.StarSystem!));
                     List<long> skippedAttacks = new();
+                    int backtracks = 0;
                     foreach (StarSystemCycleState remainingAttacker in remainingAttackers)
                     {
                         IEnumerable<Attack> attackerAttacks = possibleAttacks
@@ -155,16 +165,27 @@ namespace EDOverwatchAlertPrediction
                         int attackCost = attack.VictimSystem.AttackCost();
                         bool alertPossible = attackingCredits >= attackCost;
                         float victimSystemDistanceToMaelstrom = attack.VictimSystem.DistanceTo(maelstrom.StarSystem!);
-                        if (alertPossible && maelstromAlertCount >= 4 && !skippedAttacks.Contains(attack.VictimSystem.SystemAddress))
-                        {
-                            alertPossible = false;
-                        }
+                        bool isBacktrack = skippedAttacks.Contains(attack.VictimSystem.SystemAddress);
                         if (alertPossible)
                         {
-                            attackingCredits -= attackCost;
-                            maelstromAlertCount++;
+                            if (maelstromAlertCount >= 4 && !isBacktrack && backtracks == 0)
+                            {
+                                alertPossible = false;
+                            }
+                            else
+                            {
+                                attackingCredits -= attackCost;
+                                maelstromAlertCount++;
 
-                            skippedAttacks.AddRange(attackerAttacks.Where(a => a.VictimSystem.SystemAddress != attack.VictimSystem.SystemAddress).Select(a => a.VictimSystem.SystemAddress));
+                                if (isBacktrack)
+                                {
+                                    backtracks++;
+                                }
+                                else
+                                {
+                                    skippedAttacks.AddRange(attackerAttacks.Where(a => a.VictimSystem.SystemAddress != attack.VictimSystem.SystemAddress).Select(a => a.VictimSystem.SystemAddress));
+                                }
+                            }
                         }
 
                         await ProcessAttack(attack, alertPossible, maelstrom, remainingAttacker, dbContext, cancellationToken);

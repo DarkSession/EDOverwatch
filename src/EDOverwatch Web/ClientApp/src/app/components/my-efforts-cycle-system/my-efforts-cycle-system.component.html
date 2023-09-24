@@ -28,8 +28,44 @@
         </tbody>
     </table>
     <div class="table-container">
+        <table class="mat-mdc-table mdc-data-table__table cdk-table summary-table">
+            <tbody>
+                <ng-container *ngFor="let entry of summary">
+                    <tr class="mat-mdc-row mdc-data-table__row cdk-row thead">
+                        <td class="mat-mdc-cell mdc-data-table__cell cdk-cell">
+                            <div class="effort-type">
+                                <div class="effort-icon">
+                                    <fa-icon [icon]="entry.Icon" size="lg"></fa-icon>
+                                </div>
+                                <b>{{ entry.Type }}</b>
+                            </div>
+                        </td>
+                        <td class="mat-mdc-cell mdc-data-table__cell cdk-cell">
+                            <div class="cell-number">
+                                <b>{{ entry.Total | number }}</b>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="mat-mdc-row mdc-data-table__row cdk-row" *ngFor="let detailEntry of entry.Entries">
+                        <td class="mat-mdc-cell mdc-data-table__cell cdk-cell">
+                            {{detailEntry.Type }}
+                        </td>
+                        <td class="mat-mdc-cell mdc-data-table__cell cdk-cell">
+                            <div class="cell-number">
+                                {{ detailEntry.Total | number }}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+    <div *ngIf="!showDetails" class="details-btn">
+        <button mat-raised-button (click)="toggleShowDetails()">Show details</button>
+    </div>
+    <div class="table-container" *ngIf="showDetails">
         <div class="table">
-            <table mat-table [dataSource]="dataSource" matSort matSortActive="Date" matSortDirection="desc"
+            <table mat-table [dataSource]="detailsDataSource" matSort matSortActive="Date" matSortDirection="desc"
                 matSortDisableClear>
                 <ng-container matColumnDef="Date">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
@@ -47,17 +83,16 @@
                 <ng-container matColumnDef="Amount">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
                     <td mat-cell *matCellDef="let row">
-                        {{ row.Amount }}
+                        <div class="cell-number">
+                            {{ row.Amount | number }}
+                        </div>
                     </td>
                 </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-header-row *matHeaderRowDef="detailDisplayedColumns; sticky: true" class="thead"></tr>
+                <tr mat-row *matRowDef="let row; columns: detailDisplayedColumns;"></tr>
             </table>
-            <div *ngIf="dataSource.data.length === 0" class="empty-table">
+            <div *ngIf="detailsDataSource.data.length === 0" class="empty-table">
                 No records found.
-            </div>
-            <div *ngIf="!showAll && additionalEntries" (click)="toggleShowAll()" class="clickable load-more">
-                Show {{ additionalEntries }} more...
             </div>
         </div>
     </div>

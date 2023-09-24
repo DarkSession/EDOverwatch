@@ -20,7 +20,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.CommanderWarEfforts
             {
                 return;
             }
-            CommanderWarEffortsObject commanderWarEffortsObject = new(commander.Id);
+            CommanderWarEffortsV3Object commanderWarEffortsObject = new(commander.Id);
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(commanderWarEffortsObject)).ToList();
             if (sessions.Any())
             {

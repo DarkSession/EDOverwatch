@@ -19,7 +19,7 @@ namespace EDDataProcessor.EDDN
         private static partial Regex FleetCarrierRegexGenerator();
         private static Regex FleetCarrierRegex { get; } = FleetCarrierRegexGenerator();
 
-        [GeneratedRegex("^Maelstrom ([A-Z]+)$", RegexOptions.IgnoreCase)]
+        [GeneratedRegex("^Titan ([A-Z]+)$", RegexOptions.IgnoreCase)]
         private static partial Regex MaelstromRegexGenerator();
         private static Regex MaelstromRegex { get; } = MaelstromRegexGenerator();
 
@@ -97,7 +97,7 @@ namespace EDDataProcessor.EDDN
                     Match maelstromMatch = MaelstromRegex.Match(signal.SignalName);
                     if (maelstromMatch.Success)
                     {
-                        type = StarSystemFssSignalType.Maelstrom;
+                        type = StarSystemFssSignalType.Titan;
                         bool createdUpdated = false;
                         string maelStromName = maelstromMatch.Groups[1].Value;
                         ThargoidMaelstrom? thargoidMaelstrom = await dbContext.ThargoidMaelstroms

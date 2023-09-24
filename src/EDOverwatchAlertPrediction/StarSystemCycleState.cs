@@ -33,6 +33,8 @@ namespace EDOverwatchAlertPrediction
 
         private int LastControlCycle { get; }
 
+        public bool IsNewState { get; }
+
         public StarSystemCycleState(StarSystem dbStarSystem, int cycle)
         {
             Id = dbStarSystem.Id;
@@ -70,6 +72,7 @@ namespace EDOverwatchAlertPrediction
                 .Select(s => s.EndCycle ?? default)
                 .DefaultIfEmpty(int.MinValue)
                 .Max();
+            IsNewState = ThargoidLevel?.StartCycle == cycle;
         }
 
         public int AttackCost()

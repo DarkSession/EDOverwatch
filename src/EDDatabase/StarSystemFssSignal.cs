@@ -35,7 +35,7 @@
     {
         Other = 0,
         FleetCarrier,
-        Maelstrom,
+        Titan,
         AXCZ,
         ThargoidActivity,
     }

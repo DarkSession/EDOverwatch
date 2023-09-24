@@ -246,6 +246,11 @@ table,
   --bs-body-bg: #393939;
   --bs-table-bg: #393939;
   --bs-table-color-state: rgba(255, 255, 255, 0.87);
+  
+}
+
+.table>:not(caption)>*>* {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
 }
 
 /*
