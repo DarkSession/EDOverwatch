@@ -1,4 +1,5 @@
 ﻿using EDDatabase;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace EDOverwatchAlertPrediction
@@ -131,20 +132,27 @@ namespace EDOverwatchAlertPrediction
 
         public bool CanAttackSystem(StarSystemCycleState starSystem)
         {
-            if (DistanceTo(starSystem) > 10.02f)
+            double distanceTo = DistanceTo(starSystem);
+            /*
+            if (distanceTo < 10.02d && distanceTo > 10d)
+            {
+                Debug.WriteLine($"{Name} -> {starSystem.Name}: {distanceTo} Ly");
+            }
+            */
+            if (distanceTo > 10d)
             {
                 return false;
             }
             return true;
         }
 
-        public float DistanceTo(StarSystemCycleState system) => DistanceTo((float)system.LocationX, (float)system.LocationY, (float)system.LocationZ);
+        public double DistanceTo(StarSystemCycleState system) => DistanceTo((float)system.LocationX, (float)system.LocationY, (float)system.LocationZ);
 
-        public float DistanceTo(StarSystem system) => DistanceTo((float)system.LocationX, (float)system.LocationY, (float)system.LocationZ);
+        public double DistanceTo(StarSystem system) => DistanceTo((float)system.LocationX, (float)system.LocationY, (float)system.LocationZ);
 
-        public float DistanceTo(float x, float y, float z) => DistanceTo(new Vector3(x, y, z));
+        public double DistanceTo(float x, float y, float z) => DistanceTo(new Vector3(x, y, z));
 
-        public float DistanceTo(Vector3 location)
+        public double DistanceTo(Vector3 location)
         {
             Vector3 system2 = new((float)LocationX, (float)LocationY, (float)LocationZ);
             return Vector3.Distance(location, system2);

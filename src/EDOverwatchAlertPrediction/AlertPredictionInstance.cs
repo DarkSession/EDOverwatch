@@ -101,7 +101,7 @@ namespace EDOverwatchAlertPrediction
 
                 int attackingCredits = 20;
                 AttackMode attackMode = AttackMode.Closest;
-                float maxControlSystemDistance = starSystems
+                double maxControlSystemDistance = starSystems
                     .Where(s => s.Maelstrom == maelstrom.Name && s.ThargoidLevel?.State == StarSystemThargoidLevelState.Controlled && !s.ThargoidLevel.Completed && !s.IsNewState)
                     .Select(s => s.DistanceTo(maelstrom.StarSystem!))
                     .DefaultIfEmpty()
@@ -164,7 +164,7 @@ namespace EDOverwatchAlertPrediction
 
                         int attackCost = attack.VictimSystem.AttackCost();
                         bool alertPossible = attackingCredits >= attackCost;
-                        float victimSystemDistanceToMaelstrom = attack.VictimSystem.DistanceTo(maelstrom.StarSystem!);
+                        double victimSystemDistanceToMaelstrom = attack.VictimSystem.DistanceTo(maelstrom.StarSystem!);
                         bool isBacktrack = skippedAttacks.Contains(attack.VictimSystem.SystemAddress);
                         if (alertPossible)
                         {
