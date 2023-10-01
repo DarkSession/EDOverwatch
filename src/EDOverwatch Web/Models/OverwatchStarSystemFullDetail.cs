@@ -302,7 +302,7 @@ namespace EDOverwatch_Web.Models
                             s.LocationY >= starSystem.LocationY - maxDistance && s.LocationY <= starSystem.LocationY + maxDistance &&
                             s.LocationZ >= starSystem.LocationZ - maxDistance && s.LocationZ <= starSystem.LocationZ + maxDistance)
                         .ToListAsync(cancellationToken);
-                    nearbySystems = nearbySystems.Where(n => n.DistanceTo(starSystem) <= 10f).ToList();
+                    nearbySystems = nearbySystems.Where(n => n.DistanceTo(starSystem) <= 10f && n.ThargoidLevel != null).ToList();
                 }
 
                 return new OverwatchStarSystemFullDetail(

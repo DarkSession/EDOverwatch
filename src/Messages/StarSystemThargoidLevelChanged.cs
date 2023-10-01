@@ -6,7 +6,7 @@ namespace Messages
     public class StarSystemThargoidLevelChanged
     {
         public const string QueueName = "StarSystem.ThargoidLevelChanged";
-        public const RoutingType Routing = RoutingType.Multicast;
+        public const RoutingType Routing = RoutingType.Anycast;
 
         public long SystemAddress { get; set; }
         public bool Changed { get; set; }

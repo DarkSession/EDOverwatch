@@ -6,7 +6,7 @@ namespace Messages
     public class ThargoidMaelstromCreatedUpdated
     {
         public const string QueueName = "ThargoidMaelstrom.CreatedUpdated";
-        public const RoutingType Routing = RoutingType.Multicast;
+        public const RoutingType Routing = RoutingType.Anycast;
         public int Id { get; set; }
         public string Name { get; set; }
 

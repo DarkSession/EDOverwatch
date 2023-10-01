@@ -6,7 +6,7 @@ namespace Messages
     public class WarEffortUpdated
     {
         public const string QueueName = "WarEffort.Updated";
-        public const RoutingType Routing = RoutingType.Multicast;
+        public const RoutingType Routing = RoutingType.Anycast;
 
         public long SystemAddress { get; }
         public long? FDevCustomerId { get; }
