@@ -38,13 +38,14 @@ namespace EDDataProcessor.EDDN
                         return;
                     }
             }
+            if (await dbContext.StarSystems.FirstOrDefaultAsync(s => s.SystemAddress == Message.SystemAddress, cancellationToken) is not StarSystem starSystem)
+            {
+                return;
+            }
+
             List<long> starSystemSignalsUpdated = new();
             foreach (Signals signal in Message.Signals)
             {
-                if (await dbContext.StarSystems.FirstOrDefaultAsync(s => s.SystemAddress == Message.SystemAddress, cancellationToken) is not StarSystem starSystem)
-                {
-                    continue;
-                }
                 string signalName = signal.SignalName;
                 StarSystemFssSignalType type = StarSystemFssSignalType.Other;
                 if (signal.IsStation)
