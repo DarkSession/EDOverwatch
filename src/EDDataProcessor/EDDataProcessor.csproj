@@ -23,7 +23,6 @@
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.0.4" />
 		<PackageReference Include="ArtemisNetClient" Version="2.12.1" />
-		<PackageReference Include="Google.Apis.Sheets.v4" Version="1.62.0.3148" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

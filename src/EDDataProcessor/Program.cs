@@ -8,10 +8,8 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Newtonsoft.Json;
 using EDCApi;
-using EDDataProcessor.AXI;
 using EDDataProcessor.CApiJournal;
 using EDDataProcessor.EDDN;
-using EDDataProcessor.IDA;
 using EDDataProcessor.Inara;
 
 namespace EDDataProcessor
@@ -60,9 +58,7 @@ namespace EDDataProcessor
                 .AddScoped<CAPI>()
                 .AddScoped<FDevOAuth>()
                 .AddSingleton<JournalProcessor>()
-                .AddScoped<IdaClient>()
                 .AddSingleton<InaraClient>()
-                .AddScoped<AXIClient>()
                 .BuildServiceProvider();
 
             CancellationToken cancellationToken = default;
@@ -83,14 +79,9 @@ namespace EDDataProcessor
                 eddnProcessorTask = eddnProcessor.ProcessMessages(connection, cancellationToken);
             }
             Task scheduledInaraAndIdaUpdates = Task.CompletedTask;
-            if (Configuration.GetValue<bool>("Inara:Enabled") || Configuration.GetValue<bool>("IDA:Enabled"))
+            if (Configuration.GetValue<bool>("Inara:Enabled"))
             {
                 scheduledInaraAndIdaUpdates = ScheduledInaraAndIdaUpdates(connection, cancellationToken);
-            }
-            Task scheduledAXIUpdates = Task.CompletedTask;
-            if (Configuration.GetValue<bool>("AXI:Enabled"))
-            {
-                scheduledAXIUpdates = ScheduledAXIUpdates(cancellationToken);
             }
             Task journalProcessorTask = Task.CompletedTask;
             Task journalCommanderSelectionTask = Task.CompletedTask;
@@ -100,7 +91,7 @@ namespace EDDataProcessor
                 journalProcessorTask = journalProcessor.ProcessJournals(cancellationToken);
                 journalCommanderSelectionTask = CommanderJournalUpdateQueue(connection, cancellationToken);
             }
-            await Task.WhenAll(eddnProcessorTask, scheduledInaraAndIdaUpdates, scheduledAXIUpdates, journalProcessorTask, journalCommanderSelectionTask);
+            await Task.WhenAll(eddnProcessorTask, scheduledInaraAndIdaUpdates, journalProcessorTask, journalCommanderSelectionTask);
         }
 
         private static async Task ScheduledInaraAndIdaUpdates(IConnection connection, CancellationToken cancellationToken)
@@ -110,27 +101,6 @@ namespace EDDataProcessor
             ILogger log = Services!.GetRequiredService<ILogger<Program>>();
             while (!cancellationToken.IsCancellationRequested)
             {
-                if (Configuration!.GetValue<bool>("IDA:Enabled"))
-                {
-                    try
-                    {
-                        await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
-                        IdaClient idaClient = serviceScope.ServiceProvider.GetRequiredService<IdaClient>();
-                        List<long> systemsUpdated = await idaClient.UpdateData().ToListAsync(cancellationToken);
-                        if (systemsUpdated.Any())
-                        {
-                            foreach (long systemAddress in systemsUpdated.Distinct())
-                            {
-                                WarEffortUpdated warEffortUpdated = new(systemAddress, null);
-                                await warEffortUpdatedProducer.SendAsync(warEffortUpdated.Message, cancellationToken);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        log.LogError(e, "IdaClient exception");
-                    }
-                }
                 if (Configuration!.GetValue<bool>("Inara:Enabled"))
                 {
                     try
@@ -159,28 +129,6 @@ namespace EDDataProcessor
                 Random rnd = new();
                 int d = rnd.Next(4, 6);
                 await Task.Delay(TimeSpan.FromHours(d), cancellationToken);
-            }
-        }
-
-        private static async Task ScheduledAXIUpdates(CancellationToken cancellationToken)
-        {
-            ILogger log = Services!.GetRequiredService<ILogger<Program>>();
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                if (Configuration!.GetValue<bool>("AXI:Enabled"))
-                {
-                    try
-                    {
-                        await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
-                        AXIClient axiClient = serviceScope.ServiceProvider.GetRequiredService<AXIClient>();
-                        await axiClient.GetAndUpdate(cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        log.LogError(e, "AXIClient exception");
-                    }
-                }
-                await Task.Delay(TimeSpan.FromMinutes(15), cancellationToken);
             }
         }
 

@@ -53,14 +53,7 @@ namespace EDDataProcessor.EDDN
                         {
                             await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
                             EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
-                            if (!await dbContext.Database.CanConnectAsync(cancellationToken))
-                            {
-                                Log.LogError("Unable to connect to database...");
-                                await transaction.RollbackAsync(cancellationToken);
-                                await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
-                                continue;
-                            }
-                            Log.LogDebug("EDDNProcessor: Processing EDDN message");
+                            Log.LogInformation("EDDNProcessor: Processing EDDN message");
                             await eddnEvent.ProcessEvent(dbContext, anonymousProducer, transaction, cancellationToken);
                         }
                         else
