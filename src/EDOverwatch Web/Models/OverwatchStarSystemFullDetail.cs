@@ -18,7 +18,9 @@ namespace EDOverwatch_Web.Models
             .ToList();
         public List<OverwatchStarSystemThargoidLevelHistory> StateHistory { get; }
         public List<OverwatchStarSystemWarEffortCycle> WarEffortSummaries { get; }
+        public List<OverwatchStarSystemNearbySystem> NearbySystems { get; }
         public List<DateOnly> DaysSincePreviousTick { get; }
+        public OverwatchStarSystemAttackDefense AttackDefense { get; }
 
         protected OverwatchStarSystemFullDetail(
             StarSystem starSystem,
@@ -31,6 +33,11 @@ namespace EDOverwatch_Web.Models
             List<OverwatchStarSystemWarEffortCycle> warEffortSummaries,
             List<DateOnly> daysSincePreviousTick,
             List<Station> rescueShips,
+            List<StarSystem> nearbySystems,
+            StarSystem? recentAttacker,
+            StarSystem? predictedAttacker,
+            StarSystem? recentlyAttacked,
+            StarSystem? predictedAttack,
             bool odysseySettlements,
             bool federalFaction,
             bool imperialFaction,
@@ -49,7 +56,18 @@ namespace EDOverwatch_Web.Models
             ProgressDetails = starSystemThargoidLevelProgress.Select(s => new OverwatchStarSystemDetailProgress(s)).ToList();
             StateHistory = stateHistory.Select(s => new OverwatchStarSystemThargoidLevelHistory(s)).ToList();
             WarEffortSummaries = warEffortSummaries;
+            NearbySystems = nearbySystems.Select(n => new OverwatchStarSystemNearbySystem(n, starSystem)).OrderBy(n => n.Distance).ToList();
             DaysSincePreviousTick = daysSincePreviousTick;
+            {
+                int? requirementsTissueSampleTotal = EDWarProgressRequirements.WarEfforts.GetRequirementsEstimate((decimal)DistanceToMaelstrom, PopulationOriginal > 0, ThargoidLevel.Level);
+                int? requirementsTissueSampleRemaining = requirementsTissueSampleTotal;
+                if (requirementsTissueSampleTotal is int samplesNeedTotal && StateProgress.ProgressPercent is decimal progress)
+                {
+                    decimal remaining = 1m - progress;
+                    requirementsTissueSampleRemaining = (int)Math.Ceiling((decimal)samplesNeedTotal * remaining);
+                }
+                AttackDefense = new(recentAttacker, predictedAttacker, recentlyAttacked, predictedAttack, requirementsTissueSampleTotal, requirementsTissueSampleRemaining);
+            }
         }
 
         private static string CacheKey(long systemAddress)
@@ -96,6 +114,7 @@ namespace EDOverwatch_Web.Models
                 .FirstOrDefaultAsync(cancellationToken);
             if (systemData?.StarSystem?.ThargoidLevel != null)
             {
+                ThargoidCycle currentCycle = await dbContext.GetThargoidCycle(cancellationToken);
                 StarSystem starSystem = systemData.StarSystem;
                 Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
                 DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
@@ -218,6 +237,74 @@ namespace EDOverwatch_Web.Models
                      .Where(s => s.StarSystem == starSystem && (s.CycleEnd == null || s.CycleStart!.Start <= s.CycleEnd.Start))
                      .ToListAsync(cancellationToken);
 
+                StarSystem? recentAttacker = null;
+                StarSystem? predictedAttacker = null;
+
+                StarSystem? recentlyAttacked = null;
+                StarSystem? predictedAttack = null;
+
+                switch (starSystem.ThargoidLevel.State)
+                {
+                    case StarSystemThargoidLevelState.Alert:
+                        {
+                            recentAttacker = await dbContext.AlertPredictionCycleAttackers
+                                .AsNoTracking()
+                                .Include(a => a.AttackerStarSystem)
+                                .Where(a => a.Cycle == currentCycle && a.VictimStarSystem == starSystem)
+                                .Select(a => a.AttackerStarSystem)
+                                .FirstOrDefaultAsync(cancellationToken);
+
+                            break;
+                        }
+                    case StarSystemThargoidLevelState.Controlled:
+                        {
+                            ThargoidCycle nextCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+
+                            recentlyAttacked = await dbContext.AlertPredictionCycleAttackers
+                                .AsNoTracking()
+                                .Include(a => a.VictimStarSystem)
+                                .Where(a => a.Cycle == currentCycle && a.AttackerStarSystem == starSystem)
+                                .Select(a => a.VictimStarSystem)
+                                .FirstOrDefaultAsync(cancellationToken);
+                            predictedAttack = await dbContext.AlertPredictionAttackers
+                                .AsNoTracking()
+                                .Where(a => a.AlertPrediction!.AlertLikely && a.AlertPrediction.Cycle == nextCycle && a.StarSystem == starSystem)
+                                .Select(a => a.AlertPrediction!.StarSystem)
+                                .FirstOrDefaultAsync(cancellationToken);
+                            break;
+                        }
+                    case StarSystemThargoidLevelState.None:
+                    case StarSystemThargoidLevelState.Recovery:
+                        {
+                            ThargoidCycle nextCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+
+                            predictedAttacker = await dbContext.AlertPredictions
+                                .AsNoTracking()
+                                .Where(a => a.AlertLikely && a.Cycle == nextCycle && a.StarSystem == starSystem)
+                                .SelectMany(a => a.Attackers!)
+                                .OrderBy(a => a.Order)
+                                .Select(a => a.StarSystem)
+                                .FirstOrDefaultAsync(cancellationToken);
+
+                            break;
+                        }
+                }
+
+                List<StarSystem> nearbySystems;
+                {
+                    decimal maxDistance = 10m;
+                    nearbySystems = await dbContext.StarSystems
+                        .AsNoTracking()
+                        .Include(s => s.ThargoidLevel)
+                        .Where(s =>
+                            s != starSystem &&
+                            s.LocationX >= starSystem.LocationX - maxDistance && s.LocationX <= starSystem.LocationX + maxDistance &&
+                            s.LocationY >= starSystem.LocationY - maxDistance && s.LocationY <= starSystem.LocationY + maxDistance &&
+                            s.LocationZ >= starSystem.LocationZ - maxDistance && s.LocationZ <= starSystem.LocationZ + maxDistance)
+                        .ToListAsync(cancellationToken);
+                    nearbySystems = nearbySystems.Where(n => n.DistanceTo(starSystem) <= 10f).ToList();
+                }
+
                 return new OverwatchStarSystemFullDetail(
                     starSystem,
                     effortFocus,
@@ -229,6 +316,11 @@ namespace EDOverwatch_Web.Models
                     warEffortSummaries,
                     daysSincePreviousTick,
                     rescueShips,
+                    nearbySystems,
+                    recentAttacker: recentAttacker,
+                    predictedAttacker: predictedAttacker,
+                    recentlyAttacked: recentlyAttacked,
+                    predictedAttack: predictedAttack,
                     systemData.OdysseySettlements,
                     systemData.FederalFaction,
                     systemData.EmpireFaction,
@@ -271,6 +363,50 @@ namespace EDOverwatch_Web.Models
         {
             SourceId = (int)warEffortSource;
             Name = warEffortSource.GetEnumMemberValue();
+        }
+    }
+
+    public class OverwatchStarSystemNearbySystem
+    {
+        public OverwatchStarSystem StarSystem { get; }
+        public double Distance { get; }
+
+        public OverwatchStarSystemNearbySystem(StarSystem nearbySystem, StarSystem starSystem)
+        {
+            StarSystem = new(nearbySystem);
+            Distance = Math.Round(nearbySystem.DistanceTo(starSystem), 4);
+        }
+    }
+
+    public class OverwatchStarSystemAttackDefense
+    {
+        public OverwatchStarSystemMin? RecentAttacker { get; }
+        public OverwatchStarSystemMin? PredictedAttacker { get; }
+        public OverwatchStarSystemMin? RecentlyAttacked { get; }
+        public OverwatchStarSystemMin? PredictedAttack { get; }
+        public int? RequirementsTissueSampleTotal { get; }
+        public int? RequirementsTissueSampleRemaining { get; }
+
+        public OverwatchStarSystemAttackDefense(StarSystem? recentAttacker, StarSystem? predictedAttacker, StarSystem? recentlyAttacked, StarSystem? predictedAttack, int? requirementsTissueSampleTotal, int? requirementsTissueSampleRemaining)
+        {
+            if (recentAttacker != null)
+            {
+                RecentAttacker = new(recentAttacker);
+            }
+            if (predictedAttacker != null)
+            {
+                PredictedAttacker = new(predictedAttacker);
+            }
+            if (recentlyAttacked != null)
+            {
+                RecentlyAttacked = new(recentlyAttacked);
+            }
+            if (predictedAttack != null)
+            {
+                PredictedAttack = new(predictedAttack);
+            }
+            RequirementsTissueSampleTotal = requirementsTissueSampleTotal;
+            RequirementsTissueSampleRemaining = requirementsTissueSampleRemaining;
         }
     }
 

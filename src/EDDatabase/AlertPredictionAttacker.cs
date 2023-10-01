@@ -1,5 +1,6 @@
 ﻿namespace EDDatabase
 {
+    [Table("AlertPredictionAttacker")]
     public class AlertPredictionAttacker
     {
         [Column]
@@ -16,6 +17,8 @@
 
         [Column]
         public AlertPredictionAttackerStatus Status { get; set; }
+
+        public AlertPrediction? AlertPrediction { get; set; }
 
         public AlertPredictionAttacker(int id, long? starSystemId, int order, AlertPredictionAttackerStatus status)
         {

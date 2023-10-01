@@ -34,6 +34,12 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Home
                 {
                     return;
                 }
+                if (queueName == StarSystemThargoidLevelChanged.QueueName &&
+                    json.ToObject<StarSystemThargoidLevelChanged>() is StarSystemThargoidLevelChanged starSystemThargoidLevelChanged &&
+                    !starSystemThargoidLevelChanged.Changed)
+                {
+                    return;
+                }
                 OverwatchOverviewV2.DeleteMemoryEntry(MemoryCache);
                 WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchHomeV2), await OverwatchOverviewV2.Create(dbContext, MemoryCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)

@@ -99,9 +99,9 @@ namespace EDDataProcessor.Journal
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .Include(t => t.StarSystem)
                 .Where(t =>
-                t.StarSystem!.LocationX >= starSystem.LocationX - (t.InfluenceSphere + 11m) && t.StarSystem!.LocationX <= starSystem.LocationX + (t.InfluenceSphere + 11m) &&
-                t.StarSystem!.LocationY >= starSystem.LocationY - (t.InfluenceSphere + 11m) && t.StarSystem!.LocationY <= starSystem.LocationY + (t.InfluenceSphere + 11m) &&
-                t.StarSystem!.LocationZ >= starSystem.LocationZ - (t.InfluenceSphere + 11m) && t.StarSystem!.LocationZ <= starSystem.LocationZ + (t.InfluenceSphere + 11m))
+                    t.StarSystem!.LocationX >= starSystem.LocationX - (t.InfluenceSphere + 11m) && t.StarSystem!.LocationX <= starSystem.LocationX + (t.InfluenceSphere + 11m) &&
+                    t.StarSystem!.LocationY >= starSystem.LocationY - (t.InfluenceSphere + 11m) && t.StarSystem!.LocationY <= starSystem.LocationY + (t.InfluenceSphere + 11m) &&
+                    t.StarSystem!.LocationZ >= starSystem.LocationZ - (t.InfluenceSphere + 11m) && t.StarSystem!.LocationZ <= starSystem.LocationZ + (t.InfluenceSphere + 11m))
                 .ToListAsync(cancellationToken);
             ThargoidMaelstrom? maelstrom = maelstroms
                 .OrderBy(m => m.StarSystem?.DistanceTo(starSystem) ?? 999)

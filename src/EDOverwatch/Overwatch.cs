@@ -367,7 +367,7 @@ namespace EDOverwatch
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
 
-                StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress);
+                StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress, true);
                 await starSystemThargoidLevelChangedProducer.SendAsync(starSystemThargoidLevelChanged.Message, transaction, cancellationToken);
                 return true;
             }

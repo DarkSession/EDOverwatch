@@ -126,6 +126,7 @@ namespace DCoHTrackerDiscordBot
                                         }
                                         else if ((starSystem.ThargoidLevel.Progress ?? -1) <= progress)
                                         {
+                                            bool changed = false;
                                             if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < progress)
                                             {
                                                 StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress)
@@ -134,6 +135,7 @@ namespace DCoHTrackerDiscordBot
                                                 };
                                                 DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
                                                 starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                                                changed = true;
                                             }
                                             else
                                             {
@@ -149,6 +151,7 @@ namespace DCoHTrackerDiscordBot
                                                     remainingTimeEnd = new DateTimeOffset(remainingTimeEnd.Year, remainingTimeEnd.Month, remainingTimeEnd.Day, 0, 0, 0, TimeSpan.Zero);
                                                     ThargoidCycle thargoidCycle = await DbContext.GetThargoidCycle(remainingTimeEnd, CancellationToken.None);
                                                     starSystem.ThargoidLevel.StateExpires = thargoidCycle;
+                                                    changed = true;
                                                 }
                                             }
                                             if (progress >= 100)
@@ -163,7 +166,7 @@ namespace DCoHTrackerDiscordBot
 
                                             await using IProducer starSystemThargoidLevelChangedProducer = await Connection.CreateProducerAsync(StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing);
 
-                                            StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress);
+                                            StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress, changed);
                                             await starSystemThargoidLevelChangedProducer.SendAsync(starSystemThargoidLevelChanged.Message);
                                         }
                                     }

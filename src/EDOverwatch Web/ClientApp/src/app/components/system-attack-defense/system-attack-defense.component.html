@@ -1,0 +1,88 @@
+<div class="table-container">
+    <div class="subtitle">
+        Nearby systems
+    </div>
+    <div class="table">
+        <table mat-table [dataSource]="nearbySystems" matSort matSortActive="Distance" matSortDirection="asc"
+            matSortDisableClear>
+            <ng-container matColumnDef="Name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <span class="clickable" [routerLink]="['/system', row.StarSystem.SystemAddress]">
+                        {{ row.StarSystem.Name }}
+                    </span>
+                    <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                        (click)="copySystemName(row)"></fa-icon>
+                    <span class="badge badge-yellow"
+                        *ngIf="row.StarSystem.SystemAddress == starSystem.AttackDefense?.RecentAttacker?.SystemAddress"
+                        matTooltip="Recently attacked by this system">
+                        Recent Attacker
+                    </span>
+                    <span class="badge badge-yellow"
+                        *ngIf="row.StarSystem.SystemAddress == starSystem.AttackDefense?.PredictedAttacker?.SystemAddress"
+                        matTooltip="Predicted attack by this system in the next cycle">
+                        Predicted Attacker
+                    </span>
+                    <span class="badge badge-yellow"
+                        *ngIf="row.StarSystem.SystemAddress == starSystem.AttackDefense?.RecentlyAttacked?.SystemAddress"
+                        matTooltip="Recent attack on this system">
+                        Recently Attacked
+                    </span>
+                    <span class="badge badge-yellow"
+                        *ngIf="row.StarSystem.SystemAddress == starSystem.AttackDefense?.PredictedAttack?.SystemAddress"
+                        matTooltip="Predicted attack on this system in the next cycle">
+                        Predicted Attack
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="ThargoidLevel">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <app-thargoid-level [thargoidLevel]="row.StarSystem.ThargoidLevel"></app-thargoid-level>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Distance">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <div class="distance">
+                        {{ row.Distance | number:'0.0-2' }} Ly
+                    </div>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="nearbySystemDisplayedColumns; sticky: true" class="thead">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: nearbySystemDisplayedColumns;"></tr>
+        </table>
+        <div *ngIf="nearbySystems.data.length === 0" class="empty-table">
+            No records found.
+        </div>
+    </div>
+</div>
+<div *ngIf="showEffortEstimates">
+    <div class="subtitle">
+        Effort estimates <span class="badge badge-red">Experimental</span>
+    </div>
+    <div class="table">
+        <table mat-table [dataSource]="warEffortEstimates">
+            <ng-container matColumnDef="Type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    {{ row.type }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Amount">
+                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <span *ngIf="row.amount != null">{{ row.amount | number }} </span>
+                    <span *ngIf="row.amount == null">N/A</span>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="warEffortEstimatesColumns; sticky: true" class="thead">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: warEffortEstimatesColumns;"></tr>
+        </table>
+        <div *ngIf="warEffortEstimates.data.length === 0" class="empty-table">
+            No records found.
+        </div>
+    </div>
+</div>

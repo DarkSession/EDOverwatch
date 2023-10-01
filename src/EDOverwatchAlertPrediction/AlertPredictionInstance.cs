@@ -206,7 +206,7 @@ namespace EDOverwatchAlertPrediction
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ProcessAttack(Attack attack,bool alertPossible, ThargoidMaelstrom maelstrom, StarSystemCycleState? primaryAttacker, EdDbContext dbContext, CancellationToken cancellationToken)
+        private async Task ProcessAttack(Attack attack, bool alertPossible, ThargoidMaelstrom maelstrom, StarSystemCycleState? primaryAttacker, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             EDDatabase.AlertPrediction? systemAlertPrediction = await dbContext.AlertPredictions
                 .AsSingleQuery()

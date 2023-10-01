@@ -5,8 +5,8 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { faClipboard, faCrosshairsSimple } from '@fortawesome/pro-light-svg-icons';
-import { OverwatchStarSystemFull } from '../system-list/system-list.component';
-import { OverwatchStation } from '../station-name/station-name.component';
+import { OverwatchStarSystem, OverwatchStarSystemFull } from '../system-list/system-list.component';
+import { OverwatchStarSystemMin, OverwatchStation } from '../station-name/station-name.component';
 import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
 import { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
@@ -224,7 +224,9 @@ export interface OverwatchStarSystemFullDetail extends OverwatchStarSystemFull {
   WarEffortSources: OverwatchStarSystemWarEffortType[];
   StateHistory: OverwatchStarSystemThargoidLevelHistory[];
   WarEffortSummaries: OverwatchStarSystemWarEffortCycle[];
+  NearbySystems: OverwatchStarSystemNearbySystem[];
   DaysSincePreviousTick: string[];
+  AttackDefense: OverwatchStarSystemAttackDefense;
 }
 
 export interface OverwatchStarSystemWarEffort {
@@ -244,6 +246,11 @@ export interface FactionOperation {
   SystemName: string;
   SystemAddress: number;
   MeetingPoint: string | null;
+}
+
+export interface OverwatchStarSystemNearbySystem {
+  StarSystem: OverwatchStarSystem;
+  Distance: number,
 }
 
 interface OverwatchStarSystemDetailProgress {
@@ -283,4 +290,13 @@ interface OverwatchStarSystemWarEffortCycleEntry {
   SourceId: number;
   TypeGroup: string;
   Amount: number;
+}
+
+export interface OverwatchStarSystemAttackDefense {
+  RecentAttacker: OverwatchStarSystemMin | null;
+  PredictedAttacker: OverwatchStarSystemMin | null;
+  RecentlyAttacked: OverwatchStarSystemMin | null;
+  PredictedAttack: OverwatchStarSystemMin | null;
+  RequirementsTissueSampleTotal: number | null;
+  RequirementsTissueSampleRemaining: number | null;
 }

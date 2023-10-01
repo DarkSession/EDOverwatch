@@ -10,7 +10,7 @@ namespace EDWarProgressRequirementsTest
         [DataRow(20.93d, false, StarSystemThargoidLevelState.Alert, 313)]
         public void TestMethod1(double distance, bool populated, StarSystemThargoidLevelState state, int expectedResult)
         {
-            int? result = EDWarProgressRequirements.WarEfforts.GetRequirements((decimal)distance, populated, state);
+            int? result = EDWarProgressRequirements.WarEfforts.GetRequirementsEstimate((decimal)distance, populated, state);
             Assert.AreEqual(expectedResult, result);
         }
     }

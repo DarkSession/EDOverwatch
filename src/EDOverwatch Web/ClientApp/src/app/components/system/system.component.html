@@ -138,6 +138,9 @@
                 <mat-tab label="Operations ({{ starSystem.FactionOperationDetails.length }})">
                     <app-system-operations [starSystem]="starSystem"></app-system-operations>
                 </mat-tab>
+                <mat-tab label="Nearby systems">
+                    <app-system-attack-defense [starSystem]="starSystem"></app-system-attack-defense>
+                </mat-tab>
                 <mat-tab label="Contributions">
                     <app-system-contributions [starSystem]="starSystem"></app-system-contributions>
                 </mat-tab>

@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
 	<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-	<PackageReference Include="TesseractOCR" Version="5.3.3" />
+	<PackageReference Include="TesseractOCR" Version="5.3.5" />
   </ItemGroup>
 
   <ItemGroup>

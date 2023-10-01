@@ -7,7 +7,7 @@ namespace Messages
     public class StarSystemThargoidManualUpdate
     {
         public const string QueueName = "StarSystem.ThargoidManualUpdate";
-        public const RoutingType Routing = RoutingType.Multicast;
+        public const RoutingType Routing = RoutingType.Anycast;
 
         public long SystemAddress { get; set; }
         public string? SystemName { get; set; }

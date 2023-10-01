@@ -89,6 +89,7 @@ namespace EDOverwatch_Web.Controllers.V1
                 }
                 if (starSystem.ThargoidLevel.State == model.SystemState && ((starSystem.ThargoidLevel.Progress ?? -1) <= model.Progress))
                 {
+                    bool changed = false;
                     if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < model.Progress)
                     {
                         StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, model.Progress)
@@ -97,6 +98,7 @@ namespace EDOverwatch_Web.Controllers.V1
                         };
                         DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
                         starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
+                        changed = true;
                     }
                     else
                     {
@@ -113,6 +115,7 @@ namespace EDOverwatch_Web.Controllers.V1
                             remainingTimeEnd = new DateTimeOffset(remainingTimeEnd.Year, remainingTimeEnd.Month, remainingTimeEnd.Day, 0, 0, 0, TimeSpan.Zero);
                             ThargoidCycle thargoidCycle = await DbContext.GetThargoidCycle(remainingTimeEnd, CancellationToken.None);
                             starSystem.ThargoidLevel.StateExpires = thargoidCycle;
+                            changed = true;
                         }
                     }
                     if (model.Progress >= 100)
@@ -125,7 +128,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     }
                     await DbContext.SaveChangesAsync(cancellationToken);
 
-                    StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress);
+                    StarSystemThargoidLevelChanged starSystemThargoidLevelChanged = new(starSystem.SystemAddress, changed);
                     await Producer.SendAsync(StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing, starSystemThargoidLevelChanged.Message, cancellationToken);
                 }
                 return Ok();

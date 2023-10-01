@@ -6,13 +6,15 @@ namespace Messages
     public class StarSystemThargoidLevelChanged
     {
         public const string QueueName = "StarSystem.ThargoidLevelChanged";
-        public const RoutingType Routing = RoutingType.Anycast;
+        public const RoutingType Routing = RoutingType.Multicast;
 
         public long SystemAddress { get; set; }
+        public bool Changed { get; set; }
 
-        public StarSystemThargoidLevelChanged(long systemAddress)
+        public StarSystemThargoidLevelChanged(long systemAddress, bool changed)
         {
             SystemAddress = systemAddress;
+            Changed = changed;
         }
 
         [JsonIgnore]

@@ -1,0 +1,21 @@
+.thead {
+    background-color: #272727;
+}
+
+.badge-yellow {
+    color: #1c1c1c;
+    background-color: rgb(241, 194, 50);
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.badge-red {
+    background-color: rgb(106, 0, 0);
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.distance {
+    text-align: right;
+    width: 75px;
+}

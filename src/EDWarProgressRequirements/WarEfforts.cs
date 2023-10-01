@@ -6,25 +6,31 @@ namespace EDWarProgressRequirements
     {
         private static List<WarEffortRequirement> TissueRequirements { get; } = new()
         {
+            new(StarSystemThargoidLevelState.Alert, 10, false, 3080),
             new(StarSystemThargoidLevelState.Alert, 15, false, 1390),
-            new(StarSystemThargoidLevelState.Controlled, 5, false, 116280),
-            new(StarSystemThargoidLevelState.Controlled, 10, false, 11850),
+            new(StarSystemThargoidLevelState.Alert, 20, false, 350),
+            new(StarSystemThargoidLevelState.Alert, 25, false, 310),
+            new(StarSystemThargoidLevelState.Alert, 30, false, 310),
+            new(StarSystemThargoidLevelState.Alert, 35, false, 310),
+            new(StarSystemThargoidLevelState.Alert, 40, false, 310),
+            new(StarSystemThargoidLevelState.Controlled, 5, false, 116_280),
+            new(StarSystemThargoidLevelState.Controlled, 10, false, 11_850),
             new(StarSystemThargoidLevelState.Controlled, 15, false, 3100),
             new(StarSystemThargoidLevelState.Controlled, 20, false, 1080),
             new(StarSystemThargoidLevelState.Controlled, 25, false, 460),
             new(StarSystemThargoidLevelState.Controlled, 30, false, 305),
             new(StarSystemThargoidLevelState.Controlled, 35, false, 300),
             new(StarSystemThargoidLevelState.Controlled, 40, false, 300),
-            new(StarSystemThargoidLevelState.Controlled, 5, true, 120000),
-            new(StarSystemThargoidLevelState.Controlled, 10, true, 58970),
-            new(StarSystemThargoidLevelState.Controlled, 15, true, 15500),
+            new(StarSystemThargoidLevelState.Controlled, 5, true, 120_000),
+            new(StarSystemThargoidLevelState.Controlled, 10, true, 59_000),
+            new(StarSystemThargoidLevelState.Controlled, 15, true, 15_500),
             new(StarSystemThargoidLevelState.Controlled, 20, true, 4630),
             new(StarSystemThargoidLevelState.Controlled, 25, true, 1540),
             new(StarSystemThargoidLevelState.Controlled, 30, true, 1505),
             new(StarSystemThargoidLevelState.Controlled, 35, true, 1470),
         };
 
-        public static int? GetRequirements(decimal distanceToMaelstrom, bool wasPopulated, StarSystemThargoidLevelState state)
+        public static int? GetRequirementsEstimate(decimal distanceToMaelstrom, bool wasPopulated, StarSystemThargoidLevelState state)
         {
             int lower5Ly = (int)Math.Round(Math.Floor(distanceToMaelstrom / 5m) * 5m);
             int upper5Ly = lower5Ly + 5;
