@@ -37,9 +37,12 @@ namespace EDDataProcessor.EDDN
                 {
                     try
                     {
+                        Log.LogInformation("EDDNProcessor: Waiting for message...");
                         Message message = await consumer.ReceiveAsync(cancellationToken);
+                        Log.LogInformation("EDDNProcessor: Message received");
                         await using Transaction transaction = new();
                         await consumer.AcceptAsync(message, transaction, cancellationToken);
+                        Log.LogInformation("EDDNProcessor: Message accepted");
                         string jsonString = message.GetBody<string>();
                         JObject json = JObject.Parse(jsonString);
                         if (json.TryGetValue("$schemaRef", out JToken? schemaRef) &&
@@ -57,21 +60,23 @@ namespace EDDataProcessor.EDDN
                                 await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
                                 continue;
                             }
-                            Log.LogDebug("Received EDDN message");
+                            Log.LogDebug("EDDNProcessor: Processing EDDN message");
                             await eddnEvent.ProcessEvent(dbContext, anonymousProducer, transaction, cancellationToken);
                         }
                         else
                         {
-                            Log.LogWarning("Received EDDN message with an invalid/known schema.");
+                            Log.LogWarning("EDDNProcessor: Received EDDN message with an invalid/known schema.");
                         }
                         await transaction.CommitAsync(cancellationToken);
                     }
                     catch (Exception e)
                     {
-                        Log.LogError(e, "Processing message exception");
+                        Log.LogError(e, "EDDNProcessor: Processing message exception");
                         await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
                     }
                 }
+
+                Log.LogInformation("EDDNProcessor: End of while.");
             }
             catch (Exception e)
             {
