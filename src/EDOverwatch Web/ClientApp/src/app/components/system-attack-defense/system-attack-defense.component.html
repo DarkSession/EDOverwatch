@@ -38,7 +38,17 @@
             <ng-container matColumnDef="ThargoidLevel">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
                 <td mat-cell *matCellDef="let row" class="nowrap">
-                    <app-thargoid-level [thargoidLevel]="row.StarSystem.ThargoidLevel"></app-thargoid-level>
+                    <div class="state-cell">
+                        <app-thargoid-level [thargoidLevel]="row.StarSystem.ThargoidLevel"></app-thargoid-level>
+                        <span *ngIf="row.StarSystem.StateProgress.ProgressPercent != null">
+                            ({{ row.StarSystem.StateProgress.ProgressPercent | percent }})
+                        </span>
+                        <span class="progress-locked" *ngIf="row.StarSystem.BarnacleMatrixInSystem">
+                            <fa-icon [icon]="faHexagonExclamation"
+                                matTooltip="Barnacle matrix present in the system. Normal progression is not possible."
+                                size="lg"></fa-icon>
+                        </span>
+                    </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Distance">

@@ -66,8 +66,9 @@
                                 <fa-icon [icon]="faCircleCheck" matTooltip="Completed"></fa-icon>
                             </div>
                             <div class="progress-locked" *ngIf="row.BarnacleMatrixInSystem">
-                                <fa-icon [icon]="faLock"
-                                    matTooltip="Barnacle matrix present in the system. Progress is locked."></fa-icon>
+                                <fa-icon [icon]="faHexagonExclamation"
+                                    matTooltip="Barnacle matrix present in the system. Normal progression is not possible."
+                                    size="lg"></fa-icon>
                             </div>
                         </div>
                     </div>

@@ -2,9 +2,8 @@ import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, ViewChil
 import { CommanderWarEffortCycleStarSystem, CommanderWarEffortCycleStarSystemWarEffort, WarEffortTypeGroup } from '../my-efforts/my-efforts.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition, faTruckRampBox } from '@fortawesome/pro-duotone-svg-icons';
-import { faCrosshairs, faHandshake } from '@fortawesome/pro-light-svg-icons';
+import { faCrosshairs, faHandshake, faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
 import { faTruck, faKitMedical } from '@fortawesome/pro-duotone-svg-icons';
 
 @Component({
@@ -13,7 +12,7 @@ import { faTruck, faKitMedical } from '@fortawesome/pro-duotone-svg-icons';
   styleUrls: ['./my-efforts-cycle-system.component.css']
 })
 export class MyEffortsCycleSystemComponent implements OnChanges, AfterViewInit {
-  public readonly faLock = faLock;
+  public readonly faHexagonExclamation = faHexagonExclamation;
   public detailDisplayedColumns = ["Date", "Type", "Amount"];
   @Input() warEffortCycleStarSystem: CommanderWarEffortCycleStarSystem | null = null;
   @ViewChild(MatSort) detailSort!: MatSort;

@@ -1,6 +1,7 @@
 ﻿namespace EDDatabase
 {
     [Table("ThargoidMaelstrom")]
+    [Index(nameof(Name))]
     public class ThargoidMaelstrom
     {
         [Column]

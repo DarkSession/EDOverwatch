@@ -8,7 +8,7 @@ import { ExportToCsv, Options } from 'export-to-csv';
 import { AppService } from 'src/app/services/app.service';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
+import { faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -18,7 +18,7 @@ import { faLock } from '@fortawesome/free-solid-svg-icons';
 })
 export class CommanderFcCargoComponent implements OnInit {
   public readonly faFileCsv = faFileCsv;
-  public readonly faLock = faLock;
+  public readonly faHexagonExclamation = faHexagonExclamation;
   public pageSize: number = 50;
   public displayedColumns = ['Commodity', 'SystemName', 'SystemState', 'Quantity', 'StackNumber', 'Changed'];
   public loading = false;

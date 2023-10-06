@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnInit, 
 import { OverwatchStarSystemFullDetail, OverwatchStarSystemNearbySystem } from '../system/system.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { faClipboard } from '@fortawesome/pro-light-svg-icons';
+import { faClipboard, faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppService } from 'src/app/services/app.service';
 
@@ -13,6 +13,7 @@ import { AppService } from 'src/app/services/app.service';
 })
 export class SystemAttackDefenseComponent implements OnChanges, AfterViewInit, OnInit {
   public readonly faClipboard = faClipboard;
+  public readonly faHexagonExclamation = faHexagonExclamation;
   @Input() starSystem!: OverwatchStarSystemFullDetail;
   @ViewChild(MatSort) sort!: MatSort;
   public nearbySystems: MatTableDataSource<OverwatchStarSystemNearbySystem> = new MatTableDataSource<OverwatchStarSystemNearbySystem>();

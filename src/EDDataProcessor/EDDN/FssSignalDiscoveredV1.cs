@@ -118,7 +118,7 @@ namespace EDDataProcessor.EDDN
                         else if (thargoidMaelstrom.Updated < Message.Timestamp)
                         {
                             thargoidMaelstrom.Updated = Message.Timestamp;
-                            if (thargoidMaelstrom.StarSystem?.Id != starSystem.Id)
+                            if (thargoidMaelstrom.StarSystem?.Id != starSystem!.Id)
                             {
                                 thargoidMaelstrom.StarSystem = starSystem;
                             }

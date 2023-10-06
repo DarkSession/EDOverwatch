@@ -51,8 +51,9 @@
                                 ({{ row.StarSystem.StateProgress.ProgressPercent | percent }})
                             </span>
                             <span class="progress-locked" *ngIf="row.StarSystem.BarnacleMatrixInSystem">
-                                <fa-icon [icon]="faLock"
-                                    matTooltip="Barnacle matrix present in the system. Progress is locked."></fa-icon>
+                                <fa-icon [icon]="faHexagonExclamation"
+                                    matTooltip="Barnacle matrix present in the system. Normal progression is not possible."
+                                    size="lg"></fa-icon>
                             </span>
                         </div>
                     </td>

@@ -140,7 +140,6 @@ export class WebsocketService {
         }
         webSocketUrl += "/ws";
         this.webSocket = new WebSocket(webSocketUrl);
-        this.connectionStatusChanged();
         this.webSocket.onopen = () => {
             if (!environment.production) {
                 console.log("WebSocket.onopen");
@@ -175,6 +174,7 @@ export class WebsocketService {
             const message: WebSocketResponseMessage = JSON.parse(event.data);
             this.processMessage(message, false);
         };
+        this.connectionStatusChanged();
     }
 
     private failCallbacks(): void {

@@ -4,14 +4,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { faClipboard, faCrosshairsSimple } from '@fortawesome/pro-light-svg-icons';
+import { faClipboard, faCrosshairsSimple, faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
 import { OverwatchStarSystem, OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchStarSystemMin, OverwatchStation } from '../station-name/station-name.component';
 import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
 import { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { Context } from 'chartjs-plugin-datalabels';
-import { faBolt, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faBolt } from '@fortawesome/free-solid-svg-icons';
 import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
@@ -24,7 +24,7 @@ import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 export class SystemComponent implements OnInit {
   public readonly faClipboard = faClipboard;
   public readonly faBolt = faBolt;
-  public readonly faLock = faLock;
+  public readonly faHexagonExclamation = faHexagonExclamation;
   public readonly faCrosshairs = faCrosshairs;
   public readonly faCrosshairsSimple = faCrosshairsSimple;
   public starSystem: OverwatchStarSystemFullDetail | null = null;

@@ -3,6 +3,7 @@
     [Table("Station")]
     [Index(nameof(MarketId))]
     [Index(nameof(IsRescueShip))]
+    [Index(nameof(Name))]
     public class Station
     {
         [Column]
