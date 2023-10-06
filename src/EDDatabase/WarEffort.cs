@@ -81,6 +81,7 @@ namespace EDDatabase
             { WarEffortType.TissueSampleTitan, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleTitanMaw, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.ProtectiveMembraneScrap, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.ThargoidBiostorageCapsule, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.KillThargoidHunter, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidRevenant, WarEffortTypeGroup.Kills },
             { WarEffortType.MissionCompletionThargoidControlledSettlementReboot, WarEffortTypeGroup.Mission },
@@ -178,6 +179,9 @@ namespace EDDatabase
 
         [EnumMember(Value = "Protective membrane scrap collection")]
         ProtectiveMembraneScrap,
+
+        [EnumMember(Value = "Thargoid Bio-storage Capsule collection")]
+        ThargoidBiostorageCapsule,
     }
 
     public enum WarEffortTypeGroup : byte

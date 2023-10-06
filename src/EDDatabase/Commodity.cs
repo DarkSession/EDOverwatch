@@ -31,29 +31,5 @@
             }
             return commodity;
         }
-
-        /*
-        public static List<string> ThargoidWarRelatedCommodities { get; } = new()
-        {
-            "UnknownArtifact2",
-            "ThargoidTissueSampleType1 ",
-            "ThargoidTissueSampleType2",
-            "ThargoidTissueSampleType3",
-            "ThargoidTissueSampleType4",
-            "ThargoidTissueSampleType5",
-            "ThargoidScoutTissueSample",
-            "USSCargoBlackBox",
-            "OccupiedCryoPod",
-            "DamagedEscapePod",
-            "WreckageComponents",
-            "ThargoidTissueSampleType6",
-            "ThargoidTissueSampleType9a",
-            "ThargoidTissueSampleType9b",
-            "ThargoidTissueSampleType9c",
-            "ThargoidTissueSampleType10a",
-            "ThargoidTissueSampleType10b",
-            "ThargoidTissueSampleType10c",
-        };
-        */
     }
 }
