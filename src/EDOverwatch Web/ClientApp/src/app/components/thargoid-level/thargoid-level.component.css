@@ -4,12 +4,12 @@
     background-color: #bbb;
     border-radius: 50%;
     display: inline-block;
-    margin-right: 5px;
 }
 
 .thargoid-level {
     display: flex;
     align-items: center;
+    gap: 4px;
 }
 
 .thargoid-clear {
@@ -34,4 +34,8 @@
 
 .thargoid-recovery {
     background-color: rgb(159, 27, 255);
+}
+
+.thargoid-level-vertical {
+    flex-direction: column;
 }

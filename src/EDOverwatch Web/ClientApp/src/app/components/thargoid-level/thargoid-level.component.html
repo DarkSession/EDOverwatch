@@ -1,4 +1,6 @@
-<div class="thargoid-level" *ngIf="thargoidLevel">
+<div class="thargoid-level" *ngIf="thargoidLevel" [ngClass]="{
+    'thargoid-level-vertical': vertical
+}">
     <span class="dot" [ngClass]="dotClass" [ngStyle]="{
         'width.px': size,
         'height.px': size

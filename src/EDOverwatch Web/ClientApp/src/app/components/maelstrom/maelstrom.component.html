@@ -30,7 +30,7 @@
                 </mat-tab>
                 <mat-tab label="Affected systems">
                     <ng-template matTabContent>
-                        <app-system-list [systems]="maelstrom.Systems"></app-system-list>
+                        <app-system-list [systems]="maelstrom.Systems" [optionalColumns]="['DistanceToMaelstrom']"></app-system-list>
                     </ng-template>
                 </mat-tab>
                 <mat-tab label="Alert predictions">

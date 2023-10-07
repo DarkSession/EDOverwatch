@@ -21,7 +21,6 @@
 .systems-filter {
     padding-bottom: 12px;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
     flex-wrap: wrap;
 
@@ -71,5 +70,115 @@ mat-form-field {
 
     div {
         padding: 4px;
+    }
+}
+
+.custom-fieldset {
+    border: 1px solid var(--mdc-outlined-text-field-outline-color);
+    margin: 12px;
+    margin-top: -8px;
+    margin-bottom: 12px;
+    padding: 7px 16px 16px 16px;
+    border-radius: 4px;
+    font-family: var(--mdc-outlined-text-field-label-text-font);
+    overflow-y: auto;
+    max-width: calc(100vw - 64px);
+
+    legend {
+        float: unset;
+        width: unset;
+        padding: unset;
+        margin: unset;
+        font-size: var(--mat-form-field-outlined-label-text-populated-size);
+        color: var(--mdc-outlined-text-field-label-text-color);
+        font-weight: var(--mdc-outlined-text-field-label-text-weight);
+        transform: scale(var(--mat-mdc-form-field-floating-label-scale, 0.75));
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+.feature-box {
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.features {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    height: 100%;
+    justify-content: center;
+}
+
+.multi-icon {
+    position: relative;
+    width: 20px;
+    height: 20px;
+
+    img,
+    div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    img {
+        opacity: 0.5;
+    }
+}
+
+.icon-red {
+    color: red;
+}
+
+.content-inactive {
+    opacity: 0.3;
+}
+
+div.thargoid-states {
+    display: flex;
+    gap: 8px;
+
+    div.state {
+        border: 1px solid rgba(255, 239, 223, 0.4);
+        min-width: 60px;
+        min-height: 60px;
+        padding: 4px;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+div.thargoid-titans {
+    display: flex;
+    gap: 8px;
+
+    div.titan {
+        border: 1px solid rgba(255, 239, 223, 0.4);
+        min-width: 60px;
+        min-height: 60px;
+        padding: 4px;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 }

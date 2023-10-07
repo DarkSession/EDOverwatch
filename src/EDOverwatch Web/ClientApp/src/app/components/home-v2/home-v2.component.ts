@@ -8,6 +8,8 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
 import { OverwatchStarSystemFull, SystemListComponent } from '../system-list/system-list.component';
 import { AppService } from 'src/app/services/app.service';
 import { faFilters, faCircleXmark, faGears } from '@fortawesome/pro-duotone-svg-icons';
+import { faBolt } from '@fortawesome/free-solid-svg-icons';
+import { faCrosshairs, faCrosshairsSimple } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -21,6 +23,9 @@ export class HomeV2Component implements OnInit, AfterViewInit {
   public readonly faCircleXmark = faCircleXmark;
   public readonly OverviewDataStatus = OverviewDataStatus;
   public readonly faGears = faGears;
+  public readonly faBolt = faBolt;
+  public readonly faCrosshairs = faCrosshairs;
+  public readonly faCrosshairsSimple = faCrosshairsSimple;
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
   public hideUnpopulated: boolean = false;
   public hideCompleted: boolean = false;
@@ -145,7 +150,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       this.maelstromsSelected = maelstromsSelected.map(maelstromName => this.maelstroms.find(m => m.Name === maelstromName) as OverwatchMaelstrom);
     }
     else {
-      this.maelstromsSelected = data.Maelstroms;
+      this.maelstromsSelected = [...data.Maelstroms];
     }
 
     this.thargoidLevels = data.Levels;
@@ -155,7 +160,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       this.thargoidLevelsSelected = thargoidLevelsSelected.map(thargoidLevel => this.thargoidLevels.find(t => t.Name === thargoidLevel) as OverwatchThargoidLevel);
     }
     else {
-      this.thargoidLevelsSelected = data.Levels;
+      this.thargoidLevelsSelected = [...data.Levels];
     }
     this.hideUnpopulated = (await this.appService.getSetting("SystemListHideUnpopulated")) == "1";
     this.hideCompleted = (await this.appService.getSetting("SystemListHideCompleted")) == "1";
@@ -168,6 +173,67 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       this.featuresSelected = systemListFeatures.split(",");
     }
     this.changeDetectorRef.markForCheck();
+  }
+
+  public async toggleFeature(feature: string): Promise<void> {
+    if (this.featuresSelected.includes(feature) && this.featuresSelected.length === 1) {
+      for (const f of this.features) {
+        if (!this.featuresSelected.includes(f.key)) {
+          this.featuresSelected.push(f.key);
+        }
+      }
+    }
+    else {
+      if (this.featuresSelected.length) {
+        this.featuresSelected.splice(0, this.featuresSelected.length);
+      }
+      this.featuresSelected.push(feature);
+    }
+    this.settingChanged();
+  }
+
+  public async toggleThargoidLevel(thargoidLevel: OverwatchThargoidLevel): Promise<void> {
+    if (this.thargoidLevelsSelected.length == this.thargoidLevels.length) {
+      this.thargoidLevelsSelected.splice(0, this.thargoidLevelsSelected.length);
+      this.thargoidLevelsSelected.push(thargoidLevel);
+    }
+    else {
+      const index = this.thargoidLevelsSelected.findIndex(t => t == thargoidLevel)
+      if (index !== -1) {
+        this.thargoidLevelsSelected.splice(index, 1);
+        if (this.thargoidLevelsSelected.length === 0) {
+          for (const level of this.thargoidLevels) {
+            this.thargoidLevelsSelected.push(level);
+          }
+        }
+      }
+      else {
+        this.thargoidLevelsSelected.push(thargoidLevel);
+      }
+    }
+    this.settingChanged();
+  }
+
+  public async toggleThargoidTitan(titan: OverwatchMaelstrom): Promise<void> {
+    if (this.maelstromsSelected.length === this.maelstroms.length) {
+      this.maelstromsSelected.splice(0, this.maelstromsSelected.length);
+      this.maelstromsSelected.push(titan);
+    }
+    else {
+      const index = this.maelstromsSelected.findIndex(m => m == titan)
+      if (index !== -1) {
+        this.maelstromsSelected.splice(index, 1);
+        if (this.maelstromsSelected.length === 0) {
+          for (const maelstrom of this.maelstroms) {
+            this.maelstromsSelected.push(maelstrom);
+          }
+        }
+      }
+      else {
+        this.maelstromsSelected.push(titan);
+      }
+    }
+    this.settingChanged();
   }
 
   public async settingChanged(): Promise<void> {
