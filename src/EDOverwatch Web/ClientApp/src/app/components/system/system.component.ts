@@ -299,4 +299,6 @@ export interface OverwatchStarSystemAttackDefense {
   PredictedAttack: OverwatchStarSystemMin | null;
   RequirementsTissueSampleTotal: number | null;
   RequirementsTissueSampleRemaining: number | null;
+  RequirementsTitanPodsTotal: number | null;
+  RequirementsTitanPodsRemaining: number | null;
 }

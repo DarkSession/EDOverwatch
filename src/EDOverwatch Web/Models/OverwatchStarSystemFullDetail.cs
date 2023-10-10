@@ -61,12 +61,20 @@ namespace EDOverwatch_Web.Models
             {
                 int? requirementsTissueSampleTotal = EDWarProgressRequirements.WarEfforts.GetRequirementsEstimate((decimal)DistanceToMaelstrom, PopulationOriginal > 0, ThargoidLevel.Level);
                 int? requirementsTissueSampleRemaining = requirementsTissueSampleTotal;
+                int? titanPodsTotal = null;
+                int? titanPodsRemaining = null;
                 if (requirementsTissueSampleTotal is int samplesNeedTotal && StateProgress.ProgressPercent is decimal progress)
                 {
                     decimal remaining = 1m - progress;
                     requirementsTissueSampleRemaining = (int)Math.Ceiling((decimal)samplesNeedTotal * remaining);
+
+                    if (ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled)
+                    {
+                        titanPodsTotal = samplesNeedTotal * 5;
+                        titanPodsRemaining = requirementsTissueSampleRemaining * 5;
+                    }
                 }
-                AttackDefense = new(recentAttacker, predictedAttacker, recentlyAttacked, predictedAttack, requirementsTissueSampleTotal, requirementsTissueSampleRemaining);
+                AttackDefense = new(recentAttacker, predictedAttacker, recentlyAttacked, predictedAttack, requirementsTissueSampleTotal, requirementsTissueSampleRemaining, titanPodsTotal, titanPodsRemaining);
             }
         }
 
@@ -386,8 +394,10 @@ namespace EDOverwatch_Web.Models
         public OverwatchStarSystemMin? PredictedAttack { get; }
         public int? RequirementsTissueSampleTotal { get; }
         public int? RequirementsTissueSampleRemaining { get; }
+        public int? RequirementsTitanPodsTotal { get; }
+        public int? RequirementsTitanPodsRemaining { get; }
 
-        public OverwatchStarSystemAttackDefense(StarSystem? recentAttacker, StarSystem? predictedAttacker, StarSystem? recentlyAttacked, StarSystem? predictedAttack, int? requirementsTissueSampleTotal, int? requirementsTissueSampleRemaining)
+        public OverwatchStarSystemAttackDefense(StarSystem? recentAttacker, StarSystem? predictedAttacker, StarSystem? recentlyAttacked, StarSystem? predictedAttack, int? requirementsTissueSampleTotal, int? requirementsTissueSampleRemaining, int? requirementsTitanPodsTotal, int? requirementsTitanPodsRemaining)
         {
             if (recentAttacker != null)
             {
@@ -407,6 +417,8 @@ namespace EDOverwatch_Web.Models
             }
             RequirementsTissueSampleTotal = requirementsTissueSampleTotal;
             RequirementsTissueSampleRemaining = requirementsTissueSampleRemaining;
+            RequirementsTitanPodsTotal = requirementsTitanPodsTotal;
+            RequirementsTitanPodsRemaining = requirementsTitanPodsRemaining;
         }
     }
 

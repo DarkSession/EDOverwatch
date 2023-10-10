@@ -63,9 +63,16 @@ export class SystemAttackDefenseComponent implements OnChanges, AfterViewInit, O
         type: "Scout/interceptor tissue samples (total)",
         amount: this.starSystem.AttackDefense.RequirementsTissueSampleTotal,
       });
+      estimates.push({
+        type: "Thargoid Bio-storage Capsule (remaining)",
+        amount: this.starSystem.AttackDefense.RequirementsTitanPodsRemaining,
+      });
+      estimates.push({
+        type: "Thargoid Bio-storage Capsule (total)",
+        amount: this.starSystem.AttackDefense.RequirementsTitanPodsTotal,
+      });
     }
     this.warEffortEstimates = new MatTableDataSource<WarEffortEstimateRow>(estimates);
-    console.log(this.warEffortEstimates);
   }
 
   public ngAfterViewInit(): void {
