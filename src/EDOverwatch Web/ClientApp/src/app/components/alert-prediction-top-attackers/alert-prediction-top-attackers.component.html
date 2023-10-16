@@ -12,8 +12,8 @@
                         <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
                             (click)="copySystemName(row)"></fa-icon>
                     </span>
-                    <ng-container *ngIf="row.StarSystem.BarnacleMatrixInSystem">
-                        <span matTooltip="Barnacle matrix present in the system. Progress is locked.">
+                    <ng-container *ngIf="row.StarSystem.ThargoidSpireSiteInSystem">
+                        <span matTooltip="Thargoid spire site present in the system.">
                             <img class="feature-icon" src="assets/barnacles_logo.svg" />
                         </span>
                     </ng-container>

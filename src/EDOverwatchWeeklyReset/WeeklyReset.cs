@@ -51,7 +51,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Controlled,
                         _ => StarSystemThargoidLevelState.None,
                     };
-                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, oldThargoidLevel.IsInvisibleState)
+                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, oldThargoidLevel.IsInvisibleState, false)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,
@@ -99,7 +99,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Controlled when starSystem.OriginalPopulation > 0 => StarSystemThargoidLevelState.Recovery,
                         _ => StarSystemThargoidLevelState.None,
                     };
-                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false)
+                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false, false)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,

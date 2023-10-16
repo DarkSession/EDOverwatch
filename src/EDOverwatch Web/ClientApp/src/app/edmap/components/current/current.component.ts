@@ -66,8 +66,8 @@ export class CurrentComponent implements OnInit, AfterViewInit {
         name: "Unknown Site",
         color: "2E4840"
       },
-      "Barnacle Matrix": {
-        name: "Barnacle Matrix",
+      "Thargoid Spire Site": {
+        name: "Thargoid Spire Site",
         color: "d3f8d3"
       },
     },
@@ -92,7 +92,7 @@ export class CurrentComponent implements OnInit, AfterViewInit {
       },
     },
   }
-  private readonly defaultActiveCategories = ["20", "30", "40", "50", "70", "Barnacle Matrix"];
+  private readonly defaultActiveCategories = ["20", "30", "40", "50", "70", "Thargoid Spire Site"];
   private systems: OverwatchStarSystemFull[] = [];
 
   public constructor(
@@ -147,8 +147,8 @@ export class CurrentComponent implements OnInit, AfterViewInit {
           description += `<b>Time remaining</b>: ${dateAgoPipe.transform(data.StateExpiration.StateExpires)}<br>`;
         }
         const categories = [];
-        if (data.BarnacleMatrixInSystem) {
-          categories.push("Barnacle Matrix");
+        if (data.ThargoidSpireSiteInSystem) {
+          categories.push("Thargoid Spire Site");
         }
         categories.push(data.ThargoidLevel.Level.toString());
         const poiSite = {

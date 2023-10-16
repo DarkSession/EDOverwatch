@@ -184,6 +184,7 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.KillThargoidOrthrus,
                     WarEffortType.KillThargoidHunter,
                     WarEffortType.KillThargoidRevenant,
+                    WarEffortType.KillThargoidBanshee,
                 };
 
                 List<WarEffortType> warEffortTypeMissions = new()

@@ -177,7 +177,7 @@ export class SystemsHistoricalCycleComponent implements OnInit {
         StateExpires: system.StateExpires ?? "",
         Progress: system.Progress ?? 0,
         ProgressIsCompleted: system.ProgressIsCompleted,
-        BarnacleMatrixInSystem: system.BarnacleMatrixInSystem,
+        ThargoidSpireSiteInSystem: system.ThargoidSpireSiteInSystem,
       });
     }
 
@@ -275,7 +275,7 @@ interface OverwatchStarSystemsHistoricalSystem {
   State: string;
   PopulationOriginal: number;
   DistanceToMaelstrom: number;
-  BarnacleMatrixInSystem: boolean;
+  ThargoidSpireSiteInSystem: boolean;
   Progress: number | null;
   ProgressIsCompleted: boolean;
   StateExpires: string | null;

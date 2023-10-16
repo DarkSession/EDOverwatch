@@ -7,7 +7,9 @@
         public string State { get; }
         public long PopulationOriginal { get; }
         public double DistanceToMaelstrom { get; }
+        [Obsolete]
         public bool BarnacleMatrixInSystem { get; }
+        public bool ThargoidSpireSiteInSystem { get; }
         public int? Progress { get; }
         public bool ProgressIsCompleted { get; }
         public DateTimeOffset? StateExpires { get; }
@@ -21,7 +23,10 @@
             }
 
             PopulationOriginal = starSystem.OriginalPopulation;
+#pragma warning disable CS0612 // Type or member is obsolete
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
+#pragma warning restore CS0612 // Type or member is obsolete
+            ThargoidSpireSiteInSystem = starSystem.BarnacleMatrixInSystem;
 
             try
             {

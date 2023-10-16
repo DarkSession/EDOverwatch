@@ -88,7 +88,8 @@ namespace EDOverwatch_Web.Controllers.V1
                             string.Empty,
                             string.Empty,
                             string.Empty,
-                            CommanderFleetHasFleetCarrier.Unknown)
+                            CommanderFleetHasFleetCarrier.Unknown,
+                            CommanderPermissions.Default)
                 {
                     User = user
                 };
@@ -151,7 +152,8 @@ namespace EDOverwatch_Web.Controllers.V1
                             oAuthenticationResult.Credentials.AccessToken,
                             oAuthenticationResult.Credentials.RefreshToken,
                             oAuthenticationResult.Credentials.TokenType,
-                            CommanderFleetHasFleetCarrier.Unknown)
+                            CommanderFleetHasFleetCarrier.Unknown,
+                            CommanderPermissions.Default)
                         {
                             User = user
                         };

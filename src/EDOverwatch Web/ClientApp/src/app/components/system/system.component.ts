@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { faClipboard, faCrosshairsSimple, faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
+import { faArrowRightToArc, faClipboard, faCrosshairsSimple, faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
 import { OverwatchStarSystem, OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchStarSystemMin, OverwatchStation } from '../station-name/station-name.component';
 import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
@@ -13,6 +13,7 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
 import { Context } from 'chartjs-plugin-datalabels';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
 import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
+import { AppService } from 'src/app/services/app.service';
 
 @UntilDestroy()
 @Component({
@@ -27,18 +28,23 @@ export class SystemComponent implements OnInit {
   public readonly faHexagonExclamation = faHexagonExclamation;
   public readonly faCrosshairs = faCrosshairs;
   public readonly faCrosshairsSimple = faCrosshairsSimple;
+  public readonly faArrowRightToArc = faArrowRightToArc;
   public starSystem: OverwatchStarSystemFullDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [],
     labels: [],
   };
-  public barnacleMatrix = false;
+  public thargoidSpires = false;
   public odysseySettlement = false;
   public federation = false;
   public empire = false;
   public thargoidControlledReactivationMissions = false;
   public aXConflictZones = false;
   public groundPortAXCZ = false;
+  public counterstrike = false;
+
+  public editSaving = false;
+  public editCounterstrike : boolean | null = null;
 
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
@@ -92,7 +98,8 @@ export class SystemComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly websocketService: WebsocketService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly matSnackBar: MatSnackBar
+    private readonly matSnackBar: MatSnackBar,
+    public readonly appService: AppService
   ) {
   }
 
@@ -107,6 +114,9 @@ export class SystemComponent implements OnInit {
           });
         }
       });
+    this.appService.onEditPermissionsChanged.subscribe(() => {
+      this.changeDetectorRef.markForCheck();
+    });
     this.websocketService.on<OverwatchStarSystemFullDetail>("OverwatchSystem")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
@@ -186,13 +196,17 @@ export class SystemComponent implements OnInit {
             this.lineChartOptions!.animation = false;
           }
 
-          this.barnacleMatrix = this.starSystem?.Features?.includes("BarnacleMatrix") ?? false;
+          this.thargoidSpires = this.starSystem?.Features?.includes("ThargoidSpires") ?? false;
           this.odysseySettlement = this.starSystem?.Features?.includes("OdysseySettlements") ?? false;
           this.federation = this.starSystem?.Features?.includes("FederalFaction") ?? false;
           this.empire = this.starSystem?.Features?.includes("ImperialFaction") ?? false;
           this.thargoidControlledReactivationMissions = this.starSystem?.Features?.includes("ThargoidControlledReactivationMissions") ?? false;
           this.aXConflictZones = this.starSystem?.Features?.includes("AXConflictZones") ?? false;
           this.groundPortAXCZ = this.starSystem?.Features?.includes("GroundPortAXCZ") ?? false;
+          this.counterstrike = this.starSystem?.Features?.includes("Counterstrike") ?? false;
+          if (this.editCounterstrike === null) {
+            this.editCounterstrike = this.counterstrike;
+          }
           this.changeDetectorRef.markForCheck();
           this.chartLoaded = true;
         }
@@ -211,6 +225,20 @@ export class SystemComponent implements OnInit {
 
   public encodeUrlPart(part: string): string {
     return encodeURIComponent(part);
+  }
+
+  public async saveSystem(): Promise<void> {
+    if (!this.starSystem || !this.appService.editPermissions || this.editSaving) {
+      return;
+    }
+    this.editSaving = true;
+    this.changeDetectorRef.markForCheck();
+    await this.websocketService.sendMessageAndWaitForResponse("AdminSystemUpdate", {
+      SystemAddress: this.starSystem.SystemAddress,
+      IsCounterstrikeSystem: this.editCounterstrike,
+    });
+    this.editSaving = false;
+    this.changeDetectorRef.markForCheck();
   }
 }
 

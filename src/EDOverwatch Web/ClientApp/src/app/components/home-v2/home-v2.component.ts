@@ -9,7 +9,7 @@ import { OverwatchStarSystemFull, SystemListComponent } from '../system-list/sys
 import { AppService } from 'src/app/services/app.service';
 import { faFilters, faCircleXmark, faGears } from '@fortawesome/pro-duotone-svg-icons';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
-import { faCrosshairs, faCrosshairsSimple } from '@fortawesome/pro-light-svg-icons';
+import { faArrowRightToArc, faCrosshairs, faCrosshairsSimple } from '@fortawesome/pro-light-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -26,6 +26,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
   public readonly faBolt = faBolt;
   public readonly faCrosshairs = faCrosshairs;
   public readonly faCrosshairsSimple = faCrosshairsSimple;
+  public readonly faArrowRightToArc = faArrowRightToArc;
   @ViewChild(SystemListComponent) systemList: SystemListComponent | null = null;
   public hideUnpopulated: boolean = false;
   public hideCompleted: boolean = false;
@@ -70,12 +71,16 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         value: "AX conflict zones",
       },
       {
+        key: "Counterstrike",
+        value: "Counterstrike system",
+      },
+      {
         key: "ThargoidControlledReactivationMissions",
         value: "AX reactivation missions available",
       },
       {
-        key: "BarnacleMatrix",
-        value: "Barnacle matrix present",
+        key: "ThargoidSpires",
+        value: "Thargoid spire site present",
       },
       {
         key: "GroundPortAXCZ",

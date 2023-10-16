@@ -62,9 +62,9 @@
                             <td class="number">
                                 <div class="progress-cell">
                                     {{ starSystem.StateProgress.ProgressPercent | percent }}
-                                    <div class="progress-locked" *ngIf="starSystem.BarnacleMatrixInSystem">
+                                    <div class="progress-locked" *ngIf="starSystem.ThargoidSpireSiteInSystem">
                                         <fa-icon [icon]="faHexagonExclamation"
-                                            matTooltip="Barnacle matrix present in the system. Normal progression is not possible."
+                                            matTooltip="Thargoid spire site present in the system."
                                             size="lg"></fa-icon>
                                     </div>
                                 </div>
@@ -89,9 +89,9 @@
             </div>
             <div *ngIf="starSystem?.Features && starSystem.Features.length > 0">
                 <br>
-                <div *ngIf="barnacleMatrix" class="feature">
-                    <img class="feature-icon" src="assets/barnacles_logo.svg" matTooltip="Barnacle Matrix present" />
-                    Barnacle Matrix present
+                <div *ngIf="thargoidSpires" class="feature">
+                    <img class="feature-icon" src="assets/barnacles_logo.svg" matTooltip="Thargoid spire site present" />
+                    Thargoid spire site present
                 </div>
                 <div *ngIf="odysseySettlement" class="feature">
                     <img class="feature-icon" src="assets/settlement_o.svg"
@@ -124,6 +124,17 @@
                     </div>
                     Ground port under attack
                 </div>
+                <div *ngIf="counterstrike" class="feature">
+                    <fa-icon class="feature-icon" [icon]="faArrowRightToArc" size="xl"
+                        matTooltip="Counterstrike system"></fa-icon>
+                    Counterstrike system
+                </div>
+            </div>
+            <div *ngIf="appService.editPermissions && starSystem.ThargoidLevel?.Level == 40">
+                <br>
+                <mat-slide-toggle [(ngModel)]="editCounterstrike" (ngModelChange)="saveSystem()">
+                    Counterstrike system
+                </mat-slide-toggle>
             </div>
             <br>
             <div *ngIf="lineChartData && lineChartData.labels && lineChartData.labels.length">

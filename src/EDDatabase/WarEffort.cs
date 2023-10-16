@@ -84,6 +84,7 @@ namespace EDDatabase
             { WarEffortType.ThargoidBiostorageCapsule, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.KillThargoidHunter, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidRevenant, WarEffortTypeGroup.Kills },
+            { WarEffortType.KillThargoidBanshee, WarEffortTypeGroup.Kills },
             { WarEffortType.MissionCompletionThargoidControlledSettlementReboot, WarEffortTypeGroup.Mission },
         };
     }
@@ -182,6 +183,9 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid Bio-storage Capsule collection")]
         ThargoidBiostorageCapsule,
+
+        [EnumMember(Value = "Thargoid Banshee kill")]
+        KillThargoidBanshee,
     }
 
     public enum WarEffortTypeGroup : byte

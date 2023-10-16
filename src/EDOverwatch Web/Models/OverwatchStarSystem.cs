@@ -10,7 +10,9 @@
         public OverwatchStarSystemStateExpires? StateExpiration { get; }
         public OverwatchStarSystemStateProgress StateProgress { get; }
         public double DistanceToMaelstrom { get; }
+        [Obsolete]
         public bool BarnacleMatrixInSystem { get; }
+        public bool ThargoidSpireSiteInSystem { get; }
 
         public OverwatchStarSystem(StarSystem starSystem)
             : base(starSystem)
@@ -23,7 +25,10 @@
             {
                 DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 4);
             }
+#pragma warning disable CS0612 // Type or member is obsolete
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
+#pragma warning restore CS0612 // Type or member is obsolete
+            ThargoidSpireSiteInSystem = starSystem.BarnacleMatrixInSystem;
             StateStartCycle = starSystem.ThargoidLevel?.CycleStart?.Start ?? throw new Exception("Thargoid level must have a cycle property");
             if (starSystem.ThargoidLevel!.StateExpires != null)
             {

@@ -11,6 +11,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.System
         {
             (StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing),
             (WarEffortUpdated.QueueName, WarEffortUpdated.Routing),
+            (StarSystemUpdated.QueueName, StarSystemUpdated.Routing),
         };
 
         private IMemoryCache MemoryCache { get; }
@@ -34,6 +35,12 @@ namespace EDOverwatch_Web.WebSockets.EventListener.System
                 case WarEffortUpdated.QueueName:
                     {
                         WarEffortUpdated? data = json.ToObject<WarEffortUpdated>();
+                        systemAddress = data?.SystemAddress ?? 0;
+                        break;
+                    }
+                case StarSystemUpdated.QueueName:
+                    {
+                        StarSystemUpdated? data = json.ToObject<StarSystemUpdated>();
                         systemAddress = data?.SystemAddress ?? 0;
                         break;
                     }

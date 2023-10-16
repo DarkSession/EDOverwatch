@@ -12,9 +12,9 @@
                     <span *ngIf="warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent != null">
                         ({{ warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent | percent }})
                     </span>
-                    <span class="progress-locked" *ngIf="warEffortCycleStarSystem.StarSystem.BarnacleMatrixInSystem">
+                    <span class="progress-locked" *ngIf="warEffortCycleStarSystem.StarSystem.ThargoidSpireSiteInSystem">
                         <fa-icon [icon]="faHexagonExclamation"
-                            matTooltip="Barnacle matrix present in the system. Normal progression is not possible."
+                            matTooltip="Thargoid spire site present in the system."
                             size="lg"></fa-icon>
                     </span>
                 </td>

@@ -91,9 +91,9 @@
                                 </div>
                                 <div class="feature-box">
                                     <img class="feature-icon clickable" src="assets/barnacles_logo.svg"
-                                        matTooltip="Barnacle Matrix present" (click)="toggleFeature('BarnacleMatrix')"
+                                        matTooltip="Thargoid spire site present" (click)="toggleFeature('ThargoidSpires')"
                                         [ngClass]="{
-                                            'content-inactive': !featuresSelected.includes('BarnacleMatrix')
+                                            'content-inactive': !featuresSelected.includes('ThargoidSpires')
                                         }" />
                                 </div>
                                 <div class="feature-box">
@@ -135,6 +135,14 @@
                                     }">
                                         <fa-icon [icon]="faBolt" size="xl"
                                             matTooltip="AX reactivation missions available"></fa-icon>
+                                    </span>
+                                </div>
+                                <div class="feature-box">
+                                    <span class="clickable"
+                                        (click)="toggleFeature('Counterstrike')" [ngClass]="{
+                                        'content-inactive': !featuresSelected.includes('Counterstrike')
+                                    }">
+                                    <fa-icon [icon]="faArrowRightToArc" size="xl" matTooltip="Counterstrike system"></fa-icon>
                                     </span>
                                 </div>
                             </div>

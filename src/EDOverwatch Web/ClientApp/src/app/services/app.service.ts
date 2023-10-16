@@ -28,6 +28,9 @@ export class AppService {
   public isMenuOpen = false;
   public isMenuOpenChanged: EventEmitter<void> = new EventEmitter<void>();
 
+  public editPermissions = false;
+  public onEditPermissionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   public constructor(
     private readonly httpClient: HttpClient,
     @Inject('API_URL') private readonly apiUrl: string,
@@ -54,6 +57,11 @@ export class AppService {
     this.webSocketService.on<User>("CommanderMe").subscribe((message: WebSocketMessage<User>) => {
       this.user = message.Data;
       this.onUserChanged.emit();
+      const hasEditPermissions = this.user?.HasEditPermissions;
+      if (hasEditPermissions !== this.editPermissions) {
+        this.editPermissions = hasEditPermissions;
+        this.onEditPermissionsChanged.emit(this.editPermissions);
+      }
     });
     this.httpInterceptorService.loadingSub.subscribe((loading: boolean) => {
       this.httpLoading = loading;
@@ -221,6 +229,7 @@ export interface User {
   Commander: string | null;
   HasActiveToken: boolean;
   JournalLastImport: string | null;
+  HasEditPermissions: boolean;
 }
 
 interface OAuthResponse {

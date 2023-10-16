@@ -189,6 +189,9 @@ export class WebsocketService {
         if (!isCached) {
             this.serverResponsesReceived.push(message.MessageId);
         }
+        if (!environment.production) {
+            console.log(message);
+        }
         if (message.Name === "Authentication") {
             const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
             if (this.connectionIsAuthenticated !== authenticationData.IsAuthenticated) {

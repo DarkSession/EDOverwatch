@@ -44,7 +44,10 @@
             StationsUnderAttack = stationsUnderAttack;
             if (starSystem.BarnacleMatrixInSystem)
             {
+#pragma warning disable CS0612 // Type or member is obsolete
                 Features.Add(OverwatchStarSystemFeature.BarnacleMatrix.ToString());
+#pragma warning restore CS0612 // Type or member is obsolete
+                Features.Add(OverwatchStarSystemFeature.ThargoidSpires.ToString());
             }
             if (odysseySettlements)
             {
@@ -73,17 +76,24 @@
             {
                 Features.Add(OverwatchStarSystemFeature.GroundPortAXCZ.ToString());
             }
+            if ((starSystem.ThargoidLevel?.IsCounterstrike ?? false) && ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled)
+            {
+                Features.Add(OverwatchStarSystemFeature.Counterstrike.ToString());
+            }
         }
     }
 
     public enum OverwatchStarSystemFeature
     {
+        [Obsolete]
         BarnacleMatrix,
+        ThargoidSpires,
         OdysseySettlements,
         FederalFaction,
         ImperialFaction,
         ThargoidControlledReactivationMissions,
         AXConflictZones,
         GroundPortAXCZ,
+        Counterstrike,
     }
 }

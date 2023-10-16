@@ -1,14 +1,14 @@
 <div *ngFor="let attacker of visibleAttackers" [ngClass]="{
     'eliminated': attacker.StarSystem.StateProgress.IsCompleted,
-    'locked': attacker.StarSystem.BarnacleMatrixInSystem
+    'locked': attacker.StarSystem.ThargoidSpireSiteInSystem
 }">
     <span class="clickable" [routerLink]="['/system', attacker.StarSystem.SystemAddress]">
         {{ attacker.StarSystem.Name }}
     </span>
     <fa-icon [icon]="faPeopleGroup" *ngIf="attacker.StarSystem.PopulationOriginal > 0"
         matTooltip="Formerly populated"></fa-icon>
-    <ng-container *ngIf="attacker.StarSystem.BarnacleMatrixInSystem">
-        <span matTooltip="Barnacle matrix present in the system. Progress is locked.">
+    <ng-container *ngIf="attacker.StarSystem.ThargoidSpireSiteInSystem">
+        <span matTooltip="Thargoid spire site present in the system.">
             <img class="feature-icon" src="assets/barnacles_logo.svg" />
         </span>
     </ng-container>

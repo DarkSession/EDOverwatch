@@ -305,7 +305,7 @@ namespace EDOverwatch
                         }
                         thargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(time, cancellationToken, -1);
                     }
-                    thargoidLevel = new(0, newThargoidLevel, null, DateTimeOffset.UtcNow, false)
+                    thargoidLevel = new(0, newThargoidLevel, null, DateTimeOffset.UtcNow, false, false)
                     {
                         StarSystem = starSystem,
                         CycleStart = currentThargoidCycle,

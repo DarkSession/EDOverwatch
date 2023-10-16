@@ -53,15 +53,19 @@ namespace EDDatabase
         [Column]
         public bool IsInvisibleState { get; set; }
 
+        [Column]
+        public bool IsCounterstrike { get; set; }
+
         public IEnumerable<StarSystemThargoidLevelProgress>? ProgressHistory { get; set; }
 
-        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progress, DateTimeOffset created, bool isInvisibleState)
+        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progress, DateTimeOffset created, bool isInvisibleState, bool isCounterstrike)
         {
             Id = id;
             State = state;
             Progress = progress;
             Created = created;
             IsInvisibleState = isInvisibleState;
+            IsCounterstrike = isCounterstrike;
         }
 
         public static StarSystemThargoidLevelState GetNextThargoidState(StarSystemThargoidLevelState currentState, bool populated, bool completed)

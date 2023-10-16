@@ -44,12 +44,12 @@ namespace EDDataProcessor.Journal
                             maelstrom.InfluenceSphere = distanceToMaelstrom;
                         }
                     }
-                    starSystem.ThargoidLevel = new(0, currentState, null, updateTime, false)
+                    starSystem.ThargoidLevel = new(0, currentState, null, updateTime, false, false)
                     {
                         StarSystem = starSystem,
                         CycleStart = currentThargoidCycle,
                         Maelstrom = maelstrom,
-                        StateExpires = null, // tbd
+                        StateExpires = null,
                     };
                     changed = true;
                     await dbContext.SaveChangesAsync(cancellationToken);

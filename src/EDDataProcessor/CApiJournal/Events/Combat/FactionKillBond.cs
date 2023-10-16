@@ -25,6 +25,7 @@
                 {
                     25_000 => WarEffortType.KillThargoidRevenant, // Revenant
                     65_000 or 75_000 => WarEffortType.KillThargoidScout, // Scout
+                    1_000_000 => WarEffortType.KillThargoidBanshee, // Banshee
                     4_500_000 => WarEffortType.KillThargoidHunter, // Glaive
                     6_500_000 => WarEffortType.KillThargoidCyclops, // Cyclops
                     20_000_000 => WarEffortType.KillThargoidBasilisk, // Basilisk

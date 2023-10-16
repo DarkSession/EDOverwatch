@@ -312,6 +312,10 @@ namespace EDSystemProgress
                                                     {
                                                         systemStatus = SystemStatus.ThargoidControlledRegainedPopulated;
                                                     }
+                                                    else if (text.Contains("LOCATION"))
+                                                    {
+                                                        match = true;
+                                                    }
                                                 }
                                                 break;
                                             }
@@ -408,7 +412,7 @@ namespace EDSystemProgress
                                             }
                                         case SystemStatus.ThargoidControlled:
                                             {
-                                                match = text.Contains("DESTROY");
+                                                match = text.Contains("DESTROY") || text.Contains("SPIRE");
                                                 break;
                                             }
                                         case SystemStatus.Recovery:
