@@ -82,6 +82,8 @@ namespace EDDatabase
             { WarEffortType.TissueSampleTitanMaw, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.ProtectiveMembraneScrap, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.ThargoidBiostorageCapsule, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.ThargoidImpureSpireMineral, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.ThargoidSemiRefinedSpireMineral, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.KillThargoidHunter, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidRevenant, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidBanshee, WarEffortTypeGroup.Kills },
@@ -186,6 +188,12 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid Banshee kill")]
         KillThargoidBanshee,
+
+        [EnumMember(Value = "Thargoid Impure Spire Mineral collection")]
+        ThargoidImpureSpireMineral,
+
+        [EnumMember(Value = "Thargoid Semi-Refined Spire Mineral collection")]
+        ThargoidSemiRefinedSpireMineral,
     }
 
     public enum WarEffortTypeGroup : byte

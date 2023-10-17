@@ -40,6 +40,8 @@
                     "damagedescapepod" => WarEffortType.Recovery,
                     "wreckagecomponents" => WarEffortType.Recovery,
                     "thargoidpod" => WarEffortType.ThargoidBiostorageCapsule,
+                    "unknownmineral" => WarEffortType.ThargoidImpureSpireMineral,
+                    "unknownrefinedmineral" => WarEffortType.ThargoidSemiRefinedSpireMineral,
                     _ => default,
                 };
                 if (warEffort is WarEffortType warEffortType && warEffortType != default)

@@ -132,6 +132,19 @@ namespace EDOverwatch_Web.Models
                 {
                     WarEffortType.Recovery,
                     WarEffortType.ThargoidProbeCollection,
+                    WarEffortType.TissueSampleScout,
+                    WarEffortType.TissueSampleCyclops,
+                    WarEffortType.TissueSampleBasilisk,
+                    WarEffortType.TissueSampleMedusa,
+                    WarEffortType.TissueSampleHydra,
+                    WarEffortType.TissueSampleOrthrus,
+                    WarEffortType.TissueSampleGlaive,
+                    WarEffortType.TissueSampleTitan,
+                    WarEffortType.TissueSampleTitanMaw,
+                    WarEffortType.ProtectiveMembraneScrap,
+                    WarEffortType.ThargoidBiostorageCapsule, 
+                    WarEffortType.ThargoidImpureSpireMineral,
+                    WarEffortType.ThargoidSemiRefinedSpireMineral,
                 };
 
                 result.Humans = new(

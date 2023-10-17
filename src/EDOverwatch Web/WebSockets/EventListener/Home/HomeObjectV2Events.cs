@@ -24,6 +24,8 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Home
 
         public async ValueTask ProcessEvent(string queueName, JObject json, WebSocketServer webSocketServer, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            OverwatchOverviewV2.DeleteMemoryEntry(MemoryCache);
+
             HomeV2Object homeObject = new();
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(homeObject)).ToList();
             if (sessions.Any())
@@ -40,7 +42,6 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Home
                 {
                     return;
                 }
-                OverwatchOverviewV2.DeleteMemoryEntry(MemoryCache);
                 WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchHomeV2), await OverwatchOverviewV2.Create(dbContext, MemoryCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {

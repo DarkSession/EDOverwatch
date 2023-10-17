@@ -123,13 +123,6 @@
                             <fa-icon [icon]="faHandshake" size="lg"></fa-icon>
                             {{ row.FactionGeneralOperations }}
                         </div>
-                        <!--
-                        <span *ngFor="let specialFactionOperation of row.SpecialFactionOperations">
-                            <img src="assets/badges/{{ specialFactionOperation.Tag }}.png"
-                                style="width: 24px; height: 24px"
-                                matTooltip="{{ specialFactionOperation.Name }} target" />
-                        </span>
-                        -->
                     </div>
                 </td>
             </ng-container>
@@ -139,6 +132,13 @@
                     <div *ngIf="row.StateExpiration?.StateExpires">
                         {{ row.StateExpiration?.StateExpires | dateAgo }}
                     </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="AdminOptionSystemInCounterstrike">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Counterstrike system</th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-slide-toggle *ngIf="row.ThargoidLevel?.Level == 40" [(ngModel)]="row.editCounterstrike" (ngModelChange)="saveSystem(row)">
+                    </mat-slide-toggle>
                 </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>

@@ -30,7 +30,7 @@
                     bool imperialFaction,
                     bool axConflictZones,
                     bool groundPortUnderAttack)
-            : base(starSystem)
+            :  base(starSystem)
         {
             EffortFocus = effortFocus;
             FactionOperations = (factionAxOperations + factionGeneralOperations + factionRescueOperations + factionLogisticsOperations);

@@ -23,6 +23,8 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
 
         public async ValueTask ProcessEvent(string queueName, JObject json, WebSocketServer webSocketServer, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            Models.OverwatchStarSystems.DeleteMemoryEntry(MemoryCache);
+
             SystemsObject systemsObject = new();
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(systemsObject)).ToList();
             if (sessions.Any())
@@ -33,7 +35,6 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
                 {
                     return;
                 }
-                Models.OverwatchStarSystems.DeleteMemoryEntry(MemoryCache);
                 WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystems), await Models.OverwatchStarSystems.Create(dbContext, MemoryCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {

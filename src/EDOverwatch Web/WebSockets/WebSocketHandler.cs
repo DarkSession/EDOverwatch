@@ -39,6 +39,7 @@ namespace EDOverwatch_Web.WebSockets
     {
         public object ResponseData { get; }
         public WebSocketSessionActiveObject? ActiveObject { get; set; }
+
         public WebSocketHandlerResultSuccess(object responseData, WebSocketSessionActiveObject? activeObject)
         {
             ResponseData = responseData;

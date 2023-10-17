@@ -11,7 +11,10 @@ import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.compone
 import { ExportToCsv, Options } from 'export-to-csv';
 import { faFileCsv, faCircleQuestion, faTruck, faKitMedical } from '@fortawesome/pro-duotone-svg-icons';
 import { faCrosshairs, faHandshake } from '@fortawesome/pro-light-svg-icons';
+import { WebsocketService } from 'src/app/services/websocket.service';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
+@UntilDestroy()
 @Component({
   selector: 'app-system-list',
   templateUrl: './system-list.component.html',
@@ -46,16 +49,23 @@ export class SystemListComponent implements OnInit, OnChanges {
   public sortColumn: string = "Progress";
   public sortDirection: SortDirection = "desc";
   public filterApplied = false;
+  public editSaving = false;
 
   public constructor(
     private readonly appService: AppService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly matSnackBar: MatSnackBar
+    private readonly matSnackBar: MatSnackBar,
+    private readonly websocketService: WebsocketService
   ) {
     this.initDataSource([]);
   }
 
   public ngOnInit(): void {
+    this.appService.onEditPermissionsChanged
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this.ngOnChanges();
+      });
     this.updateSettings();
   }
 
@@ -85,6 +95,9 @@ export class SystemListComponent implements OnInit, OnChanges {
   public ngOnChanges(): void {
     this.updateDataSource();
     this.displayedColumns = [...this.baseColumns, ...this.optionalColumns];
+    if (this.appService.editPermissions) {
+      this.displayedColumns.push("AdminOptionSystemInCounterstrike");
+    }
   }
 
   public async handlePageEvent(e: PageEvent): Promise<void> {
@@ -106,6 +119,9 @@ export class SystemListComponent implements OnInit, OnChanges {
     this.filterApplied = data.length < this.systems.length;
     if (this.sort?.active) {
       data = this.dataSource.sortData(data, this.sort);
+    }
+    for (const entry of data) {
+      entry.editCounterstrike = entry.Features?.includes("Counterstrike") ?? false;
     }
     this.initDataSource(data);
     this.changeDetectorRef.detectChanges();
@@ -149,7 +165,7 @@ export class SystemListComponent implements OnInit, OnChanges {
           return (system.StateProgress.IsCompleted) ? system.StateProgress.ProgressLastChange : Number.MIN_SAFE_INTEGER;
         }
         case "StateExpiration": {
-          return (system.StateExpiration?.StateExpires ?? "");
+          return (system.StateExpiration?.StateExpires ?? "Counterstrike");
         }
         case "Features": {
           return system.Features?.length ?? 0;
@@ -195,6 +211,7 @@ export class SystemListComponent implements OnInit, OnChanges {
         StationsDamaged: system.StationsDamaged,
         StationsUnderAttack: system.StationsUnderAttack,
         ThargoidSpireSiteInSystem: system.ThargoidSpireSiteInSystem,
+        Features: system.Features?.join(","),
       });
     }
 
@@ -213,6 +230,20 @@ export class SystemListComponent implements OnInit, OnChanges {
     const csvExporter = new ExportToCsv(options);
     csvExporter.generateCsv(data);
   }
+
+  public async saveSystem(system: OverwatchStarSystem): Promise<void> {
+    if (!this.appService.editPermissions || this.editSaving) {
+      return;
+    }
+    this.editSaving = true;
+    this.changeDetectorRef.markForCheck();
+    await this.websocketService.sendMessageAndWaitForResponse("AdminSystemUpdate", {
+      SystemAddress: system.SystemAddress,
+      IsCounterstrikeSystem: !!system.editCounterstrike,
+    });
+    this.editSaving = false;
+    this.changeDetectorRef.markForCheck();
+  }
 }
 
 export interface OverwatchStarSystem {
@@ -229,6 +260,8 @@ export interface OverwatchStarSystem {
   Population: number;
   DistanceToMaelstrom: number;
   ThargoidSpireSiteInSystem: boolean;
+
+  editCounterstrike?: boolean;
 }
 
 export interface OverwatchStarSystemFull extends OverwatchStarSystem {

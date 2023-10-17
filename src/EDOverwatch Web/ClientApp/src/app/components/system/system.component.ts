@@ -44,7 +44,7 @@ export class SystemComponent implements OnInit {
   public counterstrike = false;
 
   public editSaving = false;
-  public editCounterstrike : boolean | null = null;
+  public editCounterstrike: boolean | null = null;
 
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
@@ -114,9 +114,11 @@ export class SystemComponent implements OnInit {
           });
         }
       });
-    this.appService.onEditPermissionsChanged.subscribe(() => {
-      this.changeDetectorRef.markForCheck();
-    });
+    this.appService.onEditPermissionsChanged
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this.changeDetectorRef.markForCheck();
+      });
     this.websocketService.on<OverwatchStarSystemFullDetail>("OverwatchSystem")
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
