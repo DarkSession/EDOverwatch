@@ -49,21 +49,22 @@ namespace EDDataProcessor.EDDN
                         if (starSystem == null)
                         {
                             isNew = true;
-                            starSystem = new(0,
-                                Message.SystemAddress,
-                                Message.StarSystem,
-                                (decimal)starPos[0],
-                                (decimal)starPos[1],
-                                (decimal)starPos[2],
-                                population,
-                                population,
-                                population,
-                                false,
-                                false,
-                                false,
-                                false,
-                                Message.Timestamp,
-                                Message.Timestamp)
+                            starSystem = new(id: 0,
+                                systemAddress: Message.SystemAddress,
+                                name: Message.StarSystem,
+                                locationX: (decimal)starPos[0],
+                                locationY: (decimal)starPos[1],
+                                locationZ: (decimal)starPos[2],
+                                population: population,
+                                originalPopulation: population,
+                                populationMin: population,
+                                warAffected: false,
+                                warRelevantSystem: false,
+                                barnacleMatrixInSystem: false,
+                                spireSiteBody: null,
+                                reactivationMissionsNearby: false,
+                                created: Message.Timestamp,
+                                updated: Message.Timestamp)
                             {
                                 MinorFactionPresences = new(),
                             };

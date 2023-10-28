@@ -4,31 +4,37 @@
     {
         public long PopulationOriginal { get; }
         public OverwatchThargoidLevel ThargoidLevel { get; }
+        [Obsolete("Use StateProgress object instead")]
         public short? Progress { get; }
+        [Obsolete("Use StateProgress object instead")]
         public decimal? ProgressPercent { get; }
         public DateTimeOffset StateStartCycle { get; }
         public OverwatchStarSystemStateExpires? StateExpiration { get; }
         public OverwatchStarSystemStateProgress StateProgress { get; }
         public double DistanceToMaelstrom { get; }
-        [Obsolete]
+        [Obsolete("Use ThargoidSpireSiteInSystem instead")]
         public bool BarnacleMatrixInSystem { get; }
         public bool ThargoidSpireSiteInSystem { get; }
+        public string? ThargoidSpireSiteBody { get; }
 
         public OverwatchStarSystem(StarSystem starSystem)
             : base(starSystem)
         {
             PopulationOriginal = starSystem.OriginalPopulation;
             ThargoidLevel = new(starSystem.ThargoidLevel);
-            Progress = starSystem.ThargoidLevel?.Progress;
-            ProgressPercent = (Progress != null) ? (decimal)Progress / 100m : null;
             if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem != null)
             {
                 DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 4);
             }
-#pragma warning disable CS0612 // Type or member is obsolete
+            short? progress = starSystem.ThargoidLevel?.Progress;
+            StateProgress = new(starSystem, (progress != null) ? (decimal)progress / 100m : null, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
+#pragma warning disable CS0618 // Type or member is obsolete
+            Progress = progress;
+            ProgressPercent = (progress != null) ? (decimal)progress / 100m : null;
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
-#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
             ThargoidSpireSiteInSystem = starSystem.BarnacleMatrixInSystem;
+            ThargoidSpireSiteBody = starSystem.SpireSiteBody;
             StateStartCycle = starSystem.ThargoidLevel?.CycleStart?.Start ?? throw new Exception("Thargoid level must have a cycle property");
             if (starSystem.ThargoidLevel!.StateExpires != null)
             {
@@ -50,7 +56,6 @@
                 }
                 StateExpiration = new(stateExpires, currentCycleEnds, cyclesLeft);
             }
-            StateProgress = new(starSystem, ProgressPercent, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
         }
     }
 }

@@ -30,7 +30,7 @@
                     bool imperialFaction,
                     bool axConflictZones,
                     bool groundPortUnderAttack)
-            :  base(starSystem)
+            : base(starSystem)
         {
             EffortFocus = effortFocus;
             FactionOperations = (factionAxOperations + factionGeneralOperations + factionRescueOperations + factionLogisticsOperations);
@@ -64,7 +64,7 @@
                     Features.Add(OverwatchStarSystemFeature.ImperialFaction.ToString());
                 }
             }
-            if (ThargoidLevel.Level == StarSystemThargoidLevelState.Alert && starSystem.ReactivationMissionsNearby)
+            if (ThargoidLevel.Level == StarSystemThargoidLevelState.Alert && starSystem.ReactivationMissionsNearby && (StateProgress.ProgressPercent ?? 0) < 1m)
             {
                 Features.Add(OverwatchStarSystemFeature.ThargoidControlledReactivationMissions.ToString());
             }

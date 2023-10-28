@@ -64,7 +64,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 isNew = true;
                 station = new(0, StationName, MarketID, DistFromStarLS, LandingPads?.Small ?? 0, LandingPads?.Medium ?? 0, LandingPads?.Large ?? 0, EDDatabase.StationState.Normal, RescueShipType.No, Timestamp, Timestamp)
                 {
-                    Type = await EDDatabase.StationType.GetByName(StationType, dbContext, cancellationToken)
+                    Type = await EDDatabase.StationType.GetByName(StationType, dbContext, cancellationToken),
                 };
                 dbContext.Stations.Add(station);
             }

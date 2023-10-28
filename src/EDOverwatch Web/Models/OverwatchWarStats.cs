@@ -187,6 +187,12 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.KillThargoidBanshee,
                 };
 
+                List<WarEffortType> rescueTypes = new()
+                {
+                    WarEffortType.Rescue,
+                    WarEffortType.ThargoidBiostorageCapsule,
+                };
+
                 List<WarEffortType> warEffortTypeMissions = new()
                 {
                     WarEffortType.MissionCompletionGeneric,
@@ -204,15 +210,30 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.ThargoidProbeCollection,
                 };
 
+                List<WarEffortType> samplingTypes = new()
+                {
+                    WarEffortType.TissueSampleScout,
+                    WarEffortType.TissueSampleCyclops,
+                    WarEffortType.TissueSampleBasilisk,
+                    WarEffortType.TissueSampleMedusa,
+                    WarEffortType.TissueSampleHydra,
+                    WarEffortType.TissueSampleOrthrus,
+                    WarEffortType.TissueSampleGlaive,
+                    WarEffortType.TissueSampleTitan,
+                    WarEffortType.TissueSampleTitanMaw,
+                    WarEffortType.ProtectiveMembraneScrap,
+                };
+
                 statsHumans = new(
                     Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),
                     humansSystemsControlling,
                     0,
                     warEfforts.Where(w => w.side == WarEffortSide.Humans && warEffortTypeKills.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
-                    warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.Rescue)?.amount,
+                    warEfforts.Where(w => w.side == WarEffortSide.Humans && rescueTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
                     warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.SupplyDelivery)?.amount,
                     warEfforts.Where(w => w.side == WarEffortSide.Humans && warEffortTypeMissions.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
-                    warEfforts.Where(w => w.side == WarEffortSide.Humans && recoveryTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0)
+                    warEfforts.Where(w => w.side == WarEffortSide.Humans && recoveryTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
+                    warEfforts.Where(w => w.side == WarEffortSide.Humans && samplingTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0)
                 );
             }
 

@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { faFileCsv } from '@fortawesome/pro-duotone-svg-icons';
 import { UntilDestroy } from '@ngneat/until-destroy';
-import { ExportToCsv, Options } from 'export-to-csv';
+import { mkConfig, generateCsv, download } from "export-to-csv";
 import { AppService } from 'src/app/services/app.service';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
@@ -114,20 +114,19 @@ export class CommanderFcCargoComponent implements OnInit {
       });
     }
 
-    const options: Options = {
+    const csvConfig = mkConfig({
       fieldSeparator: ',',
-      quoteStrings: '"',
+      quoteStrings: true,
       decimalSeparator: '.',
-      showLabels: true,
       showTitle: false,
       filename: "Overwatch Fleet Carrier Cargo Export",
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: true,
-    };
+    });
 
-    const csvExporter = new ExportToCsv(options);
-    csvExporter.generateCsv(data);
+    const csv = generateCsv(csvConfig)(data);
+    download(csvConfig)(csv);
   }
 }
 

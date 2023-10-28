@@ -8,7 +8,7 @@ import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { AppService } from 'src/app/services/app.service';
 import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
-import { ExportToCsv, Options } from 'export-to-csv';
+import { mkConfig, generateCsv, download } from "export-to-csv";
 import { faFileCsv, faCircleQuestion, faTruck, faKitMedical } from '@fortawesome/pro-duotone-svg-icons';
 import { faCrosshairs, faHandshake } from '@fortawesome/pro-light-svg-icons';
 import { WebsocketService } from 'src/app/services/websocket.service';
@@ -211,24 +211,24 @@ export class SystemListComponent implements OnInit, OnChanges {
         StationsDamaged: system.StationsDamaged,
         StationsUnderAttack: system.StationsUnderAttack,
         ThargoidSpireSiteInSystem: system.ThargoidSpireSiteInSystem,
+        ThargoidSpireSiteBody: system.ThargoidSpireSiteBody ?? "",
         Features: system.Features?.join(","),
       });
     }
 
-    const options: Options = {
+    const csvConfig = mkConfig({
       fieldSeparator: ',',
-      quoteStrings: '"',
+      quoteStrings: true,
       decimalSeparator: '.',
-      showLabels: true,
       showTitle: false,
       filename: "Overwatch System List Export",
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: true,
-    };
+    });
 
-    const csvExporter = new ExportToCsv(options);
-    csvExporter.generateCsv(data);
+    const csv = generateCsv(csvConfig)(data);
+    download(csvConfig)(csv);
   }
 
   public async saveSystem(system: OverwatchStarSystem): Promise<void> {
@@ -260,7 +260,7 @@ export interface OverwatchStarSystem {
   Population: number;
   DistanceToMaelstrom: number;
   ThargoidSpireSiteInSystem: boolean;
-
+  ThargoidSpireSiteBody: string | null;
   editCounterstrike?: boolean;
 }
 

@@ -58,6 +58,9 @@ namespace EDDatabase
         [Column]
         public bool BarnacleMatrixInSystem { get; set; }
 
+        [Column(TypeName = "varchar(64)")]
+        public string? SpireSiteBody { get; set; }
+
         [Column]
         public bool ReactivationMissionsNearby { get; set; }
 
@@ -90,6 +93,7 @@ namespace EDDatabase
             bool warAffected,
             bool warRelevantSystem,
             bool barnacleMatrixInSystem,
+            string? spireSiteBody,
             bool reactivationMissionsNearby,
             DateTimeOffset created,
             DateTimeOffset updated)
@@ -106,6 +110,7 @@ namespace EDDatabase
             WarAffected = warAffected;
             WarRelevantSystem = warRelevantSystem;
             BarnacleMatrixInSystem = barnacleMatrixInSystem;
+            SpireSiteBody = spireSiteBody;
             ReactivationMissionsNearby = reactivationMissionsNearby;
             Created = created;
             Updated = updated;

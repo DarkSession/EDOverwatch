@@ -52,7 +52,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
             StarSystem? starSystem = await dbContext.StarSystems
                 .Include(s => s.ThargoidLevel)
                 .FirstOrDefaultAsync(s => s.SystemAddress == data.SystemAddress, cancellationToken);
-            if (starSystem?.ThargoidLevel  == null)
+            if (starSystem?.ThargoidLevel == null)
             {
                 return new WebSocketHandlerResultError("System not found.");
             }

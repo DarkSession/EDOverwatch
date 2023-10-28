@@ -45,21 +45,22 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
             if (starSystem == null)
             {
                 isNew = true;
-                starSystem = new(0,
-                    SystemAddress,
-                    StarSystem,
-                    (decimal)StarPos[0],
-                    (decimal)StarPos[1],
-                    (decimal)StarPos[2],
-                    population,
-                    population,
-                    population,
-                    false,
-                    false,
-                    false,
-                    false,
-                    Timestamp,
-                    Timestamp)
+                starSystem = new(id: 0,
+                    systemAddress: SystemAddress,
+                    name: StarSystem,
+                    locationX: (decimal)StarPos[0],
+                    locationY: (decimal)StarPos[1],
+                    locationZ: (decimal)StarPos[2],
+                    population: population,
+                    originalPopulation: population,
+                    populationMin: population,
+                    warAffected: false,
+                    warRelevantSystem: false,
+                    barnacleMatrixInSystem: false,
+                    spireSiteBody: null,
+                    reactivationMissionsNearby: false,
+                    created: Timestamp,
+                    updated: Timestamp)
                 {
                     MinorFactionPresences = new(),
                 };

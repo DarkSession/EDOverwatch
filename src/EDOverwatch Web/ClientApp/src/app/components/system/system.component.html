@@ -91,7 +91,7 @@
                 <br>
                 <div *ngIf="thargoidSpires" class="feature">
                     <img class="feature-icon" src="assets/barnacles_logo.svg" matTooltip="Thargoid spire site present" />
-                    Thargoid spire site present
+                    Thargoid spire site present <span *ngIf="starSystem.ThargoidSpireSiteBody">on body {{ starSystem.ThargoidSpireSiteBody }}</span>
                 </div>
                 <div *ngIf="odysseySettlement" class="feature">
                     <img class="feature-icon" src="assets/settlement_o.svg"

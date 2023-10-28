@@ -23,6 +23,7 @@ export class StatsComponent implements OnInit {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       interaction: {
         mode: 'index',
         intersect: false,
@@ -37,6 +38,7 @@ export class StatsComponent implements OnInit {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           position: 'bottom',
@@ -62,6 +64,7 @@ export class StatsComponent implements OnInit {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           position: 'bottom',
@@ -80,6 +83,7 @@ export class StatsComponent implements OnInit {
     },
   };
   private chartLoaded: boolean = false;
+  public canvasWidth = 800;
 
   public constructor(
     private readonly websocketService: WebsocketService,
@@ -342,6 +346,7 @@ export class StatsComponent implements OnInit {
           this.clearedSystemsByType.options!.animation = false;
         }
       }
+      this.canvasWidth = 100 + this.stats.ThargoidCycles.length * 30;
       this.chartLoaded = true;
     }
   }
@@ -412,6 +417,7 @@ export interface OverwatchOverviewHuman {
   RescueSupplies: number | null;
   Missions: number | null;
   ItemsRecovered: number | null;
+  SamplesCollected: number | null;
 }
 
 export interface OverwatchOverviewThargoids {

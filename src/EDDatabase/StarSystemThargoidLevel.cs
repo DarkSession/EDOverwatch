@@ -54,7 +54,7 @@ namespace EDDatabase
         public bool IsInvisibleState { get; set; }
 
         [Column]
-        public bool IsCounterstrike {  get; set; }
+        public bool IsCounterstrike { get; set; }
 
         public IEnumerable<StarSystemThargoidLevelProgress>? ProgressHistory { get; set; }
 

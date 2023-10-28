@@ -81,7 +81,7 @@ namespace EDDatabase
             { WarEffortType.TissueSampleTitan, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleTitanMaw, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.ProtectiveMembraneScrap, WarEffortTypeGroup.RecoveryAndProbing },
-            { WarEffortType.ThargoidBiostorageCapsule, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.ThargoidBiostorageCapsule, WarEffortTypeGroup.Rescue },
             { WarEffortType.ThargoidImpureSpireMineral, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.ThargoidSemiRefinedSpireMineral, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.KillThargoidHunter, WarEffortTypeGroup.Kills },

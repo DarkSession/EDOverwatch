@@ -142,7 +142,7 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.TissueSampleTitan,
                     WarEffortType.TissueSampleTitanMaw,
                     WarEffortType.ProtectiveMembraneScrap,
-                    WarEffortType.ThargoidBiostorageCapsule, 
+                    WarEffortType.ThargoidBiostorageCapsule,
                     WarEffortType.ThargoidImpureSpireMineral,
                     WarEffortType.ThargoidSemiRefinedSpireMineral,
                 };
@@ -155,7 +155,8 @@ namespace EDOverwatch_Web.Models
                     warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.Rescue)?.amount,
                     warEfforts.FirstOrDefault(w => w.side == WarEffortSide.Humans && w.type == WarEffortType.SupplyDelivery)?.amount,
                     warEfforts.Where(w => w.side == WarEffortSide.Humans && warEffortTypeMissions.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
-                    warEfforts.Where(w => w.side == WarEffortSide.Humans && recoveryTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0)
+                    warEfforts.Where(w => w.side == WarEffortSide.Humans && recoveryTypes.Contains(w.type)).DefaultIfEmpty().Sum(s => s?.amount ?? 0),
+                    null
                 );
             }
 

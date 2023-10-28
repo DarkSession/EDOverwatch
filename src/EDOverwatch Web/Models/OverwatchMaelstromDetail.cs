@@ -3,7 +3,8 @@
     public class OverwatchMaelstromDetail : OverwatchMaelstrom
     {
         public List<OverwatchStarSystem> Systems { get; }
-        public List<OverwatchAlertPredictionSystem> SystemsAtRisk { get; } = new(); // We keep this for compatibility reasons for now
+        [Obsolete]
+        public List<OverwatchAlertPredictionSystem> SystemsAtRisk { get; } = new(); // We keep this for API compatibility reasons for now
         public OverwatchAlertPredictionMaelstrom AlertPrediction { get; }
         public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }

@@ -10,7 +10,7 @@ import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
-import { ExportToCsv, Options } from 'export-to-csv';
+import { mkConfig, generateCsv, download } from "export-to-csv";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { faFilters, faFileCsv, faCircleXmark } from '@fortawesome/pro-duotone-svg-icons';
@@ -181,20 +181,19 @@ export class SystemsHistoricalCycleComponent implements OnInit {
       });
     }
 
-    const options: Options = {
+    const csvConfig = mkConfig({
       fieldSeparator: ',',
-      quoteStrings: '"',
+      quoteStrings: true,
       decimalSeparator: '.',
-      showLabels: true,
       showTitle: false,
       filename: "Overwatch Historical System List Export",
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: true,
-    };
+    });
 
-    const csvExporter = new ExportToCsv(options);
-    csvExporter.generateCsv(data);
+    const csv = generateCsv(csvConfig)(data);
+    download(csvConfig)(csv);
   }
 
   public updateDataSource(): void {

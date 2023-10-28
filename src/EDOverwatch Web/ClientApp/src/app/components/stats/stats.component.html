@@ -64,6 +64,14 @@
                                 {{ stats.Humans.Missions | number }} +
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                Samples collected
+                            </td>
+                            <td class="number">
+                                {{ stats.Humans.SamplesCollected | number }} +
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <table>
@@ -158,33 +166,44 @@
                     </tbody>
                 </table>
             </div>
+            <div class="hide-on-small-mobile">
+                <div class="subtitle">
+                    Timeline
+                </div>
+                <p>Development of the war starting in November 3308 with the arrival of the Titan Taranis.</p>
+                <div class="chart-overflow-container">
+                    <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 2">
+                        <canvas baseChart [data]="maelstromHistoryChart.data" [options]="maelstromHistoryChart.options"
+                            [type]="maelstromHistoryChart.type"></canvas>
+                    </div>
+                </div>
 
-            <div class="subtitle">
-                War Development Overview
-            </div>
-            <p>Development of the war starting in November 3308 with the arrival of the Titan Taranis.</p>
-            <canvas baseChart class="chart hide-on-small-mobile" [data]="maelstromHistoryChart.data"
-                [options]="maelstromHistoryChart.options" [type]="maelstromHistoryChart.type" width="200"
-                height="100"></canvas>
+                <div class="subtitle">
+                    Cleared systems by state
+                </div>
+                <div class="chart-overflow-container">
+                    <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 3">
+                        <canvas baseChart [data]="clearedSystemsByType.data" [options]="clearedSystemsByType.options"
+                            [type]="clearedSystemsByType.type"></canvas>
+                    </div>
+                </div>
 
-            <div class="subtitle">
-                Cleared systems by state
+                <div class="subtitle">
+                    War efforts over time
+                </div>
+                <p>
+                    The numbers below are not complete while some numbers might even be counted twice from different
+                    sources.<br>
+                    Use the numbers as what they are: a high level overview.
+                </p>
+                <div class="chart-overflow-container">
+                    <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 2">
+                        <canvas baseChart [data]="contributionSummaryChart.data"
+                            [options]="contributionSummaryChart.options"
+                            [type]="contributionSummaryChart.type"></canvas>
+                    </div>
+                </div>
             </div>
-            <canvas baseChart class="chart hide-on-small-mobile" [data]="clearedSystemsByType.data"
-                [options]="clearedSystemsByType.options" [type]="clearedSystemsByType.type" width="200"
-                height="50"></canvas>
-
-            <div class="subtitle">
-                War efforts over time
-            </div>
-            <p>
-                The numbers below are not complete while some numbers might even be counted twice from different
-                sources.<br>
-                Use the numbers as what they are: a high level overview.
-            </p>
-            <canvas baseChart class="chart hide-on-small-mobile" [data]="contributionSummaryChart.data"
-                [options]="contributionSummaryChart.options" [type]="contributionSummaryChart.type" width="200"
-                height="100"></canvas>
         </div>
     </div>
 </div>

@@ -18,28 +18,34 @@
                     </tbody>
                 </table>
             </div>
+            <br>
             <mat-tab-group>
-                <mat-tab label="War Development Overview">
-                    <div class="maelstrom-summary-container hide-on-small-mobile">
-                        <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options"
-                            [type]="chartConfig.type" width="200" height="100"></canvas>
+                <mat-tab label="Affected systems">
+                    <ng-template matTabContent>
+                        <app-system-list [systems]="maelstrom.Systems"
+                            [optionalColumns]="['DistanceToMaelstrom']"></app-system-list>
+                    </ng-template>
+                </mat-tab>
+                <mat-tab label="Timeline">
+                    <div class="maelstrom-summary-container hide-on-small-mobile chart-overflow-container">
+                        <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 2">
+                            <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options"
+                                [type]="chartConfig.type"></canvas>
+                        </div>
                     </div>
                     <div class="hide-not-on-small-mobile">
                         This chart requires a higher resolution.
                     </div>
-                </mat-tab>
-                <mat-tab label="Affected systems">
-                    <ng-template matTabContent>
-                        <app-system-list [systems]="maelstrom.Systems" [optionalColumns]="['DistanceToMaelstrom']"></app-system-list>
-                    </ng-template>
                 </mat-tab>
                 <mat-tab label="Alert predictions">
                     <ng-template matTabContent>
                         <p>
                             Below you find the predicted alerts for the next cycle.
                             <br>
-                            If nothing changes and the prediction is correct it means that the highlighted systems will be in alert in the next upcoming cycle.<br>
-                            If a highlighted system has all its attacking systems cleared or is skipped for any other reason it usually means the next not highlighted system is used instead.
+                            If nothing changes and the prediction is correct it means that the highlighted systems will
+                            be in alert in the next upcoming cycle.<br>
+                            If a highlighted system has all its attacking systems cleared or is skipped for any other
+                            reason it usually means the next not highlighted system is used instead.
                         </p>
                         <app-alert-prediction [alertPrediction]="maelstrom.AlertPrediction"></app-alert-prediction>
                     </ng-template>

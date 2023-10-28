@@ -14,7 +14,7 @@ import { OverwatchThargoidCycle } from '../home-v2/home-v2.component';
 @Component({
   selector: 'app-maelstrom',
   templateUrl: './maelstrom.component.html',
-  styleUrls: ['./maelstrom.component.css'],
+  styleUrls: ['./maelstrom.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MaelstromComponent implements OnInit {
@@ -49,6 +49,7 @@ export class MaelstromComponent implements OnInit {
     },
   };
   private chartLoaded: boolean = false;
+  public canvasWidth = 800;
 
   public constructor(
     private readonly route: ActivatedRoute,
@@ -175,6 +176,7 @@ export class MaelstromComponent implements OnInit {
       if (this.chartLoaded) {
         this.chartConfig.options!.animation = false;
       }
+      this.canvasWidth = 100 + this.maelstrom.ThargoidCycles.length * 30;
       this.chartLoaded = true;
     }
   }

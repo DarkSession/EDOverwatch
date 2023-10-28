@@ -22,26 +22,52 @@ namespace EDDataProcessor.EDDN
             }
             if (Message.Event == ApproachSettlementMessageEvent.ApproachSettlement)
             {
-                Station? station = await dbContext.Stations
-                    .Include(s => s.Body)
-                    .Include(s => s.StarSystem)
-                    .FirstOrDefaultAsync(s => s.StarSystem!.SystemAddress == Message.SystemAddress && s.MarketId == Message.MarketID, cancellationToken);
-                if (station == null || station.Body?.Name == Message.BodyName)
+                if (string.IsNullOrEmpty(Message.StationEconomy))
                 {
                     return;
                 }
 
-                StarSystemBody? systemBody = await dbContext.StarSystemBodies
-                    .FirstOrDefaultAsync(s => s.StarSystem == station.StarSystem && s.Name == Message.BodyName, cancellationToken);
-                if (systemBody == null)
+                Economy? economy = await Economy.GetByName(Message.StationEconomy, dbContext, cancellationToken);
+                Station? station = await dbContext.Stations
+                    .Include(s => s.Body)
+                    .Include(s => s.StarSystem)
+                    .Include(s => s.PrimaryEconomy)
+                    .FirstOrDefaultAsync(s => s.StarSystem!.SystemAddress == Message.SystemAddress && s.MarketId == Message.MarketID, cancellationToken);
+                if (station == null)
                 {
-                    systemBody = new(0, Message.BodyID, Message.BodyName, null, false, null)
+                    StarSystem? starSystem = await dbContext.StarSystems.SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
+                    if (starSystem == null)
                     {
-                        StarSystem = station.StarSystem,
+                        return;
+                    }
+
+                    station = new(0, Message.Name ?? string.Empty, Message.MarketID, 0, 0, 0, 0, StationState.Normal, RescueShipType.No, Message.Timestamp, Message.Timestamp)
+                    {
+                        PrimaryEconomy = economy,
+                        StarSystem = starSystem,
+                        Type = await StationType.GetByName(StationType.OdysseySettlementType, dbContext, cancellationToken),
                     };
-                    dbContext.StarSystemBodies.Add(systemBody);
+                    dbContext.Stations.Add(station);
                 }
-                station.Body = systemBody;
+                else if (economy != null && station.PrimaryEconomy?.Id != economy?.Id)
+                {
+                    station.PrimaryEconomy = economy;
+                }
+
+                if (station.Body?.Name != Message.BodyName)
+                {
+                    StarSystemBody? systemBody = await dbContext.StarSystemBodies
+                        .FirstOrDefaultAsync(s => s.StarSystem == station.StarSystem && s.Name == Message.BodyName, cancellationToken);
+                    if (systemBody == null)
+                    {
+                        systemBody = new(0, Message.BodyID, Message.BodyName, null, false, null)
+                        {
+                            StarSystem = station.StarSystem,
+                        };
+                        dbContext.StarSystemBodies.Add(systemBody);
+                    }
+                    station.Body = systemBody;
+                }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
         }
@@ -93,6 +119,9 @@ namespace EDDataProcessor.EDDN
 
         [JsonProperty("MarketID", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long MarketID { get; set; }
+
+        [JsonProperty("StationEconomy")]
+        public string? StationEconomy { get; set; }
 
         [JsonProperty("BodyID", Required = Required.Always)]
         public int BodyID { get; set; }

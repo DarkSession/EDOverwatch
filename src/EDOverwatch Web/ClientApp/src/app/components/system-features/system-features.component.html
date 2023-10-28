@@ -1,6 +1,6 @@
 <div class="features">
     <img *ngIf="thargoidSpires" class="feature-icon" src="assets/barnacles_logo.svg"
-        matTooltip="Thargoid spire site present" />
+        [matTooltip]="'Thargoid spire site present' + ((starSystem?.ThargoidSpireSiteBody) ? ' on body ' + starSystem!.ThargoidSpireSiteBody : '')" />
     <img *ngIf="odysseySettlement" class="feature-icon" src="assets/settlement_o.svg"
         matTooltip="Odyssey settlement(s) present" />
     <img *ngIf="federation" class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />

@@ -21,6 +21,19 @@ table.system-information {
 
 @media (min-width: 601px) {
     .hide-not-on-small-mobile {
-      display: none;
+        display: none;
     }
-  }
+}
+
+.chart-overflow-container {
+    overflow-x: auto;
+    padding: 0;
+    margin: 0;
+
+    .chart-container {
+        display: block;
+        overflow-x: auto;
+        padding: 0;
+        margin: 0;
+    }
+}
