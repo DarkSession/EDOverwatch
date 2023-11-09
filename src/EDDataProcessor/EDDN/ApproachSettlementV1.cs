@@ -27,48 +27,37 @@ namespace EDDataProcessor.EDDN
                     return;
                 }
 
-                Economy? economy = await Economy.GetByName(Message.StationEconomy, dbContext, cancellationToken);
+
                 Station? station = await dbContext.Stations
                     .Include(s => s.Body)
                     .Include(s => s.StarSystem)
                     .Include(s => s.PrimaryEconomy)
                     .FirstOrDefaultAsync(s => s.StarSystem!.SystemAddress == Message.SystemAddress && s.MarketId == Message.MarketID, cancellationToken);
-                if (station == null)
+                if (station != null)
                 {
-                    StarSystem? starSystem = await dbContext.StarSystems.SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
-                    if (starSystem == null)
+                    Economy? economy = await Economy.GetByName(Message.StationEconomy, dbContext, cancellationToken);
+                    if (economy != null && station.PrimaryEconomy?.Id != economy?.Id)
                     {
-                        return;
+                        station.PrimaryEconomy = economy;
                     }
 
-                    station = new(0, Message.Name ?? string.Empty, Message.MarketID, 0, 0, 0, 0, StationState.Normal, RescueShipType.No, Message.Timestamp, Message.Timestamp)
+                    if (station.Body?.Name != Message.BodyName)
                     {
-                        PrimaryEconomy = economy,
-                        StarSystem = starSystem,
-                        Type = await StationType.GetByName(StationType.OdysseySettlementType, dbContext, cancellationToken),
-                    };
-                    dbContext.Stations.Add(station);
-                }
-                else if (economy != null && station.PrimaryEconomy?.Id != economy?.Id)
-                {
-                    station.PrimaryEconomy = economy;
-                }
-
-                if (station.Body?.Name != Message.BodyName)
-                {
-                    StarSystemBody? systemBody = await dbContext.StarSystemBodies
-                        .FirstOrDefaultAsync(s => s.StarSystem == station.StarSystem && s.Name == Message.BodyName, cancellationToken);
-                    if (systemBody == null)
-                    {
-                        systemBody = new(0, Message.BodyID, Message.BodyName, null, false, null)
+                        StarSystemBody? systemBody = await dbContext.StarSystemBodies
+                            .FirstOrDefaultAsync(s => s.StarSystem == station.StarSystem && s.Name == Message.BodyName, cancellationToken);
+                        if (systemBody == null)
                         {
-                            StarSystem = station.StarSystem,
-                        };
-                        dbContext.StarSystemBodies.Add(systemBody);
+                            systemBody = new(0, Message.BodyID, Message.BodyName, null, false, null)
+                            {
+                                StarSystem = station.StarSystem,
+                            };
+                            dbContext.StarSystemBodies.Add(systemBody);
+                        }
+                        station.Body = systemBody;
                     }
-                    station.Body = systemBody;
+
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
-                await dbContext.SaveChangesAsync(cancellationToken);
             }
         }
     }
