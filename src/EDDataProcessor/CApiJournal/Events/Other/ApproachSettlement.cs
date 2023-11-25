@@ -21,7 +21,7 @@
 
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(StationEconomy))
+            if (string.IsNullOrEmpty(StationEconomy) || MarketID == 0)
             {
                 return;
             }

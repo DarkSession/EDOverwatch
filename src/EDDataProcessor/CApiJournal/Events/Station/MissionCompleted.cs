@@ -74,6 +74,14 @@
                     {
                         missionWarEffortType = WarEffortType.MissionCompletionThargoidControlledSettlementReboot;
                     }
+                    else if (Name.StartsWith("Mission_TW_SpireCollect"))
+                    {
+                        missionWarEffortType = WarEffortType.MissionThargoidSpireSiteCollectResources;
+                    }
+                    else if (Name.StartsWith("Mission_TW_SpireSabotage"))
+                    {
+                        missionWarEffortType = WarEffortType.MissionThargoidSpireSiteSabotage;
+                    }
                     else
                     {
                         await DeferEvent(journalParameters, dbContext, cancellationToken);

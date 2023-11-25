@@ -63,17 +63,6 @@ namespace EDOverwatch_Web.Models
                 int? requirementsTissueSampleRemaining = requirementsTissueSampleTotal;
                 int? titanPodsTotal = null;
                 int? titanPodsRemaining = null;
-                if (requirementsTissueSampleTotal is int samplesNeedTotal && StateProgress.ProgressPercent is decimal progress)
-                {
-                    decimal remaining = 1m - progress;
-                    requirementsTissueSampleRemaining = (int)Math.Ceiling((decimal)samplesNeedTotal * remaining);
-
-                    if (ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled)
-                    {
-                        titanPodsTotal = samplesNeedTotal * 5;
-                        titanPodsRemaining = requirementsTissueSampleRemaining * 5;
-                    }
-                }
                 AttackDefense = new(recentAttacker, predictedAttacker, recentlyAttacked, predictedAttack, requirementsTissueSampleTotal, requirementsTissueSampleRemaining, titanPodsTotal, titanPodsRemaining);
             }
         }

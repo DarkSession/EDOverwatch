@@ -194,6 +194,12 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid Semi-Refined Spire Mineral collection")]
         ThargoidSemiRefinedSpireMineral,
+
+        [EnumMember(Value = "Thargoid spire site resource collection")]
+        MissionThargoidSpireSiteCollectResources,
+
+        [EnumMember(Value = "Thargoid spire site sabotage")]
+        MissionThargoidSpireSiteSabotage,
     }
 
     public enum WarEffortTypeGroup : byte

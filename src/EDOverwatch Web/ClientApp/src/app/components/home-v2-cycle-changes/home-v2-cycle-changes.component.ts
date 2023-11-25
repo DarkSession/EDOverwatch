@@ -15,6 +15,7 @@ export interface OverwatchOverviewV2CycleChange {
   AlertsDefended: number;
   InvasionsDefended: number;
   ControlsDefended: number;
+  TitansDefeated: number;
   ThargoidInvasionStarted: number;
   ThargoidsGained: number;
 }

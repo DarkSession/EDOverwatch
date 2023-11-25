@@ -14,6 +14,8 @@ import { Context } from 'chartjs-plugin-datalabels';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
 import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 import { AppService } from 'src/app/services/app.service';
+import * as dayjs from 'dayjs';
+import { MatTableDataSource } from '@angular/material/table';
 
 @UntilDestroy()
 @Component({
@@ -45,6 +47,10 @@ export class SystemComponent implements OnInit {
 
   public editSaving = false;
   public editCounterstrike: boolean | null = null;
+
+  public showProgressDetails = false;
+  public progressDetails: MatTableDataSource<ProgressDetails> = new MatTableDataSource<ProgressDetails>();
+  public progressDetailsColumns = ["State", "Time", "Progress", "Change", "Timespan"];
 
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
@@ -198,21 +204,85 @@ export class SystemComponent implements OnInit {
             this.lineChartOptions!.animation = false;
           }
 
-          this.thargoidSpires = this.starSystem?.Features?.includes("ThargoidSpires") ?? false;
-          this.odysseySettlement = this.starSystem?.Features?.includes("OdysseySettlements") ?? false;
-          this.federation = this.starSystem?.Features?.includes("FederalFaction") ?? false;
-          this.empire = this.starSystem?.Features?.includes("ImperialFaction") ?? false;
-          this.thargoidControlledReactivationMissions = this.starSystem?.Features?.includes("ThargoidControlledReactivationMissions") ?? false;
-          this.aXConflictZones = this.starSystem?.Features?.includes("AXConflictZones") ?? false;
-          this.groundPortAXCZ = this.starSystem?.Features?.includes("GroundPortAXCZ") ?? false;
-          this.counterstrike = this.starSystem?.Features?.includes("Counterstrike") ?? false;
+          this.thargoidSpires = this.starSystem.Features?.includes("ThargoidSpires") ?? false;
+          this.odysseySettlement = this.starSystem.Features?.includes("OdysseySettlements") ?? false;
+          this.federation = this.starSystem.Features?.includes("FederalFaction") ?? false;
+          this.empire = this.starSystem.Features?.includes("ImperialFaction") ?? false;
+          this.thargoidControlledReactivationMissions = this.starSystem.Features?.includes("ThargoidControlledReactivationMissions") ?? false;
+          this.aXConflictZones = this.starSystem.Features?.includes("AXConflictZones") ?? false;
+          this.groundPortAXCZ = this.starSystem.Features?.includes("GroundPortAXCZ") ?? false;
+          this.counterstrike = this.starSystem.Features?.includes("Counterstrike") ?? false;
           if (this.editCounterstrike === null) {
             this.editCounterstrike = this.counterstrike;
           }
+
+          const progressDetails: ProgressDetails[] = [];
+          let previousProgressEntry: ProgressDetails | null = null;
+          let previousDayEntry: ProgressDetails | null = previousProgressEntry;
+          this.starSystem.ProgressDetails.sort((a, b) => (a.DateTime > b.DateTime) ? 1 : -1);
+          let index = 0;
+          for (const progressEntry of this.starSystem.ProgressDetails) {
+            let newDay = true;
+            let timePassed: number | null = null;
+            let change = 0;
+            let dayChange: number | null = null;
+            if (previousProgressEntry) {
+              const previousDayId = this.getDayId(previousProgressEntry.DateTime);
+              const newDayId = this.getDayId(progressEntry.DateTime);
+              newDay = previousDayId != newDayId;
+
+              const previousTime = dayjs(previousProgressEntry.DateTime);
+              const newTime = dayjs(progressEntry.DateTime);
+
+              timePassed = newTime.diff(previousTime);
+
+              change = Math.round((progressEntry.ProgressPercentage - previousProgressEntry.ProgressPercentage) * 10000) / 10000;
+
+              if (newDay && previousDayEntry) {
+                dayChange = Math.round((progressEntry.ProgressPercentage - previousDayEntry.ProgressPercentage) * 10000) / 10000;
+                previousProgressEntry.DayChange = dayChange;
+                previousProgressEntry.DayMarker = newDay;
+              }
+            }
+
+            const progressDetailsEntry: ProgressDetails = {
+              State: progressEntry.State,
+              Date: progressEntry.Date,
+              DateTime: progressEntry.DateTime,
+              Progress: progressEntry.Progress,
+              ProgressPercentage: progressEntry.ProgressPercentage,
+              DayMarker: false,
+              Change: change,
+              Timespan: timePassed ? dayjs.duration(timePassed).format("HH:mm") : "",
+              DayChange: null,
+            };
+            progressDetails.push(progressDetailsEntry);
+
+            previousProgressEntry = progressDetailsEntry;
+            if (newDay) {
+              previousDayEntry = progressDetailsEntry;
+            }
+            index++;
+          }
+
+          progressDetails.sort((a, b) => (a.DateTime < b.DateTime) ? 1 : -1);
+
+          this.progressDetails = new MatTableDataSource<ProgressDetails>(progressDetails);
+
           this.changeDetectorRef.markForCheck();
           this.chartLoaded = true;
         }
       });
+    this.updateSettings();
+  }
+
+  private getDayId(dateTime: string): number {
+    let d = dayjs.utc(dateTime);
+    if (d.hour() < 7) {
+      d = d.set('day', d.day() - 1);
+    }
+    const result = d.year() * 10000 + (d.month() + 1) * 100 + d.date();
+    return result;
   }
 
   public copySystemName(): void {
@@ -223,6 +293,11 @@ export class SystemComponent implements OnInit {
     this.matSnackBar.open("Copied to clipboard!", "Dismiss", {
       duration: 2000,
     });
+  }
+
+  private async updateSettings(): Promise<void> {
+    this.showProgressDetails = (await this.appService.getSetting("ExperimentalProgressDetails")) === "1";
+    this.changeDetectorRef.detectChanges();
   }
 
   public encodeUrlPart(part: string): string {
@@ -331,4 +406,11 @@ export interface OverwatchStarSystemAttackDefense {
   RequirementsTissueSampleRemaining: number | null;
   RequirementsTitanPodsTotal: number | null;
   RequirementsTitanPodsRemaining: number | null;
+}
+
+interface ProgressDetails extends OverwatchStarSystemDetailProgress {
+  DayMarker: boolean;
+  Change: number;
+  Timespan: string;
+  DayChange: number | null;
 }

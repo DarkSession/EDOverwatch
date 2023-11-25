@@ -64,8 +64,7 @@
                                     {{ starSystem.StateProgress.ProgressPercent | percent }}
                                     <div class="progress-locked" *ngIf="starSystem.ThargoidSpireSiteInSystem">
                                         <fa-icon [icon]="faHexagonExclamation"
-                                            matTooltip="Thargoid spire site present in the system."
-                                            size="lg"></fa-icon>
+                                            matTooltip="Thargoid spire site present in the system." size="lg"></fa-icon>
                                     </div>
                                 </div>
                                 <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
@@ -90,8 +89,10 @@
             <div *ngIf="starSystem?.Features && starSystem.Features.length > 0">
                 <br>
                 <div *ngIf="thargoidSpires" class="feature">
-                    <img class="feature-icon" src="assets/barnacles_logo.svg" matTooltip="Thargoid spire site present" />
-                    Thargoid spire site present <span *ngIf="starSystem.ThargoidSpireSiteBody">on body {{ starSystem.ThargoidSpireSiteBody }}</span>
+                    <img class="feature-icon" src="assets/barnacles_logo.svg"
+                        matTooltip="Thargoid spire site present" />
+                    Thargoid spire site present <span *ngIf="starSystem.ThargoidSpireSiteBody">on body {{
+                        starSystem.ThargoidSpireSiteBody }}</span>
                 </div>
                 <div *ngIf="odysseySettlement" class="feature">
                     <img class="feature-icon" src="assets/settlement_o.svg"
@@ -158,6 +159,55 @@
                 </mat-tab>
                 <mat-tab label="History">
                     <app-system-history [starSystem]="starSystem"></app-system-history>
+                </mat-tab>
+                <mat-tab label="Progress details" *ngIf="showProgressDetails">
+                    <table mat-table [dataSource]="progressDetails">
+                        <ng-container matColumnDef="State">
+                            <th mat-header-cell *matHeaderCellDef>State</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap"
+                                [ngClass]="{'day-marker': row.DayMarker }">
+                                <app-thargoid-level [thargoidLevel]="row.State"></app-thargoid-level>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Time">
+                            <th mat-header-cell *matHeaderCellDef>Time reported (UTC)</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap"
+                                [ngClass]="{'day-marker': row.DayMarker }">
+                                {{ row.DateTime | date:'medium':'UTC' }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Progress">
+                            <th mat-header-cell *matHeaderCellDef>Progress</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap"
+                                [ngClass]="{'day-marker': row.DayMarker }">
+                                {{ row.ProgressPercentage | percent }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Change">
+                            <th mat-header-cell *matHeaderCellDef>Change</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap"
+                                [ngClass]="{'day-marker': row.DayMarker }">
+                                <span *ngIf="row.Change > 0" class="progress-plus">+{{ row.Change | percent }}</span>
+                                <span *ngIf="row.Change < 0" class="progress-minus">{{ row.Change | percent }}</span>
+                                <div *ngIf="row.DayChange">
+                                    (
+                                    <span *ngIf="row.DayChange > 0" class="progress-plus">+{{ row.DayChange | percent }}</span>
+                                    <span *ngIf="row.DayChange < 0" class="progress-minus">{{ row.DayChange | percent }}</span>
+                                    )
+                                </div>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Timespan">
+                            <th mat-header-cell *matHeaderCellDef>Time span</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap"
+                                [ngClass]="{'day-marker': row.DayMarker }">
+                                {{ row.Timespan }}
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="progressDetailsColumns; sticky: true" class="thead">
+                        </tr>
+                        <tr mat-row *matRowDef="let row; columns: progressDetailsColumns;"></tr>
+                    </table>
                 </mat-tab>
             </mat-tab-group>
         </div>

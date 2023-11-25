@@ -22,11 +22,10 @@ namespace EDDataProcessor.EDDN
             }
             if (Message.Event == ApproachSettlementMessageEvent.ApproachSettlement)
             {
-                if (string.IsNullOrEmpty(Message.StationEconomy))
+                if (string.IsNullOrEmpty(Message.StationEconomy) || Message.MarketID == 0)
                 {
                     return;
                 }
-
 
                 Station? station = await dbContext.Stations
                     .Include(s => s.Body)
