@@ -18,6 +18,7 @@ namespace EDSystemProgress
             new ColorRange(25, 45, 25, 45, 25, 45),
             new ColorRange(30, 40, 10, 25, 20, 25),
             new ColorRange(25, 30, 15, 25, 10, 20),
+            new ColorRange(30, 35, 25, 30, 20, 28),
             new ColorRange(35, 50, 35, 50, 35, 50),
             new ColorRange(40, 50, 15, 25, 35, 45),
             new ColorRange(45, 50, 20, 25, 30, 40),
@@ -172,6 +173,7 @@ namespace EDSystemProgress
                                 rightSideBorder = tempRightSideBorder;
                             }
                         }
+
                         if (string.IsNullOrEmpty(text))
                         {
                             continue;

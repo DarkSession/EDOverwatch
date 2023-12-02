@@ -88,6 +88,8 @@ namespace EDDatabase
             { WarEffortType.KillThargoidRevenant, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidBanshee, WarEffortTypeGroup.Kills },
             { WarEffortType.MissionCompletionThargoidControlledSettlementReboot, WarEffortTypeGroup.Mission },
+            { WarEffortType.MissionThargoidSpireSiteCollectResources, WarEffortTypeGroup.Mission },
+            { WarEffortType.MissionThargoidSpireSiteSabotage, WarEffortTypeGroup.Mission },
         };
     }
 

@@ -12,6 +12,7 @@
             Name = name;
             MissionID = missionId;
         }
+
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             if (Name.StartsWith("Mission_TW"))

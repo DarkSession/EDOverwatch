@@ -126,6 +126,8 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.MissionCompletionPassengerEvacuation,
                     WarEffortType.MissionCompletionSettlementReboot,
                     WarEffortType.MissionCompletionThargoidControlledSettlementReboot,
+                    WarEffortType.MissionThargoidSpireSiteCollectResources,
+                    WarEffortType.MissionThargoidSpireSiteSabotage,
                 };
 
                 List<WarEffortType> recoveryTypes = new()
