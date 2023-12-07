@@ -159,7 +159,7 @@ namespace EDOverwatchAlertPrediction
                         bool isBacktrack = skippedAttacks.Contains(attack.VictimSystem.SystemAddress);
                         if (alertPossible)
                         {
-                            if (maelstromAlertCount >= 4 && !isBacktrack && backtracks == 0)
+                            if (maelstromAlertCount >= 5 && !isBacktrack && backtracks == 0)
                             {
                                 alertPossible = false;
                             }
