@@ -118,7 +118,7 @@ namespace EDOverwatchAlertPrediction
             {
                 return false;
             }
-            if (ThargoidLevel?.StartCycle == Cycle || ThargoidLevel?.State != StarSystemThargoidLevelState.Controlled)
+            if (ThargoidLevel?.StartCycle == Cycle || (ThargoidLevel?.State != StarSystemThargoidLevelState.Controlled && ThargoidLevel?.State != StarSystemThargoidLevelState.Titan))
             {
                 return false;
             }
@@ -132,12 +132,6 @@ namespace EDOverwatchAlertPrediction
         public bool CanAttackSystem(StarSystemCycleState starSystem)
         {
             double distanceTo = DistanceTo(starSystem);
-            /*
-            if (distanceTo < 10.02d && distanceTo > 10d)
-            {
-                Debug.WriteLine($"{Name} -> {starSystem.Name}: {distanceTo} Ly");
-            }
-            */
             if (distanceTo > 10d)
             {
                 return false;
