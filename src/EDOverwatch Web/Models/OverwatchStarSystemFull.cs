@@ -44,9 +44,9 @@
             StationsUnderAttack = stationsUnderAttack;
             if (starSystem.BarnacleMatrixInSystem)
             {
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                 Features.Add(OverwatchStarSystemFeature.BarnacleMatrix.ToString());
-#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
                 Features.Add(OverwatchStarSystemFeature.ThargoidSpires.ToString());
             }
             if (odysseySettlements)
@@ -64,7 +64,7 @@
                     Features.Add(OverwatchStarSystemFeature.ImperialFaction.ToString());
                 }
             }
-            if (ThargoidLevel.Level == StarSystemThargoidLevelState.Alert && starSystem.ReactivationMissionsNearby && (StateProgress.ProgressPercent ?? 0) < 1m)
+            if ((ThargoidLevel.Level == StarSystemThargoidLevelState.Alert || ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion) && starSystem.ReactivationMissionsNearby && (StateProgress.ProgressPercent ?? 0) < 1m)
             {
                 Features.Add(OverwatchStarSystemFeature.ThargoidControlledReactivationMissions.ToString());
             }
@@ -85,7 +85,7 @@
 
     public enum OverwatchStarSystemFeature
     {
-        [Obsolete]
+        [Obsolete("Use ThargoidSpires instead")]
         BarnacleMatrix,
         ThargoidSpires,
         OdysseySettlements,

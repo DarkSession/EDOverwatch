@@ -93,7 +93,7 @@ namespace DCoHTrackerDiscordBot
                 await using AsyncServiceScope serviceScope = Services!.CreateAsyncScope();
                 EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
                 await TrackingModule.UpdateSystems(dbContext);
-                await TrackingModule.UpdateMaelstroms(dbContext);
+                await TrackingModule.UpdateTitans(dbContext);
             }
 
             // Bot token can be provided from the Configuration object we set up earlier

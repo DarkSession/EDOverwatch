@@ -4,7 +4,6 @@ using EDUtils;
 using Messages;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.Serialization;
-using static DCoHTrackerDiscordBot.Module.SquadronModule;
 
 namespace DCoHTrackerDiscordBot.Module
 {
@@ -38,7 +37,7 @@ namespace DCoHTrackerDiscordBot.Module
         public async Task Update(
             [Summary("Operation", "Operation Type")] OperationType operation,
 #pragma warning disable IDE0060 // Remove unused parameter
-            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
+            [Summary("Titan", "Titan"), Autocomplete(typeof(TitanAutocompleteHandler))] string titanName,
 #pragma warning restore IDE0060 // Remove unused parameter
             [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName,
             [Summary("MeetingPoint", "Meeting Point (optional)"), Autocomplete(typeof(MeetingPointAutocompleteHandler))] string? meetingPoint = null)
@@ -147,7 +146,7 @@ namespace DCoHTrackerDiscordBot.Module
         public async Task Remove(
             [Summary("Activity", "Activity Type")] OperationType operation,
 #pragma warning disable IDE0060 // Remove unused parameter
-            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string maelstromName,
+            [Summary("Titan", "Titan"), Autocomplete(typeof(TitanAutocompleteHandler))] string titanName,
 #pragma warning restore IDE0060 // Remove unused parameter
             [Summary("System", "System Name"), Autocomplete(typeof(WarStarSystemAutocompleteHandler))] string starSystemName)
         {
@@ -202,119 +201,6 @@ namespace DCoHTrackerDiscordBot.Module
             await DbContext.SaveChangesAsync();
 
             await FollowupAsync($"Removed {type.GetEnumMemberValue()} activity by **{Format.Sanitize(user.Faction.Name)} ({Format.Sanitize(user.Faction.Short)})** in **{starSystem.Name}**.");
-        }
-
-        [SlashCommand("view", "View activities by type")]
-        public async Task View(
-            [Summary("Activity", "Operation/Activity Type")] OperationType? operation = null,
-            [Summary("Maelstrom", "Maelstrom"), Autocomplete(typeof(MaelstromAutocompleteHandler))] string? maelstromName = null,
-            [Summary("Squadron", "Squadron Name"), Autocomplete(typeof(SquadronIdAutocompleteHandler))] string? squadronId = null)
-        {
-            await DeferAsync(true);
-
-            IQueryable<DcohFactionOperation> dcohFactionsQuery = DbContext.DcohFactionOperations
-                .AsNoTracking()
-                .Include(d => d.Faction)
-                .Include(d => d.StarSystem)
-                .ThenInclude(s => s!.ThargoidLevel)
-                .ThenInclude(t => t!.Maelstrom)
-                .Where(d =>
-                    d.Status == DcohFactionOperationStatus.Active &&
-                    d.StarSystem != null &&
-                    d.StarSystem.ThargoidLevel != null &&
-                    d.StarSystem.ThargoidLevel.Maelstrom != null);
-
-            string operationTypeString = string.Empty;
-            string maelstromNameString = string.Empty;
-            string squadronNameString = string.Empty;
-            if (operation is OperationType operationType)
-            {
-                DcohFactionOperationType type = OperationTypeToDcohFactionOperationType(operationType);
-                dcohFactionsQuery = dcohFactionsQuery.Where(d => d.Type == type);
-                operationTypeString = operationType.GetEnumMemberValue();
-            }
-            if (!string.IsNullOrEmpty(maelstromName))
-            {
-                maelstromName = maelstromName.Replace("%", string.Empty).Trim();
-                ThargoidMaelstrom? maelstrom = await DbContext.ThargoidMaelstroms
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => EF.Functions.Like(m.Name, maelstromName));
-                if (maelstrom == null)
-                {
-                    await FollowupAsync($"Could not find maelstrom {Format.Sanitize(maelstromName)}", ephemeral: true);
-                    return;
-                }
-                dcohFactionsQuery = dcohFactionsQuery.Where(d => d.StarSystem!.ThargoidLevel!.Maelstrom == maelstrom);
-                maelstromNameString = maelstrom.Name;
-            }
-            if (!string.IsNullOrEmpty(squadronId))
-            {
-                DcohFaction? dcohFaction = await DbContext.DcohFactions
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => m.Short == squadronId);
-                if (dcohFaction == null)
-                {
-                    await FollowupAsync($"Could not find squadron.", ephemeral: true);
-                    return;
-                }
-                dcohFactionsQuery = dcohFactionsQuery.Where(d => d.Faction == dcohFaction);
-                squadronNameString = dcohFaction.Name;
-            }
-            if (
-                string.IsNullOrEmpty(operationTypeString) &&
-                string.IsNullOrEmpty(maelstromNameString) &&
-                string.IsNullOrEmpty(squadronNameString))
-            {
-                await FollowupAsync($"You need to either provide the maelstrom, the activity or the squadron.", ephemeral: true);
-                return;
-            }
-
-            List<DcohFactionOperation> factionOperations = await dcohFactionsQuery
-                .OrderBy(s => s.StarSystem!.ThargoidLevel!.Maelstrom)
-                .ThenBy(s => s.StarSystem!.Name)
-                .ToListAsync();
-            EmbedBuilder embedMain = new EmbedBuilder()
-                           .WithTitle("Operations / Activities");
-            if (factionOperations.Any())
-            {
-                List<string> description = new();
-                if (!string.IsNullOrEmpty(operationTypeString))
-                {
-                    description.Add($"{operationTypeString} activities");
-                }
-                else
-                {
-                    description.Add("Activities");
-                }
-                if (!string.IsNullOrEmpty(maelstromNameString))
-                {
-                    description.Add("around " + maelstromNameString);
-                }
-                if (!string.IsNullOrEmpty(squadronNameString))
-                {
-                    description.Add("by " + Format.Sanitize(squadronNameString));
-                }
-                embedMain.Description = string.Join(" ", description) + ":";
-                if (string.IsNullOrEmpty(maelstromNameString))
-                {
-                    embedMain.AddField("Maelstrom", string.Join("\r\n", factionOperations.Select(c => c.StarSystem?.ThargoidLevel?.Maelstrom?.Name ?? "-")), true);
-                }
-                embedMain.AddField("System", string.Join("\r\n", factionOperations.Select(c => c.StarSystem?.Name ?? "-")), true);
-                if (string.IsNullOrEmpty(squadronNameString))
-                {
-                    embedMain.AddField("Squadron", string.Join("\r\n", factionOperations.Select(c => c.Faction?.Name ?? "-")), true);
-                }
-                if (string.IsNullOrEmpty(operationTypeString))
-                {
-                    embedMain.AddField("Activity", string.Join("\r\n", factionOperations.Select(c => c.Type.GetEnumMemberValue() ?? "-")), true);
-                }
-            }
-            else
-            {
-                embedMain.Description = "There are no known active activities that meet the criterias.";
-            }
-
-            await FollowupAsync(embed: embedMain.Build(), ephemeral: true);
         }
 
         [SlashCommand("system-update", "Request an automatic or manual review of system data")]
@@ -390,7 +276,7 @@ namespace DCoHTrackerDiscordBot.Module
             };
         }
 
-        public static Dictionary<string, List<string>> SystemsByMaelstrom { get; private set; } = new();
+        public static Dictionary<string, List<string>> SystemsByTitan { get; private set; } = new();
         public static List<string> Systems { get; private set; } = new();
         public static async Task UpdateSystems(EdDbContext dbContext)
         {
@@ -418,7 +304,7 @@ namespace DCoHTrackerDiscordBot.Module
                     systems[starSystem.ThargoidLevel.Maelstrom.Name] = new() { starSystem.Name };
                 }
             }
-            SystemsByMaelstrom = systems;
+            SystemsByTitan = systems;
             Systems = starSystems.Select(s => s.Name).ToList();
         }
 
@@ -426,11 +312,11 @@ namespace DCoHTrackerDiscordBot.Module
         {
             public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
             {
-                string? maelstrom = autocompleteInteraction.Data.Options.FirstOrDefault(o => o.Name == "maelstrom")?.Value as string;
+                string? titan = autocompleteInteraction.Data.Options.FirstOrDefault(o => o.Name == "maelstrom" || o.Name == "titan")?.Value as string;
                 List<string>? systemList = null;
-                if (!string.IsNullOrEmpty(maelstrom))
+                if (!string.IsNullOrEmpty(titan))
                 {
-                    SystemsByMaelstrom.TryGetValue(maelstrom, out systemList);
+                    SystemsByTitan.TryGetValue(titan, out systemList);
                 }
                 systemList ??= Systems;
                 IEnumerable<string> systems = systemList.OrderBy(s => s);
@@ -514,31 +400,31 @@ namespace DCoHTrackerDiscordBot.Module
             }
         }
 
-        public static List<string> Maelstroms { get; set; } = new();
-        public static async Task UpdateMaelstroms(EdDbContext dbContext)
+        public static List<string> Titans { get; set; } = new();
+        public static async Task UpdateTitans(EdDbContext dbContext)
         {
-            Maelstroms = await dbContext.ThargoidMaelstroms
+            Titans = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
                 .Select(s => s.Name)
                 .OrderBy(n => n)
                 .ToListAsync();
         }
 
-        public class MaelstromAutocompleteHandler : AutocompleteHandler
+        public class TitanAutocompleteHandler : AutocompleteHandler
         {
             public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
             {
-                IEnumerable<string> maelstroms = Maelstroms;
+                IEnumerable<string> titans = Titans;
                 if (autocompleteInteraction.Data.Current.Value is string value)
                 {
                     value = value.Trim().ToLower();
                     if (value.Length > 0)
                     {
-                        maelstroms = maelstroms.Where(s => s.ToLower().StartsWith(value));
+                        titans = titans.Where(s => s.ToLower().StartsWith(value));
                     }
                 }
                 // max - 25 suggestions at a time (API limit)
-                return Task.FromResult(AutocompletionResult.FromSuccess(maelstroms.Select(s => new AutocompleteResult(s, s)).Take(25)));
+                return Task.FromResult(AutocompletionResult.FromSuccess(titans.Select(s => new AutocompleteResult(s, s)).Take(25)));
             }
         }
     }
