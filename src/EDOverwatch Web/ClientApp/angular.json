@@ -89,11 +89,11 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "EDOverwatch_Web:build:production"
+              "buildTarget": "EDOverwatch_Web:build:production"
             },
             "development": {
-              "browserTarget": "EDOverwatch_Web:build:development",
-              "proxyConfig": "proxy.conf.js"
+              "proxyConfig": "proxy.conf.js",
+              "buildTarget": "EDOverwatch_Web:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -101,7 +101,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "EDOverwatch_Web:build"
+            "buildTarget": "EDOverwatch_Web:build"
           }
         },
         "test": {

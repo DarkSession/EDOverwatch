@@ -1,8 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Guid } from "guid-typescript";
-import * as idb from 'idb/with-async-ittr';
-import { DBSchema, IDBPDatabase } from 'idb/with-async-ittr';
+import * as idb from 'idb';
+import { DBSchema, IDBPDatabase } from 'idb';
 
 @Injectable({
     providedIn: 'root'

@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { HttpInterceptorService } from './http-interceptor.service';
 import { ConnectionStatus, WebSocketMessage, WebsocketService } from './websocket.service';
-import * as idb from 'idb/with-async-ittr';
-import { IDBPDatabase } from 'idb/with-async-ittr';
+import * as idb from 'idb';
+import { IDBPDatabase } from 'idb';
 import { SortDirection } from '@angular/material/sort';
 import { environment } from 'src/environments/environment';
 
