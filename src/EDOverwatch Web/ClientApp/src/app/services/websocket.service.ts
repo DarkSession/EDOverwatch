@@ -32,6 +32,9 @@ export class WebsocketService {
     private wasConnected = false;
     private serverResponsesReceived: string[] = [];
 
+    public serverStatus: ServerStatus = ServerStatus.OK;
+    public serverStatusChanged: EventEmitter<ServerStatus> = new EventEmitter<ServerStatus>();
+
     public constructor() {
         this.initDb();
         this.initalize();
@@ -85,12 +88,8 @@ export class WebsocketService {
         if (this.webSocket?.readyState == ConnectionStatus.Open) {
             this.disconnect();
         }
-        if (this.initalizeTimeout !== null) {
-            clearTimeout(this.initalizeTimeout);
-            this.initalizeTimeout = null;
-        }
         this.connectionIsAuthenticated = false;
-        this.initalize();
+        this.initalizeConnection(false);
     }
 
     public disconnect(): void {
@@ -108,10 +107,21 @@ export class WebsocketService {
         this.onConnectionStatusChanged.emit(this.connectionStatus);
     }
 
+    private updateServerStatus(serverStatus: ServerStatus): void {
+        if (this.serverStatus != serverStatus) {
+            this.serverStatus = serverStatus;
+            this.serverStatusChanged.emit(this.serverStatus);
+        }
+    }
+
     private initalizeConnection(delayed: boolean = true): void {
         this.connectionStatusChanged();
+        if (this.initalizeTimeout !== null) {
+            clearTimeout(this.initalizeTimeout);
+            this.initalizeTimeout = null;
+        }
         if (delayed) {
-            const timeout = this.connectionAttempt > 5 ? 30000 : 5000;
+            const timeout = this.connectionAttempt > 5 ? 10000 : 5000;
             this.initalizeTimeout = setTimeout(() => {
                 this.initalize();
             }, timeout);
@@ -121,7 +131,7 @@ export class WebsocketService {
         }
     }
 
-    private initalize(): void {
+    private async initalize(): Promise<void> {
         if (!navigator.onLine) {
             return;
         }
@@ -134,6 +144,32 @@ export class WebsocketService {
         });
         this.failCallbacks();
         this.connectionAttempt++;
+
+        try {
+            const url = window.location.origin + "/api/v1/status";
+            const status = await fetch(url);
+            switch (status.status) {
+                case 200: {
+                    this.updateServerStatus(ServerStatus.OK);
+                    break;
+                }
+                case 503: {
+                    this.updateServerStatus(ServerStatus.Maintenance);
+                    this.initalizeConnection();
+                    return;
+                }
+                default: {
+                    throw new Error(`Received unexpected server response: ${status.status}`);
+                }
+            }
+        }
+        catch (e) {
+            console.error(e);
+            this.updateServerStatus(ServerStatus.Down);
+            this.initalizeConnection();
+            return;
+        }
+
         let webSocketUrl = ((window.location.protocol === "http:") ? "ws://" : "wss://") + window.location.hostname;
         if (environment.websocketPort) {
             webSocketUrl += ":" + environment.websocketPort;
@@ -341,6 +377,12 @@ export enum ConnectionStatus {
     Open,
     Closing,
     Closed,
+}
+
+export enum ServerStatus {
+    OK,
+    Down,
+    Maintenance,
 }
 
 export interface WebSocketMessage<T = unknown> {

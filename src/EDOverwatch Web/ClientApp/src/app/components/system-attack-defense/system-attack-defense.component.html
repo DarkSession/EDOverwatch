@@ -3,7 +3,7 @@
         Nearby systems
     </div>
     <div class="table">
-        <table mat-table [dataSource]="nearbySystems" matSort matSortActive="Distance" matSortDirection="asc"
+        <table mat-table [dataSource]="nearbySystems" matSort matSortActive="DistanceToTitan" matSortDirection="asc"
             matSortDisableClear>
             <ng-container matColumnDef="Name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
@@ -45,17 +45,24 @@
                         </span>
                         <span class="progress-locked" *ngIf="row.StarSystem.ThargoidSpireSiteInSystem">
                             <fa-icon [icon]="faHexagonExclamation"
-                                matTooltip="Thargoid spire site present in the system."
-                                size="lg"></fa-icon>
+                                matTooltip="Thargoid spire site present in the system." size="lg"></fa-icon>
                         </span>
                     </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Distance">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance to system</th>
                 <td mat-cell *matCellDef="let row" class="nowrap">
                     <div class="distance">
                         {{ row.Distance | number:'0.0-2' }} Ly
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="DistanceToTitan">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance to Titan</th>
+                <td mat-cell *matCellDef="let row" class="nowrap">
+                    <div class="distance">
+                        {{ row.DistanceToTitan | number:'0.0-2' }} Ly
                     </div>
                 </td>
             </ng-container>

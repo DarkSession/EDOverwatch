@@ -32,7 +32,7 @@ namespace DCoHTrackerDiscordBot
                 }
                 if (screenshots > 0)
                 {
-                    embed.Description = "This feature is no longer supported. Please submit your updates to Overwatch and other community tools by visiting them while running EDMC or similar.";
+                    embed.Description = "This feature is no longer supported. Please submit your updates to Overwatch and other community tools by visiting the system while running EDMC or similar.";
                     List<Embed> embeds = new()
                     {
                         embed.Build(),

@@ -63,6 +63,18 @@ namespace EDOverwatch_Web.Models
                 int? requirementsTissueSampleRemaining = requirementsTissueSampleTotal;
                 int? titanPodsTotal = null;
                 int? titanPodsRemaining = null;
+                if (StateProgress.ProgressPercent is decimal progress)
+                {
+                    decimal remaining = 1m - progress;
+                    if (requirementsTissueSampleTotal is not null)
+                    {
+                        requirementsTissueSampleRemaining = (int)Math.Ceiling((decimal)requirementsTissueSampleTotal * remaining);
+                    }
+                    if (titanPodsTotal is not null)
+                    {
+                        titanPodsRemaining = (int)Math.Ceiling((decimal)titanPodsTotal * remaining);
+                    }
+                }
                 AttackDefense = new(recentAttacker, predictedAttacker, recentlyAttacked, predictedAttack, requirementsTissueSampleTotal, requirementsTissueSampleRemaining, titanPodsTotal, titanPodsRemaining);
             }
         }
@@ -367,11 +379,16 @@ namespace EDOverwatch_Web.Models
     {
         public OverwatchStarSystem StarSystem { get; }
         public double Distance { get; }
+        public double DistanceToTitan { get; }
 
         public OverwatchStarSystemNearbySystem(StarSystem nearbySystem, StarSystem starSystem)
         {
             StarSystem = new(nearbySystem);
             Distance = Math.Round(nearbySystem.DistanceTo(starSystem), 4);
+            if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem is not null)
+            {
+                DistanceToTitan = Math.Round(nearbySystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 4);
+            }
         }
     }
 

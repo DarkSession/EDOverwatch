@@ -355,7 +355,8 @@ export interface FactionOperation {
 
 export interface OverwatchStarSystemNearbySystem {
   StarSystem: OverwatchStarSystem;
-  Distance: number,
+  Distance: number;
+  DistanceToTitan: number;
 }
 
 interface OverwatchStarSystemDetailProgress {

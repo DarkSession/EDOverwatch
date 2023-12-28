@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, H
 import { SwUpdate } from '@angular/service-worker';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AppService } from './services/app.service';
-import { WebsocketService } from './services/websocket.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ServerStatus, WebsocketService } from './services/websocket.service';
+import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { faChartNetwork, faChartSimple, faContainerStorage, faCrystalBall, faGalaxy, faHandsHoldingDiamond, faHandshake, faSolarSystem, faSwords, faTimelineArrow, faUsers } from '@fortawesome/pro-duotone-svg-icons';
 import { faHandWave, faMapLocation } from '@fortawesome/pro-light-svg-icons';
@@ -31,6 +31,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   public readonly faContainerStorage = faContainerStorage;
   public loading = false;
   public sideNavMode: MatDrawerMode = "side";
+  private serverStatusSnackbar: MatSnackBarRef<TextOnlySnackBar> | null = null;
   /*
   @HostListener('window:focus', ['$event'])
   onFocus(event: any): void {
@@ -88,6 +89,25 @@ export class AppComponent implements OnInit, AfterViewInit {
       .pipe(untilDestroyed(this))
       .subscribe((loading: boolean) => {
         this.loading = loading;
+        this.changeDetectorRef.markForCheck();
+      });
+    this.websocketService.serverStatusChanged
+      .pipe(untilDestroyed(this))
+      .subscribe((status: ServerStatus) => {
+        if (this.serverStatusSnackbar != null) {
+          this.serverStatusSnackbar.dismiss();
+          this.serverStatusSnackbar = null;
+        }
+        switch (status) {
+          case ServerStatus.Down: {
+            this.serverStatusSnackbar = this.matSnackBar.open("The Overwatch server is currently unreachable. Connection will be established once it is available again.");
+            break;
+          }
+          case ServerStatus.Maintenance: {
+            this.serverStatusSnackbar = this.matSnackBar.open("Overwatch is currently unavailable for planned maintaince. Connection will be established once it is available again.");
+            break;
+          }
+        }
         this.changeDetectorRef.markForCheck();
       });
     if (this.swUpdate) {

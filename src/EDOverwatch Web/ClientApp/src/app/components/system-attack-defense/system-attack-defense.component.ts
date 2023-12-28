@@ -17,7 +17,7 @@ export class SystemAttackDefenseComponent implements OnChanges, AfterViewInit, O
   @Input() starSystem!: OverwatchStarSystemFullDetail;
   @ViewChild(MatSort) sort!: MatSort;
   public nearbySystems: MatTableDataSource<OverwatchStarSystemNearbySystem> = new MatTableDataSource<OverwatchStarSystemNearbySystem>();
-  public nearbySystemDisplayedColumns = ["Name", "ThargoidLevel", "Distance"];
+  public nearbySystemDisplayedColumns = ["Name", "ThargoidLevel", "Distance", "DistanceToTitan"];
   public warEffortEstimates: MatTableDataSource<WarEffortEstimateRow> = new MatTableDataSource<WarEffortEstimateRow>();
   public warEffortEstimatesColumns = ["Type", "Amount"];
   public showEffortEstimates = false;
@@ -46,6 +46,9 @@ export class SystemAttackDefenseComponent implements OnChanges, AfterViewInit, O
         }
         case "Distance": {
           return s.Distance;
+        }
+        case "DistanceToTitan": {
+          return s.DistanceToTitan;
         }
         default: {
           return "";
