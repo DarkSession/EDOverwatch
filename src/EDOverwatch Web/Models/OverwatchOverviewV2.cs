@@ -172,13 +172,14 @@ namespace EDOverwatch_Web.Models
                 int controlsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && p.Progress >= 100);
                 int titansDefeated = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && p.CycleEnd == currentThargoidCycle);
                 int thargoidInvasionStart = currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0);
-                int thargoidsGain = currentCycleStates.Where(p => p.Progress == null || p.Progress < 100)
-                    .Count(p => (p.State == StarSystemThargoidLevelState.Invasion && p.CycleEndId == currentThargoidCycle.Id) || (p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0));
+                int thargoidInvasionSuccess = currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Invasion && p.StateExpires?.Id == currentThargoidCycle.Id);
+                int thargoidGainFromAlert = currentCycleStates.Count(p => (p.Progress == null || p.Progress < 100) && p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0);
+                int thargoidsGain = thargoidGainFromAlert + thargoidInvasionSuccess;
 
                 overviewNextCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, titansDefeated, thargoidInvasionStart, thargoidsGain);
 
                 int alertsPredicted = await dbContext.AlertPredictions.CountAsync(a => a.Cycle == nextCycle && a.AlertLikely, cancellationToken);
-                int invasionsPredicted = invasionCount - invasionsDefended + thargoidInvasionStart;
+                int invasionsPredicted = invasionCount - thargoidInvasionSuccess - invasionsDefended + thargoidInvasionStart;
                 int controlledPredicted = controlledCount - controlsDefended + thargoidsGain;
                 int titanPredicted = titanCount - titansDefeated;
                 int recoveryPredicted = recoveryCount - currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Recovery && p.Progress >= 100) + currentCycleStates.Count(p => p.Progress >= 100 && (p.State == StarSystemThargoidLevelState.Invasion || p.State == StarSystemThargoidLevelState.Controlled) && p.StarSystem?.OriginalPopulation > 0);
