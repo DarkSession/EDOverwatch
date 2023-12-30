@@ -1,5 +1,5 @@
 ﻿using EDOverwatch_Web.WebSockets.EventListener.Home;
-using Microsoft.Extensions.Caching.Memory;
+using LazyCache;
 
 namespace EDOverwatch_Web.WebSockets.Handler
 {
@@ -9,16 +9,16 @@ namespace EDOverwatch_Web.WebSockets.Handler
 
         public override bool AllowAnonymous => true;
 
-        private IMemoryCache MemoryCache { get; }
+        private IAppCache AppCache { get; }
 
-        public OverwatchAlertPredictions(IMemoryCache memoryCache)
+        public OverwatchAlertPredictions(IAppCache appCache)
         {
-            MemoryCache = memoryCache;
+            AppCache = appCache;
         }
 
         public override async ValueTask<WebSocketHandlerResult> ProcessMessage(WebSocketMessageReceived message, WebSocketSession webSocketSession, ApplicationUser? user, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            return new WebSocketHandlerResultSuccess(await Models.OverwatchAlertPredictions.Create(dbContext, MemoryCache, cancellationToken), new HomeObject());
+            return new WebSocketHandlerResultSuccess(await Models.OverwatchAlertPredictions.Create(dbContext, AppCache, cancellationToken), new HomeObject());
         }
     }
 }

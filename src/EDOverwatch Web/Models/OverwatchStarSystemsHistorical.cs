@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using LazyCache;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EDOverwatch_Web.Models
 {
@@ -24,10 +25,10 @@ namespace EDOverwatch_Web.Models
             return $"OverwatchStarSystemsHistorical-{tickTime}";
         }
 
-        public static void DeleteMemoryEntry(IMemoryCache memoryCache, DateOnly cycle)
+        public static void DeleteMemoryEntry(IAppCache appCache, DateOnly cycle)
         {
             DateTimeOffset tickTime = GetTickTime(cycle);
-            memoryCache.Remove(CacheKey(tickTime));
+            appCache.Remove(CacheKey(tickTime));
         }
 
         private static DateTimeOffset GetTickTime(DateOnly? cycle)
@@ -44,10 +45,10 @@ namespace EDOverwatch_Web.Models
             return WeeklyTick.GetTickTime(date);
         }
 
-        public static Task<OverwatchStarSystemsHistorical> Create(DateOnly? cycle, EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        public static Task<OverwatchStarSystemsHistorical> Create(DateOnly? cycle, EdDbContext dbContext, IAppCache appCache, CancellationToken cancellationToken)
         {
             DateTimeOffset tickTime = GetTickTime(cycle);
-            return memoryCache.GetOrCreateAsync(CacheKey(tickTime), (cacheEntry) =>
+            return appCache.GetOrAddAsync(CacheKey(tickTime), (cacheEntry) =>
             {
                 cacheEntry.SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
                 return CreateInternal(tickTime, dbContext, cancellationToken);

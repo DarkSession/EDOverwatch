@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using LazyCache;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EDOverwatch_Web.Models
 {
@@ -84,14 +85,14 @@ namespace EDOverwatch_Web.Models
             return $"OverwatchStarSystemFullDetail-{systemAddress}";
         }
 
-        public static void DeleteMemoryEntry(IMemoryCache memoryCache, long systemAddress)
+        public static void DeleteMemoryEntry(IAppCache appCache, long systemAddress)
         {
-            memoryCache.Remove(CacheKey(systemAddress));
+            appCache.Remove(CacheKey(systemAddress));
         }
 
-        public static Task<OverwatchStarSystemFullDetail?> Create(long systemAddress, EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        public static Task<OverwatchStarSystemFullDetail?> Create(long systemAddress, EdDbContext dbContext, IAppCache appCache, CancellationToken cancellationToken)
         {
-            return memoryCache.GetOrCreateAsync(CacheKey(systemAddress), (cacheEntry) =>
+            return appCache.GetOrAddAsync(CacheKey(systemAddress), (cacheEntry) =>
             {
                 cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
                 return CreateInternal(systemAddress, dbContext, cancellationToken);

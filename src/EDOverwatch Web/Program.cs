@@ -111,6 +111,8 @@ namespace EDOverwatch_Web
             });
             builder.Services.AddScoped<FDevOAuth>();
 
+            builder.Services.AddLazyCache();
+
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.

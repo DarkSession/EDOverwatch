@@ -1,7 +1,7 @@
 ﻿using ActiveMQ.Artemis.Client;
 using EDOverwatch_Web.Models;
+using LazyCache;
 using Messages;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 
 namespace EDOverwatch_Web.WebSockets.EventListener.Home
@@ -15,16 +15,16 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Home
             (StarSystemUpdated.QueueName, StarSystemUpdated.Routing),
         };
 
-        private IMemoryCache MemoryCache { get; }
+        private IAppCache AppCache { get; }
 
-        public HomeObjectV2Events(IMemoryCache memoryCache)
+        public HomeObjectV2Events(IAppCache appCache)
         {
-            MemoryCache = memoryCache;
+            AppCache = appCache;
         }
 
         public async ValueTask ProcessEvent(string queueName, JObject json, WebSocketServer webSocketServer, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            OverwatchOverviewV2.DeleteMemoryEntry(MemoryCache);
+            OverwatchOverviewV2.DeleteMemoryEntry(AppCache);
 
             HomeV2Object homeObject = new();
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(homeObject)).ToList();
@@ -42,7 +42,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Home
                 {
                     return;
                 }
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchHomeV2), await OverwatchOverviewV2.Create(dbContext, MemoryCache, cancellationToken));
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchHomeV2), await OverwatchOverviewV2.Create(dbContext, AppCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

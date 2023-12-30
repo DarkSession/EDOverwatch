@@ -1,6 +1,6 @@
 ﻿using ActiveMQ.Artemis.Client;
+using LazyCache;
 using Messages;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 
 namespace EDOverwatch_Web.WebSockets.EventListener.Maelstroms
@@ -12,11 +12,11 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Maelstroms
             (StarSystemThargoidLevelChanged.QueueName, StarSystemThargoidLevelChanged.Routing),
         };
 
-        private IMemoryCache MemoryCache { get; }
+        private IAppCache AppCache { get; }
 
-        public MaelstromsObjectEvents(IMemoryCache memoryCache)
+        public MaelstromsObjectEvents(IAppCache appCache)
         {
-            MemoryCache = memoryCache;
+            AppCache = appCache;
         }
 
         public async ValueTask ProcessEvent(string queueName, JObject json, WebSocketServer webSocketServer, EdDbContext dbContext, CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Maelstroms
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(maelstromObject)).ToList();
             if (sessions.Any())
             {
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchMaelstroms), await Models.OverwatchMaelstroms.Create(dbContext, MemoryCache, cancellationToken));
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchMaelstroms), await Models.OverwatchMaelstroms.Create(dbContext, AppCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

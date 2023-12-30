@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using LazyCache;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EDOverwatch_Web.Models
 {
@@ -19,14 +20,14 @@ namespace EDOverwatch_Web.Models
 
         private const string CacheKey = "OverwatchStarSystems";
 
-        public static void DeleteMemoryEntry(IMemoryCache memoryCache)
+        public static void DeleteMemoryEntry(IAppCache appCache)
         {
-            memoryCache.Remove(CacheKey);
+            appCache.Remove(CacheKey);
         }
 
-        public static Task<OverwatchStarSystems> Create(EdDbContext dbContext, IMemoryCache memoryCache, CancellationToken cancellationToken)
+        public static Task<OverwatchStarSystems> Create(EdDbContext dbContext, IAppCache appCache, CancellationToken cancellationToken)
         {
-            return memoryCache.GetOrCreateAsync(CacheKey, (cacheEntry) =>
+            return appCache.GetOrAddAsync(CacheKey, (cacheEntry) =>
             {
                 cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
                 return CreateInternal(dbContext, cancellationToken);
