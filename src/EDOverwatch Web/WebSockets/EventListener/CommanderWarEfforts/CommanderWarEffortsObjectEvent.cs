@@ -15,7 +15,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.CommanderWarEfforts
         {
             WarEffortUpdated? warEffortUpdated = json.ToObject<WarEffortUpdated>();
             if (warEffortUpdated == null ||
-                warEffortUpdated.FDevCustomerId != null ||
+                warEffortUpdated.FDevCustomerId == null ||
                 await dbContext.Commanders.SingleOrDefaultAsync(c => c.FDevCustomerId == warEffortUpdated.FDevCustomerId, cancellationToken) is not EDDatabase.Commander commander)
             {
                 return;
