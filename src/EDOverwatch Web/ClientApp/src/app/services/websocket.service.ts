@@ -37,7 +37,7 @@ export class WebsocketService {
 
     public constructor() {
         this.initDb();
-        this.initalize();
+        this.initalizeConnection(false);
         window.addEventListener("online", () => {
             this.initalizeConnection(false);
         });
@@ -63,6 +63,9 @@ export class WebsocketService {
     }
 
     private async initDb(): Promise<void> {
+        if (!environment.production) {
+            console.log("initDb");
+        }
         try {
             this.cacheDb = await idb.openDB<CacheDb>('OverwatchCache', 1, {
                 upgrade(db) {
@@ -70,7 +73,7 @@ export class WebsocketService {
                 },
             });
             if (this.cacheDb) {
-                for (const queueItem of this.messageQueue) {
+                for (const queueItem of [...this.messageQueue]) {
                     this.checkMessageCache(queueItem.message, !!queueItem.callback);
                 }
             }
@@ -93,6 +96,9 @@ export class WebsocketService {
     }
 
     public disconnect(): void {
+        if (!environment.production) {
+            console.log("disconnect");
+        }
         if (this.connectionStatus === ConnectionStatus.Open) {
             this.authenticationResolved = new Promise((resolve) => {
                 this.authenticationResolve = resolve;
@@ -109,6 +115,9 @@ export class WebsocketService {
 
     private updateServerStatus(serverStatus: ServerStatus): void {
         if (this.serverStatus != serverStatus) {
+            if (!environment.production) {
+                console.log("updateServerStatus", serverStatus);
+            }
             this.serverStatus = serverStatus;
             this.serverStatusChanged.emit(this.serverStatus);
         }
@@ -120,30 +129,19 @@ export class WebsocketService {
             clearTimeout(this.initalizeTimeout);
             this.initalizeTimeout = null;
         }
-        if (delayed) {
-            const timeout = this.connectionAttempt > 5 ? 10000 : 5000;
-            this.initalizeTimeout = setTimeout(() => {
-                this.initalize();
-            }, timeout);
-        }
-        else {
+        const timeout = delayed ? (this.connectionAttempt > 5 ? 10000 : 5000) : 50;
+        this.initalizeTimeout = setTimeout(() => {
             this.initalize();
-        }
+        }, timeout);
     }
 
     private async initalize(): Promise<void> {
-        if (!navigator.onLine) {
+        if (!environment.production) {
+            console.log("initalize");
+        }
+        if (!navigator.onLine || this.webSocket?.readyState == ConnectionStatus.Connecting || this.webSocket?.readyState == ConnectionStatus.Open) {
             return;
         }
-        if (this.webSocket != null &&
-            (this.webSocket.readyState == ConnectionStatus.Connecting || this.webSocket.readyState == ConnectionStatus.Open)) {
-            return;
-        }
-        this.authenticationResolved = new Promise((resolve) => {
-            this.authenticationResolve = resolve;
-        });
-        this.failCallbacks();
-        this.connectionAttempt++;
 
         try {
             const url = window.location.origin + "/api/v1/status";
@@ -169,6 +167,15 @@ export class WebsocketService {
             this.initalizeConnection();
             return;
         }
+
+        if (this.webSocket?.readyState == ConnectionStatus.Connecting || this.webSocket?.readyState == ConnectionStatus.Open) {
+            return;
+        }
+        this.authenticationResolved = new Promise((resolve) => {
+            this.authenticationResolve = resolve;
+        });
+        this.failCallbacks();
+        this.connectionAttempt++;
 
         let webSocketUrl = ((window.location.protocol === "http:") ? "ws://" : "wss://") + window.location.hostname;
         if (environment.websocketPort) {
@@ -232,19 +239,35 @@ export class WebsocketService {
             const authenticationData: WebSocketMessageAuthenticationData = message.Data as any;
             if (this.connectionIsAuthenticated !== authenticationData.IsAuthenticated) {
                 this.connectionIsAuthenticated = authenticationData.IsAuthenticated;
+                if (!environment.production) {
+                    console.log("connectionIsAuthenticatedChanged -> emit");
+                }
                 this.connectionIsAuthenticatedChanged.emit();
             }
             if (this.connectionStatus === ConnectionStatus.Open) {
+                if (!environment.production) {
+                    console.log("onReady -> emit");
+                }
                 this.onReady.emit(this.wasConnected);
                 this.wasConnected = true;
-            }
-            this.connectionAttempt = 0;
-            for (const queueItem of this.messageQueue) {
-                this.sendMessageInternal(queueItem.message, !queueItem.message.CacheId, queueItem.callback);
-            }
-            this.messageQueue = [];
-            if (this.authenticationResolve) {
-                this.authenticationResolve();
+
+                for (const queueItem of [...this.messageQueue]) {
+                    if (!environment.production) {
+                        console.log("queueItem -> send", queueItem);
+                    }
+                    const i = this.messageQueue.findIndex(e => e == queueItem);
+                    if (i !== -1) {
+                        this.messageQueue.splice(i, 1);
+                    }
+                    this.sendMessageInternal(queueItem.message, !queueItem.message.CacheId, queueItem.callback);
+                }
+                if (this.authenticationResolve) {
+                    if (!environment.production) {
+                        console.log("authenticationResolve");
+                    }
+                    this.authenticationResolve();
+                }
+                this.connectionAttempt = 0;
             }
         }
         else {
@@ -325,6 +348,9 @@ export class WebsocketService {
             this.webSocket.send(JSON.stringify(message));
         }
         else {
+            if (!environment.production) {
+                console.log("Added to messageQueue, connectionStatus: ", this.connectionStatus, message);
+            }
             this.messageQueue.push({
                 message: message,
                 callback: callback,
