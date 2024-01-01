@@ -59,7 +59,7 @@ namespace EDDataProcessor.Journal
                     if (starSystem.ThargoidLevel.Progress == null || fsdJumpThargoidWar.WarProgressInternal > starSystem.ThargoidLevel.Progress)
                     {
                         starSystem.ThargoidLevel.Progress = fsdJumpThargoidWar.WarProgressInternal;
-                        starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, fsdJumpThargoidWar.WarProgressInternal)
+                        starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, fsdJumpThargoidWar.WarProgressInternal, fsdJumpThargoidWar.WarProgress)
                         {
                             ThargoidLevel = starSystem.ThargoidLevel,
                         };

@@ -32,5 +32,6 @@
     public enum AlertPredictionAttackerStatus : byte
     {
         Default = 0,
+        Expired,
     }
 }

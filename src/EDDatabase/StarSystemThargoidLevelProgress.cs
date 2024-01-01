@@ -17,12 +17,16 @@
         [Column]
         public short? Progress { get; set; }
 
-        public StarSystemThargoidLevelProgress(int id, DateTimeOffset updated, DateTimeOffset lastChecked, short? progress)
+        [Column(TypeName = "decimal(10,6)")]
+        public decimal? ProgressPercent { get; set; }
+
+        public StarSystemThargoidLevelProgress(int id, DateTimeOffset updated, DateTimeOffset lastChecked, short? progress, decimal? progressPercent)
         {
             Id = id;
             Updated = updated;
             LastChecked = lastChecked;
             Progress = progress;
+            ProgressPercent = progressPercent;
         }
     }
 }

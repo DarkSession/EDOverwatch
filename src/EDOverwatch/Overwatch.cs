@@ -336,7 +336,7 @@ namespace EDOverwatch
                 {
                     if (thargoidLevel.CurrentProgress == null || (thargoidLevel.Progress ?? -1) < progress)
                     {
-                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress)
+                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress, progress / 100m)
                         {
                             ThargoidLevel = starSystem.ThargoidLevel,
                         };

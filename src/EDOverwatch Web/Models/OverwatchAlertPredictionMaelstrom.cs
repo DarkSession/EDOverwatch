@@ -10,12 +10,14 @@
         public OverwatchAlertPredictionMaelstrom(ThargoidMaelstrom thargoidMaelstrom, List<AlertPrediction> alertPredictions)
         {
             Maelstrom = new(thargoidMaelstrom);
-            Systems = alertPredictions.Select(a =>
+            Systems = alertPredictions
+                .Select(a =>
                 {
                     double distance = Math.Round(a.StarSystem!.DistanceTo(thargoidMaelstrom.StarSystem!), 4);
-                    return new OverwatchAlertPredictionSystem(a.StarSystem, thargoidMaelstrom, distance, a.Attackers!, a.AlertLikely);
+                    return new OverwatchAlertPredictionSystem(a.StarSystem, thargoidMaelstrom, distance, a);
                 })
-                .OrderBy(a => a.Distance)
+                .OrderBy(a => a.Order)
+                .ThenBy(a => a.Distance)
                 .ToList();
             AttackingSystemCount = alertPredictions
                 .SelectMany(a => a.Attackers!)

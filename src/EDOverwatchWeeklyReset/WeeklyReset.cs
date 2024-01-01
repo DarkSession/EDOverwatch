@@ -211,17 +211,19 @@ namespace EDDataProcessor
 
                 foreach (StarSystem starSystem in starSystems)
                 {
+                    short progress;
                     if (starSystem.ThargoidLevel!.Progress <= 33)
                     {
                         starSystem.ThargoidLevel!.Progress = 0;
+                        progress = 0;
                     }
                     else
                     {
-                        short progress = (short)starSystem.ThargoidLevel!.Progress!;
+                        progress = (short)starSystem.ThargoidLevel!.Progress!;
                         progress -= 33;
                         starSystem.ThargoidLevel!.Progress = progress;
                     }
-                    starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, starSystem.ThargoidLevel!.Progress)
+                    starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress, progress / 100m)
                     {
                         ThargoidLevel = starSystem.ThargoidLevel,
                     };

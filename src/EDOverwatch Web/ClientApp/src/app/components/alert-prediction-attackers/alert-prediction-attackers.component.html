@@ -1,5 +1,5 @@
 <div *ngFor="let attacker of visibleAttackers" [ngClass]="{
-    'eliminated': attacker.StarSystem.StateProgress.IsCompleted,
+    'eliminated': attacker.StarSystem.StateProgress.IsCompleted || !attacker.IsActive,
     'locked': attacker.StarSystem.ThargoidSpireSiteInSystem
 }">
     <span class="clickable" [routerLink]="['/system', attacker.StarSystem.SystemAddress]">

@@ -1,5 +1,6 @@
 ﻿using EDDatabase;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace EDOverwatchAlertPrediction
 {
@@ -74,11 +75,10 @@ namespace EDOverwatchAlertPrediction
             foreach (ThargoidMaelstrom maelstrom in maelstroms)
             {
                 List<Attack> possibleAttacks = new();
-                int maelstromAlertCount = 0;
 
                 foreach (StarSystemCycleState attackingSystem in possibleAttackers.Where(p => p.Maelstrom == maelstrom.Name))
                 {
-                    foreach (StarSystemCycleState victimSystem in possibleVictims.Where(p => attackingSystem.CanAttackSystem(p)))
+                    foreach (StarSystemCycleState victimSystem in possibleVictims.Where(attackingSystem.CanAttackSystem))
                     {
                         Attack? possibleAttack = possibleAttacks.FirstOrDefault(p => p.VictimSystem.SystemAddress == victimSystem.SystemAddress);
                         if (possibleAttack == null)
@@ -90,6 +90,7 @@ namespace EDOverwatchAlertPrediction
                     }
                 }
 
+                int order = 0;
                 int attackingCredits = 24;
                 AttackMode attackMode = AttackMode.Closest;
                 double maxControlSystemDistance = starSystems
@@ -100,7 +101,6 @@ namespace EDOverwatchAlertPrediction
 
                 {
                     List<Attack> attackList = possibleAttacks.OrderBy(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!)).ToList();
-
                     foreach (Attack attack in attackList)
                     {
                         int attackCost = attack.VictimSystem.AttackCost();
@@ -108,7 +108,8 @@ namespace EDOverwatchAlertPrediction
 
                         StarSystemCycleState? primaryAttacker = attack.Attackers
                             .Where(a => !PrimaryAttackerSystems.Contains(a))
-                            .OrderBy(a => a.DistanceTo(maelstrom.StarSystem!))
+                            .OrderBy(a => a.ThargoidLevel?.State)
+                            .ThenBy(a => a.DistanceTo(maelstrom.StarSystem!))
                             .FirstOrDefault();
 
                         if (alertPossible && primaryAttacker == null)
@@ -123,10 +124,9 @@ namespace EDOverwatchAlertPrediction
                         if (alertPossible)
                         {
                             attackingCredits -= attackCost;
-                            maelstromAlertCount++;
                         }
-
-                        await ProcessAttack(attack, alertPossible, maelstrom, primaryAttacker, dbContext, cancellationToken);
+                        order++;
+                        await ProcessAttack(attack, alertPossible, maelstrom, primaryAttacker, order, dbContext, cancellationToken);
                         possibleAttacks.Remove(attack);
                     }
                 }
@@ -159,15 +159,13 @@ namespace EDOverwatchAlertPrediction
                         bool isBacktrack = skippedAttacks.Contains(attack.VictimSystem.SystemAddress);
                         if (alertPossible)
                         {
-                            if (maelstromAlertCount >= 5 && !isBacktrack && backtracks == 0)
+                            if (attackingCredits == attackCost && !isBacktrack && backtracks == 0)
                             {
                                 alertPossible = false;
                             }
                             else
                             {
                                 attackingCredits -= attackCost;
-                                maelstromAlertCount++;
-
                                 if (isBacktrack)
                                 {
                                     backtracks++;
@@ -179,25 +177,31 @@ namespace EDOverwatchAlertPrediction
                             }
                         }
 
-                        await ProcessAttack(attack, alertPossible, maelstrom, remainingAttacker, dbContext, cancellationToken);
+                        order++;
+                        await ProcessAttack(attack, alertPossible, maelstrom, remainingAttacker, order, dbContext, cancellationToken);
                         possibleAttacks.Remove(attack);
                     }
 
                     List<Attack> remainingAttackList = possibleAttacks.OrderBy(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!)).ToList();
                     foreach (Attack attack in remainingAttackList)
                     {
-                        await ProcessAttack(attack, false, maelstrom, null, dbContext, cancellationToken);
+                        order++;
+                        await ProcessAttack(attack, false, maelstrom, null, order, dbContext, cancellationToken);
                         possibleAttacks.Remove(attack);
                     }
                 }
             }
 
-            dbContext.AlertPredictions.RemoveRange(alertPredictions.Where(a => !UsedAlertPredictions.Contains(a)));
+            foreach (EDDatabase.AlertPrediction outdatedPrediction in alertPredictions.Where(a => !UsedAlertPredictions.Contains(a)))
+            {
+                outdatedPrediction.Status = AlertPredictionStatus.Expired;
+                outdatedPrediction.Order = 2048;
+            }
 
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ProcessAttack(Attack attack, bool alertPossible, ThargoidMaelstrom maelstrom, StarSystemCycleState? primaryAttacker, EdDbContext dbContext, CancellationToken cancellationToken)
+        private async Task ProcessAttack(Attack attack, bool alertPossible, ThargoidMaelstrom maelstrom, StarSystemCycleState? primaryAttacker, int order, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             EDDatabase.AlertPrediction? systemAlertPrediction = await dbContext.AlertPredictions
                 .AsSingleQuery()
@@ -206,7 +210,7 @@ namespace EDOverwatchAlertPrediction
                 .FirstOrDefaultAsync(cancellationToken);
             if (systemAlertPrediction == null)
             {
-                systemAlertPrediction = new(0, attack.VictimSystem.Id, alertPossible, AlertPredictionStatus.Default)
+                systemAlertPrediction = new(0, attack.VictimSystem.Id, alertPossible, AlertPredictionStatus.Default, order)
                 {
                     Cycle = ThargoidCycle,
                     Maelstrom = maelstrom,
@@ -214,30 +218,45 @@ namespace EDOverwatchAlertPrediction
                 };
                 dbContext.AlertPredictions.Add(systemAlertPrediction);
             }
+            systemAlertPrediction.Order = order;
             systemAlertPrediction.AlertLikely = alertPossible;
+            systemAlertPrediction.Status = AlertPredictionStatus.Default;
+
             UsedAlertPredictions.Add(systemAlertPrediction);
 
             List<AlertPredictionAttacker> usedAttackers = new();
             List<StarSystemCycleState> attackers = attack.Attackers
-                .OrderBy(a => PrimaryAttackerSystems.Contains(a))
+                .OrderBy(PrimaryAttackerSystems.Contains)
                 .ThenByDescending(a => a.SystemAddress == primaryAttacker?.SystemAddress)
                 .ThenBy(a => a.DistanceTo(maelstrom.StarSystem!))
                 .ToList();
-            int order = 0;
+            int attackerOrder = 0;
             foreach (StarSystemCycleState attacker in attackers)
             {
                 AlertPredictionAttacker? alertPredictionAttacker = systemAlertPrediction.Attackers!.FirstOrDefault(a => a.StarSystemId == attacker.Id);
                 if (alertPredictionAttacker == null)
                 {
-                    alertPredictionAttacker = new(0, attacker.Id, order, AlertPredictionAttackerStatus.Default);
+                    alertPredictionAttacker = new(0, attacker.Id, attackerOrder, AlertPredictionAttackerStatus.Default);
                     systemAlertPrediction.Attackers!.Add(alertPredictionAttacker);
                 }
-                alertPredictionAttacker.Order = order;
+                alertPredictionAttacker.Order = attackerOrder;
+                if (PrimaryAttackerSystems.Contains(attacker))
+                {
+                    alertPredictionAttacker.Status = AlertPredictionAttackerStatus.Expired;
+                }
+                else
+                {
+                    alertPredictionAttacker.Status = AlertPredictionAttackerStatus.Default;
+                }
                 usedAttackers.Add(alertPredictionAttacker);
-                order++;
+                attackerOrder++;
             }
 
-            systemAlertPrediction.Attackers!.RemoveAll(a => !usedAttackers.Contains(a));
+            foreach (AlertPredictionAttacker alertPrediction in systemAlertPrediction.Attackers!.Where(a => !usedAttackers.Contains(a)))
+            {
+                alertPrediction.Status = AlertPredictionAttackerStatus.Expired;
+                alertPrediction.Order = 2048;
+            }
 
             if (primaryAttacker != null)
             {

@@ -24,7 +24,6 @@ export class AlertPredictionTopAttackersComponent implements OnChanges, AfterVie
     if (!this.alertPrediction) {
       return;
     }
-    console.log( this.sort);
     this.data = new MatTableDataSource<OverwatchAlertPredictionMaelstromAttackerCount>(this.alertPrediction.AttackingSystemCount);
     this.data.sort = this.sort;
     this.data.sortingDataAccessor = (system: OverwatchAlertPredictionMaelstromAttackerCount, columnName: string): string | number => {

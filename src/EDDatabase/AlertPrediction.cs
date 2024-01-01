@@ -24,19 +24,24 @@
         [Column]
         public AlertPredictionStatus Status { get; set; }
 
+        [Column]
+        public int Order { get; set; }
+
         public List<AlertPredictionAttacker>? Attackers { get; set; }
 
-        public AlertPrediction(int id, long? starSystemId, bool alertLikely, AlertPredictionStatus status)
+        public AlertPrediction(int id, long? starSystemId, bool alertLikely, AlertPredictionStatus status, int order)
         {
             Id = id;
             StarSystemId = starSystemId;
             AlertLikely = alertLikely;
             Status = status;
+            Order = order;
         }
     }
 
     public enum AlertPredictionStatus : byte
     {
         Default = 0,
+        Expired,
     }
 }

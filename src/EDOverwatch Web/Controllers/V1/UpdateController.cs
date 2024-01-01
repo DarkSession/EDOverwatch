@@ -92,7 +92,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     bool changed = false;
                     if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < model.Progress)
                     {
-                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, model.Progress)
+                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, model.Progress, model.Progress / 100m)
                         {
                             ThargoidLevel = starSystem.ThargoidLevel,
                         };

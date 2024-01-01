@@ -25,7 +25,7 @@ export class AlertPredictionComponent implements OnChanges, AfterViewInit {
 
   public constructor(private readonly matSnackBar: MatSnackBar) {
   }
-  
+
   public ngOnChanges(): void {
     if (!this.alertPrediction) {
       return;
@@ -71,6 +71,8 @@ export interface OverwatchAlertPredictionSystem {
   Distance: number;
   Attackers: OverwatchAlertPredictionSystemAttacker[];
   PrimaryTarget: boolean;
+  IsActive: boolean;
+  Order: number;
 }
 
 

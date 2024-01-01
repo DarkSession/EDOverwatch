@@ -47,4 +47,5 @@ export class AlertPredictionAttackersComponent implements OnChanges {
 export interface OverwatchAlertPredictionSystemAttacker {
   StarSystem: OverwatchStarSystem;
   Distance: number;
+  IsActive: boolean;
 }

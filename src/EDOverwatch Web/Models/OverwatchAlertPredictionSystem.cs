@@ -6,19 +6,23 @@
         public double Distance { get; set; }
         public List<OverwatchAlertPredictionSystemAttacker> Attackers { get; set; }
         public bool PrimaryTarget { get; set; }
+        public bool IsActive { get; set; }
+        public int Order { get; set; }
 
-        public OverwatchAlertPredictionSystem(StarSystem starSystem, ThargoidMaelstrom maelstrom, double distance, List<AlertPredictionAttacker> attackers, bool primaryTarget)
+        public OverwatchAlertPredictionSystem(StarSystem starSystem, ThargoidMaelstrom maelstrom, double distance, AlertPrediction alertPrediction)
         {
             StarSystem = new(starSystem);
             Distance = distance;
-            Attackers = attackers
+            Attackers = alertPrediction.Attackers!
                 .OrderBy(a => a.Order)
                 .Select(a =>
                 {
                     double distance = Math.Round(maelstrom.StarSystem!.DistanceTo(a.StarSystem!), 4);
                     return new OverwatchAlertPredictionSystemAttacker(a, distance);
                 }).ToList();
-            PrimaryTarget = primaryTarget;
+            PrimaryTarget = alertPrediction.AlertLikely;
+            IsActive = alertPrediction.Status == AlertPredictionStatus.Default;
+            Order = alertPrediction.Order;
         }
     }
 }
