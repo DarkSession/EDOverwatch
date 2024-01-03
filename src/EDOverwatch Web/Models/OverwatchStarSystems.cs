@@ -37,6 +37,7 @@ namespace EDOverwatch_Web.Models
         private static async Task<OverwatchStarSystems> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
         {
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
 
             DateTimeOffset lastTick = WeeklyTick.GetLastTick();
             DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
@@ -80,6 +81,7 @@ namespace EDOverwatch_Web.Models
                     EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
                     AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
                     GroundPortUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack && StationType.WarGroundAssetTypes.Contains(s.Type!.Name)).Any(),
+                    HasAlertPredicted = dbContext.AlertPredictions.Any(a => a.StarSystem == s && a.Cycle == nextThargoidCycle),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -137,7 +139,8 @@ namespace EDOverwatch_Web.Models
                     system.FederalFaction,
                     system.EmpireFaction,
                     system.AXConflictZones,
-                    system.GroundPortUnderAttack));
+                    system.GroundPortUnderAttack,
+                    system.HasAlertPredicted));
             }
             return result;
         }

@@ -8,7 +8,7 @@
 
         public OverwatchAlertPredictionSystemAttacker(AlertPredictionAttacker alertPredictionAttacker, double distance)
         {
-            StarSystem = new(alertPredictionAttacker.StarSystem!);
+            StarSystem = new(alertPredictionAttacker.StarSystem!, false);
             Distance = distance;
             IsActive = alertPredictionAttacker.Status == AlertPredictionAttackerStatus.Default;
         }

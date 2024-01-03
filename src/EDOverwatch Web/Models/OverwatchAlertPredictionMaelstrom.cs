@@ -36,7 +36,7 @@
 
         public OverwatchAlertPredictionMaelstromAttackerCount(StarSystem starSystem, int count)
         {
-            StarSystem = new(starSystem);
+            StarSystem = new(starSystem, false);
             Count = count;
         }
     }

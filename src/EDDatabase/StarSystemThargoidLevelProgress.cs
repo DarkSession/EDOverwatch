@@ -14,18 +14,24 @@
 
         public StarSystemThargoidLevel? ThargoidLevel { get; set; }
 
-        [Column]
-        public short? Progress { get; set; }
+        [Column("Progress")]
+        public short? ProgressOld { get; set; }
 
         [Column(TypeName = "decimal(10,6)")]
         public decimal? ProgressPercent { get; set; }
 
-        public StarSystemThargoidLevelProgress(int id, DateTimeOffset updated, DateTimeOffset lastChecked, short? progress, decimal? progressPercent)
+        [NotMapped]
+        public decimal ProgressReadable => Math.Round((ProgressPercent ?? 0m) * 100, 2);
+
+        [NotMapped]
+        public bool IsCompleted => ProgressPercent >= 1m;
+
+        public StarSystemThargoidLevelProgress(int id, DateTimeOffset updated, DateTimeOffset lastChecked, short? progressOld, decimal? progressPercent)
         {
             Id = id;
             Updated = updated;
             LastChecked = lastChecked;
-            Progress = progress;
+            ProgressOld = progressOld;
             ProgressPercent = progressPercent;
         }
     }

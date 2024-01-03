@@ -481,6 +481,18 @@ namespace EDDataProcessor.EDDN
                 return result;
             }
         }
+        [JsonIgnore]
+        public decimal WarProgressInternalDecimal
+        {
+            get
+            {
+                if (WarProgress > 1m)
+                {
+                    return 1m;
+                }
+                return WarProgress;
+            }
+        }
         public int RemainingPorts { get; set; }
         public string? EstimatedRemainingTime { get; set; }
 

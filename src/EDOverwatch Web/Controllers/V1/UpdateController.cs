@@ -2,6 +2,7 @@
 using Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace EDOverwatch_Web.Controllers.V1
@@ -83,22 +84,32 @@ namespace EDOverwatch_Web.Controllers.V1
                     .Include(s => s.ThargoidLevel)
                     .ThenInclude(t => t!.CurrentProgress)
                     .FirstOrDefaultAsync(s => s.SystemAddress == model.SystemAddress, cancellationToken);
-                if (starSystem?.ThargoidLevel == null)
+                if (starSystem?.ThargoidLevel is null)
                 {
                     return NotFound();
                 }
-                if (starSystem.ThargoidLevel.State == model.SystemState && ((starSystem.ThargoidLevel.Progress ?? -1) <= model.Progress))
+                decimal progressPercent = model.Progress is short p ? p * 100 : 0;
+                if (starSystem.ThargoidLevel.State == model.SystemState && (starSystem.ThargoidLevel.CurrentProgress?.ProgressPercent ?? 0m) <= progressPercent)
                 {
                     bool changed = false;
-                    if (starSystem.ThargoidLevel.CurrentProgress == null || (starSystem.ThargoidLevel.Progress ?? -1) < model.Progress)
+                    if (starSystem.ThargoidLevel.CurrentProgress is null || (starSystem.ThargoidLevel.CurrentProgress.ProgressPercent ?? 0m) < progressPercent)
                     {
-                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, model.Progress, model.Progress / 100m)
+                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, model.Progress, progressPercent)
                         {
                             ThargoidLevel = starSystem.ThargoidLevel,
                         };
                         DbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
                         starSystem.ThargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
                         changed = true;
+
+                        if (starSystem.ThargoidLevel.CurrentProgress.IsCompleted)
+                        {
+                            await DbContext.DcohFactionOperations
+                                .Where(d =>
+                                    d.StarSystem == starSystem &&
+                                    d.Status == DcohFactionOperationStatus.Active)
+                                .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Status, DcohFactionOperationStatus.Expired), cancellationToken);
+                        }
                     }
                     else
                     {
@@ -117,14 +128,6 @@ namespace EDOverwatch_Web.Controllers.V1
                             starSystem.ThargoidLevel.StateExpires = thargoidCycle;
                             changed = true;
                         }
-                    }
-                    if (model.Progress >= 100)
-                    {
-                        await DbContext.DcohFactionOperations
-                            .Where(d =>
-                                d.StarSystem == starSystem &&
-                                d.Status == DcohFactionOperationStatus.Active)
-                            .ForEachAsync(d => d.Status = DcohFactionOperationStatus.Expired, cancellationToken);
                     }
                     await DbContext.SaveChangesAsync(cancellationToken);
 
@@ -149,7 +152,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     return NotFound();
                 }
                 else if (starSystem.ThargoidLevel?.State == model.SystemState &&
-                    (model.Progress == null || starSystem.ThargoidLevel?.Progress == model.Progress))
+                    (model.Progress == null || starSystem.ThargoidLevel?.CurrentProgress?.ProgressOld == model.Progress))
                 {
                     List<StarSystemUpdateQueueItem> starSystemUpdateQueueItems = await DbContext.StarSystemUpdateQueueItems
                         .Where(s => s.StarSystem == starSystem && s.Status == StarSystemUpdateQueueItemStatus.PendingAutomaticReview)

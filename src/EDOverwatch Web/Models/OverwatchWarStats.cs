@@ -79,7 +79,7 @@ namespace EDOverwatch_Web.Models
                 .AsNoTracking()
                 .Include(s => s.CycleEnd)
                 .Where(s =>
-                    s.Progress == 100 &&
+                    s.CurrentProgress!.ProgressPercent >= 1m &&
                     (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled))
                 .GroupBy(s => new
                 {
@@ -243,7 +243,7 @@ namespace EDOverwatch_Web.Models
             OverwatchOverviewContested statsContested = new(
                 systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Invasion)?.Count ?? 0,
                 systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Alert)?.Count ?? 0,
-                await dbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && s.ThargoidLevel!.Progress > 0).CountAsync(cancellationToken),
+                await dbContext.StarSystems.Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && s.ThargoidLevel!.CurrentProgress!.ProgressPercent > 0m).CountAsync(cancellationToken),
                 systemThargoidLevelCount.FirstOrDefault(s => s.Key == StarSystemThargoidLevelState.Recovery)?.Count ?? 0
             );
 

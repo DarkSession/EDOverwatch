@@ -35,7 +35,7 @@
                     .Include(s => s.CycleStart)
                     .Include(s => s.CycleEnd)
                     .Include(s => s.StateExpires)
-                    .Include(s => s.ProgressHistory!.Where(p => p.Progress == 100))
+                    .Include(s => s.ProgressHistory!.Where(p => p.ProgressPercent >= 1m))
                     .Where(s => s.StarSystem == starSystem);
                 if (thargoidCycle.Start == WeeklyTick.GetLastTick())
                 {
@@ -49,7 +49,7 @@
                 StarSystemThargoidLevel? historicalThargoidLevel = await starSystemThargoidLevelQuery.FirstOrDefaultAsync(cancellationToken);
                 if (historicalThargoidLevel?.ProgressHistory != null &&
                     historicalThargoidLevel.ProgressHistory.Any() &&
-                    historicalThargoidLevel.Progress >= 100 &&
+                    (historicalThargoidLevel.CurrentProgress?.IsCompleted ?? false) &&
                     (historicalThargoidLevel.CycleEnd == null ||
                     historicalThargoidLevel.CycleEnd.Start >= new DateTimeOffset(2022, 12, 22, 7, 0, 0, TimeSpan.Zero)))
                 {

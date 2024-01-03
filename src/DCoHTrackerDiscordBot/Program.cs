@@ -207,9 +207,9 @@ namespace DCoHTrackerDiscordBot
                                 }
                                 string systemState = starSystemUpdateQueueItem.StarSystem.ThargoidLevel?.State.GetEnumMemberValue() ?? "Clear";
                                 embed.AddField("System State", systemState, true);
-                                if (starSystemUpdateQueueItem.StarSystem.ThargoidLevel?.Progress != null)
+                                if (starSystemUpdateQueueItem.StarSystem.ThargoidLevel?.CurrentProgress?.ProgressPercent != null)
                                 {
-                                    embed.AddField("Progress", starSystemUpdateQueueItem.StarSystem.ThargoidLevel.Progress + " %", true);
+                                    embed.AddField("Progress", starSystemUpdateQueueItem.StarSystem.ThargoidLevel.CurrentProgress.ProgressReadable + " %", true);
                                 }
                                 await textChannel.SendMessageAsync($"{user.Mention}", embed: embed.Build(), allowedMentions: mentions);
                             }

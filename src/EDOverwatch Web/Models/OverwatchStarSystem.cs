@@ -17,7 +17,7 @@
         public bool ThargoidSpireSiteInSystem { get; }
         public string? ThargoidSpireSiteBody { get; }
 
-        public OverwatchStarSystem(StarSystem starSystem)
+        public OverwatchStarSystem(StarSystem starSystem, bool hasAlertPrediction)
             : base(starSystem)
         {
             PopulationOriginal = starSystem.OriginalPopulation;
@@ -26,11 +26,10 @@
             {
                 DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 4);
             }
-            short? progress = starSystem.ThargoidLevel?.Progress;
-            StateProgress = new(starSystem, (progress != null) ? (decimal)progress / 100m : null, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None);
+            StateProgress = new(starSystem, (starSystem.ThargoidLevel?.CurrentProgress?.ProgressPercent is decimal p) ? p : null, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None, hasAlertPrediction);
 #pragma warning disable CS0618 // Type or member is obsolete
-            Progress = progress;
-            ProgressPercent = (progress != null) ? (decimal)progress / 100m : null;
+            ProgressPercent = starSystem.ThargoidLevel?.CurrentProgress?.ProgressPercent;
+            Progress = starSystem.ThargoidLevel?.CurrentProgress?.ProgressOld;
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
 #pragma warning restore CS0618 // Type or member is obsolete
             ThargoidSpireSiteInSystem = starSystem.BarnacleMatrixInSystem;

@@ -54,30 +54,48 @@ namespace EDDataProcessor.Journal
                     changed = true;
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
-                if (currentState != StarSystemThargoidLevelState.None && (starSystem.ThargoidLevel.Progress == null || fsdJumpThargoidWar.WarProgressInternal >= starSystem.ThargoidLevel.Progress))
+                if (currentState != StarSystemThargoidLevelState.None)
                 {
-                    if (starSystem.ThargoidLevel.Progress == null || fsdJumpThargoidWar.WarProgressInternal > starSystem.ThargoidLevel.Progress)
+                    WarProgressChange change = WarProgressChange.None;
+                    if (starSystem.ThargoidLevel.CurrentProgress is null || fsdJumpThargoidWar.WarProgress > starSystem.ThargoidLevel.CurrentProgress.ProgressPercent)
                     {
-                        starSystem.ThargoidLevel.Progress = fsdJumpThargoidWar.WarProgressInternal;
-                        starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, fsdJumpThargoidWar.WarProgressInternal, fsdJumpThargoidWar.WarProgress)
-                        {
-                            ThargoidLevel = starSystem.ThargoidLevel,
-                        };
-                        changed = true;
-                        if (starSystem.ThargoidLevel.Progress >= 100)
-                        {
-                            await dbContext.DcohFactionOperations
-                                .Where(d =>
-                                    d.StarSystem == starSystem &&
-                                    d.Status == DcohFactionOperationStatus.Active)
-                                .ForEachAsync(d => d.Status = DcohFactionOperationStatus.Expired, cancellationToken);
-                        }
+                        change = WarProgressChange.ProgressNewOrChanged;
                     }
-                    if (starSystem.ThargoidLevel.CurrentProgress != null && starSystem.ThargoidLevel.CurrentProgress.LastChecked < updateTime)
+                    else if (fsdJumpThargoidWar.WarProgress == starSystem.ThargoidLevel.CurrentProgress.ProgressPercent)
                     {
-                        starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
+                        change = WarProgressChange.ProgressConfirmed;
                     }
-                    if (starSystem.ThargoidLevel.StateExpires == null && fsdJumpThargoidWar.RemainingDays is int remainingDays && remainingDays > 0)
+                    switch (change)
+                    {
+                        case WarProgressChange.ProgressNewOrChanged:
+                            {
+                                starSystem.ThargoidLevel.Progress = fsdJumpThargoidWar.WarProgressInternal;
+                                starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, fsdJumpThargoidWar.WarProgressInternal, fsdJumpThargoidWar.WarProgress)
+                                {
+                                    ThargoidLevel = starSystem.ThargoidLevel,
+                                };
+                                changed = true;
+                                if (starSystem.ThargoidLevel.CurrentProgress.IsCompleted)
+                                {
+                                    await dbContext.DcohFactionOperations
+                                        .Where(d =>
+                                            d.StarSystem == starSystem &&
+                                            d.Status == DcohFactionOperationStatus.Active)
+                                        .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Status, DcohFactionOperationStatus.Expired), cancellationToken);
+                                }
+                                break;
+                            }
+                        case WarProgressChange.ProgressConfirmed:
+                            {
+                                if (starSystem.ThargoidLevel.CurrentProgress is not null)
+                                {
+                                    starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
+                                }
+                                break;
+                            }
+                    }
+
+                    if (starSystem.ThargoidLevel.StateExpires is null && fsdJumpThargoidWar.RemainingDays is int remainingDays && remainingDays > 0)
                     {
                         DateTimeOffset remainingTimeEnd = DateTimeOffset.UtcNow.AddDays(remainingDays);
                         if (remainingTimeEnd.DayOfWeek == DayOfWeek.Wednesday || (remainingTimeEnd.DayOfWeek == DayOfWeek.Thursday && remainingTimeEnd.Hour < 7))
@@ -107,6 +125,13 @@ namespace EDDataProcessor.Journal
                 .OrderBy(m => m.StarSystem?.DistanceTo(starSystem) ?? 999)
                 .FirstOrDefault();
             return maelstrom;
+        }
+
+        private enum WarProgressChange
+        {
+            None,
+            ProgressConfirmed,
+            ProgressNewOrChanged,
         }
     }
 }
