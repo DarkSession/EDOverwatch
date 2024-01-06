@@ -273,7 +273,7 @@ namespace EDOverwatch
                 (thargoidLevel.State == StarSystemThargoidLevelState.Controlled && newThargoidLevel == StarSystemThargoidLevelState.None) ||
                 thargoidLevel.State < newThargoidLevel)
             {
-                decimal progressPercent = progress is short p ? p / 100 : 0m;
+                decimal progressPercent = progress is short p ? p / 100m : 0m;
                 if (thargoidLevel?.State == newThargoidLevel && (thargoidLevel?.CurrentProgress?.ProgressPercent ?? 0m) > progressPercent)
                 {
                     return false;

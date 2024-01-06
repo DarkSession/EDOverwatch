@@ -77,8 +77,8 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Reported progress completion</th>
                 <td mat-cell *matCellDef="let row">
                     <span *ngIf="row.StateProgress.IsCompleted && row.StateProgress.ProgressLastChange"
-                        matTooltip="{{ row.StateProgress.ProgressLastChange | date:'long' }}">
-                        {{ row.StateProgress.ProgressLastChange | timeago }}
+                        matTooltip="{{ row.StateProgress.ProgressCompletionReported | date:'long' }}">
+                        {{ row.StateProgress.ProgressCompletionReported | timeago }}
                     </span>
                 </td>
             </ng-container>

@@ -9,6 +9,7 @@
         public DateTimeOffset? SystemStateChanges { get; }
         public DateTimeOffset? ProgressLastChange { get; }
         public DateTimeOffset? ProgressLastChecked { get; }
+        public DateTimeOffset? ProgressCompletionReported { get; }
         public OverwatchStarSystemStateProgress(StarSystem starSystem, decimal? progressPercent, StarSystemThargoidLevelState currentSystemState, bool hasAlertPrediction)
         {
             ProgressUncapped = progressPercent;
@@ -30,6 +31,15 @@
             }
             ProgressLastChange = starSystem.ThargoidLevel?.CurrentProgress?.Updated;
             ProgressLastChecked = starSystem.ThargoidLevel?.CurrentProgress?.LastChecked;
+
+            if (starSystem.ThargoidLevel?.ProgressHistory != null)
+            {
+                ProgressCompletionReported = starSystem.ThargoidLevel?.ProgressHistory
+                    .Where(p => p.IsCompleted)
+                    .OrderBy(p => p.Updated)
+                    .Select(p => p.Updated)
+                    .FirstOrDefault();
+            }
         }
     }
 }

@@ -303,4 +303,5 @@ interface StateProgress {
   SystemStateChanges: string;
   ProgressLastChange: string;
   ProgressLastChecked: string;
+  ProgressCompletionReported: string;
 }
