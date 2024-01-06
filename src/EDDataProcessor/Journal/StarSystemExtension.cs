@@ -74,12 +74,9 @@ namespace EDDataProcessor.Journal
                                 .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Status, DcohFactionOperationStatus.Expired), cancellationToken);
                         }
                     }
-                    else if (fsdJumpThargoidWar.WarProgress == starSystem.ThargoidLevel.CurrentProgress.ProgressPercent)
+                    else if (fsdJumpThargoidWar.WarProgress == starSystem.ThargoidLevel.CurrentProgress.ProgressPercent && starSystem.ThargoidLevel.CurrentProgress.LastChecked < updateTime)
                     {
-                        if (starSystem.ThargoidLevel.CurrentProgress is not null)
-                        {
-                            starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
-                        }
+                        starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
                     }
 
                     if (starSystem.ThargoidLevel.StateExpires is null && fsdJumpThargoidWar.RemainingDays is int remainingDays && remainingDays > 0)
