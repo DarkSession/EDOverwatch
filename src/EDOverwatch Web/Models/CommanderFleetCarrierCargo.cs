@@ -49,7 +49,7 @@
                 throw new Exception("Commodity cannot be null");
             }
             Commodity = commanderFleetCarrierCargoItem.Commodity.NameEnglish ?? "Localisation missing: " + commanderFleetCarrierCargoItem.Commodity.Name;
-            StarSystem = new(commanderFleetCarrierCargoItem.SourceStarSystem ?? throw new Exception("SourceStarSystem cannot be null"));
+            StarSystem = new(commanderFleetCarrierCargoItem.SourceStarSystem ?? throw new Exception("SourceStarSystem cannot be null"), false);
             Quantity = commanderFleetCarrierCargoItem.Amount;
             StackNumber = commanderFleetCarrierCargoItem.StackNumber;
             Changed = commanderFleetCarrierCargoItem.CreatedUpdated;

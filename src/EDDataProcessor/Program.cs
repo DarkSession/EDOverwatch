@@ -54,6 +54,7 @@ namespace EDDataProcessor
                         .LogTo(Console.WriteLine)
 #endif
                         ;
+                    optionsBuilder.UseProjectables();
                 })
                 .AddScoped<CAPI>()
                 .AddScoped<FDevOAuth>()

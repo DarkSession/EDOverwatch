@@ -267,23 +267,23 @@ namespace EDOverwatch
             Transaction transaction,
             CancellationToken cancellationToken)
         {
+            StarSystemThargoidLevel? thargoidLevel = starSystem.ThargoidLevel;
             if (isManualUpdate ||
-                starSystem.ThargoidLevel?.State == null ||
-                (starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Controlled && newThargoidLevel == StarSystemThargoidLevelState.None) ||
-                starSystem.ThargoidLevel.State < newThargoidLevel)
+                thargoidLevel?.State == null ||
+                (thargoidLevel.State == StarSystemThargoidLevelState.Controlled && newThargoidLevel == StarSystemThargoidLevelState.None) ||
+                thargoidLevel.State < newThargoidLevel)
             {
-                if (starSystem.ThargoidLevel?.State == newThargoidLevel &&
-                    (progress == null || starSystem.ThargoidLevel?.Progress == progress))
+                decimal progressPercent = progress is short p ? p * 100 : 0m;
+                if (thargoidLevel?.State == newThargoidLevel && (thargoidLevel?.CurrentProgress?.ProgressPercent ?? 0m) > progressPercent)
                 {
                     return false;
                 }
                 DateTimeOffset time = isManualUpdate ? DateTimeOffset.UtcNow : starSystem.Updated;
                 ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(time, cancellationToken);
-                if (!isManualUpdate && starSystem.ThargoidLevel?.ManualUpdateCycle?.Id == currentThargoidCycle.Id)
+                if (!isManualUpdate && thargoidLevel?.ManualUpdateCycle?.Id == currentThargoidCycle.Id)
                 {
                     return false;
                 }
-                StarSystemThargoidLevel? thargoidLevel = starSystem.ThargoidLevel;
                 ThargoidCycle? stateExpires = null;
                 if (remainingTime > TimeSpan.Zero)
                 {
@@ -310,7 +310,7 @@ namespace EDOverwatch
                         StarSystem = starSystem,
                         CycleStart = currentThargoidCycle,
                         Maelstrom = maelstrom,
-                        Progress = progress,
+                        ProgressOld = progress,
                         StateExpires = stateExpires,
                     };
                     starSystem.ThargoidLevel = thargoidLevel;
@@ -332,23 +332,21 @@ namespace EDOverwatch
                     }
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
-                if (progress != null && (isManualUpdate || (thargoidLevel.Progress ?? -1) <= progress))
+                if (thargoidLevel.CurrentProgress is null || (thargoidLevel.CurrentProgress.ProgressPercent ?? 0m) < progressPercent)
                 {
-                    if (thargoidLevel.CurrentProgress == null || (thargoidLevel.Progress ?? -1) < progress)
+                    StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress, progressPercent)
                     {
-                        StarSystemThargoidLevelProgress starSystemThargoidLevelProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress, progress / 100m)
-                        {
-                            ThargoidLevel = starSystem.ThargoidLevel,
-                        };
-                        dbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
-                        thargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
-                    }
-                    else
-                    {
-                        thargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
-                    }
-                    thargoidLevel.Progress = progress;
+                        ThargoidLevel = thargoidLevel,
+                    };
+                    dbContext.StarSystemThargoidLevelProgress.Add(starSystemThargoidLevelProgress);
+                    thargoidLevel.CurrentProgress = starSystemThargoidLevelProgress;
                 }
+                else
+                {
+                    thargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
+                }
+                thargoidLevel.ProgressOld = progress;
+
                 if (stateExpires != null)
                 {
                     thargoidLevel.StateExpires = stateExpires;

@@ -73,7 +73,7 @@ namespace EDOverwatch_Web.Models
 
         public CommanderWarEffortCycleStarSystem(StarSystem starSystem, IEnumerable<EDDatabase.WarEffort> cycleStarSystemWarEfforts)
         {
-            StarSystem = new(starSystem);
+            StarSystem = new(starSystem, false);
             WarEfforts = cycleStarSystemWarEfforts
                 .Select(w => new CommanderWarEffortCycleStarSystemWarEffort(w))
                 .ToList();

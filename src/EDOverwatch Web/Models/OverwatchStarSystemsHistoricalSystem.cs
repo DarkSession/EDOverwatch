@@ -7,10 +7,11 @@
         public string State { get; }
         public long PopulationOriginal { get; }
         public double DistanceToMaelstrom { get; }
-        [Obsolete]
+        [Obsolete("Use ThargoidSpireSiteInSystem")]
         public bool BarnacleMatrixInSystem { get; }
         public bool ThargoidSpireSiteInSystem { get; }
         public int? Progress { get; }
+        public decimal? ProgressPercent { get; }
         public bool ProgressIsCompleted { get; }
         public DateTimeOffset? StateExpires { get; }
 
@@ -23,9 +24,9 @@
             }
 
             PopulationOriginal = starSystem.OriginalPopulation;
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
-#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
             ThargoidSpireSiteInSystem = starSystem.BarnacleMatrixInSystem;
 
             try
@@ -71,13 +72,15 @@
                 State = state.GetEnumMemberValue();
 
                 DistanceToMaelstrom = thargoidLevel.Maelstrom?.StarSystem?.DistanceTo(starSystem) ?? 0;
-                if (thargoidLevel.Progress == 100 && thargoidLevel.CycleEndId == thargoidLevel.Id)
+                if ((thargoidLevel.CurrentProgress?.IsCompleted ?? false) && thargoidLevel.CycleEndId == thargoidLevel.Id)
                 {
                     Progress = 100;
+                    ProgressPercent = 1m;
                 }
                 else if (thargoidLevel.ProgressHistory?.FirstOrDefault() is StarSystemThargoidLevelProgress progress && progress.Updated != default)
                 {
-                    Progress = progress.Progress;
+                    ProgressPercent = progress.ProgressPercent ?? 0m;
+                    Progress = (int)Math.Floor((decimal)ProgressPercent * 100m);
                 }
                 ProgressIsCompleted = Progress is int p && p >= 100;
                 StateExpires = thargoidLevel.StateExpires?.End;

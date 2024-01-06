@@ -8,13 +8,17 @@
         public DateTimeOffset? SystemStateChanges { get; }
         public DateTimeOffset? ProgressLastChange { get; }
         public DateTimeOffset? ProgressLastChecked { get; }
-        public OverwatchStarSystemStateProgress(StarSystem starSystem, decimal? progressPercent, StarSystemThargoidLevelState currentSystemState)
+        public OverwatchStarSystemStateProgress(StarSystem starSystem, decimal? progressPercent, StarSystemThargoidLevelState currentSystemState, bool hasAlertPrediction)
         {
             ProgressPercent = progressPercent;
             IsCompleted = ProgressPercent >= 1;
             if (IsCompleted)
             {
                 StarSystemThargoidLevelState nextSystemState = StarSystemThargoidLevel.GetNextThargoidState(currentSystemState, starSystem.OriginalPopulation > 0, true);
+                if (nextSystemState == StarSystemThargoidLevelState.None && hasAlertPrediction)
+                {
+                    nextSystemState = StarSystemThargoidLevelState.Alert;
+                }
                 NextSystemState = new(nextSystemState);
                 SystemStateChanges = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
             }

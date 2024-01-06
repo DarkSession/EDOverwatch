@@ -26,7 +26,7 @@ namespace EDOverwatchAlertPrediction
             {
                 Expires = (int)(stateExpiresDate - AlertPrediction.CycleZero).TotalDays / 7;
             }
-            Completed = starSystemThargoidLevel.Progress is short progress && progress >= 100;
+            Completed = starSystemThargoidLevel.CurrentProgress?.IsCompleted ?? false;
         }
 
         public StarSystemCycleStateThargoidLevel(StarSystemThargoidLevelState state, int startCycle, int? endCycle, int? expires, bool completed)

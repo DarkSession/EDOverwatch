@@ -61,7 +61,7 @@
                             <td class="t">Progress</td>
                             <td class="number">
                                 <div class="progress-cell">
-                                    {{ starSystem.StateProgress.ProgressPercent | percent }}
+                                    {{ starSystem.StateProgress.ProgressPercent | percent:'1.4-4' }}
                                     <div class="progress-locked" *ngIf="starSystem.ThargoidSpireSiteInSystem">
                                         <fa-icon [icon]="faHexagonExclamation"
                                             matTooltip="Thargoid spire site present in the system." size="lg"></fa-icon>

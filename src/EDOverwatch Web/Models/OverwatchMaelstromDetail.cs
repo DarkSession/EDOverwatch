@@ -3,7 +3,7 @@
     public class OverwatchMaelstromDetail : OverwatchMaelstrom
     {
         public List<OverwatchStarSystem> Systems { get; }
-        [Obsolete]
+        [Obsolete("Use AlertPrediction")]
         public List<OverwatchAlertPredictionSystem> SystemsAtRisk { get; } = new(); // We keep this for API compatibility reasons for now
         public OverwatchAlertPredictionMaelstrom AlertPrediction { get; }
         public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
@@ -24,6 +24,8 @@
 
         public static async Task<OverwatchMaelstromDetail> Create(ThargoidMaelstrom maelstrom, EdDbContext dbContext, CancellationToken cancellationToken)
         {
+            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+
             await dbContext.Entry(maelstrom)
                 .Reference(m => m.StarSystem)
                 .LoadAsync(cancellationToken);
@@ -68,6 +70,7 @@
                     EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
                     AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
                     GroundPortUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack && StationType.WarGroundAssetTypes.Contains(s.Type!.Name)).Any(),
+                    HasAlertPredicted = dbContext.AlertPredictions.Any(a => a.StarSystem == s && a.Cycle == nextThargoidCycle),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -120,10 +123,10 @@
                     system.FederalFaction,
                     system.EmpireFaction,
                     system.AXConflictZones,
-                    system.GroundPortUnderAttack));
+                    system.GroundPortUnderAttack,
+                    system.HasAlertPredicted));
             }
 
-            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
             List<AlertPrediction> alertPredictions = await dbContext.AlertPredictions
                 .AsNoTracking()
                 .AsSplitQuery()

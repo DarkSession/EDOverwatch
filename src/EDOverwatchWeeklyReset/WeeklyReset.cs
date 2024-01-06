@@ -27,7 +27,7 @@ namespace EDDataProcessor
                     .Where(s =>
                         (s.ThargoidLevel!.StateExpires!.End <= newThargoidCycle.Start ||
                         (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
-                        s.ThargoidLevel.Progress != 100 &&
+                        (s.ThargoidLevel.CurrentProgress == null || !s.ThargoidLevel.CurrentProgress!.IsCompleted) &&
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Titan && // Systems with a maelstrom
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // We do not yet know what happens if we fail to complete systems in recovery
                         )
@@ -83,7 +83,7 @@ namespace EDDataProcessor
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
-                    .Where(s => s.ThargoidLevel!.Progress == 100)
+                    .Where(s => s.ThargoidLevel!.CurrentProgress!.IsCompleted)
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
@@ -206,27 +206,27 @@ namespace EDDataProcessor
                 List<StarSystem> starSystems = await starSystemPreQuery
                     .Where(s =>
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Recovery &&
-                        s.ThargoidLevel.Progress != null && s.ThargoidLevel.Progress != 0)
+                        s.ThargoidLevel.CurrentProgress != null &&
+                        s.ThargoidLevel!.CurrentProgress.HasProgress)
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
                 {
-                    short progress;
-                    if (starSystem.ThargoidLevel!.Progress <= 33)
+                    decimal progress;
+                    if (starSystem.ThargoidLevel!.CurrentProgress!.ProgressPercent <= 33m)
                     {
-                        starSystem.ThargoidLevel!.Progress = 0;
                         progress = 0;
                     }
                     else
                     {
-                        progress = (short)starSystem.ThargoidLevel!.Progress!;
+                        progress = starSystem.ThargoidLevel!.CurrentProgress!.ProgressPercent ?? 0m;
                         progress -= 33;
-                        starSystem.ThargoidLevel!.Progress = progress;
                     }
-                    starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, progress, progress / 100m)
+                    starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, (short)Math.Floor(progress * 100m), progress)
                     {
                         ThargoidLevel = starSystem.ThargoidLevel,
                     };
+                    starSystem.ThargoidLevel!.ProgressOld = starSystem.ThargoidLevel!.CurrentProgress.ProgressLegacy;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }

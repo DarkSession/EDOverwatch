@@ -43,7 +43,7 @@ namespace EDOverwatch_Web.Models
             bool federalFaction,
             bool imperialFaction,
             bool axConflictZones) :
-            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction, axConflictZones, stations.Where(s => s.State == StationState.UnderAttack && (s.Type?.IsWarGroundAsset ?? false)).Any())
+            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction, axConflictZones, stations.Where(s => s.State == StationState.UnderAttack && (s.Type?.IsWarGroundAsset ?? false)).Any(), predictedAttacker != null)
         {
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;
@@ -384,7 +384,7 @@ namespace EDOverwatch_Web.Models
 
         public OverwatchStarSystemNearbySystem(StarSystem nearbySystem, StarSystem starSystem)
         {
-            StarSystem = new(nearbySystem);
+            StarSystem = new(nearbySystem, false);
             Distance = Math.Round(nearbySystem.DistanceTo(starSystem), 4);
             if (starSystem.ThargoidLevel?.Maelstrom?.StarSystem is not null)
             {
@@ -434,15 +434,15 @@ namespace EDOverwatch_Web.Models
         public OverwatchThargoidLevel State { get; }
         public DateOnly Date { get; }
         public DateTimeOffset DateTime { get; }
-        public short Progress { get; }
+        public int Progress { get; }
         public decimal ProgressPercentage { get; }
         public OverwatchStarSystemDetailProgress(StarSystemThargoidLevelProgress starSystemThargoidLevelProgress)
         {
             State = new(starSystemThargoidLevelProgress.ThargoidLevel);
             Date = DateOnly.FromDateTime(starSystemThargoidLevelProgress.Updated.DateTime);
             DateTime = starSystemThargoidLevelProgress.Updated;
-            Progress = starSystemThargoidLevelProgress.Progress ?? 0;
-            ProgressPercentage = (decimal)(starSystemThargoidLevelProgress.Progress ?? 0m) / 100m;
+            ProgressPercentage = starSystemThargoidLevelProgress.ProgressPercent ?? 0m;
+            Progress = (int)Math.Floor(ProgressPercentage * 100);
         }
     }
 
@@ -460,7 +460,7 @@ namespace EDOverwatch_Web.Models
         public OverwatchStarSystemThargoidLevelHistory(StarSystemThargoidLevel starSystemThargoidLevel)
         {
             AllowDetailAnalysisDisplay = (
-                starSystemThargoidLevel.Progress >= 100 &&
+                (starSystemThargoidLevel.CurrentProgress?.IsCompleted ?? false) &&
                 (starSystemThargoidLevel.CycleEnd == null ||
                 starSystemThargoidLevel.CycleEnd.Start >= new DateTimeOffset(2022, 12, 22, 7, 0, 0, TimeSpan.Zero)));
             AnalysisCycle = DateOnly.FromDateTime((starSystemThargoidLevel.CycleEnd?.Start ?? WeeklyTick.GetLastTick()).DateTime);
@@ -468,8 +468,8 @@ namespace EDOverwatch_Web.Models
             StateStart = starSystemThargoidLevel.CycleStart!.Start;
             StateEnds = starSystemThargoidLevel.CycleEnd?.End;
             StateIngameTimerExpires = starSystemThargoidLevel.StateExpires?.End;
-            Progress = starSystemThargoidLevel.Progress;
-            ProgressPercentage = starSystemThargoidLevel.Progress != null ? (decimal)starSystemThargoidLevel.Progress / 100m : null;
+            Progress = starSystemThargoidLevel.CurrentProgress?.ProgressLegacy;
+            ProgressPercentage = starSystemThargoidLevel.CurrentProgress?.ProgressPercent;
         }
     }
 }

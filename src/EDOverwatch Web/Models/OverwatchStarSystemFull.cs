@@ -29,8 +29,9 @@
                     bool federalFaction,
                     bool imperialFaction,
                     bool axConflictZones,
-                    bool groundPortUnderAttack)
-            : base(starSystem)
+                    bool groundPortUnderAttack,
+                    bool hasAlertPrediction)
+            : base(starSystem, hasAlertPrediction)
         {
             EffortFocus = effortFocus;
             FactionOperations = (factionAxOperations + factionGeneralOperations + factionRescueOperations + factionLogisticsOperations);
@@ -68,7 +69,8 @@
             {
                 Features.Add(OverwatchStarSystemFeature.ThargoidControlledReactivationMissions.ToString());
             }
-            if (axConflictZones && ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled && (StateProgress.ProgressPercent ?? 0) < 1m)
+            if (axConflictZones && (StateProgress.ProgressPercent ?? 0) < 1m
+                && (ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled || (ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion && StateExpiration != null && StateExpiration.RemainingCycles > 0)))
             {
                 Features.Add(OverwatchStarSystemFeature.AXConflictZones.ToString());
             }

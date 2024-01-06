@@ -1,6 +1,5 @@
 ﻿using EDDatabase;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace EDOverwatchAlertPrediction
 {

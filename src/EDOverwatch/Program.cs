@@ -46,6 +46,7 @@ namespace EDOverwatch
                         .LogTo(Console.WriteLine)
 #endif
                         ;
+                    optionsBuilder.UseProjectables();
                 })
                 .AddSingleton<Overwatch>()
                 .BuildServiceProvider();
