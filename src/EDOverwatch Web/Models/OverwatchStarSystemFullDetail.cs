@@ -469,7 +469,15 @@ namespace EDOverwatch_Web.Models
             StateEnds = starSystemThargoidLevel.CycleEnd?.End;
             StateIngameTimerExpires = starSystemThargoidLevel.StateExpires?.End;
             Progress = starSystemThargoidLevel.CurrentProgress?.ProgressLegacy;
+            if (Progress != null && Progress > 100)
+            {
+                Progress = 100;
+            }
             ProgressPercentage = starSystemThargoidLevel.CurrentProgress?.ProgressPercent;
+            if (ProgressPercentage != null && ProgressPercentage > 1m)
+            {
+                ProgressPercentage = 1m;
+            }
         }
     }
 }

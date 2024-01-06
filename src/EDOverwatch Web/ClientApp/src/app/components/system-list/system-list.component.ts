@@ -297,6 +297,7 @@ interface OverwatchStarSystemStateExpires {
 
 interface StateProgress {
   ProgressPercent: number;
+  ProgressUncapped: number;
   IsCompleted: boolean;
   NextSystemState: OverwatchThargoidLevel | null;
   SystemStateChanges: string;

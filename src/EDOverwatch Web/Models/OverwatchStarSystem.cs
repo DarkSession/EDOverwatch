@@ -29,7 +29,15 @@
             StateProgress = new(starSystem, starSystem.ThargoidLevel?.CurrentProgress?.ProgressPercent, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None, hasAlertPrediction);
 #pragma warning disable CS0618 // Type or member is obsolete
             ProgressPercent = StateProgress.ProgressPercent;
+            if (ProgressPercent != null && ProgressPercent > 1m)
+            {
+                ProgressPercent = 1m;
+            }
             Progress = starSystem.ThargoidLevel?.CurrentProgress?.ProgressLegacy;
+            if (Progress != null && Progress > 100)
+            {
+                Progress = 100;
+            }
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
 #pragma warning restore CS0618 // Type or member is obsolete
             ThargoidSpireSiteInSystem = starSystem.BarnacleMatrixInSystem;

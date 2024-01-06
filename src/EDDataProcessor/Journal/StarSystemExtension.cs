@@ -59,6 +59,10 @@ namespace EDDataProcessor.Journal
                     if (starSystem.ThargoidLevel.CurrentProgress is null || fsdJumpThargoidWar.WarProgress > starSystem.ThargoidLevel.CurrentProgress.ProgressPercent)
                     {
                         short progressOld = (short)Math.Floor(fsdJumpThargoidWar.WarProgress * 100m);
+                        if (progressOld > 100)
+                        {
+                            progressOld = 100;
+                        }
                         starSystem.ThargoidLevel.ProgressOld = progressOld;
                         starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, progressOld, fsdJumpThargoidWar.WarProgress)
                         {
