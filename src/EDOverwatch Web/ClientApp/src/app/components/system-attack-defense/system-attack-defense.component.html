@@ -41,7 +41,7 @@
                     <div class="state-cell">
                         <app-thargoid-level [thargoidLevel]="row.StarSystem.ThargoidLevel"></app-thargoid-level>
                         <span *ngIf="row.StarSystem.StateProgress.ProgressPercent != null">
-                            ({{ row.StarSystem.StateProgress.ProgressPercent | percent }})
+                            ({{ row.StarSystem.StateProgress.ProgressPercent | percent:'1.0-0' }})
                         </span>
                         <span class="progress-locked" *ngIf="row.StarSystem.ThargoidSpireSiteInSystem">
                             <fa-icon [icon]="faHexagonExclamation"

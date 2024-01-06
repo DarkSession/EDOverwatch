@@ -1,4 +1,6 @@
-﻿namespace EDDatabase
+﻿using EntityFrameworkCore.Projectables;
+
+namespace EDDatabase
 {
     [Table("StarSystemThargoidLevelProgress")]
     public class StarSystemThargoidLevelProgress
@@ -23,7 +25,7 @@
         [NotMapped]
         public decimal ProgressReadable => Math.Round((ProgressPercent ?? 0m) * 100, 2);
 
-        [NotMapped]
+        [Projectable]
         public bool IsCompleted => ProgressPercent >= 1m;
 
         public StarSystemThargoidLevelProgress(int id, DateTimeOffset updated, DateTimeOffset lastChecked, short? progressOld, decimal? progressPercent)

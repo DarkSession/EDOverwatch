@@ -88,6 +88,7 @@ namespace EDOverwatch_Web
                     .LogTo(Console.WriteLine)
 #endif
                     ;
+                optionsBuilder.UseProjectables();
             });
 
             builder.Services.AddSingleton<WebSocketServer>();

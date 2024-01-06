@@ -35,7 +35,7 @@
                     .Include(s => s.CycleStart)
                     .Include(s => s.CycleEnd)
                     .Include(s => s.StateExpires)
-                    .Include(s => s.ProgressHistory!.Where(p => p.ProgressPercent >= 1m))
+                    .Include(s => s.ProgressHistory!.Where(p => p.IsCompleted))
                     .Where(s => s.StarSystem == starSystem);
                 if (thargoidCycle.Start == WeeklyTick.GetLastTick())
                 {

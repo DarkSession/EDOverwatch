@@ -70,6 +70,7 @@ namespace DCoHTrackerDiscordBot
                         .LogTo(Console.WriteLine)
 #endif
                         ;
+                    optionsBuilder.UseProjectables();
                 })
                 .AddSingleton(SocketConfig)
                 .AddSingleton(InteractionServiceConfig)

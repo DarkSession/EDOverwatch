@@ -10,7 +10,7 @@
                     <app-thargoid-level
                         [thargoidLevel]="warEffortCycleStarSystem.StarSystem.ThargoidLevel"></app-thargoid-level>
                     <span *ngIf="warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent != null">
-                        ({{ warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent | percent }})
+                        ({{ warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent | percent:'1.0-0' }})
                     </span>
                     <span class="progress-locked" *ngIf="warEffortCycleStarSystem.StarSystem.ThargoidSpireSiteInSystem">
                         <fa-icon [icon]="faHexagonExclamation"

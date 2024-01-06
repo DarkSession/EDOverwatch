@@ -44,6 +44,7 @@ namespace EDOverwatchAlertPredictionApp
                         .LogTo(Console.WriteLine)
 #endif
                         ;
+                    optionsBuilder.UseProjectables();
                 })
                 .BuildServiceProvider();
 

@@ -45,6 +45,7 @@ namespace EDOverwatchWeeklyReset
                         .LogTo(Console.WriteLine)
 #endif
                         ;
+                    optionsBuilder.UseProjectables();
                 })
                 .BuildServiceProvider();
 

@@ -27,7 +27,7 @@ namespace EDDataProcessor
                     .Where(s =>
                         (s.ThargoidLevel!.StateExpires!.End <= newThargoidCycle.Start ||
                         (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
-                        (s.ThargoidLevel.CurrentProgress == null || s.ThargoidLevel.CurrentProgress!.ProgressPercent < 1m) &&
+                        (s.ThargoidLevel.CurrentProgress == null || !s.ThargoidLevel.CurrentProgress!.IsCompleted) &&
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Titan && // Systems with a maelstrom
                         s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // We do not yet know what happens if we fail to complete systems in recovery
                         )
@@ -83,7 +83,7 @@ namespace EDDataProcessor
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
-                    .Where(s => s.ThargoidLevel!.CurrentProgress!.ProgressPercent >= 1m)
+                    .Where(s => s.ThargoidLevel!.CurrentProgress!.IsCompleted)
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
@@ -207,7 +207,7 @@ namespace EDDataProcessor
                     .Where(s =>
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Recovery &&
                         s.ThargoidLevel.CurrentProgress != null &&
-                        s.ThargoidLevel!.CurrentProgress.ProgressPercent != null && 
+                        s.ThargoidLevel!.CurrentProgress.ProgressPercent != null &&
                         s.ThargoidLevel!.CurrentProgress.ProgressPercent > 0m)
                     .ToListAsync(cancellationToken);
 
