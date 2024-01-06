@@ -87,7 +87,7 @@ namespace EDOverwatch_Web.Controllers.V1
                 {
                     return NotFound();
                 }
-                decimal progressPercent = model.Progress is short p ? p * 100 : 0;
+                decimal progressPercent = model.Progress is short p ? p / 100m : 0;
                 if (starSystem.ThargoidLevel.State == model.SystemState && (starSystem.ThargoidLevel.CurrentProgress?.ProgressPercent ?? 0m) <= progressPercent)
                 {
                     bool changed = false;

@@ -66,7 +66,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const appUpdated = await this.appService.getSetting("appUpdated");
     if (appUpdated === "1") {
       await this.appService.deleteSetting("appUpdated");
-      this.matSnackBar.open("Overwatch has been updated!", "Dismiss", {
+      this.matSnackBar.open("Overwatch was reloaded to apply the latest update.", "Dismiss", {
         duration: 6000,
       });
     }

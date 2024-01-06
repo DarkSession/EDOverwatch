@@ -155,7 +155,10 @@ export class SystemComponent implements OnInit {
           for (const label of labels) {
             const lastDate = this.starSystem.ProgressDetails.filter(p => p.Date === label).sort((a, b) => (a.DateTime < b.DateTime) ? 1 : -1);
             if (lastDate.length > 0) {
-              const endOfDayProgress = lastDate[0].Progress ?? 0;
+              let endOfDayProgress = lastDate[0].Progress ?? 0;
+              if (endOfDayProgress > 100) {
+                endOfDayProgress = 100;
+              }
               progress.push(endOfDayProgress);
               previousProgress = endOfDayProgress;
             }
@@ -218,14 +221,13 @@ export class SystemComponent implements OnInit {
 
           const progressDetails: ProgressDetails[] = [];
           let previousProgressEntry: ProgressDetails | null = null;
-          let previousDayEntry: ProgressDetails | null = previousProgressEntry;
+          let previousDayEntry: ProgressDetails | null = null;
           this.starSystem.ProgressDetails.sort((a, b) => (a.DateTime > b.DateTime) ? 1 : -1);
           let index = 0;
           for (const progressEntry of this.starSystem.ProgressDetails) {
-            let newDay = true;
             let timePassed: number | null = null;
             let change = 0;
-            let dayChange: number | null = null;
+            let newDay = false;
             if (previousProgressEntry) {
               const previousDayId = this.getDayId(previousProgressEntry.DateTime);
               const newDayId = this.getDayId(progressEntry.DateTime);
@@ -236,13 +238,14 @@ export class SystemComponent implements OnInit {
 
               timePassed = newTime.diff(previousTime);
 
-              change = Math.round((progressEntry.ProgressPercentage - previousProgressEntry.ProgressPercentage) * 10000) / 10000;
-
-              if (newDay && previousDayEntry) {
-                dayChange = Math.round((progressEntry.ProgressPercentage - previousDayEntry.ProgressPercentage) * 10000) / 10000;
-                previousProgressEntry.DayChange = dayChange;
-                previousProgressEntry.DayMarker = newDay;
+              change = progressEntry.ProgressPercentage - previousProgressEntry.ProgressPercentage;
+            }
+            if (newDay && previousProgressEntry) {
+              previousProgressEntry.DayMarker = true;
+              if (previousDayEntry) {
+                previousProgressEntry.DayChange = previousProgressEntry.ProgressPercentage - previousDayEntry.ProgressPercentage;
               }
+              previousDayEntry = previousProgressEntry;
             }
 
             const progressDetailsEntry: ProgressDetails = {
@@ -251,17 +254,14 @@ export class SystemComponent implements OnInit {
               DateTime: progressEntry.DateTime,
               Progress: progressEntry.Progress,
               ProgressPercentage: progressEntry.ProgressPercentage,
-              DayMarker: false,
               Change: change,
               Timespan: timePassed ? dayjs.duration(timePassed).format("HH:mm") : "",
               DayChange: null,
+              DayMarker: false,
             };
             progressDetails.push(progressDetailsEntry);
 
             previousProgressEntry = progressDetailsEntry;
-            if (newDay) {
-              previousDayEntry = progressDetailsEntry;
-            }
             index++;
           }
 

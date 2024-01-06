@@ -180,19 +180,19 @@
                             <th mat-header-cell *matHeaderCellDef>Progress</th>
                             <td mat-cell *matCellDef="let row" class="nowrap"
                                 [ngClass]="{'day-marker': row.DayMarker }">
-                                {{ row.ProgressPercentage | percent }}
+                                {{ row.ProgressPercentage | percent:'1.4-4' }}
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="Change">
                             <th mat-header-cell *matHeaderCellDef>Change</th>
                             <td mat-cell *matCellDef="let row" class="nowrap"
                                 [ngClass]="{'day-marker': row.DayMarker }">
-                                <span *ngIf="row.Change > 0" class="progress-plus">+{{ row.Change | percent }}</span>
-                                <span *ngIf="row.Change < 0" class="progress-minus">{{ row.Change | percent }}</span>
+                                <span *ngIf="row.Change > 0" class="progress-plus">+{{ row.Change | percent:'1.4-4' }}</span>
+                                <span *ngIf="row.Change < 0" class="progress-minus">{{ row.Change | percent:'1.4-4' }}</span>
                                 <div *ngIf="row.DayChange">
                                     (
-                                    <span *ngIf="row.DayChange > 0" class="progress-plus">+{{ row.DayChange | percent }}</span>
-                                    <span *ngIf="row.DayChange < 0" class="progress-minus">{{ row.DayChange | percent }}</span>
+                                    <span *ngIf="row.DayChange > 0" class="progress-plus">+{{ row.DayChange | percent:'1.4-4' }}</span>
+                                    <span *ngIf="row.DayChange < 0" class="progress-minus">{{ row.DayChange | percent:'1.4-4' }}</span>
                                     )
                                 </div>
                             </td>
