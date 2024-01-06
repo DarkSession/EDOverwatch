@@ -207,8 +207,7 @@ namespace EDDataProcessor
                     .Where(s =>
                         s.ThargoidLevel!.State != StarSystemThargoidLevelState.Recovery &&
                         s.ThargoidLevel.CurrentProgress != null &&
-                        s.ThargoidLevel!.CurrentProgress.ProgressPercent != null &&
-                        s.ThargoidLevel!.CurrentProgress.ProgressPercent > 0m)
+                        s.ThargoidLevel!.CurrentProgress.HasProgress)
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
@@ -227,7 +226,7 @@ namespace EDDataProcessor
                     {
                         ThargoidLevel = starSystem.ThargoidLevel,
                     };
-                    starSystem.ThargoidLevel!.Progress = starSystem.ThargoidLevel!.CurrentProgress.ProgressOld;
+                    starSystem.ThargoidLevel!.ProgressOld = starSystem.ThargoidLevel!.CurrentProgress.ProgressLegacy;
                 }
                 await dbContext.SaveChangesAsync(cancellationToken);
             }

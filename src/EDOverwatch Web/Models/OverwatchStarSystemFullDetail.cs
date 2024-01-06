@@ -441,8 +441,8 @@ namespace EDOverwatch_Web.Models
             State = new(starSystemThargoidLevelProgress.ThargoidLevel);
             Date = DateOnly.FromDateTime(starSystemThargoidLevelProgress.Updated.DateTime);
             DateTime = starSystemThargoidLevelProgress.Updated;
-            Progress = (int)Math.Floor((starSystemThargoidLevelProgress.ProgressPercent ?? 0m) * 100);
             ProgressPercentage = starSystemThargoidLevelProgress.ProgressPercent ?? 0m;
+            Progress = (int)Math.Floor(ProgressPercentage * 100);
         }
     }
 
@@ -468,7 +468,7 @@ namespace EDOverwatch_Web.Models
             StateStart = starSystemThargoidLevel.CycleStart!.Start;
             StateEnds = starSystemThargoidLevel.CycleEnd?.End;
             StateIngameTimerExpires = starSystemThargoidLevel.StateExpires?.End;
-            Progress = starSystemThargoidLevel.CurrentProgress?.ProgressOld;
+            Progress = starSystemThargoidLevel.CurrentProgress?.ProgressLegacy;
             ProgressPercentage = starSystemThargoidLevel.CurrentProgress?.ProgressPercent;
         }
     }

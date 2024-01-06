@@ -41,8 +41,8 @@ namespace EDDatabase
         [ForeignKey("MaelstromId")]
         public int? MaelstromId { get; set; }
 
-        [Column]
-        public short? Progress { get; set; }
+        [Column("Progress")]
+        public short? ProgressOld { get; set; }
 
         [ForeignKey("CurrentProgressId")]
         public StarSystemThargoidLevelProgress? CurrentProgress { get; set; }
@@ -58,11 +58,11 @@ namespace EDDatabase
 
         public IEnumerable<StarSystemThargoidLevelProgress>? ProgressHistory { get; set; }
 
-        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progress, DateTimeOffset created, bool isInvisibleState, bool isCounterstrike)
+        public StarSystemThargoidLevel(int id, StarSystemThargoidLevelState state, short? progressOld, DateTimeOffset created, bool isInvisibleState, bool isCounterstrike)
         {
             Id = id;
             State = state;
-            Progress = progress;
+            ProgressOld = progressOld;
             Created = created;
             IsInvisibleState = isInvisibleState;
             IsCounterstrike = isCounterstrike;

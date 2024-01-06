@@ -26,10 +26,10 @@
             {
                 DistanceToMaelstrom = Math.Round(starSystem.DistanceTo(starSystem.ThargoidLevel.Maelstrom.StarSystem), 4);
             }
-            StateProgress = new(starSystem, (starSystem.ThargoidLevel?.CurrentProgress?.ProgressPercent is decimal p) ? p : null, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None, hasAlertPrediction);
+            StateProgress = new(starSystem, starSystem.ThargoidLevel?.CurrentProgress?.ProgressPercent, starSystem.ThargoidLevel?.State ?? StarSystemThargoidLevelState.None, hasAlertPrediction);
 #pragma warning disable CS0618 // Type or member is obsolete
-            ProgressPercent = starSystem.ThargoidLevel?.CurrentProgress?.ProgressPercent;
-            Progress = starSystem.ThargoidLevel?.CurrentProgress?.ProgressOld;
+            ProgressPercent = StateProgress.ProgressPercent;
+            Progress = starSystem.ThargoidLevel?.CurrentProgress?.ProgressLegacy;
             BarnacleMatrixInSystem = starSystem.BarnacleMatrixInSystem;
 #pragma warning restore CS0618 // Type or member is obsolete
             ThargoidSpireSiteInSystem = starSystem.BarnacleMatrixInSystem;

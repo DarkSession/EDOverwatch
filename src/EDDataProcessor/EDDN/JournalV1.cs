@@ -464,35 +464,6 @@ namespace EDDataProcessor.EDDN
         public string? NextStateFailure { get; set; }
         public bool SuccessStateReached { get; set; }
         public decimal WarProgress { get; set; }
-        [JsonIgnore]
-        public short WarProgressInternal
-        {
-            get
-            {
-                short result = (short)Math.Floor(WarProgress * 100m);
-                if (result < 0)
-                {
-                    return 0;
-                }
-                else if (result > 100)
-                {
-                    return 100;
-                }
-                return result;
-            }
-        }
-        [JsonIgnore]
-        public decimal WarProgressInternalDecimal
-        {
-            get
-            {
-                if (WarProgress > 1m)
-                {
-                    return 1m;
-                }
-                return WarProgress;
-            }
-        }
         public int RemainingPorts { get; set; }
         public string? EstimatedRemainingTime { get; set; }
 

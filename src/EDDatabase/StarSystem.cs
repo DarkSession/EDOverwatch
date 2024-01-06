@@ -44,6 +44,7 @@ namespace EDDatabase
         public StarSystemSecurity? Security { get; set; }
 
         [ForeignKey("MaelstromId")]
+        [Obsolete("Use ThargoidLevel.Maelstrom instead")]
         public ThargoidMaelstrom? DoNotUse { get; set; }
 
         [ForeignKey("ThargoidLevelId")]

@@ -56,43 +56,30 @@ namespace EDDataProcessor.Journal
                 }
                 if (currentState != StarSystemThargoidLevelState.None)
                 {
-                    WarProgressChange change = WarProgressChange.None;
                     if (starSystem.ThargoidLevel.CurrentProgress is null || fsdJumpThargoidWar.WarProgress > starSystem.ThargoidLevel.CurrentProgress.ProgressPercent)
                     {
-                        change = WarProgressChange.ProgressNewOrChanged;
+                        short progressOld = (short)Math.Floor(fsdJumpThargoidWar.WarProgress * 100m);
+                        starSystem.ThargoidLevel.ProgressOld = progressOld;
+                        starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, progressOld, fsdJumpThargoidWar.WarProgress)
+                        {
+                            ThargoidLevel = starSystem.ThargoidLevel,
+                        };
+                        changed = true;
+                        if (starSystem.ThargoidLevel.CurrentProgress.IsCompleted)
+                        {
+                            await dbContext.DcohFactionOperations
+                                .Where(d =>
+                                    d.StarSystem == starSystem &&
+                                    d.Status == DcohFactionOperationStatus.Active)
+                                .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Status, DcohFactionOperationStatus.Expired), cancellationToken);
+                        }
                     }
                     else if (fsdJumpThargoidWar.WarProgress == starSystem.ThargoidLevel.CurrentProgress.ProgressPercent)
                     {
-                        change = WarProgressChange.ProgressConfirmed;
-                    }
-                    switch (change)
-                    {
-                        case WarProgressChange.ProgressNewOrChanged:
-                            {
-                                starSystem.ThargoidLevel.Progress = fsdJumpThargoidWar.WarProgressInternal;
-                                starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, fsdJumpThargoidWar.WarProgressInternal, fsdJumpThargoidWar.WarProgress)
-                                {
-                                    ThargoidLevel = starSystem.ThargoidLevel,
-                                };
-                                changed = true;
-                                if (starSystem.ThargoidLevel.CurrentProgress.IsCompleted)
-                                {
-                                    await dbContext.DcohFactionOperations
-                                        .Where(d =>
-                                            d.StarSystem == starSystem &&
-                                            d.Status == DcohFactionOperationStatus.Active)
-                                        .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Status, DcohFactionOperationStatus.Expired), cancellationToken);
-                                }
-                                break;
-                            }
-                        case WarProgressChange.ProgressConfirmed:
-                            {
-                                if (starSystem.ThargoidLevel.CurrentProgress is not null)
-                                {
-                                    starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
-                                }
-                                break;
-                            }
+                        if (starSystem.ThargoidLevel.CurrentProgress is not null)
+                        {
+                            starSystem.ThargoidLevel.CurrentProgress.LastChecked = updateTime;
+                        }
                     }
 
                     if (starSystem.ThargoidLevel.StateExpires is null && fsdJumpThargoidWar.RemainingDays is int remainingDays && remainingDays > 0)

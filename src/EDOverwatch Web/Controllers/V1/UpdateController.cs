@@ -114,7 +114,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     {
                         starSystem.ThargoidLevel.CurrentProgress.LastChecked = DateTimeOffset.UtcNow;
                     }
-                    starSystem.ThargoidLevel.Progress = model.Progress;
+                    starSystem.ThargoidLevel.ProgressOld = model.Progress;
 
                     TimeSpan remainingTime = TimeSpan.FromDays(model.DaysLeft ?? 0);
                     if (remainingTime > TimeSpan.Zero && starSystem.ThargoidLevel.StateExpires == null)
@@ -151,7 +151,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     return NotFound();
                 }
                 else if (starSystem.ThargoidLevel?.State == model.SystemState &&
-                    (model.Progress == null || starSystem.ThargoidLevel?.CurrentProgress?.ProgressOld == model.Progress))
+                    (model.Progress == null || starSystem.ThargoidLevel?.CurrentProgress?.ProgressLegacy == model.Progress))
                 {
                     List<StarSystemUpdateQueueItem> starSystemUpdateQueueItems = await DbContext.StarSystemUpdateQueueItems
                         .Where(s => s.StarSystem == starSystem && s.Status == StarSystemUpdateQueueItemStatus.PendingAutomaticReview)

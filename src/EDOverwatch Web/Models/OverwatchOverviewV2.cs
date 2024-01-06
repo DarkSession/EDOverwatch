@@ -113,7 +113,7 @@ namespace EDOverwatch_Web.Models
                 int controlsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && p.CurrentProgress!.IsCompleted);
                 int titansDefeated = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan);
                 int thargoidInvasionStarted = previousCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && (p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0));
-                int thargoidsGained = previousCycleStates.Count(p => (p.CurrentProgress == null || p.CurrentProgress!.ProgressPercent == null || p.CurrentProgress!.ProgressPercent < 1m) && (p.State == StarSystemThargoidLevelState.Invasion || (p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0)));
+                int thargoidsGained = previousCycleStates.Count(p => (p.CurrentProgress == null || !p.CurrentProgress!.IsCompleted) && (p.State == StarSystemThargoidLevelState.Invasion || (p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0)));
 
                 overviewPreviousCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, titansDefeated, thargoidInvasionStarted, thargoidsGained);
             }
