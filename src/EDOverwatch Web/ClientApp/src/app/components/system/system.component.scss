@@ -19,17 +19,6 @@
     color: lime;
 }
 
-.feature-icon {
-    width: 20px;
-    height: 20px;
-}
-
-.feature {
-    display: flex;
-    align-items: center;
-    column-gap: 4px
-}
-
 .progress-cell {
     display: flex;
     justify-content: flex-end;
@@ -78,4 +67,25 @@
 
 .day-marker {
     background-color: rgb(241, 194, 50, 0.2);
+}
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+
+    .feature-icon-placeholder {
+        width: 22px;
+    }
+
+    .feature-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .feature {
+        display: flex;
+        align-items: center;
+        column-gap: 4px
+    }
 }

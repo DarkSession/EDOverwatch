@@ -156,16 +156,14 @@ export class SystemListComponent implements OnInit, OnChanges {
         case "Starports": {
           return (system.StationsUnderAttack + system.StationsDamaged + system.StationsUnderRepair);
         }
-        /*
-        case "FactionOperations": {
-          return (system.FactionOperations + system.SpecialFactionOperations.length * 9);
+        case "Progress": {
+          return system.StateProgress.ProgressPercent ?? 0;
         }
-        */
         case "ProgressReportedCompletion": {
-          return (system.StateProgress.IsCompleted) ? system.StateProgress.ProgressLastChange : Number.MIN_SAFE_INTEGER;
+          return (system.StateProgress.IsCompleted) ? system.StateProgress.ProgressCompletionReported : Number.MIN_SAFE_INTEGER;
         }
         case "StateExpiration": {
-          return (system.StateExpiration?.StateExpires ?? "Counterstrike");
+          return (system.StateExpiration?.StateExpires ?? "");
         }
         case "Features": {
           return system.Features?.length ?? 0;

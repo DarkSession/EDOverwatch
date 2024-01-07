@@ -91,8 +91,8 @@
                                 </div>
                                 <div class="feature-box">
                                     <img class="feature-icon clickable" src="assets/spire.svg"
-                                        matTooltip="Thargoid spire site present" (click)="toggleFeature('ThargoidSpires')"
-                                        [ngClass]="{
+                                        matTooltip="Thargoid spire site present"
+                                        (click)="toggleFeature('ThargoidSpires')" [ngClass]="{
                                             'content-inactive': !featuresSelected.includes('ThargoidSpires')
                                         }" />
                                 </div>
@@ -106,13 +106,6 @@
                                             <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="feature-box">
-                                    <img class="feature-icon clickable" src="assets/settlement_o.svg"
-                                        matTooltip="Odyssey settlement(s) present"
-                                        (click)="toggleFeature('OdysseySettlements')" [ngClass]="{
-                                        'content-inactive': !featuresSelected.includes('OdysseySettlements')
-                                    }" />
                                 </div>
                                 <div class="feature-box">
                                     <img class="feature-icon clickable" src="assets/federation.svg"
@@ -138,12 +131,19 @@
                                     </span>
                                 </div>
                                 <div class="feature-box">
-                                    <span class="clickable"
-                                        (click)="toggleFeature('Counterstrike')" [ngClass]="{
+                                    <span class="clickable" (click)="toggleFeature('Counterstrike')" [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('Counterstrike')
                                     }">
-                                    <fa-icon [icon]="faArrowRightToArc" size="xl" matTooltip="Counterstrike system"></fa-icon>
+                                        <fa-icon [icon]="faArrowRightToArc" size="xl"
+                                            matTooltip="Counterstrike system"></fa-icon>
                                     </span>
+                                </div>
+                                <div class="feature-box">
+                                    <img class="feature-icon clickable" src="assets/settlement_o.svg"
+                                        matTooltip="Odyssey settlement(s) present"
+                                        (click)="toggleFeature('OdysseySettlements')" [ngClass]="{
+                                        'content-inactive': !featuresSelected.includes('OdysseySettlements')
+                                    }" />
                                 </div>
                             </div>
                         </fieldset>

@@ -86,48 +86,65 @@
                         EDSM</a>
                 </div>
             </div>
-            <div *ngIf="starSystem?.Features && starSystem.Features.length > 0">
+            <div *ngIf="starSystem?.Features && starSystem.Features.length > 0" class="features-list">
                 <br>
+                <b>Features</b>
                 <div *ngIf="thargoidSpires" class="feature">
-                    <img class="feature-icon" src="assets/spire.svg"
-                        matTooltip="Thargoid spire site present" />
-                    Thargoid spire site present <span *ngIf="starSystem.ThargoidSpireSiteBody">on body {{
-                        starSystem.ThargoidSpireSiteBody }}</span>
+                    <div class="feature-icon-placeholder">
+                        <img class="feature-icon" src="assets/spire.svg" matTooltip="Thargoid spire site present" />
+                    </div>
+                    Thargoid spire site present
+                    <span *ngIf="starSystem.ThargoidSpireSiteBody">on body {{ starSystem.ThargoidSpireSiteBody }}</span>
                 </div>
                 <div *ngIf="odysseySettlement" class="feature">
-                    <img class="feature-icon" src="assets/settlement_o.svg"
-                        matTooltip="Odyssey settlement(s) present" /> Odyssey settlement(s) present
+                    <div class="feature-icon-placeholder">
+                        <img class="feature-icon" src="assets/settlement_o.svg"
+                            matTooltip="Odyssey settlement(s) present" />
+                    </div>
+                    Odyssey settlement(s) present
                 </div>
                 <div *ngIf="federation" class="feature">
-                    <img class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />
+                    <div class="feature-icon-placeholder">
+                        <img class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />
+                    </div>
                     Federal faction(s) present
                 </div>
                 <div *ngIf="empire" class="feature">
-                    <img class="feature-icon" src="assets/empire.svg" matTooltip="Imperial faction(s) present" />
+                    <div class="feature-icon-placeholder">
+                        <img class="feature-icon" src="assets/empire.svg" matTooltip="Imperial faction(s) present" />
+                    </div>
                     Imperial faction(s) present
                 </div>
                 <div *ngIf="thargoidControlledReactivationMissions" class="feature">
-                    <fa-icon class="feature-icon" [icon]="faBolt" size="xl"
-                        matTooltip="AX reactivation missions available"></fa-icon>
+                    <div class="feature-icon-placeholder">
+                        <fa-icon class="feature-icon" [icon]="faBolt" size="xl"
+                            matTooltip="AX reactivation missions available"></fa-icon>
+                    </div>
                     AX reactivation missions available
                 </div>
                 <div *ngIf="aXConflictZones" class="feature">
-                    <fa-icon class="feature-icon" [icon]="faCrosshairs" size="xl"
-                        matTooltip="AX conflict zones"></fa-icon>
+                    <div class="feature-icon-placeholder">
+                        <fa-icon class="feature-icon" [icon]="faCrosshairs" size="xl"
+                            matTooltip="AX conflict zones"></fa-icon>
+                    </div>
                     AX conflict zones
                 </div>
                 <div *ngIf="groundPortAXCZ" class="feature">
-                    <div class="multi-icon" matTooltip="Ground port under attack">
-                        <img class="feature-icon" src="assets/surface_port.svg" />
-                        <div class="icon-red">
-                            <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
+                    <div class="feature-icon-placeholder">
+                        <div class="multi-icon" matTooltip="Ground port under attack">
+                            <img class="feature-icon" src="assets/surface_port.svg" />
+                            <div class="icon-red">
+                                <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
+                            </div>
                         </div>
                     </div>
                     Ground port under attack
                 </div>
                 <div *ngIf="counterstrike" class="feature">
-                    <fa-icon class="feature-icon" [icon]="faArrowRightToArc" size="xl"
-                        matTooltip="Counterstrike system"></fa-icon>
+                    <div class="feature-icon-placeholder">
+                        <fa-icon class="feature-icon" [icon]="faArrowRightToArc" size="xl"
+                            matTooltip="Counterstrike system"></fa-icon>
+                    </div>
                     Counterstrike system
                 </div>
             </div>
@@ -187,12 +204,16 @@
                             <th mat-header-cell *matHeaderCellDef>Change</th>
                             <td mat-cell *matCellDef="let row" class="nowrap"
                                 [ngClass]="{'day-marker': row.DayMarker }">
-                                <span *ngIf="row.Change > 0" class="progress-plus">+{{ row.Change | percent:'1.4-4' }}</span>
-                                <span *ngIf="row.Change < 0" class="progress-minus">{{ row.Change | percent:'1.4-4' }}</span>
+                                <span *ngIf="row.Change > 0" class="progress-plus">+{{ row.Change | percent:'1.4-4'
+                                    }}</span>
+                                <span *ngIf="row.Change < 0" class="progress-minus">{{ row.Change | percent:'1.4-4'
+                                    }}</span>
                                 <div *ngIf="row.DayChange">
                                     (
-                                    <span *ngIf="row.DayChange > 0" class="progress-plus">+{{ row.DayChange | percent:'1.4-4' }}</span>
-                                    <span *ngIf="row.DayChange < 0" class="progress-minus">{{ row.DayChange | percent:'1.4-4' }}</span>
+                                    <span *ngIf="row.DayChange > 0" class="progress-plus">+{{ row.DayChange |
+                                        percent:'1.4-4' }}</span>
+                                    <span *ngIf="row.DayChange < 0" class="progress-minus">{{ row.DayChange |
+                                        percent:'1.4-4' }}</span>
                                     )
                                 </div>
                             </td>
