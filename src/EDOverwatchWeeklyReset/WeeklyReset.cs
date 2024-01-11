@@ -213,14 +213,14 @@ namespace EDDataProcessor
                 foreach (StarSystem starSystem in starSystems)
                 {
                     decimal progress;
-                    if (starSystem.ThargoidLevel!.CurrentProgress!.ProgressPercent <= 33m)
+                    if (starSystem.ThargoidLevel!.CurrentProgress!.ProgressPercent <= 0.33m)
                     {
                         progress = 0;
                     }
                     else
                     {
                         progress = starSystem.ThargoidLevel!.CurrentProgress!.ProgressPercent ?? 0m;
-                        progress -= 33;
+                        progress -= 0.33m;
                     }
                     starSystem.ThargoidLevel!.CurrentProgress = new(0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, (short)Math.Floor(progress * 100m), progress)
                     {
