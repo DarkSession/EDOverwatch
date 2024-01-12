@@ -4,8 +4,11 @@ namespace EDOverwatch_Web.Models
 {
     public class OverwatchThargoidCycle
     {
+        public static readonly DateTimeOffset CycleZero = new(2022, 11, 24, 7, 0, 0, TimeSpan.Zero);
+
         [JsonIgnore]
-        public int Id { get; set; }
+        public int Id { get; }
+        public int CycleNumber { get; }
         public DateOnly Cycle { get; }
         public DateTimeOffset Start { get; }
         public DateOnly StartDate { get; }
@@ -16,6 +19,7 @@ namespace EDOverwatch_Web.Models
         public OverwatchThargoidCycle(ThargoidCycle thargoidCycle)
         {
             Id = thargoidCycle.Id;
+            CycleNumber = (int)(thargoidCycle.Start - CycleZero).TotalDays / 7;
             Cycle = DateOnly.FromDateTime(thargoidCycle.Start.DateTime);
             Start = thargoidCycle.Start;
             StartDate = DateOnly.FromDateTime(Start.DateTime);

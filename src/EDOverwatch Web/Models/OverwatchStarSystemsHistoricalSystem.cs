@@ -12,6 +12,7 @@
         public bool ThargoidSpireSiteInSystem { get; }
         public int? Progress { get; }
         public decimal? ProgressPercent { get; }
+        public decimal? ProgressUncapped { get; }
         public bool ProgressIsCompleted { get; }
         public DateTimeOffset? StateExpires { get; }
 
@@ -71,16 +72,20 @@
                 }
                 State = state.GetEnumMemberValue();
 
-                DistanceToMaelstrom = thargoidLevel.Maelstrom?.StarSystem?.DistanceTo(starSystem) ?? 0;
-                if ((thargoidLevel.CurrentProgress?.IsCompleted ?? false) && thargoidLevel.CycleEndId == thargoidLevel.Id)
+                DistanceToMaelstrom = Math.Round(thargoidLevel.Maelstrom?.StarSystem?.DistanceTo(starSystem) ?? 0, 4);
+                if ((thargoidLevel.CurrentProgress?.IsCompleted ?? false) && thargoidLevel.CycleEndId == thargoidCycle.Id)
                 {
-                    Progress = 100;
-                    ProgressPercent = 1m;
+                    ProgressPercent = thargoidLevel.CurrentProgress.ProgressPercent ?? 0m;
+                    Progress = (int)Math.Floor((decimal)ProgressPercent * 100m);
                 }
                 else if (thargoidLevel.ProgressHistory?.FirstOrDefault() is StarSystemThargoidLevelProgress progress && progress.Updated != default)
                 {
                     ProgressPercent = progress.ProgressPercent ?? 0m;
                     Progress = (int)Math.Floor((decimal)ProgressPercent * 100m);
+                }
+                if (Progress > 100)
+                {
+                    Progress = 100;
                 }
                 ProgressIsCompleted = Progress is int p && p >= 100;
                 StateExpires = thargoidLevel.StateExpires?.End;

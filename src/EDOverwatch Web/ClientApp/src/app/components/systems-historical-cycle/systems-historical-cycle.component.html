@@ -95,11 +95,11 @@
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
                             <td mat-cell *matCellDef="let row" class="nowrap">
                                 <div class="progress-cell" *ngIf="row.Progress !== null">
-                                    <span>
+                                    <span matTooltip="{{ row.ProgressPercent | percent:'1.4-4' }}">
                                         {{ row.Progress }} %
                                     </span>
                                     <div class="progress-completed">
-                                        <fa-icon [icon]="faCircleCheck" *ngIf="row.Progress == 100"
+                                        <fa-icon [icon]="faCircleCheck" *ngIf="row.ProgressIsCompleted"
                                             matTooltip="Completed"></fa-icon>
                                     </div>
                                 </div>

@@ -176,6 +176,7 @@ export class SystemsHistoricalCycleComponent implements OnInit {
         State: system.ThargoidLevel.Name,
         StateExpires: system.StateExpires ?? "",
         Progress: system.Progress ?? 0,
+        ProgressPercent: system.ProgressPercent ?? 0,
         ProgressIsCompleted: system.ProgressIsCompleted,
         ThargoidSpireSiteInSystem: system.ThargoidSpireSiteInSystem,
       });
@@ -276,6 +277,7 @@ interface OverwatchStarSystemsHistoricalSystem {
   DistanceToMaelstrom: number;
   ThargoidSpireSiteInSystem: boolean;
   Progress: number | null;
+  ProgressPercent: number | null;
   ProgressIsCompleted: boolean;
   StateExpires: string | null;
 }

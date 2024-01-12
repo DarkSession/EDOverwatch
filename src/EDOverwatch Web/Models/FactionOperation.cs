@@ -21,7 +21,7 @@
             }
             Faction = $"{factionOperation.Faction.Name} ({factionOperation.Faction.Short})";
             Type = factionOperation.Type.GetEnumMemberValue();
-            Started = factionOperation.Created;
+            Started = factionOperation.Created.WithoutMiliseconds();
             SystemName = factionOperation.StarSystem.Name;
             SystemAddress = factionOperation.StarSystem.SystemAddress;
             MeetingPoint = factionOperation.MeetingPoint;

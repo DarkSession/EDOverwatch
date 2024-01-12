@@ -194,6 +194,7 @@ namespace EDOverwatchAlertPrediction
             foreach (EDDatabase.AlertPrediction outdatedPrediction in alertPredictions.Where(a => !UsedAlertPredictions.Contains(a)))
             {
                 outdatedPrediction.Status = AlertPredictionStatus.Expired;
+                outdatedPrediction.AlertLikely = false;
                 outdatedPrediction.Order = 2048;
             }
 

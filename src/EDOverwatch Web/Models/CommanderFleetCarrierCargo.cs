@@ -10,7 +10,7 @@
         {
             HasFleetCarrier = hasFleetCarrier;
             Cargo = fleetCarrierCargoItems.Select(f => new CommanderFleetCarrierCargoEntry(f)).ToList();
-            LastUpdated = lastUpdated;
+            LastUpdated = lastUpdated.WithoutMiliseconds();
         }
 
         public static Task<CommanderFleetCarrierCargo> Create(EdDbContext dbContext, Commander commander, CancellationToken cancellationToken)

@@ -29,15 +29,15 @@
                 NextSystemState = new(nextSystemState);
                 SystemStateChanges = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
             }
-            ProgressLastChange = starSystem.ThargoidLevel?.CurrentProgress?.Updated;
-            ProgressLastChecked = starSystem.ThargoidLevel?.CurrentProgress?.LastChecked;
+            ProgressLastChange = starSystem.ThargoidLevel?.CurrentProgress?.Updated.WithoutMiliseconds();
+            ProgressLastChecked = starSystem.ThargoidLevel?.CurrentProgress?.LastChecked.WithoutMiliseconds();
 
             if (starSystem.ThargoidLevel?.ProgressHistory != null)
             {
                 ProgressCompletionReported = starSystem.ThargoidLevel?.ProgressHistory
                     .Where(p => p.IsCompleted)
                     .OrderBy(p => p.Updated)
-                    .Select(p => p.Updated)
+                    .Select(p => p.Updated.WithoutMiliseconds())
                     .FirstOrDefault();
             }
         }
