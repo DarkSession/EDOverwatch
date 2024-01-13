@@ -29,9 +29,11 @@ namespace EDOverwatchAlertPrediction
 
         private int LastAlertCycle { get; }
 
-        private int LastInvasionCycle { get; }
-
         private int LastControlCycle { get; }
+
+        private int LastRecoveryCycle { get; }
+
+        private bool LastRecoveryLong { get; }
 
         public bool IsNewState { get; }
 
@@ -62,16 +64,20 @@ namespace EDOverwatchAlertPrediction
                 .Select(s => s.EndCycle ?? default)
                 .DefaultIfEmpty(int.MinValue)
                 .Max();
-            LastInvasionCycle = systemStates
-                .Where(s => s.State == StarSystemThargoidLevelState.Invasion && s.EndCycle < cycle)
-                .Select(s => s.EndCycle ?? default)
-                .DefaultIfEmpty(int.MinValue)
-                .Max();
             LastControlCycle = systemStates
                 .Where(s => s.State == StarSystemThargoidLevelState.Controlled && s.EndCycle < cycle)
                 .Select(s => s.EndCycle ?? default)
                 .DefaultIfEmpty(int.MinValue)
                 .Max();
+            LastRecoveryCycle = systemStates
+                .Where(s => s.State == StarSystemThargoidLevelState.Recovery && s.EndCycle < cycle)
+                .Select(s => s.EndCycle ?? default)
+                .DefaultIfEmpty(int.MinValue)
+                .Max();
+            if (LastRecoveryCycle > 0 && systemStates.FirstOrDefault(s => s.State == StarSystemThargoidLevelState.Recovery && s.EndCycle == LastRecoveryCycle) is StarSystemCycleStateThargoidLevel lastRecoveryCycle)
+            {
+                LastRecoveryLong = (lastRecoveryCycle.EndCycle - lastRecoveryCycle.StartCycle) > 1;
+            }
             IsNewState = ThargoidLevel?.StartCycle == cycle;
         }
 
@@ -101,11 +107,11 @@ namespace EDOverwatchAlertPrediction
             {
                 return false;
             }
-            if (LastInvasionCycle > 0 && (Cycle - LastInvasionCycle) <= 2)
+            if (LastControlCycle > 0 && (Cycle - LastControlCycle) <= 4)
             {
                 return false;
             }
-            if (LastControlCycle > 0 && (Cycle - LastControlCycle) <= 4)
+            if (LastRecoveryCycle > 0 && ((Cycle - LastRecoveryCycle) <= 2 || LastRecoveryLong && (Cycle - LastRecoveryCycle) <= 4))
             {
                 return false;
             }
