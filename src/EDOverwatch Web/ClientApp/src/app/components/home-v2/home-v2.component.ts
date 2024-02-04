@@ -318,6 +318,7 @@ enum OverviewDataStatus {
 }
 
 export interface OverwatchThargoidCycle {
+  CycleNumber: number;
   Cycle: string;
   Start: string;
   StartDate: string;

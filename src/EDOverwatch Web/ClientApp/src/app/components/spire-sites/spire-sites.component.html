@@ -1,0 +1,51 @@
+<div class="overwatch-content-container">
+    <div class="overwatch-content-large">
+        <div class="title">
+            Spire Sites
+        </div>
+        <div class="content-box systems-container">
+            <div class="table-container">
+                <div class="table">
+                    <table mat-table [dataSource]="systemsDataSource" matSort matSortActive="System"
+                        matSortDirection="asc" matSortDisableClear>
+                        <ng-container matColumnDef="System">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
+                                    {{ row.Name }}
+                                </span>
+                                <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
+                                    (click)="copySystemName(row)"></fa-icon>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="SiteBody">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Site Body</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                {{ row.ThargoidSpireSiteBody }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Titan">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Titan</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                <span class="clickable" [routerLink]="['/titan', row.Maelstrom.Name]">
+                                    {{ row.Maelstrom.Name }}
+                                </span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="ThargoidLevel">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
+                            <td mat-cell *matCellDef="let row">
+                                <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="systemDataSourceColumns; sticky: true" class="thead"></tr>
+                        <tr mat-row *matRowDef="let row; columns: systemDataSourceColumns;"></tr>
+                    </table>
+                    <div *ngIf="systemsDataSource.data.length === 0" class="empty-table">
+                        No records found.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

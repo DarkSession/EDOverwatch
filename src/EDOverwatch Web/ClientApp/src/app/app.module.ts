@@ -82,6 +82,7 @@ import { MyEffortsCycleSystemEffortTypeComponent } from './components/my-efforts
 import { AlertPredictionTopAttackersComponent } from './components/alert-prediction-top-attackers/alert-prediction-top-attackers.component';
 import { SystemAttackDefenseComponent } from './components/system-attack-defense/system-attack-defense.component';
 import { ExperimentalSettingsComponent } from './components/experimental-settings/experimental-settings.component';
+import { SpireSitesComponent } from './components/spire-sites/spire-sites.component';
 
 Chart.defaults.color = "#cccccc";
 Chart.defaults.borderColor = "rgba(255,255,255,0.15)";
@@ -139,7 +140,8 @@ export const httpInterceptorProviders = [
     MyEffortsCycleSystemEffortTypeComponent,
     AlertPredictionTopAttackersComponent,
     SystemAttackDefenseComponent,
-    ExperimentalSettingsComponent
+    ExperimentalSettingsComponent,
+    SpireSitesComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -262,6 +264,10 @@ export const httpInterceptorProviders = [
       {
         path: 'operations',
         component: OperationSearchComponent,
+      },
+      {
+        path: 'spire-sites',
+        component: SpireSitesComponent,
       },
       {
         path: 'stats',

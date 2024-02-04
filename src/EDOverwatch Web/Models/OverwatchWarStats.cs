@@ -5,6 +5,8 @@ namespace EDOverwatch_Web.Models
 {
     public class OverwatchWarStats
     {
+        public static readonly DateTimeOffset CycleZero = new(2022, 11, 24, 7, 0, 0, TimeSpan.Zero);
+
         public OverwatchOverviewHuman Humans { get; set; }
         public OverwatchWarStatsThargoids Thargoids { get; set; }
         public OverwatchOverviewContested Contested { get; set; }
@@ -265,6 +267,7 @@ namespace EDOverwatch_Web.Models
 
     public class WarEffortSummary
     {
+        public int CycleNumber { get; }
         public DateOnly Date { get; }
         public WarEffortType TypeId { get; }
         public string Type => EnumUtil.GetEnumMemberValue(TypeId);
@@ -278,6 +281,7 @@ namespace EDOverwatch_Web.Models
 
         public WarEffortSummary(DateOnly date, WarEffortType typeId, long amount)
         {
+            CycleNumber = (date.DayNumber - DateOnly.FromDateTime(OverwatchWarStats.CycleZero.Date).DayNumber) / 7;
             Date = date;
             TypeId = typeId;
             Amount = amount;
@@ -294,6 +298,7 @@ namespace EDOverwatch_Web.Models
 
     public class StatsCompletdSystemsPerCycle
     {
+        public int CycleNumber { get; }
         public DateOnly Cycle { get; }
         public int Completed { get; }
         public OverwatchThargoidLevel State { get; }
@@ -301,6 +306,10 @@ namespace EDOverwatch_Web.Models
         public StatsCompletdSystemsPerCycle(int? cycleEndId, List<OverwatchThargoidCycle> thargoidCycles, StarSystemThargoidLevelState level, int completed)
         {
             OverwatchThargoidCycle? overwatchThargoidCycle = thargoidCycles.FirstOrDefault(t => t.Id == cycleEndId);
+            if (overwatchThargoidCycle is not null)
+            {
+                CycleNumber = (int)(overwatchThargoidCycle.Start - OverwatchWarStats.CycleZero).TotalDays / 7;
+            }
             Cycle = DateOnly.FromDateTime((overwatchThargoidCycle?.Start ?? WeeklyTick.GetLastTick()).DateTime);
             State = new(level);
             Completed = completed;

@@ -8,6 +8,7 @@ namespace EDDatabase
     [Index(nameof(LocationX), nameof(LocationY), nameof(LocationZ))]
     [Index(nameof(WarRelevantSystem))]
     [Index(nameof(WarAffected))]
+    [Index(nameof(BarnacleMatrixInSystem))]
     public class StarSystem
     {
         [Column]

@@ -239,18 +239,7 @@ export class StatsComponent implements OnInit {
                 position: 'bottom',
               },
               datalabels: {
-                align: 'center',
-                anchor: 'center',
-                color: (context) => {
-                  return context.dataset.label === "Controlled" ? "white" : "black";
-                },
-                backgroundColor: (context: Context) => {
-                  return context.dataset.backgroundColor as Color;
-                },
-                display: (context) => {
-                  return !!context.dataset.data[context.dataIndex];
-                },
-                borderRadius: 4,
+                display: false,
               }
             },
             interaction: {
@@ -395,6 +384,7 @@ interface OverwatchWarStatsThargoids extends OverwatchOverviewThargoids {
 }
 
 interface WarEffortSummary {
+  CycleNumber: number;
   Date: string;
   TypeId: number;
   Type: string;

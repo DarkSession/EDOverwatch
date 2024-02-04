@@ -95,5 +95,11 @@ namespace EDOverwatch_Web.Controllers.V1
         {
             return OverwatchWarStats.Create(DbContext, AppCache, cancellationToken);
         }
+
+        [HttpGet]
+        public Task<OverwatchSpireSites> SpireSites(CancellationToken cancellationToken)
+        {
+            return OverwatchSpireSites.Create(DbContext, AppCache, cancellationToken);
+        }
     }
 }

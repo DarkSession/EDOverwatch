@@ -124,7 +124,7 @@ namespace EDOverwatchAlertPrediction
             {
                 return false;
             }
-            if (ThargoidLevel?.StartCycle == Cycle || (ThargoidLevel?.State != StarSystemThargoidLevelState.Controlled && ThargoidLevel?.State != StarSystemThargoidLevelState.Titan))
+            if (ThargoidLevel?.StartCycle == Cycle || (ThargoidLevel?.State != StarSystemThargoidLevelState.Controlled /*&& ThargoidLevel?.State != StarSystemThargoidLevelState.Titan*/))
             {
                 return false;
             }
