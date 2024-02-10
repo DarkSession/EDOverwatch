@@ -1,0 +1,5 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 249.344 2.393 L 360.313 490.875 L 138.374 490.875 L 249.344 2.393 Z" style="transform-box: fill-box; transform-origin: 50% 50%; stroke: rgb(255, 255, 255); stroke-width: 20px; fill: rgba(255, 255, 255, 0.3);"></path>
+  <polyline style="fill: rgba(255, 255, 255, 0.3); stroke-width: 20px; stroke: rgb(255, 255, 255);" points="139.146 490.917 43.275 490.917 114.482 187.79 164.605 372.371"></polyline>
+  <polyline style="fill: rgba(255, 255, 255, 0.3); stroke: rgb(255, 255, 255); stroke-width: 20px;" points="355.153 490.909 484.439 491.314 399.707 122.948 334.467 384.042"></polyline>
+</svg>

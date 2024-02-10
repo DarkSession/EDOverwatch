@@ -20,10 +20,14 @@
                         <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
                             (click)="copySystemName(row)"></fa-icon>
                     </span>
-                    <span>
+                    <span *ngIf="row.PrimaryTarget">
                         &nbsp;
-                        <fa-icon [icon]="faBullseyeArrow" *ngIf="row.PrimaryTarget"
-                            matTooltip="Primary target"></fa-icon>
+                        <fa-icon [icon]="faBullseyeArrow" matTooltip="Primary target"></fa-icon>
+                    </span>
+                    <span *ngIf="row.SpireSite">
+                        &nbsp;
+                        <img class="feature-icon" src="assets/spire_d.svg"
+                            matTooltip="Thargoid spire site present in the system" />
                     </span>
                 </td>
             </ng-container>

@@ -14,7 +14,7 @@
                             <td>
                                 <app-maelstrom-name [maelstrom]="starSystem.Maelstrom"></app-maelstrom-name>
                                 <span *ngIf="starSystem.DistanceToMaelstrom">
-                                    ({{ starSystem.DistanceToMaelstrom | number:'0.0-2' }} Ly)
+                                    ({{ starSystem.DistanceToMaelstrom | number:'0.2-2' }} Ly)
                                 </span>
                             </td>
                         </tr>
@@ -62,7 +62,7 @@
                             <td class="number">
                                 <div class="progress-cell">
                                     {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
-                                    <div class="progress-locked" *ngIf="starSystem.ThargoidSpireSiteInSystem">
+                                    <div class="progress-locked" *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
                                         <fa-icon [icon]="faHexagonExclamation"
                                             matTooltip="Thargoid spire site present in the system." size="lg"></fa-icon>
                                     </div>

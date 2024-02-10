@@ -8,6 +8,7 @@
         public bool PrimaryTarget { get; set; }
         public bool IsActive { get; set; }
         public int Order { get; set; }
+        public bool SpireSite { get; set; }
 
         public OverwatchAlertPredictionSystem(StarSystem starSystem, ThargoidMaelstrom maelstrom, double distance, AlertPrediction alertPrediction)
         {
@@ -23,6 +24,7 @@
             PrimaryTarget = alertPrediction.AlertLikely;
             IsActive = alertPrediction.Status == AlertPredictionStatus.Default;
             Order = alertPrediction.Order;
+            SpireSite = starSystem.BarnacleMatrixInSystem;
         }
     }
 }

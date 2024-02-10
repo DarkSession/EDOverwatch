@@ -73,6 +73,7 @@ export interface OverwatchAlertPredictionSystem {
   PrimaryTarget: boolean;
   IsActive: boolean;
   Order: number;
+  SpireSite: boolean;
 }
 
 

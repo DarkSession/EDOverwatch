@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { AppService } from 'src/app/services/app.service';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { OverwatchStarSystem } from '../system-list/system-list.component';
@@ -7,6 +6,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 import { MatSort } from '@angular/material/sort';
+import { download, generateCsv, mkConfig } from 'export-to-csv';
+import { faFileCsv } from '@fortawesome/pro-duotone-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -17,13 +18,13 @@ import { MatSort } from '@angular/material/sort';
 export class SpireSitesComponent implements OnInit {
   public systemsDataSource: MatTableDataSource<OverwatchStarSystem> = new MatTableDataSource<OverwatchStarSystem>();
   @ViewChild(MatSort) sort!: MatSort;
-  public readonly systemDataSourceColumns = ['System', 'SiteBody', 'Titan', 'ThargoidLevel'];
+  public readonly systemDataSourceColumns = ['System', 'ThargoidLevel', 'SiteBody', 'Titan', 'Distance'];
   public readonly faClipboard = faClipboard;
+  public readonly faFileCsv = faFileCsv;
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly webSocketService: WebsocketService,
-    private readonly appService: AppService,
     private readonly matSnackBar: MatSnackBar
   ) {
   }
@@ -62,6 +63,9 @@ export class SpireSitesComponent implements OnInit {
         case "ThargoidLevel": {
           return d.ThargoidLevel.Name;
         }
+        case "Distance": {
+          return d.DistanceToMaelstrom;
+        }
       }
       return d[columnName as keyof OverwatchStarSystem] as string | number;
     }
@@ -75,6 +79,43 @@ export class SpireSitesComponent implements OnInit {
       duration: 2000,
     });
   }
+
+  public exportToCsv(): void {
+    const data = [];
+    for (const system of this.systemsDataSource.data) {
+      data.push({
+        Name: system.Name,
+        SystemAddress: system.SystemAddress,
+        X: system.Coordinates.X,
+        Y: system.Coordinates.Y,
+        Z: system.Coordinates.Z,
+        Maelstrom: system.Maelstrom.Name,
+        DistanceToMaelstrom: system.DistanceToMaelstrom,
+        State: system.ThargoidLevel.Name,
+        StateExpires: system.StateExpiration?.StateExpires ?? "",
+        Progress: system.Progress ?? 0,
+        ProgressIsCompleted: system.StateProgress.IsCompleted,
+        ProgressPercent: system.StateProgress.ProgressPercent,
+        ProgressUncapped: system.StateProgress.ProgressUncapped,
+        ThargoidSpireSiteBody: system.ThargoidSpireSiteBody ?? "",
+      });
+    }
+
+    const csvConfig = mkConfig({
+      fieldSeparator: ',',
+      quoteStrings: true,
+      decimalSeparator: '.',
+      showTitle: false,
+      filename: "Overwatch Spire Sites Export",
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    });
+
+    const csv = generateCsv(csvConfig)(data);
+    download(csvConfig)(csv);
+  }
+
 }
 
 interface OverwatchSpireSites {
