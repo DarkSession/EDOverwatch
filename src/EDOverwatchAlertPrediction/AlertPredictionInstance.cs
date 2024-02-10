@@ -93,7 +93,7 @@ namespace EDOverwatchAlertPrediction
                 int attackingCredits = 32;
                 AttackMode attackMode = AttackMode.Closest;
                 double maxControlSystemDistance = starSystems
-                    .Where(s => s.Maelstrom == maelstrom.Name && s.ThargoidLevel?.State == StarSystemThargoidLevelState.Controlled && !s.ThargoidLevel.Completed && !s.IsNewState)
+                    .Where(s => s.Maelstrom == maelstrom.Name && s.ThargoidLevel?.State == StarSystemThargoidLevelState.Controlled && !s.ThargoidLevel.Completed /* && !s.IsNewState */)
                     .Select(s => s.DistanceTo(maelstrom.StarSystem!))
                     .DefaultIfEmpty()
                     .Max();

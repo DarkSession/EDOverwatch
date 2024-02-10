@@ -31,7 +31,7 @@ namespace EDOverwatchAlertPrediction
 
         private int LastControlCycle { get; }
 
-        private int LastRecoveryCycle { get; }
+        private int LastRecoveryCycleEnd { get; }
 
         private bool LastRecoveryLong { get; }
 
@@ -69,14 +69,14 @@ namespace EDOverwatchAlertPrediction
                 .Select(s => s.EndCycle ?? default)
                 .DefaultIfEmpty(int.MinValue)
                 .Max();
-            LastRecoveryCycle = systemStates
+            LastRecoveryCycleEnd = systemStates
                 .Where(s => s.State == StarSystemThargoidLevelState.Recovery && s.EndCycle < cycle)
                 .Select(s => s.EndCycle ?? default)
                 .DefaultIfEmpty(int.MinValue)
                 .Max();
-            if (LastRecoveryCycle > 0 && systemStates.FirstOrDefault(s => s.State == StarSystemThargoidLevelState.Recovery && s.EndCycle == LastRecoveryCycle) is StarSystemCycleStateThargoidLevel lastRecoveryCycle)
+            if (LastRecoveryCycleEnd > 0 && systemStates.FirstOrDefault(s => s.State == StarSystemThargoidLevelState.Recovery && s.EndCycle == LastRecoveryCycleEnd) is StarSystemCycleStateThargoidLevel lastRecoveryCycle)
             {
-                LastRecoveryLong = (lastRecoveryCycle.EndCycle - lastRecoveryCycle.StartCycle) > 1;
+                LastRecoveryLong = (lastRecoveryCycle.EndCycle - lastRecoveryCycle.StartCycle) >= 4;
             }
             IsNewState = ThargoidLevel?.StartCycle == cycle;
         }
@@ -111,7 +111,7 @@ namespace EDOverwatchAlertPrediction
             {
                 return false;
             }
-            if (LastRecoveryCycle > 0 && ((Cycle - LastRecoveryCycle) <= 2 || (LastRecoveryLong && (Cycle - LastRecoveryCycle) <= 4)))
+            if (LastRecoveryCycleEnd > 0 && !LastRecoveryLong && (Cycle - LastRecoveryCycleEnd) <= 1)
             {
                 return false;
             }

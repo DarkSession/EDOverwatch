@@ -20,8 +20,9 @@ namespace EDOverwatchAlertPrediction
                 .ToListAsync(cancellationToken);
 
             List<EDDatabase.AlertPrediction> alertPredictions = await dbContext.AlertPredictions
-                .Include(a => a.Attackers)
+                .Include(a => a.Attackers!.Where(a => a.Status == AlertPredictionAttackerStatus.Default))
                 .Where(a => a.Cycle == thargoidCycle)
+                .OrderBy(a => a.Order)
                 .ToListAsync(cancellationToken);
 
             List<AlertPredictionCycleAttacker> alertPredictionCycleAttackers = await dbContext.AlertPredictionCycleAttackers
@@ -36,6 +37,7 @@ namespace EDOverwatchAlertPrediction
                 if (starSystemThargoidLevels.Any(s => s.StarSystem == alertPrediction.StarSystem))
                 {
                     StarSystem? attackingSystem = alertPrediction.Attackers?
+                        .Where(a => a.Status == AlertPredictionAttackerStatus.Default)
                         .OrderBy(a => a.Order)
                         .Select(a => a.StarSystem)
                         .FirstOrDefault(s => !usedAttackers.Contains(s!));
