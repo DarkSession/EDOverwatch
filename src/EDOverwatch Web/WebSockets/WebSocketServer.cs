@@ -1,7 +1,6 @@
 ﻿using ActiveMQ.Artemis.Client;
 using ActiveMQ.Artemis.Client.Transactions;
 using EDOverwatch_Web.WebSockets.EventListener;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using NJsonSchema.Validation;
