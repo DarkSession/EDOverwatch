@@ -171,6 +171,14 @@
       </div>
     </mat-sidenav>
     <mat-sidenav-content>
+      <div *ngIf="showAnnouncement" class="information-message">
+        <div>
+          <fa-icon [icon]="faGears"></fa-icon>
+        </div>
+        <div>
+          {{ announcementText }}
+        </div>
+      </div>
       <router-outlet></router-outlet>
       <div class="footer">
         <!-- https://forums.frontier.co.uk/threads/elite-dangerous-media-usage-rules.510879/ -->

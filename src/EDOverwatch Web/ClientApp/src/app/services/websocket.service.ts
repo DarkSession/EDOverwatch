@@ -35,6 +35,8 @@ export class WebsocketService {
     public serverStatus: ServerStatus = ServerStatus.OK;
     public serverStatusChanged: EventEmitter<ServerStatus> = new EventEmitter<ServerStatus>();
 
+    public siteAnnouncementReceived: EventEmitter<AuthenticationStatusAnnouncement | null> = new EventEmitter<AuthenticationStatusAnnouncement | null>();
+
     public constructor() {
         this.initDb();
         this.initalizeConnection(false);
@@ -244,6 +246,7 @@ export class WebsocketService {
                 }
                 this.connectionIsAuthenticatedChanged.emit();
             }
+            this.siteAnnouncementReceived.emit(authenticationData.Announcement);
             if (this.connectionStatus === ConnectionStatus.Open) {
                 if (!environment.production) {
                     console.log("onReady -> emit");
@@ -433,6 +436,13 @@ interface WebSocketMessageQueueItem {
 
 interface WebSocketMessageAuthenticationData {
     IsAuthenticated: boolean;
+    Announcement?: AuthenticationStatusAnnouncement;
+}
+
+export interface AuthenticationStatusAnnouncement {
+    ShowFrom: string;
+    ShowTo: string;
+    Text: string;   
 }
 
 interface CacheDb extends DBSchema {

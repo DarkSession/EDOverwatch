@@ -1,6 +1,7 @@
 ﻿using ActiveMQ.Artemis.Client;
 using ActiveMQ.Artemis.Client.Transactions;
 using EDOverwatch_Web.WebSockets.EventListener;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using NJsonSchema.Validation;
@@ -18,6 +19,8 @@ namespace EDOverwatch_Web.WebSockets
         private JsonSchema WebSocketMessageReceivedSchema { get; } = JsonSchema.FromType<WebSocketMessageReceived>();
         private IConfiguration Configuration { get; }
         private IServiceProvider ServiceProvider { get; }
+        private AuthenticationStatusAnnouncement? Announcement { get; }
+
         public WebSocketServer(ILogger<WebSocketServer> log, IConfiguration configuration, IServiceProvider serviceProvider)
         {
             Log = log;
@@ -43,6 +46,18 @@ namespace EDOverwatch_Web.WebSockets
                         }
                         WebSocketActions[webSocketActionAttribute.Action].Add(type);
                     }
+                }
+            }
+            if (Configuration.GetValue<bool>("SiteAnnouncement:Enabled"))
+            {
+                if (DateTimeOffset.TryParse(Configuration.GetValue<string>("SiteAnnouncement:ShowFrom"), out DateTimeOffset showFrom) && DateTimeOffset.TryParse(Configuration.GetValue<string>("SiteAnnouncement:ShowTo"), out DateTimeOffset showTo))
+                {
+                    string text = Configuration.GetValue<string>("SiteAnnouncement:Text") ?? string.Empty;
+                    Announcement = new(showFrom, showTo, text);
+                }
+                else
+                {
+                    Log.LogWarning("Site announceement is enabled but no valid from/to date has been provided.");
                 }
             }
             _ = InitEventListener();
@@ -160,8 +175,8 @@ namespace EDOverwatch_Web.WebSockets
             {
                 return;
             }
-            bool isAuthenticated = (applicationUser != null);
-            WebSocketMessage authenticationMessage = new("Authentication", new AuthenticationStatus(isAuthenticated));
+            AuthenticationStatus authenticationStatus = new(applicationUser != null, Announcement);
+            WebSocketMessage authenticationMessage = new("Authentication", authenticationStatus);
             await authenticationMessage.Send(ws, cancellationToken);
             WebSocketSession webSocketSession = new(ws, applicationUser);
             lock (WebSocketSessions)
@@ -301,9 +316,26 @@ namespace EDOverwatch_Web.WebSockets
         class AuthenticationStatus
         {
             public bool IsAuthenticated { get; set; }
-            public AuthenticationStatus(bool isAuthenticated)
+            public AuthenticationStatusAnnouncement? Announcement { get; set; }
+
+            public AuthenticationStatus(bool isAuthenticated, AuthenticationStatusAnnouncement? announcement)
             {
                 IsAuthenticated = isAuthenticated;
+                Announcement = announcement;
+            }
+        }
+
+        class AuthenticationStatusAnnouncement
+        {
+            public DateTimeOffset ShowFrom { get; set; }
+            public DateTimeOffset ShowTo { get; set; }
+            public string Text { get; }
+
+            public AuthenticationStatusAnnouncement(DateTimeOffset showFrom, DateTimeOffset showTo, string text)
+            {
+                ShowFrom = showFrom;
+                ShowTo = showTo;
+                Text = text;
             }
         }
     }

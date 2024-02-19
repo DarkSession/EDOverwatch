@@ -2,11 +2,12 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, H
 import { SwUpdate } from '@angular/service-worker';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AppService } from './services/app.service';
-import { ServerStatus, WebsocketService } from './services/websocket.service';
+import { AuthenticationStatusAnnouncement, ServerStatus, WebsocketService } from './services/websocket.service';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { MatDrawerMode } from '@angular/material/sidenav';
-import { faChartNetwork, faChartSimple, faContainerStorage, faCrystalBall, faGalaxy, faHandsHoldingDiamond, faHandshake, faSolarSystem, faSwords, faTimelineArrow, faUsers } from '@fortawesome/pro-duotone-svg-icons';
+import { faChartNetwork, faChartSimple, faContainerStorage, faCrystalBall, faHandsHoldingDiamond, faHandshake, faSolarSystem, faSwords, faTimelineArrow, faUsers, faGears } from '@fortawesome/pro-duotone-svg-icons';
 import { faHandWave, faMapLocation } from '@fortawesome/pro-light-svg-icons';
+import { environment } from 'src/environments/environment';
 
 @UntilDestroy()
 @Component({
@@ -20,7 +21,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   public readonly faSolarSystem = faSolarSystem;
   public readonly faHandshake = faHandshake;
   public readonly faChartSimple = faChartSimple;
-  public readonly faGalaxy = faGalaxy;
   public readonly faMapLocation = faMapLocation;
   public readonly faCrystalBall = faCrystalBall;
   public readonly faChartNetwork = faChartNetwork;
@@ -29,6 +29,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   public readonly faHandWave = faHandWave;
   public readonly faSwords = faSwords;
   public readonly faContainerStorage = faContainerStorage;
+  public readonly faGears = faGears;
   public loading = false;
   public sideNavMode: MatDrawerMode = "side";
   private serverStatusSnackbar: MatSnackBarRef<TextOnlySnackBar> | null = null;
@@ -38,6 +39,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.websocketService.ensureConnected();
   }
   */
+  private announcement: AuthenticationStatusAnnouncement | null = null;
+  public showAnnouncement = false;
+  public announcementText = "";
 
   @HostListener('window:resize', ['$event'])
   onFocus(event: any): void {
@@ -51,6 +55,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     private readonly websocketService: WebsocketService,
     private readonly matSnackBar: MatSnackBar
   ) {
+    this.websocketService.siteAnnouncementReceived.subscribe(async (announcement: AuthenticationStatusAnnouncement | null) => {
+      if (announcement === null) {
+        await this.appService.deleteSetting("siteAnnouncement");
+      }
+      else {
+        await this.appService.saveSetting("siteAnnouncement", JSON.stringify(announcement));
+      }
+      this.processSiteAnnouncement(announcement);
+    });
+    setInterval(() => {
+      this.checkAnnouncement();
+    }, 60000);
   }
 
   private updateSideNavMode() {
@@ -70,6 +86,33 @@ export class AppComponent implements OnInit, AfterViewInit {
         duration: 6000,
       });
     }
+    const siteAnnouncement = await this.appService.getSetting("siteAnnouncement");
+    if (siteAnnouncement) {
+      const announcement: AuthenticationStatusAnnouncement = JSON.parse(siteAnnouncement);
+      this.processSiteAnnouncement(announcement);
+    }
+  }
+
+  private processSiteAnnouncement(announcement: AuthenticationStatusAnnouncement | null): void {
+    this.announcement = announcement;
+    this.checkAnnouncement();
+  }
+
+  private checkAnnouncement(): void {
+    if (!environment.production) {
+      console.log("checkAnnouncement"); 
+    }
+    if (this.announcement === null) {
+      this.showAnnouncement = false;
+    }
+    else {
+      const now = new Date();
+      const showFrom = new Date(this.announcement.ShowFrom);
+      const showTo = new Date(this.announcement.ShowTo);
+      this.showAnnouncement = (showFrom <= now && showTo >= now);
+      this.announcementText = this.announcement.Text;
+    }
+    this.changeDetectorRef.markForCheck();
   }
 
   public menuOpenChanged(isOpen: boolean) {
