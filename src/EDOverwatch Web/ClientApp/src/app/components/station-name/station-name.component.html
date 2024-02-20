@@ -14,11 +14,12 @@
             matTooltip="Asteroid Base" />
     </div>
     {{ station.Name }}
-    <span class="badge badge-orange" *ngIf="station.LandingPads.Large > 0" matTooltip="Large landing pad available">
+    <span class="badge badge-orange" *ngIf="station.LandingPads.Large > 0" [matTooltip]="landingPads"
+        matTooltipClass="multiline-tooltip">
         Large
     </span>
     <span class="badge badge-orange" *ngIf="station.LandingPads.Large === 0 && station.LandingPads.Medium > 0"
-        matTooltip="Medium landing pad available">
+        [matTooltip]="landingPads" m matTooltipClass="multiline-tooltip">
         Medium
     </span>
     <span *ngIf="station.Gravity" class="badge badge-gray" matTooltip="Planet gravity">

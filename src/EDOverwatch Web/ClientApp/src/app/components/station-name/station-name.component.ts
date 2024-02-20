@@ -1,12 +1,30 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-station-name',
   templateUrl: './station-name.component.html',
-  styleUrls: ['./station-name.component.css']
+  styleUrls: ['./station-name.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
-export class StationNameComponent {
+export class StationNameComponent implements OnChanges {
   @Input() station!: OverwatchStation;
+  public landingPads = "";
+
+  public ngOnChanges(): void {
+    const landingPads = ["Landing pads:"];
+    if (this.station.LandingPads) {
+      if (this.station.LandingPads.Large) {
+        landingPads.push("Large: " + this.station.LandingPads.Large);
+      }
+      if (this.station.LandingPads.Medium) {
+        landingPads.push("Medium: " + this.station.LandingPads.Medium);
+      }
+      if (this.station.LandingPads.Small) {
+        landingPads.push("Small: " + this.station.LandingPads.Small);
+      }
+    }
+    this.landingPads = landingPads.join(`\r\n`);
+  }
 }
 
 export interface OverwatchStation {
