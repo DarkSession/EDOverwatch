@@ -76,7 +76,7 @@ namespace EDOverwatchAlertPrediction
                 .Max();
             if (LastRecoveryCycleEnd > 0 && systemStates.FirstOrDefault(s => s.State == StarSystemThargoidLevelState.Recovery && s.EndCycle == LastRecoveryCycleEnd) is StarSystemCycleStateThargoidLevel lastRecoveryCycle)
             {
-                LastRecoveryLong = (lastRecoveryCycle.EndCycle - lastRecoveryCycle.StartCycle) >= 4;
+                LastRecoveryLong = (lastRecoveryCycle.EndCycle - lastRecoveryCycle.StartCycle) >= 3;
             }
             IsNewState = ThargoidLevel?.StartCycle == cycle;
         }
