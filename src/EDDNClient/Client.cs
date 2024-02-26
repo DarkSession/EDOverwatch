@@ -7,16 +7,38 @@ using System.Text;
 
 namespace EDDNClient
 {
-    internal class Client
+    internal class Client : IDisposable
     {
+        private bool Disposed { get; set; }
         private IConfiguration Configuration { get; }
         private ILogger Log { get; }
         public DateTimeOffset LastMessageReceived { get; private set; } = DateTimeOffset.UtcNow;
+        private SubscriberSocket SubscriberSocket { get; } = new();
+        private string EDDNAddress { get; }
 
         public Client(IConfiguration configuration, ILogger<Client> log)
         {
             Configuration = configuration;
             Log = log;
+            EDDNAddress = Configuration.GetValue<string>("EDDN:Address") ?? throw new Exception("No EDDN address configured!");
+        }
+
+        public void Dispose()
+        {
+            if (!Disposed)
+            {
+                try
+                {
+                    SubscriberSocket.Disconnect(EDDNAddress);
+                    Log.LogDebug("EDDN: Properly disconnected");
+                }
+                catch (Exception e)
+                {
+                    Log.LogError(e, "Exception while trying to disconnect.");
+                }
+                SubscriberSocket.Dispose();
+                Disposed = true;
+            }
         }
 
         public async Task ProcessAsync(CancellationToken cancellationToken)
@@ -48,15 +70,14 @@ namespace EDDNClient
 
         private async Task ReceiveData(IProducer producer, CancellationToken cancellationToken)
         {
-            using SubscriberSocket client = new();
-            client.Connect(Configuration.GetValue<string>("EDDN:Address") ?? throw new Exception("No EDDN address configured!"));
-            client.SubscribeToAnyTopic();
+            SubscriberSocket.Connect(EDDNAddress);
+            SubscriberSocket.SubscribeToAnyTopic();
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    (byte[] bytes, _) = await client.ReceiveFrameBytesAsync(cancellationToken);
+                    (byte[] bytes, _) = await SubscriberSocket.ReceiveFrameBytesAsync(cancellationToken);
                     LastMessageReceived = DateTimeOffset.UtcNow;
                     await using MemoryStream ms = new(bytes);
                     await using InflaterInputStream inputStream = new(ms);

@@ -49,7 +49,7 @@
             CancellationTokenSource clientCancellationTokenSource = new();
             try
             {
-                Client client = ServiceProvider.GetRequiredService<Client>();
+                using Client client = ServiceProvider.GetRequiredService<Client>();
                 Task watchClientTask = WatchClient(client, clientCancellationTokenSource);
                 Task processTask = client.ProcessAsync(clientCancellationTokenSource.Token);
                 await Task.WhenAny(watchClientTask, processTask);
