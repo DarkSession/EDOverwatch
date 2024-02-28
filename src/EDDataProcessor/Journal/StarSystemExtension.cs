@@ -56,7 +56,7 @@ namespace EDDataProcessor.Journal
                 }
                 if (currentState != StarSystemThargoidLevelState.None)
                 {
-                    bool titanHeartDestroyed = fsdJumpThargoidWar.WarProgress > 0.01m &&
+                    bool titanHeartDestroyed = fsdJumpThargoidWar.WarProgress > 0.0001m &&
                         starSystem.ThargoidLevel.CurrentProgress is not null &&
                         starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Titan &&
                         (starSystem.ThargoidLevel.CurrentProgress.ProgressPercent - fsdJumpThargoidWar.WarProgress) > 0.25m;
