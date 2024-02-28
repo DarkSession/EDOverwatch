@@ -23,7 +23,7 @@ namespace EDOverwatch_Web.Models
         {
             return appCache.GetOrAddAsync(CacheKey, (cacheEntry) =>
             {
-                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
                 return CreateInternal(dbContext, cancellationToken);
             })!;
         }
@@ -33,6 +33,7 @@ namespace EDOverwatch_Web.Models
             var maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
                 .Include(t => t.StarSystem)
+                .ThenInclude(s => s!.ThargoidLevel)
                 .Select(t => new
                 {
                     Maelstrom = t,
