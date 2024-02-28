@@ -22,13 +22,17 @@
         [ForeignKey("StarSystemId")]
         public StarSystem? StarSystem { get; set; }
 
-        public ThargoidMaelstrom(int id, string name, decimal influenceSphere, short ingameNumber, DateTimeOffset updated)
+        [Column]
+        public short HeartsRemaining { get; set; }
+
+        public ThargoidMaelstrom(int id, string name, decimal influenceSphere, short ingameNumber, DateTimeOffset updated, short heartsRemaining)
         {
             Id = id;
             Name = name;
             InfluenceSphere = influenceSphere;
             IngameNumber = ingameNumber;
             Updated = updated;
+            HeartsRemaining = heartsRemaining;
         }
     }
 }

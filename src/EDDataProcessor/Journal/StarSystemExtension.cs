@@ -56,7 +56,11 @@ namespace EDDataProcessor.Journal
                 }
                 if (currentState != StarSystemThargoidLevelState.None)
                 {
-                    if (starSystem.ThargoidLevel.CurrentProgress is null || fsdJumpThargoidWar.WarProgress > starSystem.ThargoidLevel.CurrentProgress.ProgressPercent)
+                    bool titanHeartDestroyed = fsdJumpThargoidWar.WarProgress > 0m &&
+                        starSystem.ThargoidLevel.CurrentProgress is not null &&
+                        starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Titan &&
+                        (starSystem.ThargoidLevel.CurrentProgress.ProgressPercent - fsdJumpThargoidWar.WarProgress) > 0.25m;
+                    if (starSystem.ThargoidLevel.CurrentProgress is null || fsdJumpThargoidWar.WarProgress > starSystem.ThargoidLevel.CurrentProgress.ProgressPercent || titanHeartDestroyed)
                     {
                         short progressOld = (short)Math.Floor(fsdJumpThargoidWar.WarProgress * 100m);
                         if (progressOld > 100)
@@ -68,7 +72,6 @@ namespace EDDataProcessor.Journal
                         {
                             ThargoidLevel = starSystem.ThargoidLevel,
                         };
-                        changed = true;
                         if (starSystem.ThargoidLevel.CurrentProgress.IsCompleted)
                         {
                             await dbContext.DcohFactionOperations
@@ -77,6 +80,15 @@ namespace EDDataProcessor.Journal
                                     d.Status == DcohFactionOperationStatus.Active)
                                 .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Status, DcohFactionOperationStatus.Expired), cancellationToken);
                         }
+                        if (titanHeartDestroyed && starSystem.ThargoidLevel.Maelstrom != null)
+                        {
+                            starSystem.ThargoidLevel.Maelstrom.HeartsRemaining -= 1;
+                            if (starSystem.ThargoidLevel.Maelstrom.HeartsRemaining < 0)
+                            {
+                                starSystem.ThargoidLevel.Maelstrom.HeartsRemaining = 0;
+                            }
+                        }
+                        changed = true;
                     }
                     else if (fsdJumpThargoidWar.WarProgress == starSystem.ThargoidLevel.CurrentProgress.ProgressPercent && starSystem.ThargoidLevel.CurrentProgress.LastChecked < updateTime)
                     {

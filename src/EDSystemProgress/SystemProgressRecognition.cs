@@ -183,7 +183,7 @@ namespace EDSystemProgress
                         {
                             case ImageProcessingStep.WaitForTitle:
                                 {
-                                    if (text.Contains("THARGOID WAR INFORMATION"))
+                                    if (text.Contains("THARGOID WAR"))
                                     {
                                         processingStep = ImageProcessingStep.SystemName;
 
