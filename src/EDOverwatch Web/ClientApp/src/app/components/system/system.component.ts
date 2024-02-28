@@ -16,6 +16,8 @@ import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 import { AppService } from 'src/app/services/app.service';
 import * as dayjs from 'dayjs';
 import { MatTableDataSource } from '@angular/material/table';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 
 @UntilDestroy()
 @Component({
@@ -31,6 +33,8 @@ export class SystemComponent implements OnInit {
   public readonly faCrosshairs = faCrosshairs;
   public readonly faCrosshairsSimple = faCrosshairsSimple;
   public readonly faArrowRightToArc = faArrowRightToArc;
+  public readonly faHeartRegular = faHeartRegular;
+  public readonly faHeartSolid = faHeartSolid;
   public starSystem: OverwatchStarSystemFullDetail | null = null;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [],
@@ -51,6 +55,11 @@ export class SystemComponent implements OnInit {
   public showProgressDetails = false;
   public progressDetails: MatTableDataSource<ProgressDetails> = new MatTableDataSource<ProgressDetails>();
   public progressDetailsColumns = ["State", "Time", "Progress", "Change", "Timespan"];
+
+  public titanHearts = [8, 7, 6, 5, 4, 3, 2, 1];
+
+  public showTitanHearts = false;
+  public titanHeartsRemaining = 8;
 
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
@@ -130,6 +139,12 @@ export class SystemComponent implements OnInit {
       .subscribe((message) => {
         if (message && message.Data) {
           this.starSystem = message.Data;
+
+          this.showTitanHearts = (this.starSystem.ThargoidLevel && this.starSystem.ThargoidLevel.Level === 50);
+          if (this.showTitanHearts) {
+            this.titanHeartsRemaining = this.starSystem.Maelstrom.HeartsRemaining;
+          }
+
           let labels: string[] = message.Data.DaysSincePreviousTick ?? [];
           const totalAmounts: {
             [key: string]: Int32Array

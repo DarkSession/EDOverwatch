@@ -15,4 +15,5 @@ export interface OverwatchMaelstrom {
   SystemName: string;
   SystemAddress: number;
   IngameNumber: number;
+  HeartsRemaining: number;
 }

@@ -58,17 +58,29 @@
                             </td>
                         </tr>
                         <tr *ngIf="starSystem.StateProgress">
-                            <td class="t">Progress</td>
+                            <td class="t">Progress {{ showTitanHearts ? ' current heart' : '' }}</td>
                             <td class="number">
                                 <div class="progress-cell">
                                     {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
-                                    <div class="progress-locked" *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
+                                    <div class="progress-locked"
+                                        *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
                                         <fa-icon [icon]="faHexagonExclamation"
                                             matTooltip="Thargoid spire site present in the system." size="lg"></fa-icon>
                                     </div>
                                 </div>
                                 <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
                                     Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="showTitanHearts">
+                            <td class="t">Hearts</td>
+                            <td class="titan-hearts"
+                                [matTooltip]="titanHeartsRemaining == 1 ? '1 heart remaining' : titanHeartsRemaining + ' hearts remaining'">
+                                <div *ngFor="let titanHeart of titanHearts">
+                                    <fa-icon [icon]="faHeartRegular" class="heart-destroyed"
+                                        *ngIf="titanHeartsRemaining < titanHeart"></fa-icon>
+                                    <fa-icon [icon]="faHeartSolid" *ngIf="titanHeartsRemaining >= titanHeart"></fa-icon>
                                 </div>
                             </td>
                         </tr>
@@ -177,7 +189,7 @@
                 <mat-tab label="History">
                     <app-system-history [starSystem]="starSystem"></app-system-history>
                 </mat-tab>
-                <mat-tab label="Progress details" *ngIf="showProgressDetails">
+                <mat-tab label="Progress history" *ngIf="showProgressDetails">
                     <table mat-table [dataSource]="progressDetails">
                         <ng-container matColumnDef="State">
                             <th mat-header-cell *matHeaderCellDef>State</th>

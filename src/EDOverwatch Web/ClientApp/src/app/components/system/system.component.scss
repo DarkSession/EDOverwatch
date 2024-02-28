@@ -89,3 +89,14 @@
         column-gap: 4px
     }
 }
+
+.titan-hearts {
+    display: flex;
+    flex-direction: row;
+    column-gap: 4px;
+    justify-content: flex-end;
+}
+
+.heart-destroyed {
+    opacity: 0.8;
+}
