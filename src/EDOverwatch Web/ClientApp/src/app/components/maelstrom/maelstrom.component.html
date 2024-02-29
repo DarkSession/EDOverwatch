@@ -21,6 +21,18 @@
                                 {{ maelstrom.HeartsRemaining }} / 8
                             </td>
                         </tr>
+                        <tr>
+                            <td><b>Current heart progress</b></td>
+                            <td>
+                                {{ maelstrom.HeartProgress | percent:'1.4-4' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Total Progress</b></td>
+                            <td>
+                                {{ maelstrom.TotalProgress | percent:'1.4-4' }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { faClipboard, faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { AppService } from 'src/app/services/app.service';
-import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
+import { OverwatchMaelstrom, OverwatchMaelstromProgress } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
 import { mkConfig, generateCsv, download } from "export-to-csv";
 import { faFileCsv, faCircleQuestion, faTruck, faKitMedical } from '@fortawesome/pro-duotone-svg-icons';
@@ -252,7 +252,7 @@ export interface OverwatchStarSystem {
   SystemAddress: number;
   Name: string;
   Coordinates: OverwatchStarSystemCoordinates;
-  Maelstrom: OverwatchMaelstrom;
+  Maelstrom: OverwatchMaelstromProgress;
   ThargoidLevel: OverwatchThargoidLevel;
   Progress: number | null;
   ProgressPercent: number | null;

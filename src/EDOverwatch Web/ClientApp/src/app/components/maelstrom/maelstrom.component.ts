@@ -4,7 +4,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ChartConfiguration, ChartDataset, Color } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
+import { OverwatchMaelstromProgress } from '../maelstrom-name/maelstrom-name.component';
 import { OverwatchStarSystemFull } from '../system-list/system-list.component';
 import { OverwatchAlertPredictionMaelstrom } from '../alert-prediction/alert-prediction.component';
 import { OverwatchOverviewMaelstromHistoricalSummary } from '../stats/stats.component';
@@ -206,7 +206,7 @@ export class MaelstromComponent implements OnInit {
   }
 }
 
-interface OverwatchMaelstromDetail extends OverwatchMaelstrom {
+interface OverwatchMaelstromDetail extends OverwatchMaelstromProgress {
   Systems: OverwatchStarSystemFull[];
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];

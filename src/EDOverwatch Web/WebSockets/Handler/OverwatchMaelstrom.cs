@@ -24,10 +24,10 @@ namespace EDOverwatch_Web.WebSockets.Handler
             OverwatchMaelstromRequest? data = message.Data?.ToObject<OverwatchMaelstromRequest>();
             if (data != null)
             {
-                ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms.FirstOrDefaultAsync(t => t.Name == data.Name, cancellationToken);
+                ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms.AsNoTracking().FirstOrDefaultAsync(t => t.Name == data.Name, cancellationToken);
                 if (maelstrom != null)
                 {
-                    OverwatchMaelstromDetail? overwatchMaelstromDetail = await OverwatchMaelstromDetail.Create(maelstrom, dbContext, cancellationToken);
+                    OverwatchMaelstromDetail? overwatchMaelstromDetail = await OverwatchMaelstromDetail.Create(maelstrom.Id, dbContext, cancellationToken);
                     if (overwatchMaelstromDetail != null)
                     {
                         return new WebSocketHandlerResultSuccess(overwatchMaelstromDetail, new MaelstromObject(data.Name));

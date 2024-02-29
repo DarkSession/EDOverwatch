@@ -37,6 +37,7 @@ namespace EDOverwatch_Web.WebSockets.Handler
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
                 .Include(t => t.StarSystem)
+                .ThenInclude(s => s!.ThargoidLevel)
                 .ToListAsync(cancellationToken);
 
             OverwatchOperationSearchResponse response = new(maelstroms.Select(m => new Models.OverwatchMaelstrom(m)).ToList());
@@ -49,6 +50,8 @@ namespace EDOverwatch_Web.WebSockets.Handler
                     .Include(d => d.StarSystem)
                     .ThenInclude(s => s!.ThargoidLevel)
                     .ThenInclude(t => t!.Maelstrom)
+                    .ThenInclude(m => m!.StarSystem)
+                    .ThenInclude(s => s!.ThargoidLevel)
                     .Include(d => d.Faction)
                     .Where(d => d.Status == DcohFactionOperationStatus.Active);
                 if (data.Type != null)

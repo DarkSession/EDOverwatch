@@ -25,7 +25,6 @@
                 .Include(c => c.SourceStarSystem)
                 .Include(c => c.SourceStarSystem!.ThargoidLevel)
                 .Include(c => c.SourceStarSystem!.ThargoidLevel!.Maelstrom)
-                .Include(c => c.SourceStarSystem!.ThargoidLevel!.Maelstrom!.StarSystem)
                 .Where(c => c.Commander == commander && c.SourceStarSystem != null && c.SourceStarSystem.ThargoidLevel != null)
                 .ToListAsync(cancellationToken);
 

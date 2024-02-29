@@ -58,17 +58,30 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
                 <td mat-cell *matCellDef="let row" class="nowrap">
                     <div class="progress-cell" *ngIf="row.Progress !== null">
-                        <div>
-                            <div class="progress-number"
-                                matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }}">
-                                {{ row.Progress }} %
-                            </div>
-                            <div class="titan-hearts" *ngIf="row.ThargoidLevel?.Level === 50 && row.Maelstrom">
-                                {{ row.Maelstrom.HeartsRemaining }} {{ row.Maelstrom.HeartsRemaining == 1 ? 'heart' :
-                                'hearts' }}
-                            </div>
+                        <div class="entry">
+                            <ng-container *ngIf="row.ThargoidLevel?.Level !== 50 || !row.Maelstrom">
+                                <div class="progress-number"
+                                    matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }}">
+                                    {{ row.Progress }} %
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="row.ThargoidLevel?.Level === 50 && row.Maelstrom">
+                                <div class="progress-number"
+                                    matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }} heart progress">
+                                    {{ row.Progress }} %
+                                </div>
+                                <div class="titan-progress"
+                                    matTooltip="{{ row.Maelstrom.TotalProgress | percent:'1.4-4' }} total progress">
+                                    ({{ row.Maelstrom.TotalProgress | percent:'1.1-1' }})
+                                </div>
+                                <div class="titan-progress">
+                                    {{ row.Maelstrom.HeartsRemaining }} {{ row.Maelstrom.HeartsRemaining == 1 ? 'heart'
+                                    :
+                                    'hearts' }}
+                                </div>
+                            </ng-container>
                         </div>
-                        <div>
+                        <div class="entry">
                             <div class="progress-completed" *ngIf="row.Progress >= 100">
                                 <fa-icon [icon]="faCircleCheck" matTooltip="Completed"></fa-icon>
                             </div>

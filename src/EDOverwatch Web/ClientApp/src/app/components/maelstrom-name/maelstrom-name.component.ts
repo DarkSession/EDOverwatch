@@ -15,5 +15,10 @@ export interface OverwatchMaelstrom {
   SystemName: string;
   SystemAddress: number;
   IngameNumber: number;
+}
+
+export interface OverwatchMaelstromProgress extends OverwatchMaelstrom {
   HeartsRemaining: number;
+  HeartProgress: number;
+  TotalProgress: number;
 }

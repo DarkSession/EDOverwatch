@@ -128,8 +128,9 @@ namespace EDDataProcessor
                     }
                 }
                 Random rnd = new();
-                int d = rnd.Next(4, 6);
-                await Task.Delay(TimeSpan.FromHours(d), cancellationToken);
+                int d = rnd.Next(6, 8);
+                int m = rnd.Next(1, 59);
+                await Task.Delay(TimeSpan.FromMinutes((d * 60) + m), cancellationToken);
             }
         }
 

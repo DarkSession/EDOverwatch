@@ -3,7 +3,7 @@
     public abstract class OverwatchStarSystemBase : OverwatchStarSystemMin
     {
         public OverwatchStarSystemCoordinates Coordinates { get; }
-        public OverwatchMaelstrom Maelstrom { get; }
+        public OverwatchMaelstromProgress Maelstrom { get; }
 
         public OverwatchStarSystemBase(StarSystem starSystem) : base(starSystem)
         {

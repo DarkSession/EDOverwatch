@@ -1,13 +1,12 @@
 ﻿namespace EDOverwatch_Web.Models
 {
-    public class OverwatchMaelstromBasic : OverwatchMaelstrom
+    public class OverwatchMaelstromBasic : OverwatchMaelstromProgress
     {
         public int SystemsInAlert { get; }
         public int SystemsInInvasion { get; }
         public int SystemsThargoidControlled { get; }
         public int SystemsInRecovery { get; }
         public decimal DefenseRate { get; }
-        public decimal HeartProgress { get; }
 
         public OverwatchMaelstromBasic(
             ThargoidMaelstrom thargoidMaelstrom,
@@ -24,7 +23,6 @@
             SystemsInInvasion = systemsInInvasion;
             SystemsThargoidControlled = systemsThargoidControlled;
             SystemsInRecovery = systemsInRecovery;
-            HeartProgress = thargoidMaelstrom.StarSystem?.ThargoidLevel?.CurrentProgress?.ProgressPercent ?? 0m;
             int invasionsAlertsTotal = (populatedSystemsInvaded + populatedAlertsDefended);
             if (invasionsAlertsTotal > 0)
             {

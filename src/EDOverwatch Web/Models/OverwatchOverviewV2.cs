@@ -207,6 +207,7 @@ namespace EDOverwatch_Web.Models
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)
+                .ThenInclude(s => s!.ThargoidLevel)
                 .Include(s => s.ThargoidLevel!.CycleStart)
                 .Include(s => s.ThargoidLevel!.StateExpires)
                 .Include(s => s.ThargoidLevel!.CurrentProgress)
@@ -239,6 +240,7 @@ namespace EDOverwatch_Web.Models
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
                 .Include(t => t.StarSystem)
+                .ThenInclude(s => s!.ThargoidLevel)
                 .ToListAsync(cancellationToken);
 
             Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);

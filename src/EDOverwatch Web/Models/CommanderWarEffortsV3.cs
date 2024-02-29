@@ -37,7 +37,6 @@ namespace EDOverwatch_Web.Models
                 .Include(w => w.StarSystem)
                 .Include(w => w.StarSystem!.ThargoidLevel)
                 .Include(w => w.StarSystem!.ThargoidLevel!.Maelstrom)
-                .Include(w => w.StarSystem!.ThargoidLevel!.Maelstrom!.StarSystem)
                 .Include(w => w.Cycle)
                 .Where(w => w.CommanderId == commanderId && w.StarSystem!.ThargoidLevel != null)
                 .OrderBy(w => w.Cycle!.Start)

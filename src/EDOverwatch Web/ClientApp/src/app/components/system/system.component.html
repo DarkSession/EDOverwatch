@@ -57,33 +57,64 @@
                                 {{ starSystem.EffortFocus | percent }}
                             </td>
                         </tr>
-                        <tr *ngIf="starSystem.StateProgress">
-                            <td class="t">Progress {{ showTitanHearts ? ' current heart' : '' }}</td>
-                            <td class="number">
-                                <div class="progress-cell">
-                                    {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
-                                    <div class="progress-locked"
-                                        *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
-                                        <fa-icon [icon]="faHexagonExclamation"
-                                            matTooltip="Thargoid spire site present in the system." size="lg"></fa-icon>
+                        <ng-container *ngIf="!showTitanHearts">
+                            <tr *ngIf="starSystem.StateProgress">
+                                <td class="t">Progress</td>
+                                <td class="number">
+                                    <div class="progress-cell">
+                                        {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
+                                        <div class="progress-locked"
+                                            *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
+                                            <fa-icon [icon]="faHexagonExclamation"
+                                                matTooltip="Thargoid spire site present in the system."
+                                                size="lg"></fa-icon>
+                                        </div>
                                     </div>
-                                </div>
-                                <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
-                                    Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
-                                </div>
-                            </td>
-                        </tr>
-                        <tr *ngIf="showTitanHearts">
-                            <td class="t">Hearts</td>
-                            <td class="titan-hearts"
-                                [matTooltip]="titanHeartsRemaining == 1 ? '1 heart remaining' : titanHeartsRemaining + ' hearts remaining'">
-                                <div *ngFor="let titanHeart of titanHearts">
-                                    <fa-icon [icon]="faHeartRegular" class="heart-destroyed"
-                                        *ngIf="titanHeartsRemaining < titanHeart"></fa-icon>
-                                    <fa-icon [icon]="faHeartSolid" *ngIf="titanHeartsRemaining >= titanHeart"></fa-icon>
-                                </div>
-                            </td>
-                        </tr>
+                                    <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                        Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-container *ngIf="showTitanHearts">
+                            <tr>
+                                <td class="t">Titan hearts</td>
+                                <td class="titan-hearts"
+                                    [matTooltip]="titanHeartsRemaining == 1 ? '1 heart remaining' : titanHeartsRemaining + ' hearts remaining'">
+                                    <div *ngFor="let titanHeart of titanHearts">
+                                        <fa-icon [icon]="faHeartRegular" class="heart-destroyed"
+                                            *ngIf="titanHeartsRemaining < titanHeart"></fa-icon>
+                                        <fa-icon [icon]="faHeartSolid"
+                                            *ngIf="titanHeartsRemaining >= titanHeart"></fa-icon>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr *ngIf="starSystem.StateProgress">
+                                <td class="t">Current heart progress</td>
+                                <td class="number">
+                                    <div class="progress-cell">
+                                        {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
+                                        <div class="progress-locked"
+                                            *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
+                                            <fa-icon [icon]="faHexagonExclamation"
+                                                matTooltip="Thargoid spire site present in the system."
+                                                size="lg"></fa-icon>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                        Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="t">Total progress</td>
+                                <td class="number">
+                                    <div class="progress-cell">
+                                        {{ starSystem.Maelstrom.TotalProgress| percent:'1.4-4' }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
                     </tbody>
                 </table>
                 <div class="information hide-on-mobile">

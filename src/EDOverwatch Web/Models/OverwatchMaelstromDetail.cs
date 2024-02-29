@@ -1,6 +1,6 @@
 ﻿namespace EDOverwatch_Web.Models
 {
-    public class OverwatchMaelstromDetail : OverwatchMaelstrom
+    public class OverwatchMaelstromDetail : OverwatchMaelstromProgress
     {
         public List<OverwatchStarSystem> Systems { get; }
         [Obsolete("Use AlertPrediction")]
@@ -22,17 +22,20 @@
             AlertPrediction = new(thargoidMaelstrom, alertPredictions);
         }
 
-        public static async Task<OverwatchMaelstromDetail> Create(ThargoidMaelstrom maelstrom, EdDbContext dbContext, CancellationToken cancellationToken)
+        public static async Task<OverwatchMaelstromDetail> Create(int maelstromId, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
-
-            await dbContext.Entry(maelstrom)
-                .Reference(m => m.StarSystem)
-                .LoadAsync(cancellationToken);
-            if (maelstrom.StarSystem == null)
+            ThargoidMaelstrom? maelstrom = await dbContext.ThargoidMaelstroms
+                .AsNoTracking()
+                .Include(s => s.StarSystem)
+                .ThenInclude(s => s!.ThargoidLevel)
+                .FirstOrDefaultAsync(s => s.Id == maelstromId, cancellationToken) ?? throw new Exception("Maelstrom not found.");
+            if (maelstrom?.StarSystem == null)
             {
                 throw new Exception("StarSystem is null");
             }
+
+            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+
             DateTimeOffset lastTick = WeeklyTick.GetLastTick();
             DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
             DateTimeOffset signalMaxAge = lastTick.AddDays(-7);
@@ -47,6 +50,7 @@
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)
+                .ThenInclude(s => s!.ThargoidLevel)
                 .Include(s => s.ThargoidLevel!.CycleStart)
                 .Include(s => s.ThargoidLevel!.StateExpires)
                 .Include(s => s.ThargoidLevel!.CurrentProgress)

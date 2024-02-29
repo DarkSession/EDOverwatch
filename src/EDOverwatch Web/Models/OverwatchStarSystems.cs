@@ -57,6 +57,7 @@ namespace EDOverwatch_Web.Models
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)
+                .ThenInclude(s => s!.ThargoidLevel)
                 .Include(s => s.ThargoidLevel!.CycleStart)
                 .Include(s => s.ThargoidLevel!.StateExpires)
                 .Include(s => s.ThargoidLevel!.CurrentProgress)

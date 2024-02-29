@@ -37,6 +37,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Maelstrom
             }
 
             StarSystem? starSystem = await dbContext.StarSystems
+                .AsNoTracking()
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .FirstOrDefaultAsync(s => s.SystemAddress == systemAddress, cancellationToken);
@@ -49,7 +50,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Maelstrom
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(maelstromObject)).ToList();
             if (sessions.Any())
             {
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchMaelstrom), await OverwatchMaelstromDetail.Create(starSystem.ThargoidLevel.Maelstrom, dbContext, cancellationToken));
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchMaelstrom), await OverwatchMaelstromDetail.Create(starSystem.ThargoidLevel.Maelstrom.Id, dbContext, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);
