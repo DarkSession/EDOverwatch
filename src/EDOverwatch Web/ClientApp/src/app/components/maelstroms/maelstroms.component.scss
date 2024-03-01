@@ -1,0 +1,15 @@
+.thead {
+    background-color: #272727;
+}
+
+.number-cell {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    div {
+        flex-grow: 1;
+        width: 50%;
+        text-align: right;
+    }
+}

@@ -239,6 +239,7 @@ namespace EDOverwatch_Web.Models
                     .Include(s => s.ThargoidLevel)
                     .Where(s => s.ThargoidLevel!.StarSystem == starSystem && s.Updated >= previousTickTime)
                     .OrderByDescending(s => s.Updated)
+                    .Take(500)
                     .ToListAsync(cancellationToken);
 
                 List<StarSystemThargoidLevel> thargoidLevelHistory = await dbContext.StarSystemThargoidLevels

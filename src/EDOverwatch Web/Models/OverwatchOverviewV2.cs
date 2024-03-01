@@ -171,7 +171,7 @@ namespace EDOverwatch_Web.Models
                 int alertsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && (p.CurrentProgress?.IsCompleted ?? false));
                 int invasionsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Invasion && (p.CurrentProgress?.IsCompleted ?? false));
                 int controlsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && (p.CurrentProgress?.IsCompleted ?? false));
-                int titansDefeated = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && p.CycleEnd == currentThargoidCycle);
+                int titansDefeated = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && (p.CurrentProgress?.IsCompleted ?? false));
                 int thargoidInvasionStart = currentCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0);
                 int thargoidInvasionSuccess = currentCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && p.State == StarSystemThargoidLevelState.Invasion && p.StateExpires?.Id == currentThargoidCycle.Id);
                 int thargoidGainFromAlert = currentCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0);

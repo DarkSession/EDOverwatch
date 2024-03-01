@@ -11,7 +11,14 @@
         {
             HeartsRemaining = thargoidMaelstrom.HeartsRemaining;
             HeartProgress = thargoidMaelstrom.StarSystem?.ThargoidLevel?.CurrentProgress?.ProgressPercent ?? 0m;
-            TotalProgress = 1m - (1m / 8m * thargoidMaelstrom.HeartsRemaining - 1m / 8m * HeartProgress);
+            if (thargoidMaelstrom.HeartsRemaining > 0)
+            {
+                TotalProgress = 1m - (1m / 8m * thargoidMaelstrom.HeartsRemaining - 1m / 8m * HeartProgress);
+            }
+            else
+            {
+                TotalProgress = 1m;
+            }
         }
     }
 }

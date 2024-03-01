@@ -62,13 +62,24 @@ namespace EDDataProcessor.Journal
                         (starSystem.ThargoidLevel.CurrentProgress.ProgressPercent - fsdJumpThargoidWar.WarProgress) > 0.25m;
                     if (starSystem.ThargoidLevel.CurrentProgress is null || fsdJumpThargoidWar.WarProgress > starSystem.ThargoidLevel.CurrentProgress.ProgressPercent || titanHeartDestroyed)
                     {
-                        short progressOld = (short)Math.Floor(fsdJumpThargoidWar.WarProgress * 100m);
+                        decimal warProgress = fsdJumpThargoidWar.WarProgress;
+                        if (titanHeartDestroyed && starSystem.ThargoidLevel.Maelstrom != null)
+                        {
+                            starSystem.ThargoidLevel.Maelstrom.HeartsRemaining -= 1;
+                            if (starSystem.ThargoidLevel.Maelstrom.HeartsRemaining < 0)
+                            {
+                                starSystem.ThargoidLevel.Maelstrom.HeartsRemaining = 0;
+                                warProgress = 1m;
+                            }
+                        }
+
+                        short progressOld = (short)Math.Floor(warProgress * 100m);
                         if (progressOld > 100)
                         {
                             progressOld = 100;
                         }
                         starSystem.ThargoidLevel.ProgressOld = progressOld;
-                        starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, progressOld, fsdJumpThargoidWar.WarProgress)
+                        starSystem.ThargoidLevel.CurrentProgress = new(0, updateTime, updateTime, progressOld, warProgress)
                         {
                             ThargoidLevel = starSystem.ThargoidLevel,
                         };
@@ -79,14 +90,6 @@ namespace EDDataProcessor.Journal
                                     d.StarSystem == starSystem &&
                                     d.Status == DcohFactionOperationStatus.Active)
                                 .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Status, DcohFactionOperationStatus.Expired), cancellationToken);
-                        }
-                        if (titanHeartDestroyed && starSystem.ThargoidLevel.Maelstrom != null)
-                        {
-                            starSystem.ThargoidLevel.Maelstrom.HeartsRemaining -= 1;
-                            if (starSystem.ThargoidLevel.Maelstrom.HeartsRemaining < 0)
-                            {
-                                starSystem.ThargoidLevel.Maelstrom.HeartsRemaining = 0;
-                            }
                         }
                         changed = true;
                     }

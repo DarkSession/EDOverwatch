@@ -14,6 +14,8 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
             (WarEffortUpdated.QueueName, WarEffortUpdated.Routing),
         };
 
+        private static DateTimeOffset LastUpdate { get; set; }
+
         private IAppCache AppCache { get; }
 
         public SystemsObjectEvents(IAppCache appCache)
@@ -27,14 +29,15 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
 
             SystemsObject systemsObject = new();
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(systemsObject)).ToList();
-            if (sessions.Any())
+            if (sessions.Any() && (DateTimeOffset.UtcNow - LastUpdate) >= TimeSpan.FromSeconds(30))
             {
                 if (queueName == StarSystemUpdated.QueueName &&
                     json.ToObject<StarSystemUpdated>() is StarSystemUpdated starSystemUpdated &&
-                    !await dbContext.StarSystems.AnyAsync(s => s.SystemAddress == starSystemUpdated.SystemAddress && s.WarRelevantSystem, cancellationToken))
+                    !await dbContext.StarSystems.AnyAsync(s => s.SystemAddress == starSystemUpdated.SystemAddress && s.WarRelevantSystem && s.ThargoidLevel != null && s.ThargoidLevel.State != StarSystemThargoidLevelState.None, cancellationToken))
                 {
                     return;
                 }
+                LastUpdate = DateTimeOffset.UtcNow;
                 WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystems), await Models.OverwatchStarSystems.Create(dbContext, AppCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {

@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { OverwatchMaelstrom } from '../maelstrom-name/maelstrom-name.component';
+import { OverwatchMaelstromProgress } from '../maelstrom-name/maelstrom-name.component';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,10 +12,10 @@ import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
 @Component({
   selector: 'app-maelstroms',
   templateUrl: './maelstroms.component.html',
-  styleUrls: ['./maelstroms.component.css']
+  styleUrls: ['./maelstroms.component.scss']
 })
 export class MaelstromsComponent implements OnInit {
-  public readonly displayedColumns = ['Name', 'SystemName', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery', 'DefenseRate'];
+  public readonly displayedColumns = ['Name', 'SystemName', 'HeartsRemaining', 'HeartProgress', 'TotalProgress', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery'];
   @ViewChild(MatSort) sort!: MatSort;
   public readonly faClipboard = faClipboard;
   public readonly faCircleQuestion = faCircleQuestion;
@@ -56,7 +56,7 @@ interface OverwatchMaelstroms {
   Maelstroms: OverwatchMaelstromBasic[];
 }
 
-interface OverwatchMaelstromBasic extends OverwatchMaelstrom {
+interface OverwatchMaelstromBasic extends OverwatchMaelstromProgress {
   SystemsInAlert: number;
   SystemsInInvasion: number;
   SystemsThargoidControlled: number;
