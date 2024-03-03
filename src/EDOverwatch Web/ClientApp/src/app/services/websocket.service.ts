@@ -43,6 +43,9 @@ export class WebsocketService {
         window.addEventListener("online", () => {
             this.initalizeConnection(false);
         });
+        window.addEventListener("wake", () => {
+            this.initalizeConnection(false);
+        });
         window.addEventListener("pageshow", () => {
             if (!environment.production) {
                 console.log("pageshow event");

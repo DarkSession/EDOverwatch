@@ -355,10 +355,12 @@ namespace EDOverwatch
                 {
                     thargoidLevel.StateExpires = currentThargoidCycle;
                 }
+                /*
                 if (isManualUpdate)
                 {
                     thargoidLevel.ManualUpdateCycle = currentThargoidCycle;
                 }
+                */
                 if (!starSystem.WarRelevantSystem && (starSystem.RefreshedWarRelevantSystem || newThargoidLevel != StarSystemThargoidLevelState.None))
                 {
                     starSystem.WarRelevantSystem = true;

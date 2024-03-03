@@ -25,7 +25,12 @@
         [Column]
         public short HeartsRemaining { get; set; }
 
-        public ThargoidMaelstrom(int id, string name, decimal influenceSphere, short ingameNumber, DateTimeOffset updated, short heartsRemaining)
+        [Column]
+        public DateTimeOffset? MeltdownTimeEstimate { get; set; }
+
+        public List<ThargoidMaelstromHeart>? Hearts { get; set; }
+
+        public ThargoidMaelstrom(int id, string name, decimal influenceSphere, short ingameNumber, DateTimeOffset updated, short heartsRemaining, DateTimeOffset? meltdownTimeEstimate)
         {
             Id = id;
             Name = name;
@@ -33,6 +38,7 @@
             IngameNumber = ingameNumber;
             Updated = updated;
             HeartsRemaining = heartsRemaining;
+            MeltdownTimeEstimate = meltdownTimeEstimate;
         }
     }
 }

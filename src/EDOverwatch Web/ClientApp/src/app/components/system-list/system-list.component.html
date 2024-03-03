@@ -70,11 +70,11 @@
                                     matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }} heart progress">
                                     {{ row.Progress }} %
                                 </div>
-                                <div class="titan-progress"
+                                <div *ngIf="row.Maelstrom.HeartsRemaining > 0" class="titan-progress"
                                     matTooltip="{{ row.Maelstrom.TotalProgress | percent:'1.4-4' }} total progress">
                                     ({{ row.Maelstrom.TotalProgress | percent:'1.1-1' }})
                                 </div>
-                                <div class="titan-progress">
+                                <div *ngIf="row.Maelstrom.HeartsRemaining > 0" class="titan-progress">
                                     {{ row.Maelstrom.HeartsRemaining }} {{ row.Maelstrom.HeartsRemaining == 1 ? 'heart'
                                     :
                                     'hearts' }}

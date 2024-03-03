@@ -52,6 +52,7 @@ namespace EDDatabase
 
         public DbSet<ThargoidCycle> ThargoidCycles { get; set; }
         public DbSet<ThargoidMaelstrom> ThargoidMaelstroms { get; set; }
+        public DbSet<ThargoidMaelstromHeart> ThargoidMaelstromHearts { get; set; }
         public DbSet<ThargoidMaelstromHistoricalSummary> ThargoidMaelstromHistoricalSummaries { get; set; }
 
         public DbSet<WarEffort> WarEfforts { get; set; }

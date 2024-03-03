@@ -65,10 +65,26 @@ namespace EDDataProcessor.Journal
                         decimal warProgress = fsdJumpThargoidWar.WarProgress;
                         if (titanHeartDestroyed && starSystem.ThargoidLevel.Maelstrom != null)
                         {
+                            short heartNumber = starSystem.ThargoidLevel.Maelstrom.HeartsRemaining;
+                            ThargoidMaelstromHeart? thargoidMaelstromHeart = await dbContext.ThargoidMaelstromHearts.FirstOrDefaultAsync(t => t.Maelstrom == starSystem.ThargoidLevel.Maelstrom && t.Heart == heartNumber, cancellationToken);
+                            if (thargoidMaelstromHeart is null)
+                            {
+                                thargoidMaelstromHeart = new(0, heartNumber, updateTime)
+                                {
+                                    Maelstrom = starSystem.ThargoidLevel.Maelstrom,
+                                };
+                                dbContext.ThargoidMaelstromHearts.Add(thargoidMaelstromHeart);
+                            }
+                            else
+                            {
+                                thargoidMaelstromHeart.DestructionTime ??= updateTime;
+                            }
+
                             starSystem.ThargoidLevel.Maelstrom.HeartsRemaining -= 1;
                             if (starSystem.ThargoidLevel.Maelstrom.HeartsRemaining < 0)
                             {
                                 starSystem.ThargoidLevel.Maelstrom.HeartsRemaining = 0;
+                                starSystem.ThargoidLevel.Maelstrom.MeltdownTimeEstimate = updateTime.AddDays(1);
                                 warProgress = 1m;
                             }
                         }

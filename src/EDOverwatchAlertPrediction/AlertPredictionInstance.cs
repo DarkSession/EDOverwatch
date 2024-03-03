@@ -26,6 +26,7 @@ namespace EDOverwatchAlertPrediction
         {
             List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
                 .Include(t => t.StarSystem)
+                .Where(t => t.HeartsRemaining > 0)
                 .ToListAsync(cancellationToken);
 
             List<StarSystemCycleState> starSystems;

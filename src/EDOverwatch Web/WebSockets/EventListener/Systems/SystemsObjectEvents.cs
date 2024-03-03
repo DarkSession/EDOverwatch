@@ -29,7 +29,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.Systems
 
             SystemsObject systemsObject = new();
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(systemsObject)).ToList();
-            if (sessions.Any() && (DateTimeOffset.UtcNow - LastUpdate) >= TimeSpan.FromSeconds(30))
+            if (sessions.Any() && (DateTimeOffset.UtcNow - LastUpdate) >= TimeSpan.FromSeconds(10))
             {
                 if (queueName == StarSystemUpdated.QueueName &&
                     json.ToObject<StarSystemUpdated>() is StarSystemUpdated starSystemUpdated &&

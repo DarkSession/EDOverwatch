@@ -26,6 +26,18 @@
                                     (click)="copySystemName(row)"></fa-icon>
                             </td>
                         </ng-container>
+                        <ng-container matColumnDef="State">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                <span [ngClass]="{
+                                    'titan-active': row.State == 'Active',
+                                    'titan-meltdown': row.State == 'Meltdown',
+                                    'titan-destroyed': row.State == 'Destroyed',
+                                }">
+                                    {{ row.State }}
+                                </span>
+                            </td>
+                        </ng-container>
                         <ng-container matColumnDef="HeartsRemaining">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Hearts remaining</th>
                             <td mat-cell *matCellDef="let row">

@@ -21,4 +21,6 @@ export interface OverwatchMaelstromProgress extends OverwatchMaelstrom {
   HeartsRemaining: number;
   HeartProgress: number;
   TotalProgress: number;
+  State: string;
+  MeltdownTimeEstimate: string | null;
 }
