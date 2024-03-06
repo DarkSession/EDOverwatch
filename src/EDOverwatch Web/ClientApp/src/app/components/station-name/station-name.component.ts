@@ -40,11 +40,11 @@ export interface OverwatchStation {
   State: string;
   Gravity: number | null;
   OdysseyOnly: boolean;
-  RescueShip: OverwatchStationRescueShip | null;
+  RescueShip: OverwatchRescueShip | null;
   BodyName: string | null;
 }
 
-interface OverwatchStationRescueShip {
+export interface OverwatchRescueShip {
   Name: string;
   System: OverwatchStarSystemMin;
   DistanceLy: number;

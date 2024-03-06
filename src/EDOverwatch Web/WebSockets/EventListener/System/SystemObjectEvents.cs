@@ -51,6 +51,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.System
             }
 
             Models.OverwatchStarSystemFullDetail.DeleteMemoryEntry(AppCache, systemAddress);
+            Models.OverwatchStarSystemDetailProgress.DeleteMemoryEntry(AppCache, systemAddress);
 
             SystemObject systemObject = new(systemAddress);
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(systemObject)).ToList();

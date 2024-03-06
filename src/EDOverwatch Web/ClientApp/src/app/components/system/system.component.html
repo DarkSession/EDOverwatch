@@ -24,12 +24,19 @@
                                 <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
                             </td>
                         </tr>
-                        <tr>
+                        <tr *ngIf="starSystem.StateExpiration?.StateExpires">
                             <td class="t">Remaining time</td>
                             <td>
-                                <div *ngIf="starSystem.StateExpiration?.StateExpires">
+                                <div>
                                     {{ starSystem.StateExpiration?.StateExpires | dateAgo }}
                                 </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="starSystem.ClosestRescueShip && starSystem.PopulationOriginal === 0">
+                            <td class="t">Closest rescue ship</td>
+                            <td>
+                                {{ starSystem.ClosestRescueShip.System.Name }}
+                                ({{ starSystem.ClosestRescueShip.DistanceLy | number: '1.0-0' }} Ly)
                             </td>
                         </tr>
                     </tbody>

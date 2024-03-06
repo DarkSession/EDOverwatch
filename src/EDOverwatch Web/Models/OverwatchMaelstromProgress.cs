@@ -21,6 +21,7 @@
             else
             {
                 MeltdownTimeEstimate = thargoidMaelstrom.MeltdownTimeEstimate;
+                HeartProgress = 1m;
                 TotalProgress = 1m;
                 if (thargoidMaelstrom.MeltdownTimeEstimate is DateTimeOffset meltdownEstimate && meltdownEstimate > DateTimeOffset.UtcNow)
                 {

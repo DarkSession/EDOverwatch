@@ -10,7 +10,7 @@
         public string State { get; }
         public decimal? Gravity { get; }
         public bool OdysseyOnly { get; }
-        public OverwatchStationRescueShip? RescueShip { get; }
+        public OverwatchRescueShip? RescueShip { get; }
         public string? BodyName { get; }
 
         public OverwatchStation(Station station, List<Station> rescueShips, StarSystemThargoidLevel thargoidLevel)
@@ -69,20 +69,6 @@
             Small = small;
             Medium = medium;
             Large = large;
-        }
-    }
-
-    public class OverwatchStationRescueShip
-    {
-        public string Name { get; set; }
-        public OverwatchStarSystemMin System { get; set; }
-        public decimal DistanceLy { get; set; }
-
-        public OverwatchStationRescueShip(string name, StarSystem starSystem, decimal distanceLy)
-        {
-            Name = name;
-            System = new(starSystem);
-            DistanceLy = distanceLy;
         }
     }
 }

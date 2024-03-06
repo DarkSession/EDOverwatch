@@ -15,75 +15,13 @@ namespace EDDataProcessor
                         s.ThargoidLevel != null &&
                         s.ThargoidLevel.State > StarSystemThargoidLevelState.None &&
                         s.ThargoidLevel.CycleEnd == null);
-
-            // We start with all the system which are at the end of the timer but did not progress to 100%
-            {
-                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
-                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
-                List<StarSystem> starSystems = await starSystemPreQuery
-                    .Include(s => s.ThargoidLevel)
-                    .Include(s => s.ThargoidLevel!.Maelstrom)
-                    .Include(s => s.ThargoidLevel!.StateExpires)
-                    .Where(s =>
-                        (s.ThargoidLevel!.StateExpires!.End <= newThargoidCycle.Start ||
-                        (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
-                        (s.ThargoidLevel.CurrentProgress == null || !s.ThargoidLevel.CurrentProgress!.IsCompleted) &&
-                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Titan && // Systems with a Titan
-                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // Recoveries can't fail
-                        )
-                    .ToListAsync(cancellationToken);
-                foreach (StarSystem starSystem in starSystems)
-                {
-                    if (starSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
-                    {
-                        // If its controlled, we just reset the timer
-                        starSystem.ThargoidLevel.StateExpires = null;
-                        continue;
-                    }
-
-                    StarSystemThargoidLevel oldThargoidLevel = starSystem.ThargoidLevel!;
-                    oldThargoidLevel.CycleEnd = previousThargoidCycle;
-
-                    StarSystemThargoidLevelState newState = oldThargoidLevel.State switch
-                    {
-                        StarSystemThargoidLevelState.Alert when starSystem.Population == 0 => StarSystemThargoidLevelState.Controlled,
-                        StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.Invasion,
-                        StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Controlled,
-                        _ => StarSystemThargoidLevelState.None,
-                    };
-                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, oldThargoidLevel.IsInvisibleState, false)
-                    {
-                        StarSystem = starSystem,
-                        CycleStart = newThargoidCycle,
-                        Maelstrom = oldThargoidLevel.Maelstrom,
-                    };
-                    dbContext.StarSystemThargoidLevels.Add(starSystemThargoidLevel);
-                    starSystem.ThargoidLevel = starSystemThargoidLevel;
-
-                    if (newState == StarSystemThargoidLevelState.Controlled)
-                    {
-                        starSystem.Population = 0;
-                        starSystem.PopulationMin = 0;
-                        await dbContext.Stations
-                            .Where(s => s.StarSystem == starSystem && s.State != StationState.Abandoned && s.Type!.Name != StationType.FleetCarrierStationType)
-                            .ForEachAsync((s) =>
-                            {
-                                s.State = StationState.Abandoned;
-                            }, cancellationToken);
-                    }
-                }
-                await dbContext.SaveChangesAsync(cancellationToken);
-            }
-
-            dbContext.ChangeTracker.Clear();
-
-            // Next we update all the systems which have been cleared in the previous week to their new state
+            // First we update all the systems which have been cleared in the previous week to their new state or which lost their Titan
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
-                    .Where(s => s.ThargoidLevel!.CurrentProgress!.IsCompleted)
+                    .Where(s => s.ThargoidLevel!.CurrentProgress!.IsCompleted || (s.ThargoidLevel.Maelstrom!.HeartsRemaining == 0 && s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery))
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)
@@ -165,6 +103,67 @@ namespace EDDataProcessor
 
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
+            }
+
+            dbContext.ChangeTracker.Clear();
+
+            // Next we go through all the system which are at the end of the timer but did not progress to 100%
+            {
+                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
+                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+                List<StarSystem> starSystems = await starSystemPreQuery
+                    .Include(s => s.ThargoidLevel)
+                    .Include(s => s.ThargoidLevel!.Maelstrom)
+                    .Include(s => s.ThargoidLevel!.StateExpires)
+                    .Where(s =>
+                        (s.ThargoidLevel!.StateExpires!.End <= newThargoidCycle.Start ||
+                        (s.ThargoidLevel!.StateExpires == null && s.ThargoidLevel.State == StarSystemThargoidLevelState.Alert)) &&
+                        (s.ThargoidLevel.CurrentProgress == null || !s.ThargoidLevel.CurrentProgress!.IsCompleted) &&
+                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Titan && // Systems with a Titan
+                        s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery // Recoveries can't fail
+                        )
+                    .ToListAsync(cancellationToken);
+                foreach (StarSystem starSystem in starSystems)
+                {
+                    if (starSystem.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled)
+                    {
+                        // If its controlled, we just reset the timer
+                        starSystem.ThargoidLevel.StateExpires = null;
+                        continue;
+                    }
+
+                    StarSystemThargoidLevel oldThargoidLevel = starSystem.ThargoidLevel!;
+                    oldThargoidLevel.CycleEnd = previousThargoidCycle;
+
+                    StarSystemThargoidLevelState newState = oldThargoidLevel.State switch
+                    {
+                        StarSystemThargoidLevelState.Alert when starSystem.Population == 0 => StarSystemThargoidLevelState.Controlled,
+                        StarSystemThargoidLevelState.Alert => StarSystemThargoidLevelState.Invasion,
+                        StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Controlled,
+                        _ => StarSystemThargoidLevelState.None,
+                    };
+                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, oldThargoidLevel.IsInvisibleState, false)
+                    {
+                        StarSystem = starSystem,
+                        CycleStart = newThargoidCycle,
+                        Maelstrom = oldThargoidLevel.Maelstrom,
+                    };
+                    dbContext.StarSystemThargoidLevels.Add(starSystemThargoidLevel);
+                    starSystem.ThargoidLevel = starSystemThargoidLevel;
+
+                    if (newState == StarSystemThargoidLevelState.Controlled)
+                    {
+                        starSystem.Population = 0;
+                        starSystem.PopulationMin = 0;
+                        await dbContext.Stations
+                            .Where(s => s.StarSystem == starSystem && s.State != StationState.Abandoned && s.Type!.Name != StationType.FleetCarrierStationType)
+                            .ForEachAsync((s) =>
+                            {
+                                s.State = StationState.Abandoned;
+                            }, cancellationToken);
+                    }
+                }
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
 
             dbContext.ChangeTracker.Clear();

@@ -365,6 +365,10 @@ export class StatsComponent implements OnInit {
         dataset.backgroundColor = "#38761d";
         break;
       }
+      case "Titan": {
+        dataset.backgroundColor = "#cc0000";
+        break;
+      }
       case "Recovery": {
         dataset.backgroundColor = "#9f1bff";
         break;

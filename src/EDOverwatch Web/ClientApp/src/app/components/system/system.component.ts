@@ -6,7 +6,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { faArrowRightToArc, faClipboard, faCrosshairsSimple, faHexagonExclamation } from '@fortawesome/pro-light-svg-icons';
 import { OverwatchStarSystem, OverwatchStarSystemFull } from '../system-list/system-list.component';
-import { OverwatchStarSystemMin, OverwatchStation } from '../station-name/station-name.component';
+import { OverwatchRescueShip, OverwatchStarSystemMin, OverwatchStation } from '../station-name/station-name.component';
 import { ChartConfiguration, ChartDataset, ChartType } from 'chart.js';
 import { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { OverwatchThargoidLevel } from '../thargoid-level/thargoid-level.component';
@@ -347,6 +347,7 @@ export interface OverwatchStarSystemFullDetail extends OverwatchStarSystemFull {
   NearbySystems: OverwatchStarSystemNearbySystem[];
   DaysSincePreviousTick: string[];
   AttackDefense: OverwatchStarSystemAttackDefense;
+  ClosestRescueShip: OverwatchRescueShip;
 }
 
 export interface OverwatchStarSystemWarEffort {

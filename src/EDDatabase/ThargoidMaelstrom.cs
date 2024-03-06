@@ -2,6 +2,7 @@
 {
     [Table("ThargoidMaelstrom")]
     [Index(nameof(Name))]
+    [Index(nameof(HeartsRemaining))]
     public class ThargoidMaelstrom
     {
         [Column]

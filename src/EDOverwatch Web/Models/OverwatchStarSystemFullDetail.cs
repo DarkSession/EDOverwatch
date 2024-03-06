@@ -22,6 +22,7 @@ namespace EDOverwatch_Web.Models
         public List<OverwatchStarSystemNearbySystem> NearbySystems { get; }
         public List<DateOnly> DaysSincePreviousTick { get; }
         public OverwatchStarSystemAttackDefense AttackDefense { get; }
+        public OverwatchRescueShip? ClosestRescueShip { get; }
 
         protected OverwatchStarSystemFullDetail(
             StarSystem starSystem,
@@ -78,6 +79,10 @@ namespace EDOverwatch_Web.Models
                 }
                 AttackDefense = new(recentAttacker, predictedAttacker, recentlyAttacked, predictedAttack, requirementsTissueSampleTotal, requirementsTissueSampleRemaining, titanPodsTotal, titanPodsRemaining);
             }
+            ClosestRescueShip = rescueShips
+                .OrderBy(r => r.StarSystem!.DistanceTo(starSystem))
+                .Select(r => new OverwatchRescueShip(r.Name, r.StarSystem!, (decimal)r.StarSystem!.DistanceTo(starSystem)))
+                .FirstOrDefault();
         }
 
         private static string CacheKey(long systemAddress)
@@ -446,6 +451,47 @@ namespace EDOverwatch_Web.Models
             DateTime = starSystemThargoidLevelProgress.Updated;
             ProgressPercentage = starSystemThargoidLevelProgress.ProgressPercent ?? 0m;
             Progress = (int)Math.Floor(ProgressPercentage * 100);
+        }
+
+        private static string CacheKey(long systemAddress)
+        {
+            return $"OverwatchStarSystemProgress-{systemAddress}";
+        }
+
+        public static void DeleteMemoryEntry(IAppCache appCache, long systemAddress)
+        {
+            appCache.Remove(CacheKey(systemAddress));
+        }
+
+        public static Task<List<OverwatchStarSystemDetailProgress>?> Create(long systemAddress, EdDbContext dbContext, IAppCache appCache, CancellationToken cancellationToken)
+        {
+            return appCache.GetOrAddAsync(CacheKey(systemAddress), (cacheEntry) =>
+            {
+                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+                return CreateInternal(systemAddress, dbContext, cancellationToken);
+            })!;
+        }
+
+        private static async Task<List<OverwatchStarSystemDetailProgress>?> CreateInternal(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
+        {
+            StarSystem? starSystem = await dbContext.StarSystems
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.SystemAddress == systemAddress && s.WarRelevantSystem, cancellationToken);
+            if (starSystem is null)
+            {
+                return null;
+            }
+
+            DateTimeOffset previousTickTime = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1);
+
+            List<StarSystemThargoidLevelProgress> starSystemThargoidLevelProgress = await dbContext.StarSystemThargoidLevelProgress
+                .AsNoTracking()
+                .Include(s => s.ThargoidLevel)
+                .Where(s => s.ThargoidLevel!.StarSystem == starSystem && s.Updated >= previousTickTime)
+                .OrderBy(s => s.Updated)
+                .ToListAsync(cancellationToken);
+
+            return starSystemThargoidLevelProgress.Select(s => new OverwatchStarSystemDetailProgress(s)).ToList();
         }
     }
 

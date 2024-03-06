@@ -372,11 +372,12 @@ ul {
   display: flex;
   width: 100%;
   flex-wrap: wrap;
+  flex: none;
 
   table.information,
   div.information {
     min-width: 300px;
-    max-width: 600px;
+    max-width: 500px;
     width: 30%;
     margin-right: 24px;
   }

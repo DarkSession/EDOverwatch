@@ -82,7 +82,7 @@ namespace EDOverwatch_Web.Models
                 .Include(s => s.CycleEnd)
                 .Where(s =>
                     s.CurrentProgress!.IsCompleted &&
-                    (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled))
+                    (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled || s.State == StarSystemThargoidLevelState.Titan))
                 .GroupBy(s => new
                 {
                     s.CycleEndId,
@@ -157,7 +157,7 @@ namespace EDOverwatch_Web.Models
                     .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && s.OriginalPopulation > 0)
                     .CountAsync(cancellationToken);
 
-                int maelstroms = await dbContext.ThargoidMaelstroms.CountAsync(cancellationToken);
+                int maelstroms = await dbContext.ThargoidMaelstroms.Where(t => t.HeartsRemaining > 0).CountAsync(cancellationToken);
                 statsThargoids = new(
                     Math.Round((double)(thargoidsSystemsControlling + maelstroms) / (double)relevantSystemCount, 4),
                     maelstroms,

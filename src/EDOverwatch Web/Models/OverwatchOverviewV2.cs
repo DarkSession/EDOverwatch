@@ -105,13 +105,13 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> previousCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Where(s => s.CycleEnd == previousCycle && s.CycleStart!.Start <= s.CycleEnd!.Start && (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled))
+                    .Where(s => s.CycleEnd == previousCycle && s.CycleStart!.Start <= s.CycleEnd!.Start && (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled || s.State == StarSystemThargoidLevelState.Titan))
                     .ToListAsync(cancellationToken);
 
                 int alertsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && p.CurrentProgress!.IsCompleted);
                 int invasionsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Invasion && p.CurrentProgress!.IsCompleted);
                 int controlsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && p.CurrentProgress!.IsCompleted);
-                int titansDefeated = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan);
+                int titansDefeated = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && p.CurrentProgress!.IsCompleted);
                 int thargoidInvasionStarted = previousCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && (p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0));
                 int thargoidsGained = previousCycleStates.Count(p => (p.CurrentProgress == null || !p.CurrentProgress!.IsCompleted) && (p.State == StarSystemThargoidLevelState.Invasion || (p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0)));
 

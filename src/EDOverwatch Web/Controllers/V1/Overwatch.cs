@@ -52,12 +52,20 @@ namespace EDOverwatch_Web.Controllers.V1
         }
 
         [HttpGet("{systemAddress}")]
-        [SwaggerOperation(Summary = "Returns additional data for a system")]
+        [SwaggerOperation(Summary = "Returns detailed data for a system")]
         [SwaggerResponse(200, "System data")]
         [SwaggerResponse(204, "System not found or not relevant for the Thargoid war")]
         public Task<OverwatchStarSystemFullDetail?> System(long systemAddress, CancellationToken cancellationToken)
         {
             return OverwatchStarSystemFullDetail.Create(systemAddress, DbContext, AppCache, cancellationToken);
+        }
+
+        [HttpGet]
+        [Route("~/api/v1/[controller]/System/{systemAddress}/Progress")]
+        [SwaggerOperation(Summary = "Returns detailed a progress history for a system for the current and the last tick.")]
+        public Task<List<OverwatchStarSystemDetailProgress>?> SystemProgress(long systemAddress, CancellationToken cancellationToken)
+        {
+            return OverwatchStarSystemDetailProgress.Create(systemAddress, DbContext, AppCache, cancellationToken);
         }
 
         [Obsolete("Use Titans API")]
