@@ -15,13 +15,13 @@ namespace EDDataProcessor
                         s.ThargoidLevel != null &&
                         s.ThargoidLevel.State > StarSystemThargoidLevelState.None &&
                         s.ThargoidLevel.CycleEnd == null);
-            // First we update all the systems which have been cleared in the previous week to their new state or which lost their Titan
+            // First we update all the systems which have been cleared in the previous week to their new state
             {
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
-                    .Where(s => s.ThargoidLevel!.CurrentProgress!.IsCompleted || (s.ThargoidLevel.Maelstrom!.HeartsRemaining == 0 && s.ThargoidLevel.State != StarSystemThargoidLevelState.Recovery))
+                    .Where(s => s.ThargoidLevel!.CurrentProgress!.IsCompleted)
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)

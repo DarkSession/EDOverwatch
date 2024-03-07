@@ -85,6 +85,7 @@ namespace EDDataProcessor.Journal
                             {
                                 starSystem.ThargoidLevel.Maelstrom.HeartsRemaining = 0;
                                 starSystem.ThargoidLevel.Maelstrom.MeltdownTimeEstimate = updateTime.AddDays(1);
+                                starSystem.ThargoidLevel.Maelstrom.DefeatCycle = currentThargoidCycle;
                                 warProgress = 1m;
                             }
                         }

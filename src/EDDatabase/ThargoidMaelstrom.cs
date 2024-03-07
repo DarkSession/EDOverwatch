@@ -29,6 +29,12 @@
         [Column]
         public DateTimeOffset? MeltdownTimeEstimate { get; set; }
 
+        [ForeignKey("DefeatCycleId")]
+        public ThargoidCycle? DefeatCycle { get; set; }
+
+        [ForeignKey("DefeatCycleId")]
+        public int? DefeatCycleId { get; set; }
+
         public List<ThargoidMaelstromHeart>? Hearts { get; set; }
 
         public ThargoidMaelstrom(int id, string name, decimal influenceSphere, short ingameNumber, DateTimeOffset updated, short heartsRemaining, DateTimeOffset? meltdownTimeEstimate)

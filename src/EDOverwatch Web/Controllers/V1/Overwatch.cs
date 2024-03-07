@@ -62,7 +62,7 @@ namespace EDOverwatch_Web.Controllers.V1
 
         [HttpGet]
         [Route("~/api/v1/[controller]/System/{systemAddress}/Progress")]
-        [SwaggerOperation(Summary = "Returns detailed a progress history for a system for the current and the last tick.")]
+        [SwaggerOperation(Summary = "Returns a detailed progress history for a system for the current and the last tick.")]
         public Task<List<OverwatchStarSystemDetailProgress>?> SystemProgress(long systemAddress, CancellationToken cancellationToken)
         {
             return OverwatchStarSystemDetailProgress.Create(systemAddress, DbContext, AppCache, cancellationToken);

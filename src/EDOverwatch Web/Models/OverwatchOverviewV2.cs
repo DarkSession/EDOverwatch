@@ -105,13 +105,15 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> previousCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Where(s => s.CycleEnd == previousCycle && s.CycleStart!.Start <= s.CycleEnd!.Start && (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled || s.State == StarSystemThargoidLevelState.Titan))
+                    .Include(s => s.Maelstrom)
+                    .ThenInclude(m => m!.DefeatCycle)
+                    .Where(s => (s.CycleEnd == previousCycle && s.CycleStart!.Start <= s.CycleEnd!.Start && (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == previousCycle))
                     .ToListAsync(cancellationToken);
 
                 int alertsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && p.CurrentProgress!.IsCompleted);
                 int invasionsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Invasion && p.CurrentProgress!.IsCompleted);
                 int controlsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && p.CurrentProgress!.IsCompleted);
-                int titansDefeated = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && p.CurrentProgress!.IsCompleted);
+                int titansDefeated = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && p.Maelstrom?.DefeatCycleId == previousCycle.Id);
                 int thargoidInvasionStarted = previousCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && (p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0));
                 int thargoidsGained = previousCycleStates.Count(p => (p.CurrentProgress == null || !p.CurrentProgress!.IsCompleted) && (p.State == StarSystemThargoidLevelState.Invasion || (p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0)));
 
@@ -165,13 +167,15 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> currentCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Where(s => s.CycleEnd == null || (s.CycleEnd == currentThargoidCycle && s.CycleStart!.Start <= s.CycleEnd!.Start))
+                    .Include(s => s.Maelstrom)
+                    .ThenInclude(m => m!.DefeatCycle)
+                    .Where(s => (s.CycleEnd == null || (s.CycleEnd == currentThargoidCycle && s.CycleStart!.Start <= s.CycleEnd!.Start)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == currentThargoidCycle))
                     .ToListAsync(cancellationToken);
 
                 int alertsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && (p.CurrentProgress?.IsCompleted ?? false));
                 int invasionsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Invasion && (p.CurrentProgress?.IsCompleted ?? false));
                 int controlsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Controlled && (p.CurrentProgress?.IsCompleted ?? false));
-                int titansDefeated = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && (p.CurrentProgress?.IsCompleted ?? false));
+                int titansDefeated = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Titan && p.Maelstrom?.DefeatCycleId == currentThargoidCycle.Id);
                 int thargoidInvasionStart = currentCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && p.State == StarSystemThargoidLevelState.Alert && (p.StarSystem?.OriginalPopulation ?? 0) > 0);
                 int thargoidInvasionSuccess = currentCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && p.State == StarSystemThargoidLevelState.Invasion && p.StateExpires?.Id == currentThargoidCycle.Id);
                 int thargoidGainFromAlert = currentCycleStates.Count(p => !(p.CurrentProgress?.IsCompleted ?? false) && p.State == StarSystemThargoidLevelState.Alert && p.StarSystem?.OriginalPopulation == 0);
@@ -182,7 +186,7 @@ namespace EDOverwatch_Web.Models
                 int alertsPredicted = await dbContext.AlertPredictions.CountAsync(a => a.Cycle == nextCycle && a.AlertLikely, cancellationToken);
                 int invasionsPredicted = invasionCount - thargoidInvasionSuccess - invasionsDefended + thargoidInvasionStart;
                 int controlledPredicted = controlledCount - controlsDefended + thargoidsGain;
-                int titanPredicted = titanCount - titansDefeated;
+                int titanPredicted = titanCount/* - titansDefeated*/;
                 int recoveryCompleted = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Recovery && (p.CurrentProgress?.IsCompleted ?? false));
                 int newRecoveries = currentCycleStates.Count(p => (p.CurrentProgress?.IsCompleted ?? false) && (p.State == StarSystemThargoidLevelState.Invasion || p.State == StarSystemThargoidLevelState.Controlled) && p.StarSystem?.OriginalPopulation > 0);
                 int recoveryPredicted = recoveryCount - recoveryCompleted + newRecoveries;

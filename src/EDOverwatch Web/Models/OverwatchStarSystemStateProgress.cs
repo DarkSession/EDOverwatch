@@ -19,7 +19,7 @@
                 IsCompleted = true;
                 ProgressPercent = 1;
             }
-            if (IsCompleted || starSystem.ThargoidLevel?.Maelstrom?.HeartsRemaining == 0)
+            if (IsCompleted && currentSystemState != StarSystemThargoidLevelState.Titan)
             {
                 StarSystemThargoidLevelState nextSystemState = StarSystemThargoidLevel.GetNextThargoidState(currentSystemState, starSystem.OriginalPopulation > 0, true);
                 if (nextSystemState == StarSystemThargoidLevelState.None && hasAlertPrediction)
