@@ -8,6 +8,9 @@ namespace EDOverwatch_Web.Models
         public DateTimeOffset LastTickTime { get; }
         public DateOnly LastTickDate { get; }
         public List<OverwatchStarSystemWarEffort> WarEfforts { get; }
+        /// <summary>
+        /// Detailed progress for the current and last tick. Limited to 100 entries. Use separate API call to retrieve the full list.
+        /// </summary>
         public List<OverwatchStarSystemDetailProgress> ProgressDetails { get; }
         public List<FactionOperation> FactionOperationDetails { get; }
         public List<OverwatchStation> Stations { get; }
@@ -85,26 +88,27 @@ namespace EDOverwatch_Web.Models
                 .FirstOrDefault();
         }
 
-        private static string CacheKey(long systemAddress)
+        private static string CacheKey(long systemAddress, bool extendedProgress)
         {
-            return $"OverwatchStarSystemFullDetail-{systemAddress}";
+            return $"OverwatchStarSystemFullDetail-{systemAddress}-{extendedProgress}";
         }
 
         public static void DeleteMemoryEntry(IAppCache appCache, long systemAddress)
         {
-            appCache.Remove(CacheKey(systemAddress));
+            appCache.Remove(CacheKey(systemAddress, true));
+            appCache.Remove(CacheKey(systemAddress, false));
         }
 
-        public static Task<OverwatchStarSystemFullDetail?> Create(long systemAddress, EdDbContext dbContext, IAppCache appCache, CancellationToken cancellationToken)
+        public static Task<OverwatchStarSystemFullDetail?> Create(long systemAddress, bool includeExtendedProgress, EdDbContext dbContext, IAppCache appCache, CancellationToken cancellationToken)
         {
-            return appCache.GetOrAddAsync(CacheKey(systemAddress), (cacheEntry) =>
+            return appCache.GetOrAddAsync(CacheKey(systemAddress, includeExtendedProgress), (cacheEntry) =>
             {
                 cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
-                return CreateInternal(systemAddress, dbContext, cancellationToken);
+                return CreateInternal(systemAddress, includeExtendedProgress, dbContext, cancellationToken);
             })!;
         }
 
-        private static async Task<OverwatchStarSystemFullDetail?> CreateInternal(long systemAddress, EdDbContext dbContext, CancellationToken cancellationToken)
+        private static async Task<OverwatchStarSystemFullDetail?> CreateInternal(long systemAddress, bool includeExtendedProgress, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             DateTimeOffset lastTick = WeeklyTick.GetLastTick();
             DateTimeOffset signalMaxAge = lastTick.AddDays(-7);
@@ -244,7 +248,7 @@ namespace EDOverwatch_Web.Models
                     .Include(s => s.ThargoidLevel)
                     .Where(s => s.ThargoidLevel!.StarSystem == starSystem && s.Updated >= previousTickTime)
                     .OrderByDescending(s => s.Updated)
-                    .Take(500)
+                    .Take(includeExtendedProgress ? 10000 : 100)
                     .ToListAsync(cancellationToken);
 
                 List<StarSystemThargoidLevel> thargoidLevelHistory = await dbContext.StarSystemThargoidLevels

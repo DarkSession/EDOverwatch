@@ -218,61 +218,11 @@
                 <mat-tab label="Contributions">
                     <app-system-contributions [starSystem]="starSystem"></app-system-contributions>
                 </mat-tab>
-                <mat-tab label="History">
+                <mat-tab label="System history">
                     <app-system-history [starSystem]="starSystem"></app-system-history>
                 </mat-tab>
-                <mat-tab label="Progress history" *ngIf="showProgressDetails">
-                    <table mat-table [dataSource]="progressDetails">
-                        <ng-container matColumnDef="State">
-                            <th mat-header-cell *matHeaderCellDef>State</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap"
-                                [ngClass]="{'day-marker': row.DayMarker }">
-                                <app-thargoid-level [thargoidLevel]="row.State"></app-thargoid-level>
-                            </td>
-                        </ng-container>
-                        <ng-container matColumnDef="Time">
-                            <th mat-header-cell *matHeaderCellDef>Time reported (UTC)</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap"
-                                [ngClass]="{'day-marker': row.DayMarker }">
-                                {{ row.DateTime | date:'medium':'UTC' }}
-                            </td>
-                        </ng-container>
-                        <ng-container matColumnDef="Progress">
-                            <th mat-header-cell *matHeaderCellDef>Progress</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap"
-                                [ngClass]="{'day-marker': row.DayMarker }">
-                                {{ row.ProgressPercentage | percent:'1.4-4' }}
-                            </td>
-                        </ng-container>
-                        <ng-container matColumnDef="Change">
-                            <th mat-header-cell *matHeaderCellDef>Change</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap"
-                                [ngClass]="{'day-marker': row.DayMarker }">
-                                <span *ngIf="row.Change > 0" class="progress-plus">+{{ row.Change | percent:'1.4-4'
-                                    }}</span>
-                                <span *ngIf="row.Change < 0" class="progress-minus">{{ row.Change | percent:'1.4-4'
-                                    }}</span>
-                                <div *ngIf="row.DayChange">
-                                    (
-                                    <span *ngIf="row.DayChange > 0" class="progress-plus">+{{ row.DayChange |
-                                        percent:'1.4-4' }}</span>
-                                    <span *ngIf="row.DayChange < 0" class="progress-minus">{{ row.DayChange |
-                                        percent:'1.4-4' }}</span>
-                                    )
-                                </div>
-                            </td>
-                        </ng-container>
-                        <ng-container matColumnDef="Timespan">
-                            <th mat-header-cell *matHeaderCellDef>Time span</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap"
-                                [ngClass]="{'day-marker': row.DayMarker }">
-                                {{ row.Timespan }}
-                            </td>
-                        </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="progressDetailsColumns; sticky: true" class="thead">
-                        </tr>
-                        <tr mat-row *matRowDef="let row; columns: progressDetailsColumns;"></tr>
-                    </table>
+                <mat-tab label="Progress history">
+                    <app-system-progress-details [progressData]="progressData"></app-system-progress-details>
                 </mat-tab>
             </mat-tab-group>
         </div>

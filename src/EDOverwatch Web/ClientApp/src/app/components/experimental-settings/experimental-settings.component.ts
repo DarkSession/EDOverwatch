@@ -8,7 +8,6 @@ import { AppService } from 'src/app/services/app.service';
 })
 export class ExperimentalSettingsComponent implements OnInit {
   public effortEstimates = false;
-  public progressDetails = false;
 
   public constructor(
     private readonly appService: AppService,
@@ -22,12 +21,10 @@ export class ExperimentalSettingsComponent implements OnInit {
 
   private async updateSettings(): Promise<void> {
     this.effortEstimates = (await this.appService.getSetting("ExperimentalEffortEstimates")) === "1";
-    this.progressDetails = (await this.appService.getSetting("ExperimentalProgressDetails")) === "1";
     this.changeDetectorRef.detectChanges();
   }
 
   public async saveSettings(): Promise<void> {
     await this.appService.saveSetting("ExperimentalEffortEstimates", this.effortEstimates ? "1" : "0");
-    await this.appService.saveSetting("ExperimentalProgressDetails", this.progressDetails ? "1" : "0");
   }
 }

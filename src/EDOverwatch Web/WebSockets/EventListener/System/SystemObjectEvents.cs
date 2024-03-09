@@ -57,7 +57,7 @@ namespace EDOverwatch_Web.WebSockets.EventListener.System
             List<WebSocketSession> sessions = webSocketServer.ActiveSessions.Where(a => a.ActiveObject.IsActiveObject(systemObject)).ToList();
             if (sessions.Any())
             {
-                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystem), await Models.OverwatchStarSystemFullDetail.Create(systemAddress, dbContext, AppCache, cancellationToken));
+                WebSocketMessage webSocketMessage = new(nameof(Handler.OverwatchSystem), await Models.OverwatchStarSystemFullDetail.Create(systemAddress, false, dbContext, AppCache, cancellationToken));
                 foreach (WebSocketSession session in sessions)
                 {
                     await webSocketMessage.Send(session, cancellationToken);

@@ -15,7 +15,6 @@ import { faBolt } from '@fortawesome/free-solid-svg-icons';
 import { faCrosshairs } from '@fortawesome/pro-light-svg-icons';
 import { AppService } from 'src/app/services/app.service';
 import * as dayjs from 'dayjs';
-import { MatTableDataSource } from '@angular/material/table';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 
@@ -52,11 +51,9 @@ export class SystemComponent implements OnInit {
   public editSaving = false;
   public editCounterstrike: boolean | null = null;
 
-  public showProgressDetails = false;
-  public progressDetails: MatTableDataSource<ProgressDetails> = new MatTableDataSource<ProgressDetails>();
-  public progressDetailsColumns = ["State", "Time", "Progress", "Change", "Timespan"];
-
   public titanHearts = [8, 7, 6, 5, 4, 3, 2, 1];
+
+  public progressData: ProgressDetails[] | null = null;
 
   public showTitanHearts = false;
   public titanHeartsRemaining = 8;
@@ -138,8 +135,17 @@ export class SystemComponent implements OnInit {
       .pipe(untilDestroyed(this))
       .subscribe((message) => {
         if (message && message.Data) {
-          this.starSystem = message.Data;
+          if (this.starSystem && this.starSystem.SystemAddress === message.Data.SystemAddress && message.Data.ProgressDetails) {
+            const progressData = this.starSystem.ProgressDetails;
+            for (const newProgressDetails of message.Data.ProgressDetails) {
+              if (progressData.findIndex(p => p.DateTime === newProgressDetails.DateTime) === -1) {
+                progressData.push(newProgressDetails);
+              }
+            }
+            message.Data.ProgressDetails = progressData;
+          }
 
+          this.starSystem = message.Data;
           this.showTitanHearts = (this.starSystem.ThargoidLevel && this.starSystem.ThargoidLevel.Level === 50);
           if (this.showTitanHearts) {
             this.titanHeartsRemaining = this.starSystem.Maelstrom.HeartsRemaining;
@@ -281,14 +287,13 @@ export class SystemComponent implements OnInit {
           }
 
           progressDetails.sort((a, b) => (a.DateTime < b.DateTime) ? 1 : -1);
-
-          this.progressDetails = new MatTableDataSource<ProgressDetails>(progressDetails);
+          this.progressData = progressDetails;
 
           this.changeDetectorRef.markForCheck();
           this.chartLoaded = true;
         }
       });
-    this.updateSettings();
+    // this.updateSettings();
   }
 
   private getDayId(dateTime: string): number {
@@ -310,10 +315,12 @@ export class SystemComponent implements OnInit {
     });
   }
 
+  /*
   private async updateSettings(): Promise<void> {
     this.showProgressDetails = (await this.appService.getSetting("ExperimentalProgressDetails")) === "1";
     this.changeDetectorRef.detectChanges();
   }
+  */
 
   public encodeUrlPart(part: string): string {
     return encodeURIComponent(part);
@@ -425,7 +432,7 @@ export interface OverwatchStarSystemAttackDefense {
   RequirementsTitanPodsRemaining: number | null;
 }
 
-interface ProgressDetails extends OverwatchStarSystemDetailProgress {
+export interface ProgressDetails extends OverwatchStarSystemDetailProgress {
   DayMarker: boolean;
   Change: number;
   Timespan: string;

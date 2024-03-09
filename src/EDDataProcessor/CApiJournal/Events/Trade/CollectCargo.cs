@@ -28,6 +28,7 @@
                     "thargoidtissuesampletype5" => WarEffortType.TissueSampleOrthrus,
                     "thargoidscouttissuesample" => WarEffortType.TissueSampleScout,
                     "thargoidtissuesampletype6" => WarEffortType.TissueSampleGlaive,
+                    "thargoidtissuesampletype7" => WarEffortType.TissueSampleScythe,
                     "thargoidtissuesampletype9a" => WarEffortType.TissueSampleTitan,
                     "thargoidtissuesampletype9b" => WarEffortType.TissueSampleTitan,
                     "thargoidtissuesampletype9c" => WarEffortType.TissueSampleTitan,

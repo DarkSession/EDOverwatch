@@ -167,7 +167,7 @@
         <div *ngIf="dataSource.data.length === 0" class="empty-table">
             No records found.
         </div>
-        <mat-paginator [pageSizeOptions]="[25, 50, 100]" [pageSize]="pageSize" [showFirstLastButtons]="true"
+        <mat-paginator [pageSizeOptions]="[25, 50, 100, 250]" [pageSize]="pageSize" [showFirstLastButtons]="true"
             (page)="handlePageEvent($event)" aria-label="Select page of systems"></mat-paginator>
     </div>
     <div class="options-bottom" *ngIf="!filterApplied">

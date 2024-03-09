@@ -77,19 +77,41 @@ namespace EDOverwatch_Web.Models
                     .ToList();
             }
 
-            List<StatsCompletdSystemsPerCycle> completedSystemsPerCycle = await dbContext.StarSystemThargoidLevels
-                .AsNoTracking()
-                .Include(s => s.CycleEnd)
-                .Where(s =>
-                    s.CurrentProgress!.IsCompleted &&
-                    (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled || s.State == StarSystemThargoidLevelState.Titan))
-                .GroupBy(s => new
-                {
-                    s.CycleEndId,
-                    s.State,
-                })
-                .Select(s => new StatsCompletdSystemsPerCycle(s.Key.CycleEndId, thargoidCycles, s.Key.State, s.Count()))
-                .ToListAsync(cancellationToken);
+            List<StatsCompletdSystemsPerCycle> completedSystemsPerCycle = new();
+            {
+                List<StatsCompletdSystemsPerCycle> completedNormalSystemStates = await dbContext.StarSystemThargoidLevels
+                    .AsNoTracking()
+                    .Include(s => s.CycleEnd)
+                    .Where(s =>
+                        s.CurrentProgress!.IsCompleted &&
+                        (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled))
+                    .GroupBy(s => new
+                    {
+                        s.CycleEndId,
+                        s.State,
+                    })
+                    .Select(s => new StatsCompletdSystemsPerCycle(s.Key.CycleEndId, thargoidCycles, s.Key.State, s.Count()))
+                    .ToListAsync(cancellationToken);
+
+                completedSystemsPerCycle.AddRange(completedNormalSystemStates);
+            }
+            {
+                List<StatsCompletdSystemsPerCycle> completedTitansPerCycle = await dbContext.StarSystemThargoidLevels
+                    .AsNoTracking()
+                    .Include(s => s.Maelstrom)
+                    .Where(s =>
+                        s.CurrentProgress!.IsCompleted &&
+                        s.State == StarSystemThargoidLevelState.Titan)
+                    .GroupBy(s => new
+                    {
+                        s.Maelstrom!.DefeatCycleId,
+                        s.State,
+                    })
+                    .Select(s => new StatsCompletdSystemsPerCycle(s.Key.DefeatCycleId, thargoidCycles, s.Key.State, s.Count()))
+                    .ToListAsync(cancellationToken);
+
+                completedSystemsPerCycle.AddRange(completedTitansPerCycle);
+            }
 
             List<ThargoidMaelstromHistoricalSummary> maelstromHistoricalSummaries = await dbContext.ThargoidMaelstromHistoricalSummaries
                 .AsNoTracking()
@@ -224,6 +246,7 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.TissueSampleHydra,
                     WarEffortType.TissueSampleOrthrus,
                     WarEffortType.TissueSampleGlaive,
+                    WarEffortType.TissueSampleScythe,
                     WarEffortType.TissueSampleTitan,
                     WarEffortType.TissueSampleTitanMaw,
                     WarEffortType.ProtectiveMembraneScrap,

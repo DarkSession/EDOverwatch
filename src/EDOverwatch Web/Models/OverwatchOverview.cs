@@ -142,6 +142,7 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.TissueSampleHydra,
                     WarEffortType.TissueSampleOrthrus,
                     WarEffortType.TissueSampleGlaive,
+                    WarEffortType.TissueSampleScythe,
                     WarEffortType.TissueSampleTitan,
                     WarEffortType.TissueSampleTitanMaw,
                     WarEffortType.ProtectiveMembraneScrap,

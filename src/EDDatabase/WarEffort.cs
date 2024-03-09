@@ -78,6 +78,7 @@ namespace EDDatabase
             { WarEffortType.TissueSampleHydra, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleOrthrus, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleGlaive, WarEffortTypeGroup.RecoveryAndProbing },
+            { WarEffortType.TissueSampleScythe, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleTitan, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.TissueSampleTitanMaw, WarEffortTypeGroup.RecoveryAndProbing },
             { WarEffortType.ProtectiveMembraneScrap, WarEffortTypeGroup.RecoveryAndProbing },
@@ -202,6 +203,9 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid spire site sabotage")]
         MissionThargoidSpireSiteSabotage,
+
+        [EnumMember(Value = "Thargoid Scythe tissue sample collection")]
+        TissueSampleScythe,
     }
 
     public enum WarEffortTypeGroup : byte

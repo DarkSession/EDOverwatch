@@ -57,7 +57,7 @@ namespace EDOverwatch_Web.Controllers.V1
         [SwaggerResponse(204, "System not found or not relevant for the Thargoid war")]
         public Task<OverwatchStarSystemFullDetail?> System(long systemAddress, CancellationToken cancellationToken)
         {
-            return OverwatchStarSystemFullDetail.Create(systemAddress, DbContext, AppCache, cancellationToken);
+            return OverwatchStarSystemFullDetail.Create(systemAddress, false, DbContext, AppCache, cancellationToken);
         }
 
         [HttpGet]
