@@ -21,7 +21,8 @@ namespace EDDataProcessor
                 ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
                 List<StarSystem> starSystems = await starSystemPreQuery
-                    .Where(s => s.ThargoidLevel!.CurrentProgress!.IsCompleted && s.ThargoidLevel!.State != StarSystemThargoidLevelState.Titan)
+                    .Where(s => (s.ThargoidLevel!.CurrentProgress!.IsCompleted && s.ThargoidLevel!.State != StarSystemThargoidLevelState.Titan) ||
+                                (s.ThargoidLevel!.Maelstrom!.HeartsRemaining <= 0 && (s.ThargoidLevel!.State == StarSystemThargoidLevelState.Alert || s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion)))
                     .ToListAsync(cancellationToken);
 
                 foreach (StarSystem starSystem in starSystems)

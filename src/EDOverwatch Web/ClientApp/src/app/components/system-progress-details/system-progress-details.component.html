@@ -1,6 +1,7 @@
 <div class="small">
-    Daily progress changes (from 7am UTC to 7am UTC are highlighted).
+    Daily progress changes (from 7am to 7am UTC) are highlighted.
 </div>
+<br>
 <table mat-table [dataSource]="progressDetails">
     <ng-container matColumnDef="State">
         <th mat-header-cell *matHeaderCellDef>State</th>
@@ -52,6 +53,7 @@
 <mat-paginator [pageSizeOptions]="[100, 250, 500, 1000]" [pageSize]="progressDetailsPageSize"
     [showFirstLastButtons]="true" (page)="handlePageEvent($event)"
     aria-label="Select page of progress details"></mat-paginator>
+<br>
 <div class="options-bottom">
     <span (click)="exportToCsv()" class="clickable">
         <fa-icon [icon]="faFileCsv"></fa-icon>
