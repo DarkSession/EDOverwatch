@@ -164,13 +164,13 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       const existingEntry = this.dataRaw.findIndex(d => d.SystemAddress == data.SystemChanged.SystemAddress);
       if (existingEntry !== -1) {
         this.dataRaw[existingEntry] = data.SystemChanged;
-        this.dataRaw = [...this.dataRaw];
       }
       else {
         this.dataRaw.push(data.SystemChanged);
       }
-      this.changeDetectorRef.markForCheck();
+      this.dataRaw = [...this.dataRaw];
     }
+    this.changeDetectorRef.markForCheck();
   }
 
   private async update(data: OverwatchOverviewV2): Promise<void> {
