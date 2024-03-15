@@ -378,8 +378,8 @@ ul {
   div.information {
     min-width: 300px;
     max-width: 600px;
-    width: 30%;
-    margin-right: 24px;
+    width: 100vw;
+    margin-right: 52px;
 
     table {
       width: 100%;
@@ -390,7 +390,7 @@ ul {
     tr {
       td {
         height: 52px;
-        padding: 8px;
+        padding: 0px 12px;
       }
     }
 

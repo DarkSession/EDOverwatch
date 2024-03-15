@@ -1,33 +1,26 @@
 ﻿using EDOverwatch_Web.Services;
 using LazyCache;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace EDOverwatch_Web.Models
 {
-    public class OverwatchOverviewV2
+    public class OverwatchOverviewV2PartialUpdate
     {
         public OverwatchOverviewV2Cycle PreviousCycle { get; }
         public OverwatchOverviewV2CycleChange PreviousCycleChanges { get; }
         public OverwatchOverviewV2Cycle CurrentCycle { get; }
         public OverwatchOverviewV2CycleChange NextCycleChanges { get; }
         public OverwatchOverviewV2Cycle NextCyclePrediction { get; }
-        public List<OverwatchMaelstrom> Maelstroms { get; }
-        public List<OverwatchThargoidLevel> Levels => Enum.GetValues<StarSystemThargoidLevelState>()
-            .Where(s => s > StarSystemThargoidLevelState.None)
-            .Select(s => new OverwatchThargoidLevel(s))
-            .ToList();
-        public List<OverwatchStarSystem> Systems { get; }
+        public OverwatchStarSystem SystemChanged { get; }
         public DateTimeOffset NextTick => WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 1);
         public OverviewDataStatus Status { get; }
 
-        protected OverwatchOverviewV2(
+        protected OverwatchOverviewV2PartialUpdate(
             OverwatchOverviewV2Cycle previousCycle,
             OverwatchOverviewV2CycleChange previousCycleChanges,
             OverwatchOverviewV2Cycle currentCycle,
             OverwatchOverviewV2CycleChange nextCycleChanges,
             OverwatchOverviewV2Cycle nextCyclePrediction,
-            List<ThargoidMaelstrom> thargoidMaelstroms,
-            List<OverwatchStarSystem> systems,
+            OverwatchStarSystem systemChanged,
             OverviewDataStatus status)
         {
             PreviousCycle = previousCycle;
@@ -35,28 +28,16 @@ namespace EDOverwatch_Web.Models
             CurrentCycle = currentCycle;
             NextCycleChanges = nextCycleChanges;
             NextCyclePrediction = nextCyclePrediction;
-            Maelstroms = thargoidMaelstroms.Select(t => new OverwatchMaelstrom(t)).ToList();
-            Systems = systems;
+            SystemChanged = systemChanged;
             Status = status;
         }
 
-        private const string CacheKey = "OverwatchOverviewV2";
-
-        public static void DeleteMemoryEntry(IAppCache appCache)
+        public static Task<OverwatchOverviewV2PartialUpdate?> Create(long systemAddress, EdDbContext dbContext, IAppCache appCache, EdMaintenance edMaintenance, CancellationToken cancellationToken)
         {
-            appCache.Remove(CacheKey);
+            return CreateInternal(systemAddress, dbContext, edMaintenance, cancellationToken);
         }
 
-        public static Task<OverwatchOverviewV2> Create(EdDbContext dbContext, IAppCache appCache, EdMaintenance edMaintenance, CancellationToken cancellationToken)
-        {
-            return appCache.GetOrAddAsync(CacheKey, (cacheEntry) =>
-            {
-                cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
-                return CreateInternal(dbContext, edMaintenance, cancellationToken);
-            })!;
-        }
-
-        private static async Task<OverwatchOverviewV2> CreateInternal(EdDbContext dbContext, EdMaintenance edMaintenance, CancellationToken cancellationToken)
+        private static async Task<OverwatchOverviewV2PartialUpdate?> CreateInternal(long systemAddress, EdDbContext dbContext, EdMaintenance edMaintenance, CancellationToken cancellationToken)
         {
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
             DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -202,13 +183,9 @@ namespace EDOverwatch_Web.Models
                 stationMaxAge = lastTick;
             }
 
-            var systems = await dbContext.StarSystems
+            var system = await dbContext.StarSystems
                .AsNoTracking()
-               .Where(s =>
-                           s.ThargoidLevel != null &&
-                           s.ThargoidLevel.State >= StarSystemThargoidLevelState.Alert &&
-                           s.ThargoidLevel.Maelstrom != null &&
-                           s.ThargoidLevel.Maelstrom.StarSystem != null)
+               .Where(s => s.SystemAddress == systemAddress)
                 .Include(s => s.ThargoidLevel)
                 .ThenInclude(t => t!.Maelstrom)
                 .ThenInclude(m => m!.StarSystem)
@@ -240,13 +217,12 @@ namespace EDOverwatch_Web.Models
                     GroundPortUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack && StationType.WarGroundAssetTypes.Contains(s.Type!.Name)).Any(),
                     HasAlertPredicted = dbContext.AlertPredictions.Any(a => a.StarSystem == s && a.Cycle == nextCycle && a.AlertLikely),
                 })
-                .ToListAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
 
-            List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
-                .AsNoTracking()
-                .Include(t => t.StarSystem)
-                .ThenInclude(s => s!.ThargoidLevel)
-                .ToListAsync(cancellationToken);
+            if (system is null)
+            {
+                return null;
+            }
 
             Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
             DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
@@ -254,6 +230,7 @@ namespace EDOverwatch_Web.Models
             var efforts = await dbContext.WarEfforts
                 .AsNoTracking()
                 .Where(w =>
+                        w.StarSystemId == system.StarSystem.Id &&
                         w.Date >= startDate &&
                         w.StarSystem!.WarRelevantSystem &&
                         w.Side == WarEffortSide.Humans)
@@ -270,20 +247,18 @@ namespace EDOverwatch_Web.Models
                 })
                 .ToListAsync(cancellationToken);
 
-            List<OverwatchStarSystem> overwatchStarSystems = new();
-
-            foreach (var system in systems)
+            StarSystem starSystem = system.StarSystem;
+            decimal effortFocus = 0;
+            if (totalEffortSums.Any())
             {
-                StarSystem starSystem = system.StarSystem;
-                decimal effortFocus = 0;
-                if (totalEffortSums.Any())
-                {
-                    effortFocus = WarEffort.CalculateSystemFocus(efforts.Where(e => e.StarSystemId == starSystem.Id).Select(e => new WarEffortTypeSum(e.Type, e.Amount)), totalEffortSums);
-                }
-                List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
-                    .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
-                    .ToList();
-                overwatchStarSystems.Add(new OverwatchStarSystemFull(
+                effortFocus = WarEffort.CalculateSystemFocus(efforts.Where(e => e.StarSystemId == starSystem.Id).Select(e => new WarEffortTypeSum(e.Type, e.Amount)), totalEffortSums);
+            }
+
+            List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
+                .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
+                .ToList();
+
+            OverwatchStarSystem overwatchStarSystem = new OverwatchStarSystemFull(
                     starSystem,
                     effortFocus,
                     factionAxOperations: system.FactionAxOperations,
@@ -299,8 +274,7 @@ namespace EDOverwatch_Web.Models
                     system.EmpireFaction,
                     system.AXConflictZones,
                     system.GroundPortUnderAttack,
-                    system.HasAlertPredicted));
-            }
+                    system.HasAlertPredicted);
 
             OverviewDataStatus status = OverviewDataStatus.Default;
             if (now.DayOfWeek == DayOfWeek.Thursday)
@@ -315,14 +289,7 @@ namespace EDOverwatch_Web.Models
                 }
             }
 
-            return new OverwatchOverviewV2(overviewPreviousCycle, overviewPreviousCycleChanges, overviewCurrentCycle, overviewNextCycleChanges, overviewNextCyclePrediction, maelstroms, overwatchStarSystems, status);
+            return new OverwatchOverviewV2PartialUpdate(overviewPreviousCycle, overviewPreviousCycleChanges, overviewCurrentCycle, overviewNextCycleChanges, overviewNextCyclePrediction, overwatchStarSystem, status);
         }
-    }
-
-    public enum OverviewDataStatus
-    {
-        Default,
-        TickInProgress,
-        UpdatePending,
     }
 }

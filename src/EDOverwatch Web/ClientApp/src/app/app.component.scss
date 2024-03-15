@@ -118,3 +118,15 @@
         padding: 4px;
     }
 }
+
+.menu-open {
+    transition-property: transform;
+    transition-duration: 0.5s;
+    transform: rotate(90deg);
+}
+
+.menu-closed {
+    transition-property: transform;
+    transition-duration: 0.5s;
+    transform: rotate(0deg);
+}

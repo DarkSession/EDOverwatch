@@ -48,40 +48,47 @@
                         <tbody>
                             <tr>
                                 <td class="t">Population</td>
-                                <td class="number">
-                                    <div>
-                                        {{ starSystem.Population | number }}
-                                    </div>
-                                    <div class="small" *ngIf="starSystem.Population != starSystem.PopulationOriginal"
-                                        [ngClass]="{
+                                <td>
+                                    <div class="number">
+                                        <div>
+                                            {{ starSystem.Population | number }}
+                                        </div>
+                                        <div class="small"
+                                            *ngIf="starSystem.Population != starSystem.PopulationOriginal" [ngClass]="{
                                           'population-decrease': (starSystem.Population < starSystem.PopulationOriginal),
                                           'population-increase': (starSystem.Population > starSystem.PopulationOriginal)
                                         }">
-                                        {{ (starSystem.Population - starSystem.PopulationOriginal) | number }}
+                                            {{ (starSystem.Population - starSystem.PopulationOriginal) | number }}
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="t">Player Focus</td>
-                                <td class="number">
-                                    {{ starSystem.EffortFocus | percent }}
+                                <td>
+                                    <div class="number">
+                                        {{ starSystem.EffortFocus | percent }}
+                                    </div>
                                 </td>
                             </tr>
                             <ng-container *ngIf="!showTitanHearts">
                                 <tr *ngIf="starSystem.StateProgress">
                                     <td class="t">Progress</td>
-                                    <td class="number">
-                                        <div class="progress-cell">
-                                            {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
-                                            <div class="progress-locked"
-                                                *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
-                                                <fa-icon [icon]="faHexagonExclamation"
-                                                    matTooltip="Thargoid spire site present in the system."
-                                                    size="lg"></fa-icon>
+                                    <td>
+                                        <div class="number">
+                                            <div class="progress-cell">
+                                                {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
+                                                <div class="progress-locked"
+                                                    *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
+                                                    <fa-icon [icon]="faHexagonExclamation"
+                                                        matTooltip="Thargoid spire site present in the system."
+                                                        size="lg"></fa-icon>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
-                                            Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                            <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                                Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1
+                                                }}
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -103,45 +110,53 @@
             </div>
             <div *ngIf="showTitanHearts">
                 <br>
-                <div class="subtitle">Titan</div>
+                <div class="subtitle">Titan state</div>
                 <div class="content-flex">
                     <table class="information">
                         <tbody>
                             <tr>
                                 <td class="t">Titan hearts</td>
-                                <td class="titan-hearts"
-                                    [matTooltip]="titanHeartsRemaining == 1 ? '1 heart remaining' : titanHeartsRemaining + ' hearts remaining'">
-                                    <div *ngFor="let titanHeart of titanHearts">
-                                        <fa-icon [icon]="faHeartRegular" class="heart-destroyed"
-                                            *ngIf="titanHeartsRemaining < titanHeart"></fa-icon>
-                                        <fa-icon [icon]="faHeartSolid"
-                                            *ngIf="titanHeartsRemaining >= titanHeart"></fa-icon>
+                                <td>
+                                    <div class="titan-hearts"
+                                        [matTooltip]="titanHeartsRemaining == 1 ? '1 heart remaining' : titanHeartsRemaining + ' hearts remaining'">
+                                        <div *ngFor="let titanHeart of titanHearts">
+                                            <fa-icon [icon]="faHeartRegular" class="heart-destroyed"
+                                                *ngIf="titanHeartsRemaining < titanHeart"></fa-icon>
+                                            <fa-icon [icon]="faHeartSolid"
+                                                *ngIf="titanHeartsRemaining >= titanHeart"></fa-icon>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
                             <tr *ngIf="starSystem.StateProgress">
                                 <td class="t">Current heart progress</td>
-                                <td class="number">
-                                    <div class="progress-cell">
-                                        {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
-                                    </div>
-                                    <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
-                                        Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                <td>
+                                    <div class="number">
+                                        <div class="progress-cell">
+                                            {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
+                                        </div>
+                                        <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                            Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="t">Total progress</td>
-                                <td class="number">
-                                    <div class="progress-cell">
-                                        {{ starSystem.Maelstrom.TotalProgress | percent:'1.4-4' }}
+                                <td>
+                                    <div class="number">
+                                        <div class="progress-cell">
+                                            {{ starSystem.Maelstrom.TotalProgress | percent:'1.4-4' }}
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
                             <tr *ngIf="starSystem.Maelstrom.CompletionTimeEstimate">
                                 <td class="t">Estimated completion time</td>
-                                <td class="number">
-                                    {{ starSystem.Maelstrom.CompletionTimeEstimate | dateAgo }}
+                                <td>
+                                    <div class="number">
+                                        {{ starSystem.Maelstrom.CompletionTimeEstimate | dateAgo }}
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
