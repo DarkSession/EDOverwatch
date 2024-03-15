@@ -1,5 +1,6 @@
 .number {
     text-align: right;
+    max-width: 150px;
 }
 
 .thead {
@@ -83,6 +84,7 @@
     flex-direction: row;
     column-gap: 4px;
     justify-content: flex-end;
+    max-width: 150px;
 }
 
 .heart-destroyed {
