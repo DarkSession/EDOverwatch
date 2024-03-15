@@ -423,6 +423,16 @@ namespace EDOverwatch
                 {
                     Log.LogError(e, "QueueUpdates exception");
                 }
+                try
+                {
+                    await using AsyncServiceScope serviceScope = ServiceProvider.CreateAsyncScope();
+                    EdDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<EdDbContext>();
+                    await EstimatedCompletion.Titan.UpdateTitanEstimatedCompletion(dbContext, cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    Log.LogError(e, "UpdateTitanEstimatedCompletion exception");
+                }
                 await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
             }
         }

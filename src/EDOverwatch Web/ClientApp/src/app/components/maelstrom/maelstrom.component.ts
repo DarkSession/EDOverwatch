@@ -211,5 +211,9 @@ interface OverwatchMaelstromDetail extends OverwatchMaelstromProgress {
   MaelstromHistory: OverwatchOverviewMaelstromHistoricalSummary[];
   ThargoidCycles: OverwatchThargoidCycle[];
   AlertPrediction: OverwatchAlertPredictionMaelstrom;
+  DamageResistance: TitanDamageResistance;
 }
 
+export interface TitanDamageResistance {
+  Name: string;
+}

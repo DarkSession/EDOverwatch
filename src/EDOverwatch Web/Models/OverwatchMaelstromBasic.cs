@@ -7,6 +7,7 @@
         public int SystemsThargoidControlled { get; }
         public int SystemsInRecovery { get; }
         public decimal DefenseRate { get; }
+        public TitanDamageResistance DamageResistance { get; }
 
         public OverwatchMaelstromBasic(
             ThargoidMaelstrom thargoidMaelstrom,
@@ -28,6 +29,7 @@
             {
                 DefenseRate = Math.Round((decimal)(populatedInvasionsDefended + populatedAlertsDefended) / (decimal)invasionsAlertsTotal, 4);
             }
+            DamageResistance = TitanDamageResistance.GetDamageResistance(systemsThargoidControlled, thargoidMaelstrom.HeartsRemaining);
         }
     }
 }

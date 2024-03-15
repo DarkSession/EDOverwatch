@@ -1,4 +1,5 @@
 ﻿using EDOverwatch_Web.Models;
+using EDOverwatch_Web.Services;
 using LazyCache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -17,10 +18,12 @@ namespace EDOverwatch_Web.Controllers.V1
     {
         private EdDbContext DbContext { get; }
         private IAppCache AppCache { get; }
-        public Overwatch(EdDbContext dbContext, IAppCache appCache)
+        private EdMaintenance EdMaintenance { get; }
+        public Overwatch(EdDbContext dbContext, IAppCache appCache, EdMaintenance edMaintenance)
         {
             DbContext = dbContext;
             AppCache = appCache;
+            EdMaintenance = edMaintenance;
         }
 
         [Obsolete("Use Stats API")]
@@ -34,7 +37,7 @@ namespace EDOverwatch_Web.Controllers.V1
         [SwaggerOperation(Summary = "Returns a list of systems of the current cycle and some more", Description = "Returns a list of systems which are affected by the Thargoid war in the current cycle and some numbers about the previous, current and next cycle.")]
         public Task<OverwatchOverviewV2> OverviewV2(CancellationToken cancellationToken)
         {
-            return OverwatchOverviewV2.Create(DbContext, AppCache, cancellationToken);
+            return OverwatchOverviewV2.Create(DbContext, AppCache, EdMaintenance, cancellationToken);
         }
 
         [HttpGet]

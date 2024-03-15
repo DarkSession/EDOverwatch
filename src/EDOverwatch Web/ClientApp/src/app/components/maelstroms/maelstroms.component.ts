@@ -7,6 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { faClipboard } from '@fortawesome/pro-light-svg-icons';
 import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
+import { TitanDamageResistance } from '../maelstrom/maelstrom.component';
 
 @UntilDestroy()
 @Component({
@@ -15,7 +16,7 @@ import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
   styleUrls: ['./maelstroms.component.scss']
 })
 export class MaelstromsComponent implements OnInit {
-  public readonly displayedColumns = ['Name', 'SystemName', 'State', 'HeartsRemaining', 'HeartProgress', 'TotalProgress', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery'];
+  public readonly displayedColumns = ['Name', 'SystemName', 'State', 'DamageResistance', 'HeartsRemaining', 'HeartProgress', 'TotalProgress', 'SystemsInAlert', 'SystemsInInvasion', 'SystemsThargoidControlled', 'SystemsInRecovery'];
   @ViewChild(MatSort) sort!: MatSort;
   public readonly faClipboard = faClipboard;
   public readonly faCircleQuestion = faCircleQuestion;
@@ -62,4 +63,5 @@ interface OverwatchMaelstromBasic extends OverwatchMaelstromProgress {
   SystemsThargoidControlled: number;
   SystemsInRecovery: number;
   DefenseRate: number;
+  DamageResistance: TitanDamageResistance;
 }

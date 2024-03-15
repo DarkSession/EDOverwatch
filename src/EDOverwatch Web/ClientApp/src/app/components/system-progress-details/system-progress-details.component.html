@@ -50,7 +50,7 @@
     </tr>
     <tr mat-row *matRowDef="let row; columns: progressDetailsColumns;"></tr>
 </table>
-<mat-paginator [pageSizeOptions]="[100, 250, 500, 1000]" [pageSize]="progressDetailsPageSize"
+<mat-paginator [pageSizeOptions]="[25, 50, 100, 250, 500, 1000]" [pageSize]="progressDetailsPageSize"
     [showFirstLastButtons]="true" (page)="handlePageEvent($event)"
     aria-label="Select page of progress details"></mat-paginator>
 <br>

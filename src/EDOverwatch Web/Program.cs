@@ -5,6 +5,7 @@ using ActiveMQ.Artemis.Client.Extensions.DependencyInjection;
 using ActiveMQ.Artemis.Client.Extensions.Hosting;
 using EDCApi;
 using EDOverwatch_Web.Authentication;
+using EDOverwatch_Web.Services;
 using EDOverwatch_Web.WebSockets;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration.Json;
@@ -110,7 +111,10 @@ namespace EDOverwatch_Web
                                           .WithHeaders("content-type");
                                   });
             });
+            builder.Services.AddHttpClient();
             builder.Services.AddScoped<FDevOAuth>();
+            builder.Services.AddSingleton<EdMaintenance>();
+            builder.Services.AddHostedService<EdMaintenainceBackgroundTask>();
 
             builder.Services.AddLazyCache();
 

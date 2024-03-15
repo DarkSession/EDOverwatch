@@ -7,83 +7,106 @@
         </div>
         <div class="content-box">
             <div class="content-flex">
-                <table class="information">
-                    <tbody>
-                        <tr>
-                            <td class="t">Titan</td>
-                            <td>
-                                <app-maelstrom-name [maelstrom]="starSystem.Maelstrom"></app-maelstrom-name>
-                                <span *ngIf="starSystem.DistanceToMaelstrom">
-                                    ({{ starSystem.DistanceToMaelstrom | number:'0.2-2' }} Ly)
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="t">Thargoid State</td>
-                            <td>
-                                <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
-                            </td>
-                        </tr>
-                        <tr *ngIf="starSystem.StateExpiration?.StateExpires">
-                            <td class="t">Remaining time</td>
-                            <td>
-                                <div>
-                                    {{ starSystem.StateExpiration?.StateExpires | dateAgo }}
-                                </div>
-                            </td>
-                        </tr>
-                        <tr *ngIf="starSystem.ClosestRescueShip && starSystem.PopulationOriginal === 0">
-                            <td class="t">Closest rescue ship</td>
-                            <td>
-                                {{ starSystem.ClosestRescueShip.System.Name }}
-                                ({{ starSystem.ClosestRescueShip.DistanceLy | number: '1.0-0' }} Ly)
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="information">
-                    <tbody>
-                        <tr>
-                            <td class="t">Population</td>
-                            <td class="number">
-                                <div>
-                                    {{ starSystem.Population | number }}
-                                </div>
-                                <div class="small" *ngIf="starSystem.Population != starSystem.PopulationOriginal"
-                                    [ngClass]="{
-                                      'population-decrease': (starSystem.Population < starSystem.PopulationOriginal),
-                                      'population-increase': (starSystem.Population > starSystem.PopulationOriginal)
-                                    }">
-                                    {{ (starSystem.Population - starSystem.PopulationOriginal) | number }}
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="t">Player Focus</td>
-                            <td class="number">
-                                {{ starSystem.EffortFocus | percent }}
-                            </td>
-                        </tr>
-                        <ng-container *ngIf="!showTitanHearts">
-                            <tr *ngIf="starSystem.StateProgress">
-                                <td class="t">Progress</td>
-                                <td class="number">
-                                    <div class="progress-cell">
-                                        {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
-                                        <div class="progress-locked"
-                                            *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
-                                            <fa-icon [icon]="faHexagonExclamation"
-                                                matTooltip="Thargoid spire site present in the system."
-                                                size="lg"></fa-icon>
-                                        </div>
-                                    </div>
-                                    <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
-                                        Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                <div class="information">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="t">Titan</td>
+                                <td>
+                                    <app-maelstrom-name [maelstrom]="starSystem.Maelstrom"></app-maelstrom-name>
+                                    <span *ngIf="starSystem.DistanceToMaelstrom">
+                                        ({{ starSystem.DistanceToMaelstrom | number:'0.2-2' }} Ly)
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="t">Thargoid State</td>
+                                <td>
+                                    <app-thargoid-level [thargoidLevel]="starSystem.ThargoidLevel"></app-thargoid-level>
+                                </td>
+                            </tr>
+                            <tr *ngIf="starSystem.StateExpiration?.StateExpires">
+                                <td class="t">Remaining time</td>
+                                <td>
+                                    <div>
+                                        {{ starSystem.StateExpiration?.StateExpires | dateAgo }}
                                     </div>
                                 </td>
                             </tr>
-                        </ng-container>
-                        <ng-container *ngIf="showTitanHearts">
+                            <tr *ngIf="starSystem.ClosestRescueShip && starSystem.PopulationOriginal === 0">
+                                <td class="t">Closest rescue ship</td>
+                                <td>
+                                    {{ starSystem.ClosestRescueShip.System.Name }}
+                                    ({{ starSystem.ClosestRescueShip.DistanceLy | number: '1.0-0' }} Ly)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="information">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="t">Population</td>
+                                <td class="number">
+                                    <div>
+                                        {{ starSystem.Population | number }}
+                                    </div>
+                                    <div class="small" *ngIf="starSystem.Population != starSystem.PopulationOriginal"
+                                        [ngClass]="{
+                                          'population-decrease': (starSystem.Population < starSystem.PopulationOriginal),
+                                          'population-increase': (starSystem.Population > starSystem.PopulationOriginal)
+                                        }">
+                                        {{ (starSystem.Population - starSystem.PopulationOriginal) | number }}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="t">Player Focus</td>
+                                <td class="number">
+                                    {{ starSystem.EffortFocus | percent }}
+                                </td>
+                            </tr>
+                            <ng-container *ngIf="!showTitanHearts">
+                                <tr *ngIf="starSystem.StateProgress">
+                                    <td class="t">Progress</td>
+                                    <td class="number">
+                                        <div class="progress-cell">
+                                            {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
+                                            <div class="progress-locked"
+                                                *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
+                                                <fa-icon [icon]="faHexagonExclamation"
+                                                    matTooltip="Thargoid spire site present in the system."
+                                                    size="lg"></fa-icon>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                            Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1 }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="information hide-on-mobile">
+                    <b>External system links</b>
+                    <br>
+                    <a href="https://inara.cz/elite/starsystem/?search={{ encodeUrlPart(starSystem.Name) }}"
+                        target="_blank" rel="noreferrer">
+                        Inara</a>
+                    <br>
+                    <a href="https://www.edsm.net/en/system?systemID64={{ starSystem.SystemAddress }}" target="_blank"
+                        rel="noreferrer">
+                        EDSM</a>
+                </div>
+            </div>
+            <div *ngIf="showTitanHearts">
+                <br>
+                <div class="subtitle">Titan</div>
+                <div class="content-flex">
+                    <table class="information">
+                        <tbody>
                             <tr>
                                 <td class="t">Titan hearts</td>
                                 <td class="titan-hearts"
@@ -115,24 +138,19 @@
                                     </div>
                                 </td>
                             </tr>
-                        </ng-container>
-                    </tbody>
-                </table>
-                <div class="information hide-on-mobile">
-                    <b>External links</b>
-                    <br>
-                    <a href="https://inara.cz/elite/starsystem/?search={{ encodeUrlPart(starSystem.Name) }}"
-                        target="_blank" rel="noreferrer">
-                        Inara</a>
-                    <br>
-                    <a href="https://www.edsm.net/en/system?systemID64={{ starSystem.SystemAddress }}" target="_blank"
-                        rel="noreferrer">
-                        EDSM</a>
+                            <tr *ngIf="starSystem.Maelstrom.CompletionTimeEstimate">
+                                <td class="t">Estimated completion time</td>
+                                <td class="number">
+                                    {{ starSystem.Maelstrom.CompletionTimeEstimate | dateAgo }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div *ngIf="starSystem?.Features && starSystem.Features.length > 0" class="features-list">
                 <br>
-                <b>Features</b>
+                <div class="subtitle">Features</div>
                 <div *ngIf="thargoidSpires" class="feature">
                     <div class="feature-icon-placeholder">
                         <img class="feature-icon" src="assets/spire.svg" matTooltip="Thargoid spire site present" />
@@ -219,10 +237,14 @@
                     <app-system-contributions [starSystem]="starSystem"></app-system-contributions>
                 </mat-tab>
                 <mat-tab label="System history">
-                    <app-system-history [starSystem]="starSystem"></app-system-history>
+                    <ng-template matTabContent>
+                        <app-system-history [starSystem]="starSystem"></app-system-history>
+                    </ng-template>
                 </mat-tab>
                 <mat-tab label="Progress history">
-                    <app-system-progress-details [progressData]="progressData"></app-system-progress-details>
+                    <ng-template matTabContent>
+                        <app-system-progress-details [progressData]="progressData"></app-system-progress-details>
+                    </ng-template>
                 </mat-tab>
             </mat-tab-group>
         </div>

@@ -3,14 +3,14 @@
     public class OverwatchMaelstromDetail : OverwatchMaelstromProgress
     {
         public List<OverwatchStarSystem> Systems { get; }
-        [Obsolete("Use AlertPrediction")]
-        public List<OverwatchAlertPredictionSystem> SystemsAtRisk { get; } = new(); // We keep this for API compatibility reasons for now
         public OverwatchAlertPredictionMaelstrom AlertPrediction { get; }
         public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }
+        public TitanDamageResistance DamageResistance { get; }
 
         protected OverwatchMaelstromDetail(
-            ThargoidMaelstrom thargoidMaelstrom, List<OverwatchStarSystem> systems,
+            ThargoidMaelstrom thargoidMaelstrom,
+            List<OverwatchStarSystem> systems,
             List<AlertPrediction> alertPredictions,
             List<OverwatchOverviewMaelstromHistoricalSummary> maelstromHistory,
             List<OverwatchThargoidCycle> thargoidCycles) :
@@ -20,6 +20,7 @@
             MaelstromHistory = maelstromHistory;
             ThargoidCycles = thargoidCycles;
             AlertPrediction = new(thargoidMaelstrom, alertPredictions);
+            DamageResistance = TitanDamageResistance.GetDamageResistance(systems.Count(s => s.ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled), thargoidMaelstrom.HeartsRemaining);
         }
 
         public static async Task<OverwatchMaelstromDetail> Create(int maelstromId, EdDbContext dbContext, CancellationToken cancellationToken)

@@ -5,36 +5,48 @@
         </div>
         <div class="content-box" *ngIf="maelstrom">
             <div class="content-flex">
-                <table class="system-information">
-                    <tbody>
-                        <tr>
-                            <td><b>System</b></td>
-                            <td>
-                                <span class="clickable" [routerLink]="['/system', maelstrom.SystemAddress]">
-                                    {{ maelstrom.SystemName }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><b>Hearts</b></td>
-                            <td>
-                                {{ maelstrom.HeartsRemaining }} / 8
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><b>Current heart progress</b></td>
-                            <td>
-                                {{ maelstrom.HeartProgress | percent:'1.4-4' }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><b>Total Progress</b></td>
-                            <td>
-                                {{ maelstrom.TotalProgress | percent:'1.4-4' }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="information">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><b>System</b></td>
+                                <td>
+                                    <span class="clickable" [routerLink]="['/system', maelstrom.SystemAddress]">
+                                        {{ maelstrom.SystemName }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="maelstrom.DamageResistance?.Name">
+                                <td><b>Damage resistance</b></td>
+                                <td>{{ maelstrom.DamageResistance.Name }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Hearts</b></td>
+                                <td>
+                                    {{ maelstrom.HeartsRemaining }} / 8
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Current heart progress</b></td>
+                                <td>
+                                    {{ maelstrom.HeartProgress | percent:'1.4-4' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Total progress</b></td>
+                                <td>
+                                    {{ maelstrom.TotalProgress | percent:'1.4-4' }}
+                                </td>
+                            </tr>
+                            <tr *ngIf="maelstrom.CompletionTimeEstimate">
+                                <td><b>Estimated completion time</b></td>
+                                <td>
+                                    {{ maelstrom.CompletionTimeEstimate | dateAgo }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <br>
             <mat-tab-group>

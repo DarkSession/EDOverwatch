@@ -1,4 +1,5 @@
-﻿using LazyCache;
+﻿using EDOverwatch_Web.Services;
+using LazyCache;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace EDOverwatch_Web.Models
@@ -46,16 +47,16 @@ namespace EDOverwatch_Web.Models
             appCache.Remove(CacheKey);
         }
 
-        public static Task<OverwatchOverviewV2> Create(EdDbContext dbContext, IAppCache appCache, CancellationToken cancellationToken)
+        public static Task<OverwatchOverviewV2> Create(EdDbContext dbContext, IAppCache appCache, EdMaintenance edMaintenance, CancellationToken cancellationToken)
         {
             return appCache.GetOrAddAsync(CacheKey, (cacheEntry) =>
             {
                 cacheEntry.SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
-                return CreateInternal(dbContext, cancellationToken);
+                return CreateInternal(dbContext, edMaintenance, cancellationToken);
             })!;
         }
 
-        private static async Task<OverwatchOverviewV2> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
+        private static async Task<OverwatchOverviewV2> CreateInternal(EdDbContext dbContext, EdMaintenance edMaintenance, CancellationToken cancellationToken)
         {
             ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
             DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -304,7 +305,7 @@ namespace EDOverwatch_Web.Models
             OverviewDataStatus status = OverviewDataStatus.Default;
             if (now.DayOfWeek == DayOfWeek.Thursday)
             {
-                if (now.Hour == 7 && now.Minute < 30)
+                if (edMaintenance.IsInMaintenanceMode || (now.Hour == 7 && now.Minute < 30))
                 {
                     status = OverviewDataStatus.TickInProgress;
                 }

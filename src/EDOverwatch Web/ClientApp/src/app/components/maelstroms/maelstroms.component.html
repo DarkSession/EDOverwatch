@@ -38,6 +38,12 @@
                                 </span>
                             </td>
                         </ng-container>
+                        <ng-container matColumnDef="DamageResistance">
+                            <th mat-header-cell *matHeaderCellDef>Damage resistance</th>
+                            <td mat-cell *matCellDef="let row" class="nowrap">
+                                {{ row.DamageResistance?.Name }}
+                            </td>
+                        </ng-container>
                         <ng-container matColumnDef="HeartsRemaining">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>Hearts remaining</th>
                             <td mat-cell *matCellDef="let row">
@@ -66,7 +72,7 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemsInAlert">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Systems in alert</th>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Alert</th>
                             <td mat-cell *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.SystemsInAlert }}</div>
@@ -75,7 +81,7 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemsInInvasion">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Systems in invasion</th>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Invasion</th>
                             <td mat-cell *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.SystemsInInvasion }}</div>
@@ -84,7 +90,7 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemsThargoidControlled">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Systems Thargoid controlled</th>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Systems controlled</th>
                             <td mat-cell *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.SystemsThargoidControlled }}</div>

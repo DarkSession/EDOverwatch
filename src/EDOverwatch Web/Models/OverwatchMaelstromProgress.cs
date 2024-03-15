@@ -7,6 +7,7 @@
         public decimal TotalProgress { get; }
         public string State { get; }
         public DateTimeOffset? MeltdownTimeEstimate { get; }
+        public DateTimeOffset? CompletionTimeEstimate { get; }
 
         public OverwatchMaelstromProgress(ThargoidMaelstrom thargoidMaelstrom) :
             base(thargoidMaelstrom)
@@ -17,6 +18,7 @@
             {
                 State = "Active";
                 TotalProgress = 1m - (1m / 8m * thargoidMaelstrom.HeartsRemaining - 1m / 8m * HeartProgress);
+                CompletionTimeEstimate = thargoidMaelstrom.CompletionTimeEstimate;
             }
             else
             {

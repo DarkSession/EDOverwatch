@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ProgressDetails } from '../system/system.component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -9,7 +9,8 @@ import { download, generateCsv, mkConfig } from 'export-to-csv';
 @Component({
   selector: 'app-system-progress-details',
   templateUrl: './system-progress-details.component.html',
-  styleUrl: './system-progress-details.component.css'
+  styleUrl: './system-progress-details.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemProgressDetailsComponent implements OnChanges, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
@@ -18,9 +19,11 @@ export class SystemProgressDetailsComponent implements OnChanges, AfterViewInit 
   @Input() progressData: ProgressDetails[] | null = null;
   public progressDetails: MatTableDataSource<ProgressDetails> = new MatTableDataSource<ProgressDetails>();
   public progressDetailsColumns = ["State", "Time", "Progress", "Change", "Timespan"];
-  public progressDetailsPageSize: number = 100;
+  public progressDetailsPageSize: number = 25;
 
-  public constructor(private readonly appService: AppService) {
+  public constructor(
+    private readonly appService: AppService,
+    private readonly changeDetectorRef: ChangeDetectorRef) {
   }
 
   public ngOnChanges(): void {
@@ -33,6 +36,7 @@ export class SystemProgressDetailsComponent implements OnChanges, AfterViewInit 
   public ngAfterViewInit() {
     if (this.progressDetails) {
       this.progressDetails.paginator = this.paginator;
+      this.changeDetectorRef.markForCheck();
     }
   }
 

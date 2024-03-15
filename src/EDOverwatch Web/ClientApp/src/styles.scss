@@ -377,9 +377,26 @@ ul {
   table.information,
   div.information {
     min-width: 300px;
-    max-width: 500px;
+    max-width: 600px;
     width: 30%;
     margin-right: 24px;
+
+    table {
+      width: 100%;
+      min-width: 300px;
+      max-width: 600px;
+    }
+
+    tr {
+      td {
+        height: 52px;
+        padding: 8px;
+      }
+    }
+
+    tr:nth-child(odd) {
+      background-color: #393939;
+    }
   }
 
   .t {
