@@ -117,6 +117,12 @@ export class HomeV2Component implements OnInit, AfterViewInit {
         this.update(message.Data);
       });
     this.webSocketService
+      .on<OverwatchOverviewV2Partial>("OverwatchHomeV2PartialUpdate")
+      .pipe(untilDestroyed(this))
+      .subscribe((message) => {
+        this.partialUpdate(message.Data);
+      });
+    this.webSocketService
       .onReady
       .pipe(untilDestroyed(this))
       .subscribe((isReconnect: boolean) => {
@@ -144,7 +150,30 @@ export class HomeV2Component implements OnInit, AfterViewInit {
     }
   }
 
-  private async update(data: OverwatchOverviewV2) {
+  private async partialUpdate(data: OverwatchOverviewV2Partial): Promise<void> {
+    this.nextTick = data.NextTick;
+    if (this.overview) {
+      this.overview.Status = data.Status;
+      this.overview.PreviousCycle = data.PreviousCycle;
+      this.overview.PreviousCycleChanges = data.PreviousCycleChanges;
+      this.overview.CurrentCycle = data.CurrentCycle;
+      this.overview.NextCycleChanges = data.NextCycleChanges;
+      this.overview.NextCyclePrediction = data.NextCyclePrediction;
+    }
+    if (this.dataRaw) {
+      const existingEntry = this.dataRaw.findIndex(d => d.SystemAddress == data.SystemChanged.SystemAddress);
+      if (existingEntry !== -1) {
+        this.dataRaw[existingEntry] = data.SystemChanged;
+        this.dataRaw = [...this.dataRaw];
+      }
+      else {
+        this.dataRaw.push(data.SystemChanged);
+      }
+      this.changeDetectorRef.markForCheck();
+    }
+  }
+
+  private async update(data: OverwatchOverviewV2): Promise<void> {
     this.nextTick = data.NextTick;
     this.dataRaw = data.Systems;
     this.overview = data;
@@ -298,17 +327,24 @@ export class HomeV2Component implements OnInit, AfterViewInit {
   }
 }
 
-interface OverwatchOverviewV2 {
+interface OverwatchOverviewV2Base {
   PreviousCycle: OverwatchOverviewV2Cycle;
   PreviousCycleChanges: OverwatchOverviewV2CycleChange;
   CurrentCycle: OverwatchOverviewV2Cycle;
   NextCycleChanges: OverwatchOverviewV2CycleChange;
   NextCyclePrediction: OverwatchOverviewV2Cycle;
+  NextTick: string;
+  Status: OverviewDataStatus;
+}
+
+interface OverwatchOverviewV2Partial extends OverwatchOverviewV2Base {
+  SystemChanged: OverwatchStarSystemFull;
+}
+
+interface OverwatchOverviewV2 extends OverwatchOverviewV2Base {
   Maelstroms: OverwatchMaelstrom[];
   Levels: OverwatchThargoidLevel[];
   Systems: OverwatchStarSystemFull[];
-  NextTick: string;
-  Status: OverviewDataStatus;
 }
 
 enum OverviewDataStatus {
