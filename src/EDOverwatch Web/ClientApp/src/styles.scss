@@ -373,23 +373,24 @@ ul {
   width: 100%;
   flex-wrap: wrap;
   flex: none;
+  gap: 20px;
 
   table.information,
   div.information {
     min-width: 300px;
-    max-width: 600px;
-    width: 100vw;
-    margin-right: 52px;
+    max-width: 500px;
+    width: calc(100vw - 72px);
+    margin-top: 20px;
 
     table {
       width: 100%;
       min-width: 300px;
-      max-width: 600px;
+      max-width: 500px;
     }
 
     tr {
       td {
-        height: 52px;
+        height: 40px;
         padding: 0px 12px;
       }
     }
