@@ -5,8 +5,8 @@ namespace Messages
 {
     public class WarEffortUpdated
     {
-        public const string QueueName = "WarEffort.Updated";
-        public const RoutingType Routing = RoutingType.Anycast;
+        public const string QueueName = "WarEffort.UpdatedV2";
+        public const RoutingType Routing = RoutingType.Multicast;
 
         public long SystemAddress { get; }
         public long? FDevCustomerId { get; }

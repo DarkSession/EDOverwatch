@@ -108,6 +108,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   }
 
   public updateDataSource(): void {
+    console.log("updateDataSource");
     const systemNameFilter = (this.systemNameFilter ?? "").trim().toUpperCase();
     let data = this.systems.filter(d =>
       (this.maelstromsSelected === null || typeof this.maelstromsSelected.find(m => m.Name === d.Maelstrom.Name) !== 'undefined') &&

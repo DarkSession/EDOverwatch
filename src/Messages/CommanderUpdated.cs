@@ -5,8 +5,8 @@ namespace Messages
 {
     public class CommanderUpdated
     {
-        public const string QueueName = "Commander.Updated";
-        public const RoutingType Routing = RoutingType.Anycast;
+        public const string QueueName = "Commander.Updatedv2";
+        public const RoutingType Routing = RoutingType.Multicast;
 
         public long FDevCustomerId { get; set; }
         public CommanderUpdated(long fDevCustomerId)

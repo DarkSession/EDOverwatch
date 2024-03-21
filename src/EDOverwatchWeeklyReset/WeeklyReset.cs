@@ -234,6 +234,36 @@ namespace EDDataProcessor
             }
 
             dbContext.ChangeTracker.Clear();
+
+
+            {
+                ThargoidCycle cycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -2);
+                ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
+                ThargoidCycle newThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+
+                List<StarSystem> starSystems = await starSystemPreQuery
+                    .Where(s =>
+                        s.ThargoidLevel!.State == StarSystemThargoidLevelState.Titan &&
+                        s.ThargoidLevel!.Maelstrom!.DefeatCycle == cycle)
+                    .ToListAsync(cancellationToken);
+
+                foreach (StarSystem starSystem in starSystems)
+                {
+                    StarSystemThargoidLevel oldThargoidLevel = starSystem.ThargoidLevel!;
+                    oldThargoidLevel.CycleEnd = previousThargoidCycle;
+
+                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, StarSystemThargoidLevelState.None, null, DateTimeOffset.UtcNow, false, false)
+                    {
+                        StarSystem = starSystem,
+                        CycleStart = newThargoidCycle,
+                        Maelstrom = oldThargoidLevel.Maelstrom,
+                    };
+                    dbContext.StarSystemThargoidLevels.Add(newStarSystemThargoidLevel);
+                    starSystem.ThargoidLevel = newStarSystemThargoidLevel;
+                }
+
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }
