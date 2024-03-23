@@ -31,6 +31,10 @@ namespace EDDataProcessor.Journal
                 bool changed = false;
                 if (starSystem.ThargoidLevel?.State != currentState)
                 {
+                    if (currentState == StarSystemThargoidLevelState.Titan && starSystem.ThargoidLevel?.Maelstrom != null && starSystem.ThargoidLevel.Maelstrom.HeartsRemaining <= 0)
+                    {
+                        return false;
+                    }
                     if (starSystem.ThargoidLevel != null)
                     {
                         starSystem.ThargoidLevel.CycleEnd = await dbContext.GetThargoidCycle(updateTime, cancellationToken, -1);

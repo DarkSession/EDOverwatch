@@ -18,7 +18,7 @@
                 !await dbContext.CommanderMissions.AnyAsync(c => c.MissionId == MissionID, cancellationToken))
             {
                 int count = Count;
-                if (Name.StartsWith("Mission_TW_PassengerEvacuation"))
+                if (count == 0 && PassengerCount > 0)
                 {
                     count = PassengerCount;
                 }

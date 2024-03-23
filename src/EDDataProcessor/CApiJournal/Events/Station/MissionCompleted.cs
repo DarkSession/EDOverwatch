@@ -90,9 +90,25 @@
                     }
                     commanderMission.Status = CommanderMissionStatus.Completed;
                     await AddOrUpdateWarEffort(journalParameters, commanderMission.System, missionWarEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
-                    if (commanderMission.Count > 0 && countWarEffortType != null)
+                    if (countWarEffortType != null)
                     {
-                        await AddOrUpdateWarEffort(journalParameters, commanderMission.System, (WarEffortType)countWarEffortType, commanderMission.Count, WarEffortSide.Humans, dbContext, cancellationToken);
+                        int passengerCount = 0;
+                        if (commanderMission.Count > 0)
+                        {
+                            passengerCount = commanderMission.Count;
+                        }
+                        else if (Count > 0)
+                        {
+                            passengerCount = Count;
+                        }
+                        else if (PassengerCount > 0)
+                        {
+                            passengerCount = PassengerCount;
+                        }
+                        if (passengerCount > 0)
+                        {
+                            await AddOrUpdateWarEffort(journalParameters, commanderMission.System, (WarEffortType)countWarEffortType, passengerCount, WarEffortSide.Humans, dbContext, cancellationToken);
+                        }
                     }
                 }
             }
