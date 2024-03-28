@@ -26,7 +26,7 @@ namespace EDOverwatch_Web.Controllers.V1
             EdMaintenance = edMaintenance;
         }
 
-        [Obsolete("Use Stats API")]
+        [Obsolete("Use Stats API to get complete numbers. This API no longer considers data collected from new features.")]
         [HttpGet]
         public Task<OverwatchOverview> Overview(CancellationToken cancellationToken)
         {
@@ -71,7 +71,7 @@ namespace EDOverwatch_Web.Controllers.V1
             return OverwatchStarSystemDetailProgress.Create(systemAddress, DbContext, AppCache, cancellationToken);
         }
 
-        [Obsolete("Use Titans API")]
+        [Obsolete("Use Titans API. This API will remain for consumer backward compatibility reasons.")]
         [HttpGet]
         public Task<OverwatchMaelstroms> Maelstroms(CancellationToken cancellationToken) => Titans(cancellationToken);
 
@@ -102,12 +102,14 @@ namespace EDOverwatch_Web.Controllers.V1
         }
 
         [HttpGet]
+        [SwaggerOperation(Summary = "Returns the data from the Overwatch stats page.")]
         public Task<OverwatchWarStats> Stats(CancellationToken cancellationToken)
         {
             return OverwatchWarStats.Create(DbContext, AppCache, cancellationToken);
         }
 
         [HttpGet]
+        [SwaggerOperation(Summary = "Returns a list of spire sites, their location and state.")]
         public Task<OverwatchSpireSites> SpireSites(CancellationToken cancellationToken)
         {
             return OverwatchSpireSites.Create(DbContext, AppCache, cancellationToken);

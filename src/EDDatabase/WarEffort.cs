@@ -62,10 +62,14 @@ namespace EDDatabase
             { WarEffortType.KillThargoidHydra, WarEffortTypeGroup.Kills },
             { WarEffortType.KillThargoidOrthrus, WarEffortTypeGroup.Kills },
             { WarEffortType.Rescue, WarEffortTypeGroup.Rescue },
+            { WarEffortType.EvacuationPassenger, WarEffortTypeGroup.Rescue },
+            { WarEffortType.EvacuationWounded, WarEffortTypeGroup.Rescue },
+            { WarEffortType.EvacuatioRefugee, WarEffortTypeGroup.Rescue },
             { WarEffortType.SupplyDelivery, WarEffortTypeGroup.Supply },
             { WarEffortType.MissionCompletionGeneric, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionThargoidKill, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionPassengerEvacuation, WarEffortTypeGroup.Mission },
+            { WarEffortType.MissionCompletionRefugeeEvacuation, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionDelivery, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionRescue, WarEffortTypeGroup.Mission },
             { WarEffortType.MissionCompletionSettlementReboot, WarEffortTypeGroup.Mission },
@@ -206,6 +210,18 @@ namespace EDDatabase
 
         [EnumMember(Value = "Thargoid Scythe tissue sample collection")]
         TissueSampleScythe,
+
+        [EnumMember(Value = "Passenger evacuation")]
+        EvacuationPassenger,
+
+        [EnumMember(Value = "Wounded evacuation")]
+        EvacuationWounded,
+
+        [EnumMember(Value = "Refugee evacuation")]
+        EvacuatioRefugee,
+
+        [EnumMember(Value = "Refugee evacuation mission")]
+        MissionCompletionRefugeeEvacuation,
     }
 
     public enum WarEffortTypeGroup : byte

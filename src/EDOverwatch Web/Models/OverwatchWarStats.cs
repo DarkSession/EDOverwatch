@@ -215,6 +215,9 @@ namespace EDOverwatch_Web.Models
                 List<WarEffortType> rescueTypes = new()
                 {
                     WarEffortType.Rescue,
+                    WarEffortType.EvacuationPassenger,
+                    WarEffortType.EvacuationWounded,
+                    WarEffortType.EvacuatioRefugee,
                     WarEffortType.ThargoidBiostorageCapsule,
                 };
 
@@ -225,6 +228,7 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.MissionCompletionRescue,
                     WarEffortType.MissionCompletionThargoidKill,
                     WarEffortType.MissionCompletionPassengerEvacuation,
+                    WarEffortType.MissionCompletionRefugeeEvacuation,
                     WarEffortType.MissionCompletionSettlementReboot,
                     WarEffortType.MissionCompletionThargoidControlledSettlementReboot,
                     WarEffortType.MissionThargoidSpireSiteCollectResources,

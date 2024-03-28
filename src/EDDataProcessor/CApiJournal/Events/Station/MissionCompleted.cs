@@ -51,12 +51,17 @@
                     else if (Name.StartsWith("Mission_TW_Rescue"))
                     {
                         missionWarEffortType = WarEffortType.MissionCompletionRescue;
-                        countWarEffortType = WarEffortType.Rescue;
+                        countWarEffortType = WarEffortType.EvacuationWounded;
                     }
-                    else if (Name.StartsWith("Mission_TW_PassengerEvacuation") || Name.StartsWith("Mission_TW_RefugeeBulk") || Name.StartsWith("Mission_TW_RefugeeVIP"))
+                    else if (Name.StartsWith("Mission_TW_PassengerEvacuation"))
                     {
                         missionWarEffortType = WarEffortType.MissionCompletionPassengerEvacuation;
-                        countWarEffortType = WarEffortType.Rescue;
+                        countWarEffortType = WarEffortType.EvacuationPassenger;
+                    }
+                    else if (Name.StartsWith("Mission_TW_RefugeeBulk") || Name.StartsWith("Mission_TW_RefugeeVIP"))
+                    {
+                        missionWarEffortType = WarEffortType.MissionCompletionRefugeeEvacuation;
+                        countWarEffortType = WarEffortType.EvacuatioRefugee;
                     }
                     else if (Name.StartsWith("Mission_TW_Massacre"))
                     {
@@ -92,22 +97,22 @@
                     await AddOrUpdateWarEffort(journalParameters, commanderMission.System, missionWarEffortType, 1, WarEffortSide.Humans, dbContext, cancellationToken);
                     if (countWarEffortType != null)
                     {
-                        int passengerCount = 0;
+                        int count = 0;
                         if (commanderMission.Count > 0)
                         {
-                            passengerCount = commanderMission.Count;
+                            count = commanderMission.Count;
                         }
                         else if (Count > 0)
                         {
-                            passengerCount = Count;
+                            count = Count;
                         }
                         else if (PassengerCount > 0)
                         {
-                            passengerCount = PassengerCount;
+                            count = PassengerCount;
                         }
-                        if (passengerCount > 0)
+                        if (count > 0)
                         {
-                            await AddOrUpdateWarEffort(journalParameters, commanderMission.System, (WarEffortType)countWarEffortType, passengerCount, WarEffortSide.Humans, dbContext, cancellationToken);
+                            await AddOrUpdateWarEffort(journalParameters, commanderMission.System, (WarEffortType)countWarEffortType, count, WarEffortSide.Humans, dbContext, cancellationToken);
                         }
                     }
                 }

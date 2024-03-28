@@ -125,6 +125,7 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.MissionCompletionRescue,
                     WarEffortType.MissionCompletionThargoidKill,
                     WarEffortType.MissionCompletionPassengerEvacuation,
+                    WarEffortType.MissionCompletionRefugeeEvacuation,
                     WarEffortType.MissionCompletionSettlementReboot,
                     WarEffortType.MissionCompletionThargoidControlledSettlementReboot,
                     WarEffortType.MissionThargoidSpireSiteCollectResources,

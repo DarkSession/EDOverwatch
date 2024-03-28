@@ -232,16 +232,10 @@ export const httpInterceptorProviders = [
       {
         path: 'maelstroms',
         component: MaelstromsComponent,
-        data: {
-          reuseRoute: true,
-        },
       },
       {
         path: 'titans',
         component: MaelstromsComponent,
-        data: {
-          reuseRoute: true,
-        },
       },
       {
         path: 'edmap',

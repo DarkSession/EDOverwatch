@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace EDOverwatch.EstimatedCompletion
 {
@@ -63,42 +62,30 @@ namespace EDOverwatch.EstimatedCompletion
                         .CountAsync(cancellationToken);
                 }
 
-                decimal m = 1m;
-                int i = 0;
-                do
+                decimal predictedDailyProgress = pastDayProgress / 2m + pastHourProgress * 12;
+                if (predictedDailyProgress <= 0)
                 {
-                    i++;
-                    Debug.WriteLine("Using m = " + m);
-                    decimal predictedDailyProgress = pastDayProgress / 2m / m + pastHourProgress * 12 * m;
-                    if (predictedDailyProgress <= 0)
-                    {
-                        titan.CompletionTimeEstimate = null;
-                        break;
-                    }
-                    decimal daysRemaining = remainingProgress / predictedDailyProgress;
-                    if (daysRemaining > 365)
-                    {
-                        titan.CompletionTimeEstimate = null;
-                        break;
-                    }
-                    else
-                    {
-                        if (daysRemaining > 1)
-                        {
-                            decimal d = 3m - daysRemaining * 24m / 8m;
-                            Debug.WriteLine("d = " + d);
-                            if (d > 0 && d - m > 0.25m)
-                            {
-                                m = d;
-                                Debug.WriteLine("m => " + m);
-                                continue;
-                            }
-                        }
-                        titan.CompletionTimeEstimate = DateTimeOffset.UtcNow.AddDays((double)Math.Round(daysRemaining, 4));
-                        break;
-                    }
+                    titan.CompletionTimeEstimate = null;
+                    break;
                 }
-                while (i <= 20);
+                decimal daysRemaining = remainingProgress / predictedDailyProgress;
+                if (daysRemaining > 365)
+                {
+                    titan.CompletionTimeEstimate = null;
+                    break;
+                }
+                else if (daysRemaining <= 0.5m)
+                {
+                    predictedDailyProgress = pastHourProgress * 24;
+                    daysRemaining = remainingProgress / predictedDailyProgress;
+                }
+                if (daysRemaining <= 0m)
+                {
+                    titan.CompletionTimeEstimate = null;
+                    break;
+                }
+
+                titan.CompletionTimeEstimate = DateTimeOffset.UtcNow.AddDays((double)Math.Round(daysRemaining, 4));
             }
 
             await dbContext.SaveChangesAsync(cancellationToken);
