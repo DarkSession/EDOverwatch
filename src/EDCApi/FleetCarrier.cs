@@ -53,8 +53,8 @@ namespace EDCApi
         [JsonProperty("qty")]
         public int Qty { get; set; }
 
-        [JsonProperty("value")]
-        public int Value { get; set; }
+        // [JsonProperty("value")]
+        // public long Value { get; set; }
 
         [JsonProperty("originSystem")]
         public long? OriginSystem { get; set; }
