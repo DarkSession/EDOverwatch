@@ -14,6 +14,7 @@
             string damageResistanceName = systemsThargoidControlled switch
             {
                 >= 0 when heartsRemaining <= 0 => string.Empty,
+                0 => "Completely vulnerable",
                 <= 3 => "Compromised",
                 <= 6 => "Moderate",
                 <= 7 => "High",
