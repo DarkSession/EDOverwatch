@@ -20,7 +20,7 @@
                 {
                     await StartClient();
                     Log.LogWarning("Client stopped...");
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    await Task.Delay(TimeSpan.FromSeconds(2));
                 }
                 catch (Exception e)
                 {
@@ -31,6 +31,7 @@
 
         private async Task WatchClient(Client client, CancellationTokenSource cancellationTokenSource)
         {
+            Log.LogInformation("WatchClient started");
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
                 TimeSpan timeSinceLastMessage = (DateTimeOffset.UtcNow - client.LastMessageReceived);
@@ -46,10 +47,12 @@
 
         private async Task StartClient()
         {
+            Log.LogInformation("Starting new client instance");
             CancellationTokenSource clientCancellationTokenSource = new();
             try
             {
-                using Client client = ServiceProvider.GetRequiredService<Client>();
+                using IServiceScope scope = ServiceProvider.CreateScope();
+                Client client = scope.ServiceProvider.GetRequiredService<Client>();
                 Task watchClientTask = WatchClient(client, clientCancellationTokenSource);
                 Task processTask = client.ProcessAsync(clientCancellationTokenSource.Token);
                 await Task.WhenAny(watchClientTask, processTask);
