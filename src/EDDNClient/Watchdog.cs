@@ -49,19 +49,27 @@
         {
             Log.LogInformation("Starting new client instance");
             CancellationTokenSource clientCancellationTokenSource = new();
+            using IServiceScope scope = ServiceProvider.CreateScope();
+            Client client = scope.ServiceProvider.GetRequiredService<Client>();
+
             try
             {
-                using IServiceScope scope = ServiceProvider.CreateScope();
-                Client client = scope.ServiceProvider.GetRequiredService<Client>();
                 Task watchClientTask = WatchClient(client, clientCancellationTokenSource);
                 Task processTask = client.ProcessAsync(clientCancellationTokenSource.Token);
                 await Task.WhenAny(watchClientTask, processTask);
+                Log.LogWarning("Watchdog or client condition met.");
             }
             catch (Exception e)
             {
                 Log.LogError(e, "Client exception");
+            }
+            finally
+            {
+
                 clientCancellationTokenSource.Cancel();
             }
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
         }
     }
 }

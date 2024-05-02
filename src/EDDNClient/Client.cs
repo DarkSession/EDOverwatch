@@ -47,20 +47,21 @@ namespace EDDNClient
             {
                 Log.LogInformation("Starting client");
 
-                Endpoint activeMqEndpont = Endpoint.Create(
+                Endpoint activeMqEndpoint = Endpoint.Create(
                    Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
                    Configuration.GetValue<int?>("ActiveMQ:Port") ?? throw new Exception("No ActiveMQ port configured"),
                    Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
                    Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
 
                 ConnectionFactory connectionFactory = new();
-                await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpont, cancellationToken);
+                await using IConnection connection = await connectionFactory.CreateAsync(activeMqEndpoint, cancellationToken);
                 await using IProducer producer = await connection.CreateProducerAsync("EDDN", RoutingType.Anycast, cancellationToken);
 
+                Log.LogInformation("Starting NetMQ...");
                 using NetMQRuntime runtime = new();
                 runtime.Run(cancellationToken, ReceiveData(producer, cancellationToken));
-                Log.LogInformation("Client started");
-                await Task.Delay(Timeout.Infinite, cancellationToken);
+
+                await Task.Delay(TimeSpan.FromSeconds(1), CancellationToken.None);
             }
             catch (Exception e)
             {
@@ -68,7 +69,7 @@ namespace EDDNClient
             }
         }
 
-        private async Task ReceiveData(IProducer producer, CancellationToken cancellationToken)
+        private async Task ReceiveData(IProducer producer, CancellationToken cancellationToken = default)
         {
             SubscriberSocket.Connect(EDDNAddress);
             SubscriberSocket.SubscribeToAnyTopic();
