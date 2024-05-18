@@ -2,9 +2,9 @@
     'eliminated': attacker.StarSystem.StateProgress.IsCompleted || !attacker.IsActive,
     'locked': attacker.StarSystem.ThargoidSpireSiteInSystem
 }">
-    <span class="clickable" [routerLink]="['/system', attacker.StarSystem.SystemAddress]">
+    <a [routerLink]="['/system', attacker.StarSystem.SystemAddress]">
         {{ attacker.StarSystem.Name }}
-    </span>
+    </a>
     <fa-icon [icon]="faPeopleGroup" *ngIf="attacker.StarSystem.PopulationOriginal > 0"
         matTooltip="Formerly populated"></fa-icon>
     <ng-container *ngIf="attacker.StarSystem.ThargoidSpireSiteInSystem">

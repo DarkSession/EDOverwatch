@@ -105,6 +105,12 @@ mat-form-field {
     justify-content: center;
 }
 
+.feature-box-disabled {
+    color: red;
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
 .features {
     display: flex;
     gap: 8px;

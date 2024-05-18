@@ -5,9 +5,9 @@
             <ng-container matColumnDef="Name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
                 <td mat-cell *matCellDef="let row" class="nowrap">
-                    <span class="clickable" [routerLink]="['/system', row.SystemAddress]">
+                    <a [routerLink]="['/system', row.SystemAddress]">
                         {{ row.Name }}
-                    </span>
+                    </a>
                     <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
                         (click)="copySystemName(row)"></fa-icon>
                 </td>

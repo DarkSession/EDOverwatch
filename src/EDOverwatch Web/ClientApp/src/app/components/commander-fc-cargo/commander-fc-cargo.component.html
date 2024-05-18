@@ -37,9 +37,9 @@
                 <ng-container matColumnDef="SystemName">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Origin</th>
                     <td mat-cell *matCellDef="let row">
-                        <span class="clickable" [routerLink]="['/system', row.StarSystem.SystemAddress]">
+                        <a [routerLink]="['/system', row.StarSystem.SystemAddress]">
                             {{ row.StarSystem.Name }}
-                        </span>
+                        </a>
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="SystemState">

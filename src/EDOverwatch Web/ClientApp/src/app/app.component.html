@@ -58,13 +58,13 @@
     <mat-sidenav #sidenav mode="side" [opened]="appService.isMenuOpen" (openedChange)="menuOpenChanged($event)"
       [mode]="sideNavMode" class="side-nav">
       <div class="side-nav-title" style="margin-top: 0px;">The War</div>
-      <div routerLink="/" class="clickable">
+      <a routerLink="/">
         <div class="side-nav-icon">
           <fa-icon [icon]="faSolarSystem" size="xl"></fa-icon>
         </div>
         <div>Systems</div>
-      </div>
-      <div routerLink="titans" class="clickable">
+      </a>
+      <a routerLink="titans">
         <div class="side-nav-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 20px; height: 20px;">
             <!--! Font Awesome Pro 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
@@ -75,8 +75,8 @@
           </svg>
         </div>
         <div>Titans</div>
-      </div>
-      <div routerLink="spire-sites" class="clickable">
+      </a>
+      <a routerLink="spire-sites">
         <div class="side-nav-icon">
           <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;">
             <path fill="currentColor" stroke="currentColor"
@@ -90,71 +90,71 @@
           </svg>
         </div>
         <div>Spire Sites</div>
-      </div>
-      <div routerLink="operations" class="clickable">
+      </a>
+      <a routerLink="operations">
         <div class="side-nav-icon">
           <fa-icon [icon]="faHandshake" size="xl"></fa-icon>
         </div>
         <div>Active operations</div>
-      </div>
-      <div routerLink="stats" class="clickable">
+      </a>
+      <a routerLink="stats">
         <div class="side-nav-icon">
           <fa-icon [icon]="faChartSimple" size="xl"></fa-icon>
         </div>
         <div>Stats</div>
-      </div>
-      <div class="hide-on-mobile" routerLink="edmap/current" class="clickable">
+      </a>
+      <a class="hide-on-mobile" routerLink="edmap/current">
         <div class="side-nav-icon">
           <fa-icon [icon]="faMapLocation" size="xl"></fa-icon>
         </div>
         <div>Map (current situation)</div>
-      </div>
+      </a>
       <div class="side-nav-title">Community</div>
-      <div routerLink="contribute" class="clickable">
+      <a routerLink="contribute">
         <div class="side-nav-icon">
           <fa-icon [icon]="faHandsHoldingDiamond" size="xl"></fa-icon>
         </div>
         <div>Contribute</div>
-      </div>
-      <div routerLink="join-the-fight" class="clickable">
+      </a>
+      <a routerLink="join-the-fight">
         <div class="side-nav-icon">
           <fa-icon [icon]="faUsers" size="xl"></fa-icon>
         </div>
         <div>Join the fight!</div>
-      </div>
+      </a>
       <div class="side-nav-title">Past &amp; Future</div>
-      <div routerLink="systems-cycle" class="clickable">
+      <a routerLink="systems-cycle">
         <div class="side-nav-icon">
           <fa-icon [icon]="faTimelineArrow" size="xl"></fa-icon>
         </div>
         <div>Past Cycles</div>
-      </div>
-      <div routerLink="alert-predictions" class="clickable">
+      </a>
+      <a routerLink="alert-predictions">
         <div class="side-nav-icon">
           <fa-icon [icon]="faCrystalBall" size="xl"></fa-icon>
         </div>
         <div>Alert Predictions</div>
-      </div>
-      <div class="hide-on-mobile" routerLink="edmap/historical" class="clickable">
+      </a>
+      <a class="hide-on-mobile" routerLink="edmap/historical">
         <div class="side-nav-icon">
           <fa-icon [icon]="faMapLocation" size="xl"></fa-icon>
         </div>
         <div>Map (historical)</div>
-      </div>
+      </a>
       <ng-container *ngIf="appService.user">
         <div class="side-nav-title">My Commander</div>
-        <div routerLink="my-efforts" class="clickable">
+        <a routerLink="my-efforts">
           <div class="side-nav-icon">
             <fa-icon [icon]="faSwords" size="xl"></fa-icon>
           </div>
           <div>War contributions</div>
-        </div>
-        <div routerLink="commander/fleet-carrier-cargo" class="clickable">
+        </a>
+        <a routerLink="commander/fleet-carrier-cargo">
           <div class="side-nav-icon">
             <fa-icon [icon]="faContainerStorage" size="xl"></fa-icon>
           </div>
           <div>Fleet carrier cargo</div>
-        </div>
+        </a>
       </ng-container>
       <div class="side-nav-title">Boring Stuff</div>
       <a href="/api/swagger/index.html" target="_blank">
@@ -163,12 +163,12 @@
         </div>
         <div>API / Swagger</div>
       </a>
-      <div routerLink="about" class="clickable">
+      <a routerLink="about">
         <div class="side-nav-icon">
           <fa-icon [icon]="faHandWave" size="xl"></fa-icon>
         </div>
         <div>About</div>
-      </div>
+      </a>
     </mat-sidenav>
     <mat-sidenav-content>
       <div *ngIf="showAnnouncement" class="information-message">

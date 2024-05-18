@@ -1,7 +1,9 @@
 <div *ngIf="warEffortCycleStarSystem">
-    <div class="subtitle clickable" [routerLink]="[ '/system', warEffortCycleStarSystem.StarSystem.SystemAddress ]">
-        {{ warEffortCycleStarSystem.StarSystem.Name }}
-    </div>
+    <a [routerLink]="[ '/system', warEffortCycleStarSystem.StarSystem.SystemAddress ]">
+        <div class="subtitle">
+            {{ warEffortCycleStarSystem.StarSystem.Name }}
+        </div>
+    </a>
     <table class="info-table">
         <tbody>
             <tr>
@@ -13,8 +15,7 @@
                         ({{ warEffortCycleStarSystem.StarSystem.StateProgress.ProgressPercent | percent:'1.0-0' }})
                     </span>
                     <span class="progress-locked" *ngIf="warEffortCycleStarSystem.StarSystem.ThargoidSpireSiteInSystem">
-                        <fa-icon [icon]="faHexagonExclamation"
-                            matTooltip="Thargoid spire site present in the system."
+                        <fa-icon [icon]="faHexagonExclamation" matTooltip="Thargoid spire site present in the system."
                             size="lg"></fa-icon>
                     </span>
                 </td>

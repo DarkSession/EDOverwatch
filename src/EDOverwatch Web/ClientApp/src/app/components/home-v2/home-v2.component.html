@@ -121,14 +121,18 @@
                                         'content-inactive': !featuresSelected.includes('ImperialFaction')
                                     }" />
                                 </div>
-                                <div class="feature-box">
+                                <div class="feature-box feature-box-disabled">
+                                    <!--
                                     <span class="clickable"
                                         (click)="toggleFeature('ThargoidControlledReactivationMissions')" [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('ThargoidControlledReactivationMissions')
                                     }">
                                         <fa-icon [icon]="faBolt" size="xl"
-                                            matTooltip="AX reactivation missions available"></fa-icon>
+                                            matTooltip="AX reactivation missions - Currently not available in-game"></fa-icon>
                                     </span>
+                                    -->
+                                    <fa-icon [icon]="faBolt" size="xl"
+                                        matTooltip="AX reactivation missions - Currently not available in-game"></fa-icon>
                                 </div>
                                 <div class="feature-box">
                                     <span class="clickable" (click)="toggleFeature('Counterstrike')" [ngClass]="{

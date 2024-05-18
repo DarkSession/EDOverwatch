@@ -33,7 +33,11 @@ h3 {
   outline: 0;
 }
 
-a,
+a {
+  color: unset;
+  text-decoration: none !important;
+}
+
 .link {
   color: #fbd7b4;
 }

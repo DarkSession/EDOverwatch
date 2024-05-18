@@ -11,9 +11,9 @@
                             <tr>
                                 <td><b>System</b></td>
                                 <td>
-                                    <span class="clickable" [routerLink]="['/system', maelstrom.SystemAddress]">
+                                    <a [routerLink]="['/system', maelstrom.SystemAddress]">
                                         {{ maelstrom.SystemName }}
-                                    </span>
+                                    </a>
                                 </td>
                             </tr>
                             <tr *ngIf="maelstrom.DamageResistance?.Name">
