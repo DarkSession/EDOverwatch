@@ -7,8 +7,8 @@ namespace EDOverwatchAlertPrediction
     {
         private int Cycle { get; }
         private ThargoidCycle ThargoidCycle { get; }
-        private List<StarSystemCycleState> PrimaryAttackerSystems { get; } = new();
-        private List<EDDatabase.AlertPrediction> UsedAlertPredictions { get; } = new();
+        private List<StarSystemCycleState> PrimaryAttackerSystems { get; } = [];
+        private List<EDDatabase.AlertPrediction> UsedAlertPredictions { get; } = [];
 
         enum AttackMode : byte
         {
@@ -74,7 +74,7 @@ namespace EDOverwatchAlertPrediction
 
             foreach (ThargoidMaelstrom maelstrom in maelstroms)
             {
-                List<Attack> possibleAttacks = new();
+                List<Attack> possibleAttacks = [];
 
                 foreach (StarSystemCycleState attackingSystem in possibleAttackers.Where(p => p.Maelstrom == maelstrom.Name))
                 {
@@ -100,7 +100,7 @@ namespace EDOverwatchAlertPrediction
                     .Max();
 
                 {
-                    List<Attack> attackList = possibleAttacks.OrderBy(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!)).ToList();
+                    List<Attack> attackList = [.. possibleAttacks.OrderBy(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!))];
                     foreach (Attack attack in attackList)
                     {
                         int attackCost = attack.VictimSystem.AttackCost();
@@ -131,14 +131,14 @@ namespace EDOverwatchAlertPrediction
                     }
                 }
 
-                if (attackMode == AttackMode.NearestAttacksFurthest && possibleAttacks.Any())
+                if (attackMode == AttackMode.NearestAttacksFurthest && possibleAttacks.Count != 0)
                 {
                     IEnumerable<StarSystemCycleState> remainingAttackers = possibleAttacks
                         .SelectMany(p => p.Attackers)
                         .DistinctBy(a => a.SystemAddress)
                         .Where(p => !PrimaryAttackerSystems.Contains(p))
                         .OrderBy(a => a.DistanceTo(maelstrom.StarSystem!));
-                    List<long> skippedAttacks = new();
+                    List<long> skippedAttacks = [];
                     int backtracks = 0;
                     foreach (StarSystemCycleState remainingAttacker in remainingAttackers)
                     {
@@ -182,7 +182,7 @@ namespace EDOverwatchAlertPrediction
                         possibleAttacks.Remove(attack);
                     }
 
-                    List<Attack> remainingAttackList = possibleAttacks.OrderBy(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!)).ToList();
+                    List<Attack> remainingAttackList = [.. possibleAttacks.OrderBy(p => p.VictimSystem.DistanceTo(maelstrom.StarSystem!))];
                     foreach (Attack attack in remainingAttackList)
                     {
                         order++;
@@ -215,7 +215,7 @@ namespace EDOverwatchAlertPrediction
                 {
                     Cycle = ThargoidCycle,
                     Maelstrom = maelstrom,
-                    Attackers = new(),
+                    Attackers = [],
                 };
                 dbContext.AlertPredictions.Add(systemAlertPrediction);
             }
@@ -225,12 +225,14 @@ namespace EDOverwatchAlertPrediction
 
             UsedAlertPredictions.Add(systemAlertPrediction);
 
-            List<AlertPredictionAttacker> usedAttackers = new();
+            List<AlertPredictionAttacker> usedAttackers = [];
+#pragma warning disable IDE0305 // Simplify collection initialization
             List<StarSystemCycleState> attackers = attack.Attackers
                 .OrderBy(PrimaryAttackerSystems.Contains)
                 .ThenByDescending(a => a.SystemAddress == primaryAttacker?.SystemAddress)
                 .ThenBy(a => a.DistanceTo(maelstrom.StarSystem!))
                 .ToList();
+#pragma warning restore IDE0305 // Simplify collection initialization
             int attackerOrder = 0;
             foreach (StarSystemCycleState attacker in attackers)
             {

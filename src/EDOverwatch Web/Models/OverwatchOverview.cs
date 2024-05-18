@@ -8,7 +8,7 @@ namespace EDOverwatch_Web.Models
         public OverwatchOverviewHuman? Humans { get; set; }
         public OverwatchOverviewThargoids? Thargoids { get; set; }
         public OverwatchOverviewContested? Contested { get; set; }
-        public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
+        public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = [];
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }
 
         protected OverwatchOverview(List<OverwatchThargoidCycle> thargoidCycles)
@@ -104,8 +104,8 @@ namespace EDOverwatch_Web.Models
                         s.Population > 0)
                     .CountAsync(cancellationToken);
 
-                List<WarEffortType> warEffortTypeKills = new()
-                {
+                List<WarEffortType> warEffortTypeKills =
+                [
                     WarEffortType.KillGeneric,
                     WarEffortType.KillThargoidScout,
                     WarEffortType.KillThargoidCyclops,
@@ -116,10 +116,10 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.KillThargoidHunter,
                     WarEffortType.KillThargoidRevenant,
                     WarEffortType.KillThargoidBanshee,
-                };
+                ];
 
-                List<WarEffortType> warEffortTypeMissions = new()
-                {
+                List<WarEffortType> warEffortTypeMissions =
+                [
                     WarEffortType.MissionCompletionGeneric,
                     WarEffortType.MissionCompletionDelivery,
                     WarEffortType.MissionCompletionRescue,
@@ -130,10 +130,10 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.MissionCompletionThargoidControlledSettlementReboot,
                     WarEffortType.MissionThargoidSpireSiteCollectResources,
                     WarEffortType.MissionThargoidSpireSiteSabotage,
-                };
+                ];
 
-                List<WarEffortType> recoveryTypes = new()
-                {
+                List<WarEffortType> recoveryTypes =
+                [
                     WarEffortType.Recovery,
                     WarEffortType.ThargoidProbeCollection,
                     WarEffortType.TissueSampleScout,
@@ -150,7 +150,7 @@ namespace EDOverwatch_Web.Models
                     WarEffortType.ThargoidBiostorageCapsule,
                     WarEffortType.ThargoidImpureSpireMineral,
                     WarEffortType.ThargoidSemiRefinedSpireMineral,
-                };
+                ];
 
                 result.Humans = new(
                     Math.Round((double)humansSystemsControlling / (double)relevantSystemCount, 4),

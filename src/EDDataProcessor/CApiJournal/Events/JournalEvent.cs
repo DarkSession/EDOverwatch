@@ -101,7 +101,7 @@
 
         public void AddWarEffortSystemAddress(long systemAddress)
         {
-            WarEffortsUpdatedSystemAddresses ??= new();
+            WarEffortsUpdatedSystemAddresses ??= [];
             WarEffortsUpdatedSystemAddresses.Add(systemAddress);
         }
 

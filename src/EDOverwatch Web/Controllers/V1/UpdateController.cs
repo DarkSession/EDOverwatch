@@ -23,7 +23,7 @@ namespace EDOverwatch_Web.Controllers.V1
         [HttpGet]
         public async Task<List<OverwatchStarSystemMin>> PossibleNewSystems(CancellationToken cancellationToken)
         {
-            List<OverwatchStarSystemMin> result = new();
+            List<OverwatchStarSystemMin> result = [];
             ThargoidCycle thargoidCycle = await DbContext.GetThargoidCycle(cancellationToken);
 
             List<AlertPrediction> alertPredictions = await DbContext.AlertPredictions

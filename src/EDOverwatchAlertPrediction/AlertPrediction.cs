@@ -30,7 +30,7 @@ namespace EDOverwatchAlertPrediction
                 .Where(a => a.Cycle == thargoidCycle)
                 .ToListAsync(cancellationToken);
 
-            List<StarSystem> usedAttackers = new();
+            List<StarSystem> usedAttackers = [];
 
             foreach (EDDatabase.AlertPrediction alertPrediction in alertPredictions)
             {

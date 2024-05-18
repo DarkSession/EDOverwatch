@@ -28,7 +28,7 @@ namespace EDDataProcessor.EDDN
                 case JournalMessageEvent.CarrierJump:
                 case JournalMessageEvent.Location:
                     {
-                        List<double> starPos = Message.StarPos?.ToList() ?? new();
+                        List<double> starPos = Message.StarPos?.ToList() ?? [];
                         if (starPos.Count != 3)
                         {
                             break;
@@ -66,7 +66,7 @@ namespace EDDataProcessor.EDDN
                                 created: Message.Timestamp,
                                 updated: Message.Timestamp)
                             {
-                                MinorFactionPresences = new(),
+                                MinorFactionPresences = [],
                             };
                             starSystem.UpdateWarRelevantSystem();
                             dbContext.StarSystems.Add(starSystem);
@@ -115,7 +115,7 @@ namespace EDDataProcessor.EDDN
                                 starSystem.PopulationMin = population;
                                 changed = true;
                             }
-                            if (Message.Factions?.Any() ?? false)
+                            if (Message.Factions is not null && Message.Factions.Count != 0)
                             {
                                 foreach (FSDJumpFaction faction in Message.Factions.Where(f => !string.IsNullOrEmpty(f.Allegiance)))
                                 {
@@ -354,7 +354,7 @@ namespace EDDataProcessor.EDDN
 
         /// <summary>Must be added by the sender if not present in the journal event</summary>
         [JsonProperty("StarPos", Required = Required.Always)]
-        public ICollection<double> StarPos { get; set; } = new System.Collections.ObjectModel.Collection<double>();
+        public ICollection<double> StarPos { get; set; } = [];
 
         /// <summary>Should be added by the sender if not present in the journal event</summary>
         [JsonProperty("SystemAddress", Required = Required.Always)]

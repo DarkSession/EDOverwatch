@@ -168,7 +168,7 @@ namespace EDOverwatch
                                     List<string> similarStarSystemNames = allStarSystems
                                         .Where(a => StringUtil.ComputeSimilarity(a, starSystemThargoidManualUpdate.SystemName) <= 1)
                                         .ToList();
-                                    if (similarStarSystemNames.Any())
+                                    if (similarStarSystemNames.Count != 0)
                                     {
                                         Log.LogWarning("Found {count} similar star system names", similarStarSystemNames.Count);
                                         if (similarStarSystemNames.Count == 1)
@@ -482,7 +482,7 @@ namespace EDOverwatch
                 }
             }
 
-            if (thargoidMaelstromHistoricalCycleSummaries.Any())
+            if (thargoidMaelstromHistoricalCycleSummaries.Count != 0)
             {
                 dbContext.ThargoidMaelstromHistoricalSummaries.RemoveRange(thargoidMaelstromHistoricalCycleSummaries);
             }
@@ -523,7 +523,7 @@ namespace EDOverwatch
                 .Where(s => s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled && s.Stations!.Any(s => s.Type!.Name == StationType.OdysseySettlementType && s.PrimaryEconomy!.Name == Economy.Military))
                 .ToListAsync(cancellationToken);
 
-            List<long> applicableSystems = new();
+            List<long> applicableSystems = [];
             decimal maxDistance = 20m;
 
             foreach (StarSystem thargoidControlledWithMilitarySettlement in thargoidControlledWithMilitarySettlements)

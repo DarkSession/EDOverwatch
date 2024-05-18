@@ -62,7 +62,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     created: Timestamp,
                     updated: Timestamp)
                 {
-                    MinorFactionPresences = new(),
+                    MinorFactionPresences = [],
                 };
                 starSystem.UpdateWarRelevantSystem();
                 dbContext.StarSystems.Add(starSystem);
@@ -111,7 +111,7 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     starSystem.PopulationMin = population;
                     changed = true;
                 }
-                if (Factions?.Any() ?? false)
+                if (Factions is not null && Factions.Count != 0)
                 {
                     foreach (FSDJumpFaction faction in Factions.Where(f => !string.IsNullOrEmpty(f.Allegiance)))
                     {

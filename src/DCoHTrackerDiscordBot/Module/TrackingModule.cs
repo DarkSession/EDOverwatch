@@ -276,11 +276,11 @@ namespace DCoHTrackerDiscordBot.Module
             };
         }
 
-        public static Dictionary<string, List<string>> SystemsByTitan { get; private set; } = new();
-        public static List<string> Systems { get; private set; } = new();
+        public static Dictionary<string, List<string>> SystemsByTitan { get; private set; } = [];
+        public static List<string> Systems { get; private set; } = [];
         public static async Task UpdateSystems(EdDbContext dbContext)
         {
-            Dictionary<string, List<string>> systems = new();
+            Dictionary<string, List<string>> systems = [];
             List<StarSystem> starSystems = await dbContext.StarSystems
                 .AsNoTracking()
                 .Include(s => s.ThargoidLevel)
@@ -301,7 +301,7 @@ namespace DCoHTrackerDiscordBot.Module
                 }
                 else
                 {
-                    systems[starSystem.ThargoidLevel.Maelstrom.Name] = new() { starSystem.Name };
+                    systems[starSystem.ThargoidLevel.Maelstrom.Name] = [starSystem.Name];
                 }
             }
             SystemsByTitan = systems;
@@ -354,7 +354,7 @@ namespace DCoHTrackerDiscordBot.Module
                             .ToListAsync();
                     }
                 }
-                systemList ??= new();
+                systemList ??= [];
                 // max - 25 suggestions at a time (API limit)
                 return AutocompletionResult.FromSuccess(systemList.Select(s => new AutocompleteResult(s, s)).Take(25));
             }
@@ -364,7 +364,7 @@ namespace DCoHTrackerDiscordBot.Module
         {
             public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
             {
-                List<string> result = new();
+                List<string> result = [];
                 string? systemName = autocompleteInteraction.Data.Options.FirstOrDefault(o => o.Name == "system")?.Value as string;
                 if (!string.IsNullOrWhiteSpace(systemName) && systemName.Length > 2 && autocompleteInteraction.Data.Current.Value is string value && value.Length > 0)
                 {
@@ -400,7 +400,7 @@ namespace DCoHTrackerDiscordBot.Module
             }
         }
 
-        public static List<string> Titans { get; set; } = new();
+        public static List<string> Titans { get; set; } = [];
         public static async Task UpdateTitans(EdDbContext dbContext)
         {
             Titans = await dbContext.ThargoidMaelstroms

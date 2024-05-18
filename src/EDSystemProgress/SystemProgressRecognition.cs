@@ -12,8 +12,8 @@ namespace EDSystemProgress
 {
     public static partial class SystemProgressRecognition
     {
-        private static List<ColorRange> InvasionProgressColors { get; } = new()
-        {
+        private static List<ColorRange> InvasionProgressColors { get; } =
+        [
             // Bar
             new ColorRange(25, 45, 25, 45, 25, 45),
             new ColorRange(30, 40, 10, 25, 20, 25),
@@ -37,10 +37,10 @@ namespace EDSystemProgress
             new ColorRange(120, 140, 120, 140, 110, 140),
             new ColorRange(140, 170, 140, 170, 140, 170),
             new ColorRange(230, 255, 230, 255, 230, 255),
-        };
+        ];
 
-        private static List<ColorRange> InvasionRemainingColors { get; } = new()
-        {
+        private static List<ColorRange> InvasionRemainingColors { get; } =
+        [
             new ColorRange(5, 15, 20, 50, 0, 10),
             new ColorRange(10, 20, 18, 30, 0, 5),
             new ColorRange(15, 30, 24, 50, 0, 15),
@@ -48,10 +48,10 @@ namespace EDSystemProgress
             new ColorRange(20, 25, 20, 25, 0, 0),
             new ColorRange(50, 70, 60, 100, 0, 35),
             new ColorRange(20, 60, 45, 100, 0, 35),
-        };
+        ];
 
-        private static List<ColorRange> AlertProgressColors { get; } = new()
-        {
+        private static List<ColorRange> AlertProgressColors { get; } =
+        [
             new ColorRange(140, 160, 140, 160, 110, 160),
             new ColorRange(150, 170, 150, 180, 120, 170),
             new ColorRange(160, 180, 160, 180, 130, 180),
@@ -67,14 +67,14 @@ namespace EDSystemProgress
             new ColorRange(190, 205, 170, 195, 160, 240),
             new ColorRange(210, 240, 190, 230, 180, 210),
             new ColorRange(240, 255, 220, 235, 210, 225),
-        };
+        ];
 
-        private static List<ColorRange> AlertRemainingColors { get; } = new()
-        {
+        private static List<ColorRange> AlertRemainingColors { get; } =
+        [
             new ColorRange(100, 130, 30, 50, 0, 20),
             new ColorRange(120, 180, 45, 102, 0, 47),
             new ColorRange(220, 255, 100, 125, 0, 5),
-        };
+        ];
 
         public static async Task<ExtractSystemProgressResult> ExtractSystemProgress(MemoryStream imageContent, ILogger log)
         {
@@ -657,8 +657,8 @@ namespace EDSystemProgress
         }
 
         // Manually fixing some stuff until a better solution is found...
-        private static Dictionary<string, string> SystemNameCorrections { get; } = new()
-        {
+        private static Dictionary<string, string> SystemNameCorrections { get; } =
+        [
             /*
             { "ARIETIS SECTOR AG-P B5-0", "ARIETIS SECTOR AQ-P B5-0" },
             { "OBASSI 0SAW", "OBASSI OSAW" },
@@ -680,7 +680,7 @@ namespace EDSystemProgress
             { "PEGASI SECTOR GE-N A8-0", "PEGASI SECTOR QE-N A8-0" },
             { "Bl DHORORA", "BI DHORORA" },
             */
-        };
+        ];
 
         [GeneratedRegex("IN ((\\d{0,1})W|)\\s{0,}((\\d{0,1})D|)$", RegexOptions.IgnoreCase, "en-CH")]
         private static partial Regex DurationRegex();

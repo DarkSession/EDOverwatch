@@ -43,7 +43,7 @@ namespace EDOverwatch_Web.Controllers.V1
         public string Name { get; set; }
         public string Description { get; set; }
         public string Url { get; set; }
-        public Dictionary<string, ApiDiscoveryEvent> Events { get; } = new();
+        public Dictionary<string, ApiDiscoveryEvent> Events { get; } = [];
         public ApiDiscoveryEndpoints Endpoints { get; } = new();
 
         public ApiDiscovery(string name, string description, string url)
@@ -68,7 +68,7 @@ namespace EDOverwatch_Web.Controllers.V1
 
         public ApiDiscoveryEvent AddFilter(string fieldName, string regexFilter)
         {
-            Filters ??= new();
+            Filters ??= [];
             Filters[fieldName] = regexFilter;
             return this;
         }

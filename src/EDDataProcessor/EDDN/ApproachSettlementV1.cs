@@ -94,7 +94,7 @@ namespace EDDataProcessor.EDDN
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.MinLength(3)]
         [System.ComponentModel.DataAnnotations.MaxLength(3)]
-        public ICollection<double> StarPos { get; set; } = new System.Collections.ObjectModel.Collection<double>();
+        public ICollection<double> StarPos { get; set; } = [];
 
         [JsonProperty("SystemAddress", Required = Required.Always)]
         public long SystemAddress { get; set; }

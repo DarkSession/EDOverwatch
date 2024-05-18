@@ -10,14 +10,14 @@ namespace EDDataProcessor.CApiJournal
         private IConfiguration Configuration { get; }
         private IServiceProvider ServiceProvider { get; }
         private ILogger Log { get; }
-        private Dictionary<string, Type> JournalEvents { get; } = new();
+        private Dictionary<string, Type> JournalEvents { get; } = [];
 
         public JournalProcessor(IConfiguration configuration, IServiceProvider serviceProvider, ILogger<JournalProcessor> log)
         {
             Configuration = configuration;
             ServiceProvider = serviceProvider;
             Log = log;
-            Dictionary<string, Type> capiEvents = new();
+            Dictionary<string, Type> capiEvents = [];
             foreach (Type journalEventType in GetType().Assembly
                                     .GetTypes()
                                     .Where(t => t.IsClass && !t.IsAbstract && typeof(JournalEvent).IsAssignableFrom(t)))
@@ -82,7 +82,7 @@ namespace EDDataProcessor.CApiJournal
             {
                 return;
             }
-            List<long> warEffortsUpdatedSystemAddresses = new();
+            List<long> warEffortsUpdatedSystemAddresses = [];
             {
                 List<CommanderDeferredJournalEvent> commanderDeferredJournalEvents = await dbContext.CommanderDeferredJournalEvents
                      .Where(c => c.Commander == commander && c.Status == CommanderDeferredJournalEventStatus.Pending)
@@ -105,7 +105,7 @@ namespace EDDataProcessor.CApiJournal
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
 
-            if (warEffortsUpdatedSystemAddresses.Any())
+            if (warEffortsUpdatedSystemAddresses.Count != 0)
             {
                 foreach (long systemAddress in warEffortsUpdatedSystemAddresses.Distinct())
                 {
@@ -170,7 +170,7 @@ namespace EDDataProcessor.CApiJournal
                             commander.JournalDay = journalDay;
                         }
                     }
-                    if (warEffortsUpdatedSystemAddresses.Any())
+                    if (warEffortsUpdatedSystemAddresses.Count != 0)
                     {
                         foreach (long systemAddress in warEffortsUpdatedSystemAddresses.Distinct())
                         {
@@ -300,7 +300,7 @@ namespace EDDataProcessor.CApiJournal
             using StringReader strReader = new(journal);
 
             int currentLine = 0;
-            List<long> warEffortsUpdatedSystemAddresses = new();
+            List<long> warEffortsUpdatedSystemAddresses = [];
             string? journalLine;
             do
             {

@@ -41,11 +41,9 @@ namespace EDOverwatch_Web
                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKeyAuthentication", null)
                 .AddScheme<AuthenticationSchemeOptions, CommanderApiKeyAuthenticationHandler>("CommanderApiKeyAuthenticationHandler", null);
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("DataUpdate", policy => policy.RequireClaim("DataUpdate"));
-                options.AddPolicy("FactionUpdate", policy => policy.RequireClaim("FactionUpdate"));
-            });
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("DataUpdate", policy => policy.RequireClaim("DataUpdate"))
+                .AddPolicy("FactionUpdate", policy => policy.RequireClaim("FactionUpdate"));
 
             // Add services to the container.
             builder.Services.AddControllers()
@@ -63,7 +61,7 @@ namespace EDOverwatch_Web
                 });
             });
 
-            List<string> origins = (builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty).Split(",").ToList();
+            List<string> origins = [.. (builder.Configuration.GetValue<string>("HTTP:CorsOrigin") ?? string.Empty).Split(",")];
 
             ActiveMQ.Artemis.Client.Endpoint activeMqEndpont = ActiveMQ.Artemis.Client.Endpoint.Create(
                 builder.Configuration.GetValue<string>("ActiveMQ:Host") ?? throw new Exception("No ActiveMQ host configured"),
@@ -71,7 +69,7 @@ namespace EDOverwatch_Web
                 builder.Configuration.GetValue<string>("ActiveMQ:Username") ?? string.Empty,
                 builder.Configuration.GetValue<string>("ActiveMQ:Password") ?? string.Empty);
 
-            builder.Services.AddActiveMq("DN", new[] { activeMqEndpont })
+            builder.Services.AddActiveMq("DN", [activeMqEndpont])
                 .AddAnonymousProducer<ActiveMqMessageProducer>();
             builder.Services.AddActiveMqHostedService();
             builder.Services.AddDbContext<EdDbContext>(optionsBuilder =>
@@ -98,7 +96,7 @@ namespace EDOverwatch_Web
                 options.AddDefaultPolicy(
                     corsBuilder =>
                     {
-                        corsBuilder.WithOrigins(origins.ToArray())
+                        corsBuilder.WithOrigins([.. origins])
                                 .AllowCredentials()
                                 .WithMethods(HttpMethods.Post, HttpMethods.Get, HttpMethods.Options)
                                 .WithHeaders("content-type", "content-length");
@@ -155,12 +153,12 @@ namespace EDOverwatch_Web
 
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src https://discord.com;");
+                context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src https://discord.com;");
                 // trusted-types angular angular#bundler; require-trusted-types-for 'script';
-                context.Response.Headers.Add("X-Frame-Options", "deny");
-                context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
-                context.Response.Headers.Add("Referrer-Policy", "strict-origin");
-                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                context.Response.Headers.Append("X-Frame-Options", "deny");
+                context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+                context.Response.Headers.Append("Referrer-Policy", "strict-origin");
+                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
                 await next();
             });
 
