@@ -12,7 +12,7 @@ namespace EDOverwatch_Web.Models
         public OverwatchAlertPredictions(ThargoidCycle thargoidCycle, List<ThargoidMaelstrom> maelstroms, List<AlertPrediction> alertPredictions, List<AlertPredictionCycleAttacker> alertPredictionCycleAttackers)
         {
             Cycle = new(thargoidCycle);
-            Maelstroms = new();
+            Maelstroms = [];
             foreach (ThargoidMaelstrom maelstrom in maelstroms)
             {
                 List<AlertPrediction> systems = alertPredictions

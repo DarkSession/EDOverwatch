@@ -56,12 +56,14 @@ namespace EDOverwatch_Web.Models
         public CommandWarEffortCycle(OverwatchThargoidCycle thargoidCycle, IEnumerable<EDDatabase.WarEffort> cycleWarEfforts)
         {
             ThargoidCycle = thargoidCycle;
+#pragma warning disable IDE0305 // Simplify collection initialization
             StarSystems = cycleWarEfforts
                 .GroupBy(c => c.StarSystemId)
                 .Select(c => new CommanderWarEffortCycleStarSystem(c.First().StarSystem!, c))
                 .OrderByDescending(c => c.WarEfforts.Max(w => w.Date))
                 .ThenByDescending(c => c.WarEfforts.Max(w => w.Id))
                 .ToList();
+#pragma warning restore IDE0305 // Simplify collection initialization
         }
     }
 

@@ -48,8 +48,8 @@
         [NotMapped]
         public bool IsWarGroundAsset => WarGroundAssetTypes.Contains(Name);
 
-        public static List<string> WarRelevantAssetTypes { get; } = new()
-        {
+        public static List<string> WarRelevantAssetTypes { get; } =
+        [
             "Bernal",
             "Orbis",
             "Coriolis",
@@ -59,13 +59,13 @@
             "CraterPort",
             "Ocellus",
             "AsteroidBase",
-        };
+        ];
 
-        public static List<string> WarGroundAssetTypes { get; } = new()
-        {
+        public static List<string> WarGroundAssetTypes { get; } =
+        [
             "CraterOutpost",
             "CraterPort",
-        };
+        ];
 
         public const string OdysseySettlementType = "OnFootSettlement";
     }

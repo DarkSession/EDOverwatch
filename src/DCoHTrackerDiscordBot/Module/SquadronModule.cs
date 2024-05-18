@@ -207,7 +207,7 @@ namespace DCoHTrackerDiscordBot.Module
                         return AutocompletionResult.FromSuccess(factions.Select(s => new AutocompleteResult($"{s.Name} ({s.Short})", s.Short)));
                     }
                 }
-                return AutocompletionResult.FromSuccess(new List<AutocompleteResult>());
+                return AutocompletionResult.FromSuccess([]);
             }
         }
     }

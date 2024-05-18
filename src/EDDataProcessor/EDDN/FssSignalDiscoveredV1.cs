@@ -31,7 +31,7 @@ namespace EDDataProcessor.EDDN
             }
             switch (Header.SoftwareName)
             {
-                // Some senders send bad data
+                // Some senders are known to send bad data for this event
                 case "EDDiscovery" when Header.SoftwareVersion == "15.1.0.0":
                 case "EDDLite" when Header.SoftwareVersion == "2.3.0.0":
                     {
@@ -43,7 +43,7 @@ namespace EDDataProcessor.EDDN
                 return;
             }
 
-            List<long> starSystemSignalsUpdated = new();
+            List<long> starSystemSignalsUpdated = [];
             foreach (Signals signal in Message.Signals)
             {
                 string signalName = signal.SignalName;
@@ -206,7 +206,7 @@ namespace EDDataProcessor.EDDN
         [JsonProperty("signals", Required = Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.MinLength(1)]
-        public ICollection<Signals> Signals { get; set; } = new System.Collections.ObjectModel.Collection<Signals>();
+        public ICollection<Signals> Signals { get; set; } = [];
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.7.2.0 (Newtonsoft.Json v13.0.0.0)")]

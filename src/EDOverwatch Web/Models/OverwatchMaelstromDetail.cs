@@ -4,7 +4,7 @@
     {
         public List<OverwatchStarSystem> Systems { get; }
         public OverwatchAlertPredictionMaelstrom AlertPrediction { get; }
-        public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = new();
+        public List<OverwatchOverviewMaelstromHistoricalSummary> MaelstromHistory { get; set; } = [];
         public List<OverwatchThargoidCycle> ThargoidCycles { get; }
         public TitanDamageResistance DamageResistance { get; }
 
@@ -102,12 +102,12 @@
                 })
                 .ToListAsync(cancellationToken);
 
-            List<OverwatchStarSystem> resultStarSystems = new();
+            List<OverwatchStarSystem> resultStarSystems = [];
             foreach (var system in systems)
             {
                 StarSystem starSystem = system.StarSystem;
                 decimal effortFocus = 0;
-                if (totalEffortSums.Any())
+                if (totalEffortSums.Count != 0)
                 {
                     effortFocus = WarEffort.CalculateSystemFocus(efforts.Where(e => e.StarSystemId == starSystem.Id).Select(e => new WarEffortTypeSum(e.Type, e.Amount)), totalEffortSums);
                 }

@@ -12,7 +12,7 @@
         public int StationsUnderRepair { get; protected set; }
         public int StationsDamaged { get; protected set; }
         public int StationsUnderAttack { get; protected set; }
-        public List<string> Features { get; } = new();
+        public List<string> Features { get; } = [];
 
         public OverwatchStarSystemFull(
                     StarSystem starSystem,

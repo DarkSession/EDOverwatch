@@ -24,7 +24,7 @@ namespace EDDataProcessor.CApiJournal.Events.Exploration
             {
                 return;
             }
-            List<long> starSystemSignalsUpdated = new();
+            List<long> starSystemSignalsUpdated = [];
 
             StarSystemFssSignalType type = StarSystemFssSignalType.Other;
             if (IsStation is bool isStation)

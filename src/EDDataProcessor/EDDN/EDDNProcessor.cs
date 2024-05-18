@@ -7,7 +7,7 @@ namespace EDDataProcessor.EDDN
     {
         private ILogger Log { get; }
         private IServiceProvider ServiceProvider { get; }
-        private Dictionary<string, Type> EDDNProcessors { get; } = new();
+        private Dictionary<string, Type> EDDNProcessors { get; } = [];
 
         public EDDNProcessor(ILogger<EDDNProcessor> log, IServiceProvider serviceProvider)
         {

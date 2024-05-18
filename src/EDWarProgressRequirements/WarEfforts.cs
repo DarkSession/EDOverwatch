@@ -4,8 +4,8 @@ namespace EDWarProgressRequirements
 {
     public static class WarEfforts
     {
-        private static List<WarEffortRequirement> TissueRequirements { get; } = new()
-        {
+        private static List<WarEffortRequirement> TissueRequirements { get; } =
+        [
             new(StarSystemThargoidLevelState.Alert, 10, false, 3080),
             new(StarSystemThargoidLevelState.Alert, 15, false, 1390),
             new(StarSystemThargoidLevelState.Alert, 20, false, 350),
@@ -28,7 +28,7 @@ namespace EDWarProgressRequirements
             new(StarSystemThargoidLevelState.Controlled, 25, true, 1540),
             new(StarSystemThargoidLevelState.Controlled, 30, true, 1505),
             new(StarSystemThargoidLevelState.Controlled, 35, true, 1470),
-        };
+        ];
 
         public static int? GetRequirementsEstimate(decimal distanceToMaelstrom, bool wasPopulated, StarSystemThargoidLevelState state)
         {

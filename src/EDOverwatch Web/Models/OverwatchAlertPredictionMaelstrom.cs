@@ -10,6 +10,7 @@
         public OverwatchAlertPredictionMaelstrom(ThargoidMaelstrom thargoidMaelstrom, List<AlertPrediction> alertPredictions)
         {
             Maelstrom = new(thargoidMaelstrom);
+#pragma warning disable IDE0305 // Simplify collection initialization
             Systems = alertPredictions
                 .Select(a =>
                 {
@@ -25,6 +26,7 @@
                 .Select(a => new OverwatchAlertPredictionMaelstromAttackerCount(a.First().StarSystem!, a.Count()))
                 .OrderByDescending(a => a.Count)
                 .ToList();
+#pragma warning restore IDE0305 // Simplify collection initialization
             ExpectedAlerts = alertPredictions.Count(a => a.AlertLikely);
         }
     }

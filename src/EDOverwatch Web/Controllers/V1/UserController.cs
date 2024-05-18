@@ -124,7 +124,7 @@ namespace EDOverwatch_Web.Controllers.V1
                         Profile? profile = await FDevOAuth.GetProfile(oAuthenticationResult.Credentials, cancellationToken);
                         if (string.IsNullOrEmpty(profile?.Commander?.Name))
                         {
-                            return new OAuthResponse(new List<string>() { "Authentication failed! Your Frontier profile does not seem to have an Elite Dangerous profile." });
+                            return new OAuthResponse(["Authentication failed! Your Frontier profile does not seem to have an Elite Dangerous profile."]);
                         }
                         string userName = RegexRemoveCharacters().Replace(profile!.Commander!.Name, "_") + "-" + oAuthenticationResult.CustomerId;
 
@@ -135,7 +135,7 @@ namespace EDOverwatch_Web.Controllers.V1
                         IdentityResult result = await UserManager.CreateAsync(user);
                         if (!result.Succeeded)
                         {
-                            return new OAuthResponse(new List<string>() { "Registration could not be completed." });
+                            return new OAuthResponse(["Registration could not be completed."]);
                         }
                         await DbContext.SaveChangesAsync(cancellationToken);
                         commander = new(
@@ -177,7 +177,7 @@ namespace EDOverwatch_Web.Controllers.V1
                         if (oAuthWasExpired)
                         {
                             List<WebSocketSession> sessions = WebSocketServer.ActiveSessions.Where(a => a.UserId == commander.User.Id).ToList();
-                            if (sessions.Any())
+                            if (sessions.Count != 0)
                             {
                                 WebSocketMessage webSocketMessage = new(nameof(CommanderMe), new User(commander));
                                 foreach (WebSocketSession session in sessions)
@@ -190,7 +190,7 @@ namespace EDOverwatch_Web.Controllers.V1
                     }
                 }
             }
-            return new OAuthResponse(new List<string>() { "Authentication failed!" });
+            return new OAuthResponse(["Authentication failed!"]);
         }
 
         [HttpPost]
