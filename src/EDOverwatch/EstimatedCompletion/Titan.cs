@@ -66,13 +66,13 @@ namespace EDOverwatch.EstimatedCompletion
                 if (predictedDailyProgress <= 0)
                 {
                     titan.CompletionTimeEstimate = null;
-                    break;
+                    continue;
                 }
                 decimal daysRemaining = remainingProgress / predictedDailyProgress;
                 if (daysRemaining > 365)
                 {
                     titan.CompletionTimeEstimate = null;
-                    break;
+                    continue;
                 }
                 else if (daysRemaining <= 0.5m)
                 {
@@ -82,7 +82,7 @@ namespace EDOverwatch.EstimatedCompletion
                 if (daysRemaining <= 0m)
                 {
                     titan.CompletionTimeEstimate = null;
-                    break;
+                    continue;
                 }
 
                 titan.CompletionTimeEstimate = DateTimeOffset.UtcNow.AddDays((double)Math.Round(daysRemaining, 4));
