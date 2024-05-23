@@ -15,6 +15,7 @@
             {
                 >= 0 when heartsRemaining <= 0 => string.Empty,
                 0 => "Completely vulnerable",
+                <= 2 => "Highly compromised",
                 <= 3 => "Compromised",
                 <= 6 => "Moderate",
                 <= 7 => "High",
