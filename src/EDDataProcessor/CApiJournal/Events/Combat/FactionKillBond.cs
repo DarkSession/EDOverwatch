@@ -21,19 +21,40 @@
         {
             if (AwardingFaction == "$faction_PilotsFederation;" && VictimFaction == "$faction_Thargoid;")
             {
-                WarEffortType warEffortType = Reward switch
+                WarEffortType warEffortType;
+                if (Timestamp <= new DateTimeOffset(2024, 5, 28, 8, 0, 0, TimeSpan.Zero))
                 {
-                    25_000 => WarEffortType.KillThargoidRevenant, // Revenant
-                    65_000 or 75_000 => WarEffortType.KillThargoidScout, // Scout
-                    1_000_000 => WarEffortType.KillThargoidBanshee, // Banshee
-                    4_500_000 => WarEffortType.KillThargoidHunter, // Glaive
-                    6_500_000 => WarEffortType.KillThargoidCyclops, // Cyclops
-                    20_000_000 => WarEffortType.KillThargoidBasilisk, // Basilisk
-                    34_000_000 => WarEffortType.KillThargoidMedusa, // Medusa
-                    50_000_000 => WarEffortType.KillThargoidHydra, // Hydra
-                    40_000_000 => WarEffortType.KillThargoidOrthrus, // Orthrus
-                    _ => WarEffortType.KillGeneric,
-                };
+                    warEffortType = Reward switch
+                    {
+                        25_000 => WarEffortType.KillThargoidRevenant, // Revenant
+                        65_000 or 75_000 => WarEffortType.KillThargoidScout, // Scout
+                        1_000_000 => WarEffortType.KillThargoidBanshee, // Banshee
+                        4_500_000 => WarEffortType.KillThargoidHunter, // Glaive
+                        6_500_000 => WarEffortType.KillThargoidCyclops, // Cyclops
+                        20_000_000 => WarEffortType.KillThargoidBasilisk, // Basilisk
+                        34_000_000 => WarEffortType.KillThargoidMedusa, // Medusa
+                        50_000_000 => WarEffortType.KillThargoidHydra, // Hydra
+                        40_000_000 => WarEffortType.KillThargoidOrthrus, // Orthrus
+                        _ => WarEffortType.KillGeneric,
+                    };
+                }
+                else
+                {
+                    warEffortType = Reward switch
+                    {
+                        25_000 => WarEffortType.KillThargoidRevenant, // Revenant
+                        65_000 or 75_000 => WarEffortType.KillThargoidScout, // Scout
+                        1_000_000 => WarEffortType.KillThargoidBanshee, // Banshee
+                        4_500_000 => WarEffortType.KillThargoidHunter, // Glaive
+                        8_000_000 => WarEffortType.KillThargoidCyclops, // Cyclops
+                        24_000_000 => WarEffortType.KillThargoidBasilisk, // Basilisk
+                        40_000_000 => WarEffortType.KillThargoidMedusa, // Medusa
+                        60_000_000 => WarEffortType.KillThargoidHydra, // Hydra
+                        15_000_000 => WarEffortType.KillThargoidOrthrus, // Orthrus
+                        _ => WarEffortType.KillGeneric,
+                    };
+                }
+
                 if (warEffortType == WarEffortType.KillGeneric)
                 {
                     await DeferEvent(journalParameters, dbContext, cancellationToken);
