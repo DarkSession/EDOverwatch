@@ -57,7 +57,7 @@
                     </ng-template>
                 </mat-tab>
                 <mat-tab label="Timeline">
-                    <div class="maelstrom-summary-container hide-on-small-mobile chart-overflow-container">
+                    <div class="hide-on-small-mobile chart-overflow-container">
                         <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 2">
                             <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options"
                                 [type]="chartConfig.type"></canvas>

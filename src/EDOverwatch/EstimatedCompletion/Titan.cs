@@ -54,12 +54,13 @@ namespace EDOverwatch.EstimatedCompletion
                         .FirstOrDefaultAsync(cancellationToken);
                     if (previousHourProgress is not null)
                     {
-                        pastHourProgress = currentProgress - (previousHourProgress.ProgressPercent ?? 0m);
+                        var heartsDestroyed = await dbContext.ThargoidMaelstromHearts
+                            .AsNoTracking()
+                            .Where(s => s.Maelstrom == titan && s.DestructionTime >= previousHourTime)
+                            .CountAsync(cancellationToken);
+                        decimal currentProgressWithHeartsDestroyed = currentProgress + heartsDestroyed;
+                        pastHourProgress = currentProgressWithHeartsDestroyed - (previousHourProgress.ProgressPercent ?? 0m);
                     }
-                    pastHourProgress += await dbContext.ThargoidMaelstromHearts
-                        .AsNoTracking()
-                        .Where(s => s.Maelstrom == titan && s.DestructionTime >= previousHourTime)
-                        .CountAsync(cancellationToken);
                 }
 
                 decimal predictedDailyProgress = pastDayProgress / 2m + pastHourProgress * 12;

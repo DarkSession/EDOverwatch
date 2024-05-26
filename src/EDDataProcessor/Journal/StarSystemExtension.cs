@@ -58,6 +58,7 @@ namespace EDDataProcessor.Journal
                     changed = true;
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
+
                 if (currentState != StarSystemThargoidLevelState.None)
                 {
                     bool titanHeartDestroyed = fsdJumpThargoidWar.WarProgress > 0.0001m &&
@@ -91,6 +92,15 @@ namespace EDDataProcessor.Journal
                                 starSystem.ThargoidLevel.Maelstrom.MeltdownTimeEstimate = updateTime.AddDays(1);
                                 starSystem.ThargoidLevel.Maelstrom.DefeatCycle = currentThargoidCycle;
                                 warProgress = 1m;
+                            }
+                        }
+
+                        if (currentState == StarSystemThargoidLevelState.Titan && starSystem.ThargoidLevel.CurrentProgress?.ProgressPercent is decimal currentProgress)
+                        {
+                            decimal progressIncrease = warProgress - currentProgress;
+                            if (progressIncrease > 0.5m)
+                            {
+                                return false;
                             }
                         }
 

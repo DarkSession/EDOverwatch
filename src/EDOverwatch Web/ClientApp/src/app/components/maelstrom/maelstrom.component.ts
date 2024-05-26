@@ -176,7 +176,7 @@ export class MaelstromComponent implements OnInit {
       if (this.chartLoaded) {
         this.chartConfig.options!.animation = false;
       }
-      this.canvasWidth = 100 + this.maelstrom.ThargoidCycles.length * 30;
+      this.canvasWidth = 100 + this.maelstrom.ThargoidCycles.length * 28;
       this.chartLoaded = true;
     }
   }
