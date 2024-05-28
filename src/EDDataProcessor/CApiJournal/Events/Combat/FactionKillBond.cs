@@ -43,7 +43,7 @@
                     warEffortType = Reward switch
                     {
                         25_000 => WarEffortType.KillThargoidRevenant, // Revenant
-                        65_000 or 75_000 => WarEffortType.KillThargoidScout, // Scout
+                        65_000 or 75_000 or 80_000 => WarEffortType.KillThargoidScout, // Scout
                         1_000_000 => WarEffortType.KillThargoidBanshee, // Banshee
                         4_500_000 => WarEffortType.KillThargoidHunter, // Glaive
                         8_000_000 => WarEffortType.KillThargoidCyclops, // Cyclops
