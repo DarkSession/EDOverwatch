@@ -19,10 +19,6 @@ namespace EDDataProcessor.EDDN
         private static partial Regex FleetCarrierRegexGenerator();
         private static Regex FleetCarrierRegex { get; } = FleetCarrierRegexGenerator();
 
-        [GeneratedRegex("^Titan ([A-Z]+)$", RegexOptions.IgnoreCase)]
-        private static partial Regex MaelstromRegexGenerator();
-        private static Regex MaelstromRegex { get; } = MaelstromRegexGenerator();
-
         public async ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
             if (!Header.IsLive)
@@ -93,53 +89,15 @@ namespace EDDataProcessor.EDDN
                         }
                     }
                 }
-                else
+                else if (signalName.StartsWith("$Warzone_TG_"))
                 {
-                    Match maelstromMatch = MaelstromRegex.Match(signal.SignalName);
-                    if (maelstromMatch.Success)
-                    {
-                        type = StarSystemFssSignalType.Titan;
-                        bool createdUpdated = false;
-                        string maelStromName = maelstromMatch.Groups[1].Value;
-                        ThargoidMaelstrom? thargoidMaelstrom = await dbContext.ThargoidMaelstroms
-                            .Include(t => t.StarSystem)
-                            .ThenInclude(s => s!.ThargoidLevel)
-                            .ThenInclude(t => t!.Maelstrom)
-                            .FirstOrDefaultAsync(t => t.Name == maelStromName, cancellationToken);
-                        if (thargoidMaelstrom == null)
-                        {
-                            thargoidMaelstrom = new(0, maelStromName, 20m, 0, Message.Timestamp, 8, null)
-                            {
-                                StarSystem = starSystem,
-                            };
-                            await dbContext.SaveChangesAsync(cancellationToken);
-                            createdUpdated = true;
-                        }
-                        else if (thargoidMaelstrom.Updated < Message.Timestamp)
-                        {
-                            thargoidMaelstrom.Updated = Message.Timestamp;
-                            if (thargoidMaelstrom.StarSystem?.Id != starSystem!.Id)
-                            {
-                                thargoidMaelstrom.StarSystem = starSystem;
-                            }
-                            await dbContext.SaveChangesAsync(cancellationToken);
-                            createdUpdated = true;
-                        }
-                        if (createdUpdated && thargoidMaelstrom != null)
-                        {
-                            ThargoidMaelstromCreatedUpdated thargoidMaelstromCreatedUpdated = new(thargoidMaelstrom.Id, thargoidMaelstrom.Name);
-                            await activeMqProducer.SendAsync(ThargoidMaelstromCreatedUpdated.QueueName, ThargoidMaelstromCreatedUpdated.Routing, thargoidMaelstromCreatedUpdated.Message, activeMqTransaction, cancellationToken);
-                        }
-                    }
-                    else if (signalName.StartsWith("$Warzone_TG_"))
-                    {
-                        type = StarSystemFssSignalType.AXCZ;
-                    }
-                    else if (signalName == "$USS_NonHumanSignalSource;")
-                    {
-                        type = StarSystemFssSignalType.ThargoidActivity;
-                    }
+                    type = StarSystemFssSignalType.AXCZ;
                 }
+                else if (signalName == "$USS_NonHumanSignalSource;")
+                {
+                    type = StarSystemFssSignalType.ThargoidActivity;
+                }
+
                 bool signalUpdated = false;
                 StarSystemFssSignal? starSystemFssSignal = await dbContext.StarSystemFssSignals
                     .FirstOrDefaultAsync(s => s.StarSystem == starSystem && s.Type == type && s.Name == signalName, cancellationToken);

@@ -271,13 +271,13 @@ namespace EDOverwatch_Web.Models
                 })
                 .ToListAsync(cancellationToken);
 
-            List<OverwatchStarSystem> overwatchStarSystems = new();
+            List<OverwatchStarSystem> overwatchStarSystems = [];
 
             foreach (var system in systems)
             {
                 StarSystem starSystem = system.StarSystem;
                 decimal effortFocus = 0;
-                if (totalEffortSums.Any())
+                if (totalEffortSums.Count != 0)
                 {
                     effortFocus = WarEffort.CalculateSystemFocus(efforts.Where(e => e.StarSystemId == starSystem.Id).Select(e => new WarEffortTypeSum(e.Type, e.Amount)), totalEffortSums);
                 }
