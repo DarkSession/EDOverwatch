@@ -76,7 +76,7 @@
             {
                 Features.Add(OverwatchStarSystemFeature.AXConflictZones.ToString());
             }
-            if (groundPortUnderAttack && ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion && (StateProgress.ProgressPercent ?? 0) < 1m)
+            if (groundPortUnderAttack && (ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled || ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion) && (StateProgress.ProgressPercent ?? 0) < 1m)
             {
                 Features.Add(OverwatchStarSystemFeature.GroundPortAXCZ.ToString());
             }
