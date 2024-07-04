@@ -91,6 +91,7 @@ namespace EDOverwatchAlertPrediction
                 }
 
                 int order = 0;
+                int possibleOrder = 0;
                 int attackingCredits = 36;
                 AttackMode attackMode = AttackMode.Closest;
                 double maxControlSystemDistance = starSystems
@@ -126,7 +127,11 @@ namespace EDOverwatchAlertPrediction
                             attackingCredits -= attackCost;
                         }
                         order++;
-                        await ProcessAttack(attack, alertPossible, maelstrom, primaryAttacker, order, dbContext, cancellationToken);
+                        if (alertPossible)
+                        {
+                            possibleOrder++;
+                        }
+                        await ProcessAttack(attack, alertPossible, maelstrom, primaryAttacker, order, possibleOrder, dbContext, cancellationToken);
                         possibleAttacks.Remove(attack);
                     }
                 }
@@ -178,7 +183,11 @@ namespace EDOverwatchAlertPrediction
                         }
 
                         order++;
-                        await ProcessAttack(attack, alertPossible, maelstrom, remainingAttacker, order, dbContext, cancellationToken);
+                        if (alertPossible)
+                        {
+                            possibleOrder++;
+                        }
+                        await ProcessAttack(attack, alertPossible, maelstrom, remainingAttacker, order, possibleOrder, dbContext, cancellationToken);
                         possibleAttacks.Remove(attack);
                     }
 
@@ -186,7 +195,7 @@ namespace EDOverwatchAlertPrediction
                     foreach (Attack attack in remainingAttackList)
                     {
                         order++;
-                        await ProcessAttack(attack, false, maelstrom, null, order, dbContext, cancellationToken);
+                        await ProcessAttack(attack, false, maelstrom, null, order, 999, dbContext, cancellationToken);
                         possibleAttacks.Remove(attack);
                     }
                 }
@@ -202,7 +211,7 @@ namespace EDOverwatchAlertPrediction
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ProcessAttack(Attack attack, bool alertPossible, ThargoidMaelstrom maelstrom, StarSystemCycleState? primaryAttacker, int order, EdDbContext dbContext, CancellationToken cancellationToken)
+        private async Task ProcessAttack(Attack attack, bool alertPossible, ThargoidMaelstrom maelstrom, StarSystemCycleState? primaryAttacker, int order, int possibleOrder, EdDbContext dbContext, CancellationToken cancellationToken)
         {
             EDDatabase.AlertPrediction? systemAlertPrediction = await dbContext.AlertPredictions
                 .AsSingleQuery()
@@ -211,7 +220,7 @@ namespace EDOverwatchAlertPrediction
                 .FirstOrDefaultAsync(cancellationToken);
             if (systemAlertPrediction == null)
             {
-                systemAlertPrediction = new(0, attack.VictimSystem.Id, alertPossible, AlertPredictionStatus.Default, order)
+                systemAlertPrediction = new(0, attack.VictimSystem.Id, alertPossible, AlertPredictionStatus.Default, order, (possibleOrder <= 3) ? AlertPredictionType.Invasion : AlertPredictionType.Alert)
                 {
                     Cycle = ThargoidCycle,
                     Maelstrom = maelstrom,
@@ -222,6 +231,7 @@ namespace EDOverwatchAlertPrediction
             systemAlertPrediction.Order = order;
             systemAlertPrediction.AlertLikely = alertPossible;
             systemAlertPrediction.Status = AlertPredictionStatus.Default;
+            systemAlertPrediction.Type = (possibleOrder <= 3) ? AlertPredictionType.Invasion : AlertPredictionType.Alert;
 
             UsedAlertPredictions.Add(systemAlertPrediction);
 

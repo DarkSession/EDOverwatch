@@ -74,6 +74,7 @@ export interface OverwatchAlertPredictionSystem {
   IsActive: boolean;
   Order: number;
   SpireSite: boolean;
+  InvasionPredicted: boolean;
 }
 
 
@@ -82,6 +83,7 @@ export interface OverwatchAlertPredictionMaelstrom {
   Systems: OverwatchAlertPredictionSystem[];
   AttackingSystemCount: OverwatchAlertPredictionMaelstromAttackerCount[];
   ExpectedAlerts: number;
+  ExpectedInvasions: number;
 }
 
 export interface OverwatchAlertPredictionMaelstromAttackerCount {

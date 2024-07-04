@@ -6,6 +6,7 @@
         public List<OverwatchAlertPredictionSystem> Systems { get; set; }
         public List<OverwatchAlertPredictionMaelstromAttackerCount> AttackingSystemCount { get; }
         public int ExpectedAlerts { get; }
+        public int ExpectedInvasions { get; }
 
         public OverwatchAlertPredictionMaelstrom(ThargoidMaelstrom thargoidMaelstrom, List<AlertPrediction> alertPredictions)
         {
@@ -15,7 +16,7 @@
                 .Select(a =>
                 {
                     double distance = Math.Round(a.StarSystem!.DistanceTo(thargoidMaelstrom.StarSystem!), 4);
-                    return new OverwatchAlertPredictionSystem(a.StarSystem, thargoidMaelstrom, distance, a);
+                    return new OverwatchAlertPredictionSystem(a.StarSystem, thargoidMaelstrom, distance, a, a.Type == AlertPredictionType.Invasion);
                 })
                 .OrderBy(a => a.Order)
                 .ThenBy(a => a.Distance)
@@ -27,7 +28,8 @@
                 .OrderByDescending(a => a.Count)
                 .ToList();
 #pragma warning restore IDE0305 // Simplify collection initialization
-            ExpectedAlerts = alertPredictions.Count(a => a.AlertLikely);
+            ExpectedAlerts = alertPredictions.Count(a => a.AlertLikely && a.Type == AlertPredictionType.Alert);
+            ExpectedInvasions = alertPredictions.Count(a => a.AlertLikely && a.Type == AlertPredictionType.Invasion);
         }
     }
 

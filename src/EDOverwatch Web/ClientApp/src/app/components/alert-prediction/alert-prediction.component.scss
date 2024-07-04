@@ -20,7 +20,12 @@ div.load-more {
     background-color: rgb(241, 194, 50, 0.1);
 }
 
-.alert-likely:hover {
+.invasion-predicted {
+    background-color: rgb(255, 82, 0, 0.1);
+}
+
+.alert-likely:hover,
+.invasion-predicted:hover {
     background-color: rgb(241, 194, 50, 0.05) !important;
 }
 
@@ -39,6 +44,10 @@ table {
 
 .thargoid-alert {
     background-color: rgb(241, 194, 50);
+}
+
+.thargoid-invasion {
+    background-color: rgb(255, 82, 0);
 }
 
 .table-top {

@@ -104,6 +104,10 @@ namespace EDOverwatchAlertPrediction
                     return false;
                 }
             }
+            if (!WasPopulated)
+            {
+                return false;
+            }
             if (LastAlertCycle > 0 && (Cycle - LastAlertCycle) <= 2)
             {
                 return false;

@@ -27,15 +27,19 @@
         [Column]
         public int Order { get; set; }
 
+        [Column]
+        public AlertPredictionType Type { get; set; }
+
         public List<AlertPredictionAttacker>? Attackers { get; set; }
 
-        public AlertPrediction(int id, long? starSystemId, bool alertLikely, AlertPredictionStatus status, int order)
+        public AlertPrediction(int id, long? starSystemId, bool alertLikely, AlertPredictionStatus status, int order, AlertPredictionType type)
         {
             Id = id;
             StarSystemId = starSystemId;
             AlertLikely = alertLikely;
             Status = status;
             Order = order;
+            Type = type;
         }
     }
 
@@ -43,5 +47,11 @@
     {
         Default = 0,
         Expired,
+    }
+
+    public enum AlertPredictionType : byte
+    {
+        Alert,
+        Invasion,
     }
 }

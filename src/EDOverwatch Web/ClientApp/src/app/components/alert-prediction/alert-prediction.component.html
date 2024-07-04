@@ -1,6 +1,8 @@
 <div class="table-top" *ngIf="alertPrediction">
     <div>
         <span class="dot thargoid-alert"></span>Predicted alerts: {{ alertPrediction.ExpectedAlerts }}
+        <br>
+        <span class="dot thargoid-invasion"></span>Predicted invasions: {{ alertPrediction.ExpectedInvasions }}
     </div>
     <div>
         Possible targets: {{ alertPrediction.Systems.length }}
@@ -64,7 +66,8 @@
             <tr mat-header-row *matHeaderRowDef="alertPredictionColumns; sticky: true" class="thead">
             </tr>
             <tr mat-row *matRowDef="let row; columns: alertPredictionColumns;" [ngClass]="{
-                'alert-likely': row.PrimaryTarget
+                'invasion-predicted': row.InvasionPredicted,
+                'alert-likely': !row.InvasionPredicted && row.PrimaryTarget
             }"></tr>
         </table>
         <div *ngIf="sortedAlertPredictions.data.length === 0" class="empty-table">

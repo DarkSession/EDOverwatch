@@ -9,8 +9,9 @@
         public bool IsActive { get; set; }
         public int Order { get; set; }
         public bool SpireSite { get; set; }
+        public bool InvasionPredicted { get; set; }
 
-        public OverwatchAlertPredictionSystem(StarSystem starSystem, ThargoidMaelstrom maelstrom, double distance, AlertPrediction alertPrediction)
+        public OverwatchAlertPredictionSystem(StarSystem starSystem, ThargoidMaelstrom maelstrom, double distance, AlertPrediction alertPrediction, bool invasionPredicted)
         {
             StarSystem = new(starSystem);
             Distance = distance;
@@ -25,6 +26,7 @@
             IsActive = alertPrediction.Status == AlertPredictionStatus.Default;
             Order = alertPrediction.Order;
             SpireSite = starSystem.BarnacleMatrixInSystem;
+            InvasionPredicted = invasionPredicted;
         }
     }
 }
