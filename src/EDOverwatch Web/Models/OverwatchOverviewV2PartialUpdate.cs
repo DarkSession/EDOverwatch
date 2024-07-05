@@ -166,8 +166,8 @@ namespace EDOverwatch_Web.Models
 
                 overviewNextCycleChanges = new(alertsDefended, invasionsDefended, controlsDefended, titansDefeated, thargoidInvasionStart, thargoidsGain);
 
-                int alertsPredicted = await dbContext.AlertPredictions.CountAsync(a => a.Cycle == nextCycle && a.AlertLikely, cancellationToken);
-                int invasionsPredicted = invasionCount - thargoidInvasionSuccess - invasionsDefended + thargoidInvasionStart;
+                int alertsPredicted = await dbContext.AlertPredictions.CountAsync(a => a.Cycle == nextCycle && a.AlertLikely && a.Type == AlertPredictionType.Alert, cancellationToken);
+                int invasionsPredicted = invasionCount - thargoidInvasionSuccess - invasionsDefended + thargoidInvasionStart + await dbContext.AlertPredictions.CountAsync(a => a.Cycle == nextCycle && a.AlertLikely && a.Type == AlertPredictionType.Invasion, cancellationToken);
                 int controlledPredicted = controlledCount - controlsDefended + thargoidsGain;
                 int titanPredicted = titanCount - previousCycleTitansDefeated;
                 int recoveryCompleted = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Recovery && (p.CurrentProgress?.IsCompleted ?? false));
