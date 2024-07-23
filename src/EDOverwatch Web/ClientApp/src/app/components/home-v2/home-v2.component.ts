@@ -76,7 +76,7 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       },
       {
         key: "ThargoidControlledReactivationMissions",
-        value: "AX reactivation missions available",
+        value: "Hostile reactivation missions available",
       },
       {
         key: "ThargoidSpires",
