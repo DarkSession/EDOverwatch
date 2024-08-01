@@ -18,7 +18,7 @@ namespace EDDataProcessor.EDDN
 
         public async ValueTask ProcessEvent(EdDbContext dbContext, IAnonymousProducer activeMqProducer, Transaction activeMqTransaction, CancellationToken cancellationToken)
         {
-            if (!Header.IsLive)
+            if (!Header.IsLive || Header.IsBlacklisted)
             {
                 return;
             }
