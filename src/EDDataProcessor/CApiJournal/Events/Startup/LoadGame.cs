@@ -13,11 +13,7 @@
 
         public override ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            journalParameters.Commander.IsInLiveVersion = !string.IsNullOrEmpty(GameVersion) && Version.TryParse(GameVersion, out Version? gameVersion) && gameVersion.Major >= 4;
-            if (GameBuild == "r304032/r0")
-            {
-                journalParameters.Commander.IsInLiveVersion = false;
-            }
+            journalParameters.Commander.IsInLiveVersion = !string.IsNullOrEmpty(GameVersion) && Version.TryParse(GameVersion, out Version? gameVersion) && gameVersion.Major >= 4 && GameBuild != "r304032/r0";
             return ValueTask.CompletedTask;
         }
     }
