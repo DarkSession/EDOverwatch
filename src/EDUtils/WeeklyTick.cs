@@ -28,7 +28,7 @@
 
         public static DateTimeOffset GetTickTime(DateOnly date, int weekOffset = 0)
         {
-            int dayOffset = date.DayOfWeek switch
+            var dayOffset = date.DayOfWeek switch
             {
                 DayOfWeek.Sunday => -3,
                 DayOfWeek.Monday => -4,
@@ -42,6 +42,12 @@
             DateOnly thursday = date.AddDays(dayOffset);
             DateTimeOffset lastThursdayCycle = new(thursday.Year, thursday.Month, thursday.Day, 7, 0, 0, TimeSpan.Zero);
             return lastThursdayCycle.AddDays(weekOffset * 7);
+        }
+
+        public static int GetNumberOfTicksSinceDate(DateTimeOffset tickDateTime)
+        {
+            var lastTick = GetLastTick();
+            return (int)Math.Floor((lastTick - tickDateTime).Days / 7d);
         }
     }
 }

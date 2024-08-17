@@ -20,6 +20,12 @@
                                 <td><b>Damage resistance</b></td>
                                 <td>{{ maelstrom.DamageResistance.Name }}</td>
                             </tr>
+                            @if (maelstrom.TotalProgress == 1) {
+                                <tr>
+                                    <td><b>Caustic level</b></td>
+                                    <td>{{ maelstrom.CausticLevel }}</td>
+                                </tr>
+                            }
                             <tr>
                                 <td><b>Hearts</b></td>
                                 <td>

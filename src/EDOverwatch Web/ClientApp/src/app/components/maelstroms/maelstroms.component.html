@@ -29,13 +29,18 @@
                         <ng-container matColumnDef="State">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
                             <td mat-cell *matCellDef="let row" class="nowrap">
-                                <span [ngClass]="{
+                                <div [ngClass]="{
                                     'titan-active': row.State == 'Active',
                                     'titan-meltdown': row.State == 'Meltdown',
                                     'titan-destroyed': row.State == 'Destroyed',
                                 }">
                                     {{ row.State }}
-                                </span>
+                                </div>
+                                @if (row.State === 'Destroyed' && row.CausticLevel) {
+                                    <div class="small">
+                                        Caustic level: {{ row.CausticLevel }}
+                                    </div>
+                                }
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="DamageResistance">

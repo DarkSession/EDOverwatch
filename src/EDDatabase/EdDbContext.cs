@@ -114,6 +114,10 @@ namespace EDDatabase
             modelBuilder.Entity<ThargoidMaelstrom>()
                .Navigation(t => t.StarSystem)
                .AutoInclude();
+
+            modelBuilder.Entity<ThargoidMaelstrom>()
+               .Navigation(t => t.DefeatCycle)
+               .AutoInclude();
         }
 
         public Task<ThargoidCycle> GetThargoidCycle(CancellationToken cancellationToken) => GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);

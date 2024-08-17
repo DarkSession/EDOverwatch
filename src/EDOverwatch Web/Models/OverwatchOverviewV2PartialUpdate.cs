@@ -88,8 +88,6 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> previousCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Include(s => s.Maelstrom)
-                    .ThenInclude(m => m!.DefeatCycle)
                     .Where(s => (s.CycleEnd == previousCycle && s.CycleStart!.Start <= s.CycleEnd!.Start && (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == previousCycle))
                     .ToListAsync(cancellationToken);
 
@@ -150,8 +148,6 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> currentCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Include(s => s.Maelstrom)
-                    .ThenInclude(m => m!.DefeatCycle)
                     .Where(s => (s.CycleEnd == null || (s.CycleEnd == currentThargoidCycle && s.CycleStart!.Start <= s.CycleEnd!.Start)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == currentThargoidCycle))
                     .ToListAsync(cancellationToken);
 

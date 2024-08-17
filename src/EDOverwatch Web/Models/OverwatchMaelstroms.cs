@@ -3,14 +3,9 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace EDOverwatch_Web.Models
 {
-    public class OverwatchMaelstroms
+    public class OverwatchMaelstroms(List<OverwatchMaelstromBasic> maelstroms)
     {
-        public List<OverwatchMaelstromBasic> Maelstroms { get; }
-
-        public OverwatchMaelstroms(List<OverwatchMaelstromBasic> maelstroms)
-        {
-            Maelstroms = maelstroms;
-        }
+        public List<OverwatchMaelstromBasic> Maelstroms => maelstroms;
 
         private const string CacheKey = "OverwatchMaelstroms";
 
@@ -46,7 +41,7 @@ namespace EDOverwatch_Web.Models
                     PopulatedInvasionsDefended = dbContext.StarSystemThargoidLevels.Count(s => s.Maelstrom == t && s.CycleEnd != null && s.CycleStart!.Start <= s.CycleEnd.Start && s.StarSystem!.OriginalPopulation > 0 && s.State == StarSystemThargoidLevelState.Invasion && s.CurrentProgress!.IsCompleted),
                 })
                 .ToListAsync(cancellationToken);
-            List<OverwatchMaelstromBasic> result = maelstroms
+            var result = maelstroms
                 .Select(m =>
                     new OverwatchMaelstromBasic(m.Maelstrom, m.SystemsInAlert, m.SystemsInInvasion, m.SystemsThargoidControlled, m.SystemsInRecovery, m.PopulatedSystemsInvaded, m.PopulatedAlertsDefended, m.PopulatedInvasionsDefended))
                 .ToList();

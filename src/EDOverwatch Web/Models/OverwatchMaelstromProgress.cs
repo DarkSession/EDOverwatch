@@ -1,4 +1,7 @@
-﻿namespace EDOverwatch_Web.Models
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace EDOverwatch_Web.Models
 {
     public class OverwatchMaelstromProgress : OverwatchMaelstrom
     {
@@ -8,6 +11,8 @@
         public string State { get; }
         public DateTimeOffset? MeltdownTimeEstimate { get; }
         public DateTimeOffset? CompletionTimeEstimate { get; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public TitanCausticLevel CausticLevel { get; }
 
         public OverwatchMaelstromProgress(ThargoidMaelstrom thargoidMaelstrom) :
             base(thargoidMaelstrom)
@@ -34,6 +39,30 @@
                     State = "Destroyed";
                 }
             }
+            CausticLevel = TitanCausticLevel.None;
+            if (thargoidMaelstrom.DefeatCycle is not null && thargoidMaelstrom.MeltdownTimeEstimate is not null && thargoidMaelstrom.MeltdownTimeEstimate <= DateTimeOffset.UtcNow)
+            {
+                var ticksSinceDefated = WeeklyTick.GetNumberOfTicksSinceDate(thargoidMaelstrom.DefeatCycle.Start);
+                if (ticksSinceDefated >= 0)
+                {
+                    CausticLevel = ticksSinceDefated switch
+                    {
+                        < 0 => TitanCausticLevel.None,
+                        <= 1 => TitanCausticLevel.Extreme,
+                        <= 2 => TitanCausticLevel.Medium,
+                        <= 3 => TitanCausticLevel.Low,
+                        _ => TitanCausticLevel.None,
+                    };
+                }
+            }
         }
+    }
+
+    public enum TitanCausticLevel
+    {
+        None,
+        Extreme,
+        Medium,
+        Low,
     }
 }

@@ -24,4 +24,5 @@ export interface OverwatchMaelstromProgress extends OverwatchMaelstrom {
   State: string;
   MeltdownTimeEstimate: string | null;
   CompletionTimeEstimate: string | null;
+  CausticLevel: string;
 }
