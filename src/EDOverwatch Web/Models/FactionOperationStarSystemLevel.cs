@@ -8,7 +8,7 @@
         public FactionOperationStarSystemLevel(DcohFactionOperation factionOperation) :
             base(factionOperation)
         {
-            ThargoidLevel = new(factionOperation.StarSystem?.ThargoidLevel ?? new StarSystemThargoidLevel(0, StarSystemThargoidLevelState.None, 0, DateTimeOffset.UtcNow, false, false));
+            ThargoidLevel = new(factionOperation.StarSystem?.ThargoidLevel ?? new StarSystemThargoidLevel(0, StarSystemThargoidLevelState.None, 0, DateTimeOffset.UtcNow, false, false, StarSystemThargoidLevelState.None));
             Maelstrom = new(factionOperation.StarSystem?.ThargoidLevel?.Maelstrom ?? new ThargoidMaelstrom(0, string.Empty, 0m, 0, DateTimeOffset.UtcNow, 8, null));
         }
     }

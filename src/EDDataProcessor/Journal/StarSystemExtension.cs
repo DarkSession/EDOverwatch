@@ -48,7 +48,7 @@ namespace EDDataProcessor.Journal
                             maelstrom.InfluenceSphere = distanceToMaelstrom;
                         }
                     }
-                    starSystem.ThargoidLevel = new(0, currentState, null, updateTime, false, false)
+                    starSystem.ThargoidLevel = new(0, currentState, null, updateTime, false, false, starSystem.ThargoidLevel?.State)
                     {
                         StarSystem = starSystem,
                         CycleStart = currentThargoidCycle,

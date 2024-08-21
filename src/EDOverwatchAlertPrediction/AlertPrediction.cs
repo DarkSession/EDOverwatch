@@ -16,7 +16,7 @@ namespace EDOverwatchAlertPrediction
         public static async Task UpdateAttackersForCycle(EdDbContext dbContext, ThargoidCycle thargoidCycle, CancellationToken cancellationToken)
         {
             List<StarSystemThargoidLevel> starSystemThargoidLevels = await dbContext.StarSystemThargoidLevels
-                .Where(s => s.State == StarSystemThargoidLevelState.Alert && s.CycleEnd == null && s.StateExpires == thargoidCycle)
+                .Where(s => ((s.State == StarSystemThargoidLevelState.Alert && s.StateExpires == thargoidCycle) || (s.State == StarSystemThargoidLevelState.Invasion && s.PreviousState != StarSystemThargoidLevelState.Alert)) && s.CycleEnd == null)
                 .ToListAsync(cancellationToken);
 
             List<EDDatabase.AlertPrediction> alertPredictions = await dbContext.AlertPredictions

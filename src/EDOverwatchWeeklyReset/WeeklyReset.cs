@@ -38,7 +38,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Controlled when starSystem.OriginalPopulation > 0 => StarSystemThargoidLevelState.Recovery,
                         _ => StarSystemThargoidLevelState.None,
                     };
-                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false, false)
+                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, false, false, oldThargoidLevel.State)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,
@@ -143,7 +143,7 @@ namespace EDDataProcessor
                         StarSystemThargoidLevelState.Invasion => StarSystemThargoidLevelState.Controlled,
                         _ => StarSystemThargoidLevelState.None,
                     };
-                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, oldThargoidLevel.IsInvisibleState, false)
+                    StarSystemThargoidLevel starSystemThargoidLevel = new(0, newState, null, DateTimeOffset.UtcNow, oldThargoidLevel.IsInvisibleState, false, oldThargoidLevel.State)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,
@@ -252,7 +252,7 @@ namespace EDDataProcessor
                     StarSystemThargoidLevel oldThargoidLevel = starSystem.ThargoidLevel!;
                     oldThargoidLevel.CycleEnd = previousThargoidCycle;
 
-                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, StarSystemThargoidLevelState.None, null, DateTimeOffset.UtcNow, false, false)
+                    StarSystemThargoidLevel newStarSystemThargoidLevel = new(0, StarSystemThargoidLevelState.None, null, DateTimeOffset.UtcNow, false, false, oldThargoidLevel.State)
                     {
                         StarSystem = starSystem,
                         CycleStart = newThargoidCycle,
