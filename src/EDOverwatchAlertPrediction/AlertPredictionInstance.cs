@@ -231,7 +231,7 @@ namespace EDOverwatchAlertPrediction
             systemAlertPrediction.Order = order;
             systemAlertPrediction.AlertLikely = alertPossible;
             systemAlertPrediction.Status = AlertPredictionStatus.Default;
-            systemAlertPrediction.Type = (possibleOrder <= 3) ? AlertPredictionType.Invasion : AlertPredictionType.Alert;
+            systemAlertPrediction.Type = (possibleOrder <= 3 && alertPossible) ? AlertPredictionType.Invasion : AlertPredictionType.Alert;
 
             UsedAlertPredictions.Add(systemAlertPrediction);
 
