@@ -6,29 +6,47 @@
         <div class="content-box systems-container">
             <div class="table-container">
                 <div class="table">
-                    <table mat-table [dataSource]="dataSource" matSort matSortActive="Name" matSortDirection="asc"
-                        matSortDisableClear>
+                    <table mat-table
+                           [dataSource]="dataSource"
+                           matSort
+                           matSortActive="Name"
+                           matSortDirection="asc"
+                           matSortDisableClear>
                         <ng-container matColumnDef="Name">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Name</th>
+                            <td mat-cell
+                                *matCellDef="let row"
+                                class="nowrap">
                                 <a [routerLink]="['/titan', row.Name]">
                                     {{ row.Name }}
                                 </a>
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemName">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>System</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>System</th>
+                            <td mat-cell
+                                *matCellDef="let row"
+                                class="nowrap">
                                 <a [routerLink]="['/system', row.SystemAddress]">
                                     {{ row.SystemName }}
                                 </a>
-                                <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
-                                    (click)="copySystemName(row)"></fa-icon>
+                                <fa-icon [icon]="faClipboard"
+                                         matTooltip="Copy to clipboard"
+                                         class="clickable"
+                                         (click)="copySystemName(row)"></fa-icon>
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="State">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>State</th>
+                            <td mat-cell
+                                *matCellDef="let row"
+                                class="nowrap">
                                 <div [ngClass]="{
                                     'titan-active': row.State == 'Active',
                                     'titan-meltdown': row.State == 'Meltdown',
@@ -37,21 +55,27 @@
                                     {{ row.State }}
                                 </div>
                                 @if (row.State === 'Destroyed' && row.CausticLevel) {
-                                    <div class="small">
-                                        Caustic level: {{ row.CausticLevel }}
-                                    </div>
+                                <div class="small">
+                                    Caustic levels: {{ row.CausticLevel }}
+                                </div>
                                 }
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="DamageResistance">
-                            <th mat-header-cell *matHeaderCellDef>Damage resistance</th>
-                            <td mat-cell *matCellDef="let row" class="nowrap">
+                            <th mat-header-cell
+                                *matHeaderCellDef>Damage resistance</th>
+                            <td mat-cell
+                                *matCellDef="let row"
+                                class="nowrap">
                                 {{ row.DamageResistance?.Name }}
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="HeartsRemaining">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Hearts remaining</th>
-                            <td mat-cell *matCellDef="let row">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Hearts remaining</th>
+                            <td mat-cell
+                                *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.HeartsRemaining }}</div>
                                     <div></div>
@@ -59,8 +83,11 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="HeartProgress">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress current heart</th>
-                            <td mat-cell *matCellDef="let row">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Progress current heart</th>
+                            <td mat-cell
+                                *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.HeartProgress | percent:'1.2-2' }}</div>
                                     <div></div>
@@ -68,8 +95,11 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="TotalProgress">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total progress</th>
-                            <td mat-cell *matCellDef="let row">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Total progress</th>
+                            <td mat-cell
+                                *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.TotalProgress | percent:'1.2-2' }}</div>
                                     <div></div>
@@ -77,8 +107,11 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemsInAlert">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Alert</th>
-                            <td mat-cell *matCellDef="let row">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Alert</th>
+                            <td mat-cell
+                                *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.SystemsInAlert }}</div>
                                     <div></div>
@@ -86,8 +119,11 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemsInInvasion">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Invasion</th>
-                            <td mat-cell *matCellDef="let row">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Invasion</th>
+                            <td mat-cell
+                                *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.SystemsInInvasion }}</div>
                                     <div></div>
@@ -95,8 +131,11 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemsThargoidControlled">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Systems controlled</th>
-                            <td mat-cell *matCellDef="let row">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Systems controlled</th>
+                            <td mat-cell
+                                *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.SystemsThargoidControlled }}</div>
                                     <div></div>
@@ -104,18 +143,25 @@
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="SystemsInRecovery">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Systems in recovery</th>
-                            <td mat-cell *matCellDef="let row">
+                            <th mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header>Systems in recovery</th>
+                            <td mat-cell
+                                *matCellDef="let row">
                                 <div class="number-cell">
                                     <div>{{ row.SystemsInRecovery }}</div>
                                     <div></div>
                                 </div>
                             </td>
                         </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-header-row
+                            *matHeaderRowDef="displayedColumns; sticky: true"
+                            class="thead"></tr>
+                        <tr mat-row
+                            *matRowDef="let row; columns: displayedColumns;"></tr>
                     </table>
-                    <div *ngIf="dataSource.data.length === 0" class="empty-table">
+                    <div *ngIf="dataSource.data.length === 0"
+                         class="empty-table">
                         No records found.
                     </div>
                 </div>

@@ -30,13 +30,13 @@ namespace EDOverwatch_Web.Models
 
         private static async Task<OverwatchSpireSites> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            List<StarSystem> starSystems = await dbContext.StarSystems
+            var starSystems = await dbContext.StarSystems
                 .AsNoTracking()
                 .Include(s => s.ThargoidLevel)
-                .Where(s => s.BarnacleMatrixInSystem)
+                .Where(s => s.BarnacleMatrixInSystem && s.ThargoidLevel!.Maelstrom!.State == ThargoidMaelstromState.Active)
                 .ToListAsync(cancellationToken);
 
-            List<OverwatchStarSystem> systems = starSystems.Select(s => new OverwatchStarSystem(s, false)).ToList();
+            var systems = starSystems.Select(s => new OverwatchStarSystem(s, false)).ToList();
 
             return new OverwatchSpireSites(systems);
         }

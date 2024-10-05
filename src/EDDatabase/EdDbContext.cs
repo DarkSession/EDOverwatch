@@ -114,6 +114,10 @@ namespace EDDatabase
                 .AutoInclude();
 
             modelBuilder.Entity<ThargoidMaelstrom>()
+                .Property(t => t.State)
+                .HasDefaultValue(ThargoidMaelstromState.Active);
+
+            modelBuilder.Entity<ThargoidMaelstrom>()
                .Navigation(t => t.StarSystem)
                .AutoInclude();
 

@@ -235,7 +235,6 @@ namespace EDDataProcessor
 
             dbContext.ChangeTracker.Clear();
 
-
             {
                 ThargoidCycle cycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -2);
                 ThargoidCycle previousThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, -1);
@@ -260,6 +259,34 @@ namespace EDDataProcessor
                     };
                     dbContext.StarSystemThargoidLevels.Add(newStarSystemThargoidLevel);
                     starSystem.ThargoidLevel = newStarSystemThargoidLevel;
+                }
+
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            dbContext.ChangeTracker.Clear();
+
+            {
+                var maelstroms = await dbContext.ThargoidMaelstroms
+                    .Include(t => t.StarSystem)
+                    .ThenInclude(s => s!.ThargoidLevel)
+                    .Select(t => new
+                    {
+                        Maelstrom = t,
+                        SystemsInInvasion = dbContext.StarSystems.Count(s => s.ThargoidLevel!.Maelstrom == t && s.ThargoidLevel!.State == StarSystemThargoidLevelState.Invasion),
+                        SystemsThargoidControlled = dbContext.StarSystems.Count(s => s.ThargoidLevel!.Maelstrom == t && s.ThargoidLevel!.State == StarSystemThargoidLevelState.Controlled),
+                        SystemsInRecovery = dbContext.StarSystems.Count(s => s.ThargoidLevel!.Maelstrom == t && s.ThargoidLevel!.State == StarSystemThargoidLevelState.Recovery),
+                    })
+                    .ToListAsync(cancellationToken);
+
+                foreach (var maelstrom in maelstroms)
+                {
+                    var state = ThargoidMaelstromState.Active;
+                    if (maelstrom.SystemsInInvasion == 0 && maelstrom.SystemsThargoidControlled == 0 && maelstrom.SystemsInRecovery == 0)
+                    {
+                        state = ThargoidMaelstromState.Disabled;
+                    }
+                    maelstrom.Maelstrom.State = state;
                 }
 
                 await dbContext.SaveChangesAsync(cancellationToken);

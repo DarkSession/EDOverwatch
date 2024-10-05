@@ -27,6 +27,8 @@ export class MaelstromComponent implements OnInit {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      aspectRatio: 2,
       plugins: {
         legend: {
           position: 'bottom',
@@ -137,6 +139,8 @@ export class MaelstromComponent implements OnInit {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 2,
           plugins: {
             legend: {
               position: 'bottom',

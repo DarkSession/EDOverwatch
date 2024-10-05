@@ -13,12 +13,12 @@ namespace EDOverwatch_Web.Models
         {
             Cycle = new(thargoidCycle);
             Maelstroms = [];
-            foreach (ThargoidMaelstrom maelstrom in maelstroms)
+            foreach (var maelstrom in maelstroms)
             {
-                List<AlertPrediction> systems = alertPredictions
+                var systems = alertPredictions
                     .Where(a => a.Maelstrom?.Id == maelstrom.Id)
                     .ToList();
-                OverwatchAlertPredictionMaelstrom maelstromEntry = new(maelstrom, systems);
+                var maelstromEntry = new OverwatchAlertPredictionMaelstrom(maelstrom, systems);
                 Maelstroms.Add(maelstromEntry);
             }
             CurrentCycleAttackers = alertPredictionCycleAttackers.Select(a => new OverwatchStarSystemMin(a.AttackerStarSystem!)).ToList();
@@ -42,15 +42,16 @@ namespace EDOverwatch_Web.Models
 
         private static async Task<OverwatchAlertPredictions> CreateInternal(EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            ThargoidCycle nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
-            ThargoidCycle currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
+            var nextThargoidCycle = await dbContext.GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken, 1);
+            var currentThargoidCycle = await dbContext.GetThargoidCycle(cancellationToken);
 
-            List<ThargoidMaelstrom> maelstroms = await dbContext.ThargoidMaelstroms
+            var maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
+                .Where(t => t.HeartsRemaining > 0)
                 .OrderBy(m => m.Name)
                 .ToListAsync(cancellationToken);
 
-            List<AlertPrediction> alertPredictions = await dbContext.AlertPredictions
+            var alertPredictions = await dbContext.AlertPredictions
                 .AsNoTracking()
                 .AsSplitQuery()
                 .Include(a => a.Attackers!)
@@ -58,7 +59,7 @@ namespace EDOverwatch_Web.Models
                 .Where(a => a.Cycle == nextThargoidCycle)
                 .ToListAsync(cancellationToken);
 
-            List<AlertPredictionCycleAttacker> alertPredictionCycleAttackers = await dbContext.AlertPredictionCycleAttackers
+            var alertPredictionCycleAttackers = await dbContext.AlertPredictionCycleAttackers
                 .AsNoTracking()
                 .Where(a => a.Cycle == currentThargoidCycle)
                 .ToListAsync(cancellationToken);

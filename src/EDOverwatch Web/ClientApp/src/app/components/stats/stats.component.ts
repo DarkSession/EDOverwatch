@@ -24,6 +24,7 @@ export class StatsComponent implements OnInit {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      aspectRatio: 2,
       interaction: {
         mode: 'index',
         intersect: false,
@@ -39,6 +40,7 @@ export class StatsComponent implements OnInit {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      aspectRatio: 2,
       plugins: {
         legend: {
           position: 'bottom',
@@ -65,6 +67,7 @@ export class StatsComponent implements OnInit {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      aspectRatio: 2,
       plugins: {
         legend: {
           position: 'bottom',
@@ -83,7 +86,6 @@ export class StatsComponent implements OnInit {
     },
   };
   private chartLoaded: boolean = false;
-  public canvasWidth = 800;
 
   public constructor(
     private readonly websocketService: WebsocketService,
@@ -142,6 +144,8 @@ export class StatsComponent implements OnInit {
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2,
             interaction: {
               mode: 'index',
               intersect: false,
@@ -234,6 +238,8 @@ export class StatsComponent implements OnInit {
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2,
             plugins: {
               legend: {
                 position: 'bottom',
@@ -306,6 +312,8 @@ export class StatsComponent implements OnInit {
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2,
             plugins: {
               legend: {
                 position: 'bottom',
@@ -346,7 +354,6 @@ export class StatsComponent implements OnInit {
           this.clearedSystemsByType.options!.animation = false;
         }
       }
-      this.canvasWidth = 100 + this.stats.ThargoidCycles.length * 30;
       this.chartLoaded = true;
     }
   }

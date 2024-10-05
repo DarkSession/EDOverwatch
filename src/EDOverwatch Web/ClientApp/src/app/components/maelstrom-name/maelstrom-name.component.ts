@@ -15,6 +15,7 @@ export interface OverwatchMaelstrom {
   SystemName: string;
   SystemAddress: number;
   IngameNumber: number;
+  RemainingState: "Disabled" | "Active";
 }
 
 export interface OverwatchMaelstromProgress extends OverwatchMaelstrom {

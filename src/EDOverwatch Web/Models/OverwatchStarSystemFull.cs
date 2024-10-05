@@ -89,9 +89,9 @@
         public static async Task<(int startDateHour, int totalActivity)> GetTotalPlayerActivity(EdDbContext dbContext)
         {
             var time = WeeklyTick.GetLastTick();
-            if (DateTimeOffset.UtcNow.AddDays(-1) > time)
+            if (DateTimeOffset.UtcNow.AddHours(-6) > time)
             {
-                time = DateTimeOffset.UtcNow.AddDays(-1);
+                time = DateTimeOffset.UtcNow.AddHours(-6);
             }
 
             var dateHour = time.Year * 1000000 + time.Month * 10000 + time.Day * 100 + time.Hour;

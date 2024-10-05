@@ -7,7 +7,8 @@
             <div class="subtitle">
                 Systems and numbers
             </div>
-            <div class="table-container" *ngIf="stats">
+            <div class="table-container"
+                 *ngIf="stats">
                 <table>
                     <thead>
                         <tr>
@@ -172,9 +173,12 @@
                 </div>
                 <p>Timeline of the war starting in November 3308 with the arrival of the Titan Taranis.</p>
                 <div class="chart-overflow-container">
-                    <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 2">
-                        <canvas baseChart [data]="maelstromHistoryChart.data" [options]="maelstromHistoryChart.options"
-                            [type]="maelstromHistoryChart.type"></canvas>
+                    <div class="chart-container"
+                         style="width: 100%; height: 50vh;">
+                        <canvas baseChart
+                                [data]="maelstromHistoryChart.data"
+                                [options]="maelstromHistoryChart.options"
+                                [type]="maelstromHistoryChart.type"></canvas>
                     </div>
                 </div>
 
@@ -182,9 +186,12 @@
                     Cleared systems by state
                 </div>
                 <div class="chart-overflow-container">
-                    <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 3">
-                        <canvas baseChart [data]="clearedSystemsByType.data" [options]="clearedSystemsByType.options"
-                            [type]="clearedSystemsByType.type"></canvas>
+                    <div class="chart-container"
+                         style="width: 100%; height: 50vh;">
+                        <canvas baseChart
+                                [data]="clearedSystemsByType.data"
+                                [options]="clearedSystemsByType.options"
+                                [type]="clearedSystemsByType.type"></canvas>
                     </div>
                 </div>
 
@@ -197,10 +204,12 @@
                     Use the numbers as what they are: a high level overview.
                 </p>
                 <div class="chart-overflow-container">
-                    <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 2">
-                        <canvas baseChart [data]="contributionSummaryChart.data"
-                            [options]="contributionSummaryChart.options"
-                            [type]="contributionSummaryChart.type"></canvas>
+                    <div class="chart-container"
+                         style="width: 100%; height: 50vh;">
+                        <canvas baseChart
+                                [data]="contributionSummaryChart.data"
+                                [options]="contributionSummaryChart.options"
+                                [type]="contributionSummaryChart.type"></canvas>
                     </div>
                 </div>
             </div>

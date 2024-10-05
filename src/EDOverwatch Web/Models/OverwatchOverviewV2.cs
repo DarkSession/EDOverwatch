@@ -244,6 +244,7 @@ namespace EDOverwatch_Web.Models
 
             var maelstroms = await dbContext.ThargoidMaelstroms
                 .AsNoTracking()
+                .Where(t => t.State == ThargoidMaelstromState.Active)
                 .Include(t => t.StarSystem)
                 .ThenInclude(s => s!.ThargoidLevel)
                 .ToListAsync(cancellationToken);

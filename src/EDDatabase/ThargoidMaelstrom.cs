@@ -1,8 +1,11 @@
-﻿namespace EDDatabase
+﻿using System.ComponentModel;
+
+namespace EDDatabase
 {
     [Table("ThargoidMaelstrom")]
     [Index(nameof(Name))]
     [Index(nameof(HeartsRemaining))]
+    [Index(nameof(State))]
     public class ThargoidMaelstrom
     {
         [Column]
@@ -38,9 +41,12 @@
         [Column]
         public DateTimeOffset? CompletionTimeEstimate { get; set; }
 
+        [Column]
+        public ThargoidMaelstromState State { get; set; }
+
         public List<ThargoidMaelstromHeart>? Hearts { get; set; }
 
-        public ThargoidMaelstrom(int id, string name, decimal influenceSphere, short ingameNumber, DateTimeOffset updated, short heartsRemaining, DateTimeOffset? meltdownTimeEstimate)
+        public ThargoidMaelstrom(int id, string name, decimal influenceSphere, short ingameNumber, DateTimeOffset updated, short heartsRemaining, DateTimeOffset? meltdownTimeEstimate, ThargoidMaelstromState state)
         {
             Id = id;
             Name = name;
@@ -49,6 +55,13 @@
             Updated = updated;
             HeartsRemaining = heartsRemaining;
             MeltdownTimeEstimate = meltdownTimeEstimate;
+            State = state;
         }
+    }
+
+    public enum ThargoidMaelstromState
+    {
+        Disabled,
+        Active,
     }
 }

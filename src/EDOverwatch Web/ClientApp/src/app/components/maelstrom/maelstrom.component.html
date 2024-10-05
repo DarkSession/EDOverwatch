@@ -1,9 +1,11 @@
 <div class="overwatch-content-container">
     <div class="overwatch-content-large">
-        <div class="title" *ngIf="maelstrom">
+        <div class="title"
+             *ngIf="maelstrom">
             Titan {{ maelstrom.Name }}
         </div>
-        <div class="content-box" *ngIf="maelstrom">
+        <div class="content-box"
+             *ngIf="maelstrom">
             <div class="content-flex">
                 <div class="information">
                     <table>
@@ -21,10 +23,10 @@
                                 <td>{{ maelstrom.DamageResistance.Name }}</td>
                             </tr>
                             @if (maelstrom.TotalProgress == 1) {
-                                <tr>
-                                    <td><b>Caustic level</b></td>
-                                    <td>{{ maelstrom.CausticLevel }}</td>
-                                </tr>
+                            <tr>
+                                <td><b>Caustic levels</b></td>
+                                <td>{{ maelstrom.CausticLevel }}</td>
+                            </tr>
                             }
                             <tr>
                                 <td><b>Hearts</b></td>
@@ -59,14 +61,18 @@
                 <mat-tab label="Affected systems">
                     <ng-template matTabContent>
                         <app-system-list [systems]="maelstrom.Systems"
-                            [optionalColumns]="['DistanceToMaelstrom']"></app-system-list>
+                                         [optionalColumns]="['DistanceToMaelstrom']"></app-system-list>
                     </ng-template>
                 </mat-tab>
                 <mat-tab label="Timeline">
                     <div class="hide-on-small-mobile chart-overflow-container">
-                        <div class="chart-container" [style.width.px]="canvasWidth" [style.height.px]="canvasWidth / 2">
-                            <canvas baseChart class="chart" [data]="chartConfig.data" [options]="chartConfig.options"
-                                [type]="chartConfig.type"></canvas>
+                        <div class="chart-container"
+                             style="width: 100%; height: 50vh;">
+                            <canvas baseChart
+                                    class="chart"
+                                    [data]="chartConfig.data"
+                                    [options]="chartConfig.options"
+                                    [type]="chartConfig.type"></canvas>
                         </div>
                     </div>
                     <div class="hide-not-on-small-mobile">
