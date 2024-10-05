@@ -85,6 +85,23 @@
                 Features.Add(OverwatchStarSystemFeature.Counterstrike.ToString());
             }
         }
+
+        public static async Task<(int startDateHour, int totalActivity)> GetTotalPlayerActivity(EdDbContext dbContext)
+        {
+            var time = WeeklyTick.GetLastTick();
+            if (DateTimeOffset.UtcNow.AddDays(-1) > time)
+            {
+                time = DateTimeOffset.UtcNow.AddDays(-1);
+            }
+
+            var dateHour = time.Year * 1000000 + time.Month * 10000 + time.Day * 100 + time.Hour;
+
+            var totalActivity = await dbContext.PlayerActivities
+                .Where(p => p.DateHour >= dateHour)
+                .CountAsync();
+
+            return (dateHour, totalActivity);
+        }
     }
 
     public enum OverwatchStarSystemFeature

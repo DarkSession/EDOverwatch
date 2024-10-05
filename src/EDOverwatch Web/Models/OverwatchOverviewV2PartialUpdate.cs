@@ -172,13 +172,15 @@ namespace EDOverwatch_Web.Models
                 overviewNextCyclePrediction = new(nextCycle.Start, nextCycle.End, alertsPredicted, invasionsPredicted, controlledPredicted, titanPredicted, recoveryPredicted);
             }
 
-            DateTimeOffset lastTick = WeeklyTick.GetLastTick();
-            DateTimeOffset stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
-            DateTimeOffset signalMaxAge = lastTick.AddDays(-7);
+            var lastTick = WeeklyTick.GetLastTick();
+            var stationMaxAge = DateTimeOffset.UtcNow.AddDays(-1);
+            var signalMaxAge = lastTick.AddDays(-7);
             if (lastTick < stationMaxAge)
             {
                 stationMaxAge = lastTick;
             }
+
+            (var startDateHour, var totalActivity) = await OverwatchStarSystemFull.GetTotalPlayerActivity(dbContext);
 
             var system = await dbContext.StarSystems
                .AsNoTracking()
@@ -213,6 +215,7 @@ namespace EDOverwatch_Web.Models
                     AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
                     GroundPortUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack && StationType.WarGroundAssetTypes.Contains(s.Type!.Name)).Any(),
                     HasAlertPredicted = dbContext.AlertPredictions.Any(a => a.StarSystem == s && a.Cycle == nextCycle && a.AlertLikely),
+                    PlayerActivityCount = s.PlayerActivities!.Count(p => p.DateHour >= startDateHour),
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -221,41 +224,18 @@ namespace EDOverwatch_Web.Models
                 return null;
             }
 
-            Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
-            DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
-
-            var efforts = await dbContext.WarEfforts
-                .AsNoTracking()
-                .Where(w =>
-                        w.StarSystemId == system.StarSystem.Id &&
-                        w.Date >= startDate &&
-                        w.StarSystem!.WarRelevantSystem &&
-                        w.Side == WarEffortSide.Humans)
-                .GroupBy(w => new
-                {
-                    w.StarSystemId,
-                    w.Type,
-                })
-                .Select(w => new
-                {
-                    w.Key.StarSystemId,
-                    w.Key.Type,
-                    Amount = w.Sum(g => g.Amount),
-                })
-                .ToListAsync(cancellationToken);
-
-            StarSystem starSystem = system.StarSystem;
-            decimal effortFocus = 0;
-            if (totalEffortSums.Count != 0)
+            var starSystem = system.StarSystem;
+            var effortFocus = 0m;
+            if (totalActivity != 0)
             {
-                effortFocus = WarEffort.CalculateSystemFocus(efforts.Where(e => e.StarSystemId == starSystem.Id).Select(e => new WarEffortTypeSum(e.Type, e.Amount)), totalEffortSums);
+                effortFocus = Math.Round((decimal)system.PlayerActivityCount / (decimal)totalActivity, 4);
             }
 
-            List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
+            var specialFactionOperations = system.SpecialFactionOperations
                 .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
                 .ToList();
 
-            OverwatchStarSystem overwatchStarSystem = new OverwatchStarSystemFull(
+            var overwatchStarSystem = new OverwatchStarSystemFull(
                     starSystem,
                     effortFocus,
                     factionAxOperations: system.FactionAxOperations,

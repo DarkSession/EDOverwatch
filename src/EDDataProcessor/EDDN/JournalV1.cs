@@ -1,6 +1,7 @@
 ﻿using EDDataProcessor.Journal;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using System.Threading.Channels;
 
 namespace EDDataProcessor.EDDN
 {
@@ -71,9 +72,14 @@ namespace EDDataProcessor.EDDN
                             starSystem.UpdateWarRelevantSystem();
                             dbContext.StarSystems.Add(starSystem);
                         }
+
+                        var dbChanges = starSystem.Updated < Message.Timestamp || isNew;
+                        var changed = isNew;
+
+                        dbChanges = await PlayerActivityHelper.RegisterPlayerActivity(Header.UploaderID, Message.Timestamp, starSystem, dbContext) || dbChanges;
+
                         if (starSystem.Updated < Message.Timestamp || isNew)
                         {
-                            bool changed = isNew;
                             starSystem.Updated = Message.Timestamp;
                             if (starSystem.Name != Message.StarSystem)
                             {
@@ -82,7 +88,7 @@ namespace EDDataProcessor.EDDN
                             }
                             if (!string.IsNullOrEmpty(Message.SystemAllegiance))
                             {
-                                FactionAllegiance allegiance = await FactionAllegiance.GetByName(Message.SystemAllegiance, dbContext, cancellationToken);
+                                var allegiance = await FactionAllegiance.GetByName(Message.SystemAllegiance, dbContext, cancellationToken);
                                 if (starSystem.Allegiance?.Id != allegiance.Id)
                                 {
                                     starSystem.Allegiance = allegiance;
@@ -91,7 +97,7 @@ namespace EDDataProcessor.EDDN
                             }
                             if (!string.IsNullOrEmpty(Message.SystemSecurity))
                             {
-                                StarSystemSecurity starSystemSecurity = await StarSystemSecurity.GetByName(Message.SystemSecurity, dbContext, cancellationToken);
+                                var starSystemSecurity = await StarSystemSecurity.GetByName(Message.SystemSecurity, dbContext, cancellationToken);
                                 if (starSystem.Security?.Id != starSystemSecurity.Id)
                                 {
                                     starSystem.Security = starSystemSecurity;
@@ -117,9 +123,9 @@ namespace EDDataProcessor.EDDN
                             }
                             if (Message.Factions is not null && Message.Factions.Count != 0)
                             {
-                                foreach (FSDJumpFaction faction in Message.Factions.Where(f => !string.IsNullOrEmpty(f.Allegiance)))
+                                foreach (var faction in Message.Factions.Where(f => !string.IsNullOrEmpty(f.Allegiance)))
                                 {
-                                    MinorFaction minorFaction = await MinorFaction.GetByName(faction.Name, dbContext, cancellationToken);
+                                    var minorFaction = await MinorFaction.GetByName(faction.Name, dbContext, cancellationToken);
                                     if (minorFaction.Allegiance?.Name != faction.Allegiance)
                                     {
                                         minorFaction.Allegiance = await FactionAllegiance.GetByName(faction.Allegiance, dbContext, cancellationToken);
@@ -143,13 +149,19 @@ namespace EDDataProcessor.EDDN
                             {
                                 changed = await starSystem.UpdateThargoidWar(Message.Timestamp, Message.ThargoidWar, dbContext, cancellationToken) || changed;
                             }
-                            await dbContext.SaveChangesAsync(cancellationToken);
-                            if (changed)
-                            {
-                                StarSystemUpdated starSystemUpdated = new(Message.SystemAddress);
-                                await activeMqProducer.SendAsync(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, activeMqTransaction, cancellationToken);
-                            }
                         }
+
+                        if (dbChanges)
+                        {
+                            await dbContext.SaveChangesAsync(cancellationToken);
+                        }
+
+                        if (changed)
+                        {
+                            var starSystemUpdated = new StarSystemUpdated(Message.SystemAddress);
+                            await activeMqProducer.SendAsync(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, activeMqTransaction, cancellationToken);
+                        }
+
                         break;
                     }
                 case JournalMessageEvent.Scan:
@@ -202,7 +214,9 @@ namespace EDDataProcessor.EDDN
                             break;
                         }
 
-                        StarSystem? starSystem = await dbContext.StarSystems.SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
+                        StarSystem? starSystem = await dbContext.StarSystems
+                            .Include(s => s.ThargoidLevel)
+                            .SingleOrDefaultAsync(m => m.SystemAddress == Message.SystemAddress, cancellationToken);
                         if (starSystem == null)
                         {
                             break;
@@ -237,6 +251,13 @@ namespace EDDataProcessor.EDDN
                             };
                             dbContext.Stations.Add(station);
                         }
+
+                        var dbChanges = station.Updated < Message.Timestamp || isNew;
+                        if (Message.Event == JournalMessageEvent.Location)
+                        {
+                            dbChanges = await PlayerActivityHelper.RegisterPlayerActivity(Header.UploaderID, Message.Timestamp, starSystem, dbContext) || dbChanges;
+                        }
+
                         if (station.Updated < Message.Timestamp || isNew)
                         {
                             bool changed = isNew;
@@ -322,7 +343,6 @@ namespace EDDataProcessor.EDDN
                             {
                                 station.MinorFaction = await MinorFaction.GetByName(Message.StationFaction.Name, dbContext, cancellationToken);
                             }
-                            await dbContext.SaveChangesAsync(cancellationToken);
                             /*
                             if (changed)
                             {
@@ -331,6 +351,12 @@ namespace EDDataProcessor.EDDN
                             }
                             */
                         }
+
+                        if (dbChanges)
+                        {
+                            await dbContext.SaveChangesAsync(cancellationToken);
+                        }
+
                         break;
                     }
             }

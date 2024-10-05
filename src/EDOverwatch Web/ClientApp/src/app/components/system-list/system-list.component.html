@@ -1,80 +1,120 @@
 <div class="table-container">
-    <div class="table" [ngStyle]="{ 'height.vh': maxHeight }">
-        <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)"
-            [matSortActive]="sortColumn" [matSortDirection]="sortDirection" matSortDisableClear>
+    <div class="table"
+         [ngStyle]="{ 'height.vh': maxHeight }">
+        <table mat-table
+               [dataSource]="dataSource"
+               matSort
+               (matSortChange)="sortData($event)"
+               [matSortActive]="sortColumn"
+               [matSortDirection]="sortDirection"
+               matSortDisableClear>
             <ng-container matColumnDef="Name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>System Name</th>
-                <td mat-cell *matCellDef="let row" class="nowrap">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>System Name</th>
+                <td mat-cell
+                    *matCellDef="let row"
+                    class="nowrap">
                     <a [routerLink]="['/system', row.SystemAddress]">
                         {{ row.Name }}
                     </a>
-                    <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
-                        (click)="copySystemName(row)"></fa-icon>
+                    <fa-icon [icon]="faClipboard"
+                             matTooltip="Copy to clipboard"
+                             class="clickable"
+                             (click)="copySystemName(row)"></fa-icon>
                 </td>
             </ng-container>
             <ng-container matColumnDef="ThargoidLevel">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Thargoid State</th>
-                <td mat-cell *matCellDef="let row" class="nowrap">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Thargoid State</th>
+                <td mat-cell
+                    *matCellDef="let row"
+                    class="nowrap">
                     <app-thargoid-level [thargoidLevel]="row.ThargoidLevel"></app-thargoid-level>
                     <div *ngIf="row.StateProgress?.IsCompleted && row.StateProgress.NextSystemState"
-                        class="state-change">
+                         class="state-change">
                         <app-thargoid-level [thargoidLevel]="row.StateProgress.NextSystemState"
-                            [size]="9"></app-thargoid-level>
+                                            [size]="9"></app-thargoid-level>
                         &nbsp;in {{ row.StateProgress.SystemStateChanges | dateAgo:1 }}
                     </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Population">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Population</th>
-                <td mat-cell *matCellDef="let row" class="cell-right">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Population</th>
+                <td mat-cell
+                    *matCellDef="let row"
+                    class="cell-right">
                     {{ row.Population | numberSuffix:1 }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="PopulationOriginal">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Population (Original)</th>
-                <td mat-cell *matCellDef="let row" class="cell-right">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Population (Original)</th>
+                <td mat-cell
+                    *matCellDef="let row"
+                    class="cell-right">
                     {{ row.PopulationOriginal | numberSuffix:1 }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="Starports">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Starports</th>
-                <td mat-cell *matCellDef="let row">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Starports</th>
+                <td mat-cell
+                    *matCellDef="let row">
                     <app-system-starport-status [starSystem]="row"></app-system-starport-status>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Maelstrom">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Titan</th>
-                <td mat-cell *matCellDef="let row">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Titan</th>
+                <td mat-cell
+                    *matCellDef="let row">
                     <app-maelstrom-name [maelstrom]="row.Maelstrom"></app-maelstrom-name>
                 </td>
             </ng-container>
             <ng-container matColumnDef="DistanceToMaelstrom">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance to Titan</th>
-                <td mat-cell *matCellDef="let row">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Distance to Titan</th>
+                <td mat-cell
+                    *matCellDef="let row">
                     {{ row.DistanceToMaelstrom | number:'0.2-2' }} Ly
                 </td>
             </ng-container>
             <ng-container matColumnDef="Progress">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Progress</th>
-                <td mat-cell *matCellDef="let row" class="nowrap">
-                    <div class="progress-cell" *ngIf="row.Progress !== null">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Progress</th>
+                <td mat-cell
+                    *matCellDef="let row"
+                    class="nowrap">
+                    <div class="progress-cell"
+                         *ngIf="row.Progress !== null">
                         <div class="entry">
                             <ng-container *ngIf="row.ThargoidLevel?.Level !== 50 || !row.Maelstrom">
                                 <div class="progress-number"
-                                    matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }}">
+                                     matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }}">
                                     {{ row.Progress }} %
                                 </div>
                             </ng-container>
                             <ng-container *ngIf="row.ThargoidLevel?.Level === 50 && row.Maelstrom">
                                 <div class="progress-number"
-                                    matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }} heart progress">
+                                     matTooltip="{{ row.StateProgress?.ProgressUncapped | percent:'1.4-4' }} heart progress">
                                     {{ row.Progress }} %
                                 </div>
-                                <div *ngIf="row.Maelstrom.HeartsRemaining > 0" class="titan-progress"
-                                    matTooltip="{{ row.Maelstrom.TotalProgress | percent:'1.4-4' }} total progress">
+                                <div *ngIf="row.Maelstrom.HeartsRemaining > 0"
+                                     class="titan-progress"
+                                     matTooltip="{{ row.Maelstrom.TotalProgress | percent:'1.4-4' }} total progress">
                                     ({{ row.Maelstrom.TotalProgress | percent:'1.1-1' }})
                                 </div>
-                                <div *ngIf="row.Maelstrom.HeartsRemaining > 0" class="titan-progress">
+                                <div *ngIf="row.Maelstrom.HeartsRemaining > 0"
+                                     class="titan-progress">
                                     {{ row.Maelstrom.HeartsRemaining }} {{ row.Maelstrom.HeartsRemaining == 1 ? 'heart'
                                     :
                                     'hearts' }}
@@ -82,107 +122,150 @@
                             </ng-container>
                         </div>
                         <div class="entry">
-                            <div class="progress-completed" *ngIf="row.Progress >= 100">
-                                <fa-icon [icon]="faCircleCheck" matTooltip="Completed"></fa-icon>
+                            <div class="progress-completed"
+                                 *ngIf="row.Progress >= 100">
+                                <fa-icon [icon]="faCircleCheck"
+                                         matTooltip="Completed"></fa-icon>
                             </div>
-                            <div class="progress-locked" *ngIf="row.ThargoidSpireSiteInSystem && row.Progress != 100">
+                            <div class="progress-locked"
+                                 *ngIf="row.ThargoidSpireSiteInSystem && row.Progress != 100">
                                 <fa-icon [icon]="faHexagonExclamation"
-                                    matTooltip="Thargoid spire site present in the system." size="lg"></fa-icon>
+                                         matTooltip="Thargoid spire site present in the system."
+                                         size="lg"></fa-icon>
                             </div>
                         </div>
                     </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="ProgressReportedCompletion">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Reported progress completion</th>
-                <td mat-cell *matCellDef="let row">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Reported progress completion</th>
+                <td mat-cell
+                    *matCellDef="let row">
                     <span *ngIf="row.StateProgress.IsCompleted && row.StateProgress.ProgressCompletionReported"
-                        matTooltip="{{ row.StateProgress.ProgressCompletionReported | date:'long' }}">
+                          matTooltip="{{ row.StateProgress.ProgressCompletionReported | date:'long' }}">
                         {{ row.StateProgress.ProgressCompletionReported | timeago }}
                     </span>
                 </td>
             </ng-container>
             <ng-container matColumnDef="EffortFocus">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    matTooltip="Registered effort focus approximately since the last tick or the last 24 hours if the tick happened more than 24 hours ago">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header
+                    matTooltip="Player presence since the last tick or the last 24 hours (if the tick happened more than 24 hours ago)">
                     Focus&nbsp;
                     <fa-icon [icon]="faCircleQuestion"></fa-icon>
                 </th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell
+                    *matCellDef="let row">
                     {{ row.EffortFocus | percent }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="Features">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Features</th>
-                <td mat-cell *matCellDef="let row">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Features</th>
+                <td mat-cell
+                    *matCellDef="let row">
                     <app-system-features [starSystem]="row"></app-system-features>
                 </td>
             </ng-container>
             <ng-container matColumnDef="FactionOperations">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Operations</th>
-                <td mat-cell *matCellDef="let row">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Operations</th>
+                <td mat-cell
+                    *matCellDef="let row">
                     <div class="operations-column">
-                        <div class="operation operation-combat" *ngIf="row.FactionAxOperations"
-                            matTooltip="AX Combat Operations">
-                            <fa-icon [icon]="faCrosshairs" size="lg"></fa-icon>
+                        <div class="operation operation-combat"
+                             *ngIf="row.FactionAxOperations"
+                             matTooltip="AX Combat Operations">
+                            <fa-icon [icon]="faCrosshairs"
+                                     size="lg"></fa-icon>
                             {{ row.FactionAxOperations }}
                         </div>
-                        <div class="operation operation-rescue" *ngIf="row.FactionRescueOperations"
-                            matTooltip="Rescue Operations">
-                            <fa-icon [icon]="faKitMedical" size="lg"></fa-icon>
+                        <div class="operation operation-rescue"
+                             *ngIf="row.FactionRescueOperations"
+                             matTooltip="Rescue Operations">
+                            <fa-icon [icon]="faKitMedical"
+                                     size="lg"></fa-icon>
                             {{ row.FactionRescueOperations }}
                         </div>
-                        <div class="operation operation-logistics" *ngIf="row.FactionLogisticsOperations"
-                            matTooltip="Logistics Operations">
-                            <fa-icon [icon]="faTruck" size="lg"></fa-icon>
+                        <div class="operation operation-logistics"
+                             *ngIf="row.FactionLogisticsOperations"
+                             matTooltip="Logistics Operations">
+                            <fa-icon [icon]="faTruck"
+                                     size="lg"></fa-icon>
                             {{ row.FactionLogisticsOperations }}
                         </div>
-                        <div class="operation operation-general" *ngIf="row.FactionGeneralOperations"
-                            matTooltip="General Operations">
-                            <fa-icon [icon]="faHandshake" size="lg"></fa-icon>
+                        <div class="operation operation-general"
+                             *ngIf="row.FactionGeneralOperations"
+                             matTooltip="General Operations">
+                            <fa-icon [icon]="faHandshake"
+                                     size="lg"></fa-icon>
                             {{ row.FactionGeneralOperations }}
                         </div>
                     </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="StateExpiration">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Remaining time</th>
-                <td mat-cell *matCellDef="let row">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Remaining time</th>
+                <td mat-cell
+                    *matCellDef="let row">
                     <div *ngIf="row.StateExpiration?.StateExpires">
                         {{ row.StateExpiration?.StateExpires | dateAgo }}
                     </div>
                 </td>
             </ng-container>
             <ng-container matColumnDef="AdminOptionSystemInCounterstrike">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Counterstrike system</th>
-                <td mat-cell *matCellDef="let row">
-                    <mat-slide-toggle *ngIf="row.ThargoidLevel?.Level == 40" [(ngModel)]="row.editCounterstrike"
-                        (ngModelChange)="saveSystem(row)">
+                <th mat-header-cell
+                    *matHeaderCellDef
+                    mat-sort-header>Counterstrike system</th>
+                <td mat-cell
+                    *matCellDef="let row">
+                    <mat-slide-toggle *ngIf="row.ThargoidLevel?.Level == 40"
+                                      [(ngModel)]="row.editCounterstrike"
+                                      (ngModelChange)="saveSystem(row)">
                     </mat-slide-toggle>
                 </td>
             </ng-container>
-            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="thead"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row
+                *matHeaderRowDef="displayedColumns; sticky: true"
+                class="thead"></tr>
+            <tr mat-row
+                *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-        <div *ngIf="dataSource.data.length === 0" class="empty-table">
+        <div *ngIf="dataSource.data.length === 0"
+             class="empty-table">
             No records found.
         </div>
-        <mat-paginator [pageSizeOptions]="[25, 50, 100, 250]" [pageSize]="pageSize" [showFirstLastButtons]="true"
-            (page)="handlePageEvent($event)" aria-label="Select page of systems"></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[25, 50, 100, 250]"
+                       [pageSize]="pageSize"
+                       [showFirstLastButtons]="true"
+                       (page)="handlePageEvent($event)"
+                       aria-label="Select page of systems"></mat-paginator>
     </div>
-    <div class="options-bottom" *ngIf="!filterApplied">
-        <span (click)="exportToCsv(true)" class="clickable">
+    <div class="options-bottom"
+         *ngIf="!filterApplied">
+        <span (click)="exportToCsv(true)"
+              class="clickable">
             <fa-icon [icon]="faFileCsv"></fa-icon>
             Export as CSV
         </span>
     </div>
-    <div class="options-bottom" *ngIf="filterApplied">
-        <span (click)="exportToCsv(true)" class="clickable">
+    <div class="options-bottom"
+         *ngIf="filterApplied">
+        <span (click)="exportToCsv(true)"
+              class="clickable">
             <fa-icon [icon]="faFileCsv"></fa-icon>
             Export all as CSV
         </span>
         <br>
-        <span (click)="exportToCsv(false)" class="clickable">
+        <span (click)="exportToCsv(false)"
+              class="clickable">
             <fa-icon [icon]="faFileCsv"></fa-icon>
             Export current view as CSV
         </span>

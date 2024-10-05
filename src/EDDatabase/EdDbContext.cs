@@ -57,6 +57,8 @@ namespace EDDatabase
 
         public DbSet<WarEffort> WarEfforts { get; set; }
 
+        public DbSet<PlayerActivity> PlayerActivities { get; set; }
+
         public EdDbContext(DbContextOptions<EdDbContext> options) : base(options)
         {
         }
@@ -118,6 +120,11 @@ namespace EDDatabase
             modelBuilder.Entity<ThargoidMaelstrom>()
                .Navigation(t => t.DefeatCycle)
                .AutoInclude();
+
+            modelBuilder.Entity<PlayerActivity>()
+                .HasOne(p => p.StarSystem)
+                .WithMany(s => s.PlayerActivities)
+                .HasForeignKey(p => p.StarSystemId);
         }
 
         public Task<ThargoidCycle> GetThargoidCycle(CancellationToken cancellationToken) => GetThargoidCycle(DateTimeOffset.UtcNow, cancellationToken);

@@ -45,6 +45,8 @@
                 stationMaxAge = lastTick;
             }
 
+            (var startDateHour, var totalActivity) = await OverwatchStarSystemFull.GetTotalPlayerActivity(dbContext);
+
             var systems = await dbContext.StarSystems
                 .AsNoTracking()
                 .Where(s => s.ThargoidLevel!.Maelstrom == maelstrom && s.ThargoidLevel.State > StarSystemThargoidLevelState.None)
@@ -77,41 +79,21 @@
                     AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
                     GroundPortUnderAttack = s.Stations!.Where(s => s.Updated > stationMaxAge && s.State == StationState.UnderAttack && StationType.WarGroundAssetTypes.Contains(s.Type!.Name)).Any(),
                     HasAlertPredicted = dbContext.AlertPredictions.Any(a => a.StarSystem == s && a.Cycle == nextThargoidCycle && a.AlertLikely),
-                })
-                .ToListAsync(cancellationToken);
-
-            Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
-            DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
-
-            var efforts = await dbContext.WarEfforts
-                .AsNoTracking()
-                .Where(w =>
-                        w.Date >= startDate &&
-                        systems.Select(y => y.StarSystem).Contains(w.StarSystem!) &&
-                        w.Side == WarEffortSide.Humans)
-                .GroupBy(w => new
-                {
-                    w.StarSystemId,
-                    w.Type,
-                })
-                .Select(w => new
-                {
-                    w.Key.StarSystemId,
-                    w.Key.Type,
-                    Amount = w.Sum(g => g.Amount),
+                    PlayerActivityCount = s.PlayerActivities!.Count(p => p.DateHour >= startDateHour),
                 })
                 .ToListAsync(cancellationToken);
 
             List<OverwatchStarSystem> resultStarSystems = [];
             foreach (var system in systems)
             {
-                StarSystem starSystem = system.StarSystem;
-                decimal effortFocus = 0;
-                if (totalEffortSums.Count != 0)
+                var starSystem = system.StarSystem;
+                var effortFocus = 0m;
+                if (totalActivity != 0)
                 {
-                    effortFocus = WarEffort.CalculateSystemFocus(efforts.Where(e => e.StarSystemId == starSystem.Id).Select(e => new WarEffortTypeSum(e.Type, e.Amount)), totalEffortSums);
+                    effortFocus = Math.Round((decimal)system.PlayerActivityCount / (decimal)totalActivity, 4);
                 }
-                List<OverwatchStarSystemSpecialFactionOperation> specialFactionOperations = system.SpecialFactionOperations
+
+                var specialFactionOperations = system.SpecialFactionOperations
                     .Select(s => new OverwatchStarSystemSpecialFactionOperation(s.Short, s.Name))
                     .ToList();
                 resultStarSystems.Add(new OverwatchStarSystemFull(

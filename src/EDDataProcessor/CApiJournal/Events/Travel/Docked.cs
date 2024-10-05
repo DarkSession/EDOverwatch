@@ -1,4 +1,6 @@
-﻿using EDDataProcessor.EDDN;
+﻿using EDDatabase;
+using EDDataProcessor.EDDN;
+using EDDataProcessor.Journal;
 using System.Text.RegularExpressions;
 
 namespace EDDataProcessor.CApiJournal.Events.Travel
@@ -33,8 +35,10 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
 
         public override async ValueTask ProcessEvent(JournalParameters journalParameters, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            StarSystem? starSystem = await dbContext.StarSystems.SingleOrDefaultAsync(m => m.SystemAddress == SystemAddress, cancellationToken);
-            if (starSystem == null)
+            StarSystem? starSystem = await dbContext.StarSystems
+                .Include(s => s.ThargoidLevel)
+                .SingleOrDefaultAsync(m => m.SystemAddress == SystemAddress, cancellationToken);
+            if (starSystem is null)
             {
                 return;
             }
@@ -68,6 +72,11 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 };
                 dbContext.Stations.Add(station);
             }
+
+            var dbChanges = station.Updated < Timestamp || isNew;
+
+            dbChanges = await PlayerActivityHelper.RegisterPlayerActivity(journalParameters.Commander.Name, Timestamp, starSystem, dbContext) || dbChanges;
+
             if (station.Updated < Timestamp || isNew)
             {
                 bool changed = isNew;
@@ -151,7 +160,6 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                     station.MinorFaction = await MinorFaction.GetByName(StationFaction.Name, dbContext, cancellationToken);
                     changed = true;
                 }
-                await dbContext.SaveChangesAsync(cancellationToken);
                 /*
                 if (changed)
                 {
@@ -160,6 +168,12 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 }
                 */
             }
+
+            if (dbChanges)
+            {
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+
             journalParameters.Commander.System = starSystem;
             journalParameters.Commander.Station = station;
         }

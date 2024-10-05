@@ -82,6 +82,8 @@ namespace EDDatabase
 
         public IEnumerable<StarSystemFssSignal>? FssSignals { get; set; }
 
+        public IEnumerable<PlayerActivity>? PlayerActivities { get; set; }
+
         public StarSystem(
             long id,
             long systemAddress,

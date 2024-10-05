@@ -67,9 +67,13 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 starSystem.UpdateWarRelevantSystem();
                 dbContext.StarSystems.Add(starSystem);
             }
+            var dbChanges = starSystem.Updated < Timestamp || isNew;
+            var changed = isNew;
+
+            dbChanges = await PlayerActivityHelper.RegisterPlayerActivity(journalParameters.Commander.Name, Timestamp, starSystem, dbContext) || dbChanges;
+
             if (starSystem.Updated < Timestamp || isNew)
             {
-                bool changed = isNew;
                 starSystem.Updated = Timestamp;
                 if (starSystem.Name != StarSystem)
                 {
@@ -140,12 +144,15 @@ namespace EDDataProcessor.CApiJournal.Events.Travel
                 {
                     changed = await starSystem.UpdateThargoidWar(Timestamp, ThargoidWar, dbContext, cancellationToken) || changed;
                 }
+            }
+            if (dbChanges)
+            {
                 await dbContext.SaveChangesAsync(cancellationToken);
-                if (changed)
-                {
-                    StarSystemUpdated starSystemUpdated = new(SystemAddress);
-                    await journalParameters.SendMqMessage(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, cancellationToken);
-                }
+            }
+            if (changed)
+            {
+                StarSystemUpdated starSystemUpdated = new(SystemAddress);
+                await journalParameters.SendMqMessage(StarSystemUpdated.QueueName, StarSystemUpdated.Routing, starSystemUpdated.Message, cancellationToken);
             }
             journalParameters.Commander.System = starSystem;
         }

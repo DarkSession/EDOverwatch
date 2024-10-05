@@ -110,8 +110,10 @@ namespace EDOverwatch_Web.Models
 
         private static async Task<OverwatchStarSystemFullDetail?> CreateInternal(long systemAddress, bool includeExtendedProgress, EdDbContext dbContext, CancellationToken cancellationToken)
         {
-            DateTimeOffset lastTick = WeeklyTick.GetLastTick();
-            DateTimeOffset signalMaxAge = lastTick.AddDays(-7);
+            var lastTick = WeeklyTick.GetLastTick();
+            var signalMaxAge = lastTick.AddDays(-7);
+
+            (var startDateHour, var totalActivity) = await OverwatchStarSystemFull.GetTotalPlayerActivity(dbContext);
 
             var systemData = await dbContext.StarSystems
                 .AsNoTracking()
@@ -131,43 +133,30 @@ namespace EDOverwatch_Web.Models
                     FederalFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Federation),
                     EmpireFaction = s.MinorFactionPresences!.Any(m => m.MinorFaction!.Allegiance!.Name == FactionAllegiance.Empire),
                     AXConflictZones = s.FssSignals!.Any(f => f.Type == StarSystemFssSignalType.AXCZ && f.LastSeen >= signalMaxAge),
+                    PlayerActivityCount = s.PlayerActivities!.Count(p => p.DateHour >= startDateHour),
                 })
                 .FirstOrDefaultAsync(cancellationToken);
             if (systemData?.StarSystem?.ThargoidLevel != null)
             {
-                ThargoidCycle currentCycle = await dbContext.GetThargoidCycle(cancellationToken);
-                StarSystem starSystem = systemData.StarSystem;
-                Dictionary<WarEffortTypeGroup, long> totalEffortSums = await WarEffort.GetTotalWarEfforts(dbContext, cancellationToken);
-                DateOnly startDate = WarEffort.GetWarEffortFocusStartDate();
+                var currentCycle = await dbContext.GetThargoidCycle(cancellationToken);
+                var starSystem = systemData.StarSystem;
 
-                decimal effortFocus = 0;
-                if (totalEffortSums.Any())
+                var effortFocus = 0m;
+                if (totalActivity != 0)
                 {
-                    List<WarEffortTypeSum> systemEfforts = await dbContext.WarEfforts
-                        .AsNoTracking()
-                        .Where(w =>
-                                w.Date >= startDate &&
-                                w.StarSystem == starSystem &&
-                                w.Side == WarEffortSide.Humans)
-                        .GroupBy(w => new
-                        {
-                            w.Type,
-                        })
-                        .Select(w => new WarEffortTypeSum(w.Key.Type, w.Sum(g => g.Amount)))
-                        .ToListAsync(cancellationToken);
-                    effortFocus = WarEffort.CalculateSystemFocus(systemEfforts, totalEffortSums);
+                    effortFocus = Math.Round((decimal)systemData.PlayerActivityCount / (decimal)totalActivity, 4);
                 }
 
-                DateTimeOffset previousTickTime = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1);
-                DateOnly previousTickDay = DateOnly.FromDateTime(previousTickTime.DateTime);
-                DateOnly lastTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 0).DateTime);
-                DateOnly today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
+                var previousTickTime = WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, -1);
+                var previousTickDay = DateOnly.FromDateTime(previousTickTime.DateTime);
+                var lastTickDay = DateOnly.FromDateTime(WeeklyTick.GetTickTime(DateTimeOffset.UtcNow, 0).DateTime);
+                var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
 
-                List<DateOnly> daysSincePreviousTick = Enumerable.Range(0, today.DayNumber - previousTickDay.DayNumber + 1)
+                var daysSincePreviousTick = Enumerable.Range(0, today.DayNumber - previousTickDay.DayNumber + 1)
                     .Select(previousTickDay.AddDays)
                     .ToList();
 
-                List<OverwatchStarSystemWarEffort> warEfforts = await dbContext.WarEfforts
+                var warEfforts = await dbContext.WarEfforts
                     .AsNoTracking()
                     .Where(w =>
                             w.Date >= previousTickDay &&
