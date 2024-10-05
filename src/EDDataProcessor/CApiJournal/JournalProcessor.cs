@@ -156,7 +156,7 @@ namespace EDDataProcessor.CApiJournal
                         }
                         catch (Exception e)
                         {
-                            throw new Exception("Error processing journal", e);
+                            throw new Exception($"Error processing journal for '{commander.Name}' ({commander.Id})", e);
                         }
                         commander.JournalLastLine = currentLine;
                         commander.JournalDay = journalDay;
