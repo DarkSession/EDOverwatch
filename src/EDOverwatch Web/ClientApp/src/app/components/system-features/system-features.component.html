@@ -1,20 +1,51 @@
 <div class="features">
-    <fa-icon *ngIf="aXConflictZones" [icon]="faCrosshairs" size="xl" matTooltip="AX conflict zones"></fa-icon>
-    <img *ngIf="thargoidSpires" class="feature-icon" src="assets/spire.svg"
-        [matTooltip]="'Thargoid spire site present' + ((starSystem?.ThargoidSpireSiteBody) ? ' on body ' + starSystem!.ThargoidSpireSiteBody : '')" />
-    <div *ngIf="groundPortAXCZ" class="multi-icon" matTooltip="Ground port under attack">
-        <img class="feature-icon" src="assets/surface_port.svg" />
+    <fa-icon *ngIf="aXConflictZones"
+             [icon]="faCrosshairs"
+             size="xl"
+             matTooltip="AX conflict zones"></fa-icon>
+    <img *ngIf="thargoidSpires"
+         class="feature-icon"
+         src="assets/spire.svg"
+         [matTooltip]="'Thargoid spire site present' + ((starSystem?.ThargoidSpireSiteBody) ? ' on body ' + starSystem!.ThargoidSpireSiteBody : '')" />
+    <img *ngIf="starportUnderAttack"
+         class="feature-icon"
+         src="assets/station-attacked.png"
+         matTooltip="Starport under attack" />
+    <img *ngIf="starportDamaged"
+         class="feature-icon"
+         src="assets/station-damaged.png"
+         matTooltip="Damaged starport" />
+    <img *ngIf="starportUnderRepair"
+         class="feature-icon"
+         src="assets/station-repair.png"
+         matTooltip="Starport under repair" />
+    <div *ngIf="groundPortAXCZ"
+         class="multi-icon"
+         matTooltip="Ground port under attack">
+        <img class="feature-icon"
+             src="assets/surface_port.svg" />
         <div class="icon-red">
-            <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
+            <fa-icon [icon]="faCrosshairsSimple"
+                     size="lg"></fa-icon>
         </div>
     </div>
-    <img *ngIf="federation" class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />
-    <img *ngIf="empire" class="feature-icon" src="assets/empire.svg" matTooltip="Imperial faction(s) present" />
-    <fa-icon *ngIf="thargoidControlledReactivationMissions" [icon]="faBolt" size="xl"
-        matTooltip="Hostile reboot missions available"></fa-icon>
+    <img *ngIf="federation"
+         class="feature-icon"
+         src="assets/federation.svg"
+         matTooltip="Federal faction(s) present" />
+    <img *ngIf="empire"
+         class="feature-icon"
+         src="assets/empire.svg"
+         matTooltip="Imperial faction(s) present" />
+    <fa-icon *ngIf="thargoidControlledReactivationMissions"
+             [icon]="faBolt"
+             size="xl"
+             matTooltip="Hostile reboot missions available"></fa-icon>
     <!--
     <fa-icon *ngIf="counterstrike" [icon]="faArrowRightToArc" size="xl" matTooltip="Counterstrike system"></fa-icon>
     -->
-    <img *ngIf="odysseySettlement" class="feature-icon" src="assets/settlement_o.svg"
-        matTooltip="Odyssey settlement(s) present" />
+    <img *ngIf="odysseySettlement"
+         class="feature-icon"
+         src="assets/settlement_o.svg"
+         matTooltip="Odyssey settlement(s) present" />
 </div>

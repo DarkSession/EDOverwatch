@@ -47,6 +47,9 @@ export class SystemComponent implements OnInit {
   public aXConflictZones = false;
   public groundPortAXCZ = false;
   public counterstrike = false;
+  public starportUnderAttack = false;
+  public starportDamaged = false;
+  public starportUnderRepair = false;
 
   public editSaving = false;
   public editCounterstrike: boolean | null = null;
@@ -236,6 +239,10 @@ export class SystemComponent implements OnInit {
           this.aXConflictZones = this.starSystem.Features?.includes("AXConflictZones") ?? false;
           this.groundPortAXCZ = this.starSystem.Features?.includes("GroundPortAXCZ") ?? false;
           this.counterstrike = this.starSystem.Features?.includes("Counterstrike") ?? false;
+          this.starportUnderAttack = this.starSystem.Features?.includes("StarportUnderAttack") ?? false;
+          this.starportDamaged = this.starSystem.Features?.includes("StarportDamaged") ?? false;
+          this.starportUnderRepair = this.starSystem.Features?.includes("StarportUnderRepair") ?? false;
+
           if (this.editCounterstrike === null) {
             this.editCounterstrike = this.counterstrike;
           }

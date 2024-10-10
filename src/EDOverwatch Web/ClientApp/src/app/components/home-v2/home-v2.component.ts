@@ -44,8 +44,13 @@ export class HomeV2Component implements OnInit, AfterViewInit {
   }[] = [
       {
         key: "EffortFocus",
-        value: "Focus",
-      }, {
+        value: "Player presence",
+      },
+      {
+        key: "Starports",
+        value: "Starports",
+      },
+      {
         key: "DistanceToMaelstrom",
         value: "Distance to Titan",
       },
@@ -97,7 +102,20 @@ export class HomeV2Component implements OnInit, AfterViewInit {
       {
         key: "OdysseySettlements",
         value: "Odyssey settlement(s)",
-      }];
+      },
+      {
+        key: "StarportUnderRepair",
+        value: "Starport under repair",
+      },
+      {
+        key: "StarportDamaged",
+        value: "Damaged starport",
+      },
+      {
+        key: "StarportUnderAttack",
+        value: "Starport under attack",
+      }
+    ];
   public featuresSelected: string[] = this.features.map(f => f.key);
   public dataRaw: OverwatchStarSystemFull[] = [];
   @ViewChild("stateContainers") stateContainers: ElementRef | null = null;

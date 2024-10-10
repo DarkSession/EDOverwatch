@@ -31,7 +31,7 @@ export class SystemListComponent implements OnInit, OnChanges {
   public readonly faTruck = faTruck;
   public readonly faHandshake = faHandshake;
   public readonly faHexagonExclamation = faHexagonExclamation;
-  private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Starports', 'Progress', 'Features', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
+  private readonly baseColumns = ['Name', 'ThargoidLevel', 'Population', 'Progress', 'Features', 'FactionOperations', 'StateExpiration', 'Maelstrom'];
   public displayedColumns: string[] = [];
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;

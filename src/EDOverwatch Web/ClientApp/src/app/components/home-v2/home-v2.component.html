@@ -1,6 +1,7 @@
 <div class="overwatch-content-container">
     <div class="overwatch-content-large">
-        <div *ngIf="overview?.Status == OverviewDataStatus.TickInProgress" class="information-message">
+        <div *ngIf="overview?.Status == OverviewDataStatus.TickInProgress"
+             class="information-message">
             <div>
                 <fa-icon [icon]="faGears"></fa-icon>
             </div>
@@ -8,7 +9,8 @@
                 Elite Dangerous weekly server tick in progress.
             </div>
         </div>
-        <div *ngIf="overview?.Status == OverviewDataStatus.UpdatePending" class="information-message">
+        <div *ngIf="overview?.Status == OverviewDataStatus.UpdatePending"
+             class="information-message">
             <div>
                 <fa-icon [icon]="faGears"></fa-icon>
             </div>
@@ -18,16 +20,21 @@
             </div>
         </div>
         <div class="state-containers-parent">
-            <div class="state-containers" #stateContainers>
-                <app-home-v2-cycle [cycle]="overview?.PreviousCycle" title="Previous cycle"></app-home-v2-cycle>
+            <div class="state-containers"
+                 #stateContainers>
+                <app-home-v2-cycle [cycle]="overview?.PreviousCycle"
+                                   title="Previous cycle"></app-home-v2-cycle>
                 <app-home-v2-cycle-changes [cycleChange]="overview?.PreviousCycleChanges"
-                    title="Results"></app-home-v2-cycle-changes>
-                <app-home-v2-cycle [cycle]="overview?.CurrentCycle" title="Current cycle"
-                    information="Cycle ends in {{ nextTick | dateAgo }}"></app-home-v2-cycle>
-                <app-home-v2-cycle-changes [future]="true" [cycleChange]="overview?.NextCycleChanges"
-                    title="Intermediate result"></app-home-v2-cycle-changes>
-                <app-home-v2-cycle [cycle]="overview?.NextCyclePrediction" title="Next cycle"
-                    information="Based on intermediate result"></app-home-v2-cycle>
+                                           title="Results"></app-home-v2-cycle-changes>
+                <app-home-v2-cycle [cycle]="overview?.CurrentCycle"
+                                   title="Current cycle"
+                                   information="Cycle ends in {{ nextTick | dateAgo }}"></app-home-v2-cycle>
+                <app-home-v2-cycle-changes [future]="true"
+                                           [cycleChange]="overview?.NextCycleChanges"
+                                           title="Intermediate result"></app-home-v2-cycle-changes>
+                <app-home-v2-cycle [cycle]="overview?.NextCyclePrediction"
+                                   title="Next cycle"
+                                   information="Based on intermediate result"></app-home-v2-cycle>
             </div>
         </div>
         <div class="title">
@@ -37,26 +44,33 @@
             <div style="height: 24px;"></div>
             <div class="content-top-container">
                 <div class="systems-filter">
-                    <mat-form-field appearance="outline" floatLabel="always">
+                    <mat-form-field appearance="outline"
+                                    floatLabel="always">
                         <mat-label>System Name</mat-label>
-                        <input matInput [(ngModel)]="systemNameFilter" (ngModelChange)="updateDataSource()"
-                            placeholder="Search by system name">
+                        <input matInput
+                               [(ngModel)]="systemNameFilter"
+                               (ngModelChange)="updateDataSource()"
+                               placeholder="Search by system name">
                     </mat-form-field>
                     <div *ngIf="maelstroms && maelstroms.length">
                         <fieldset class="custom-fieldset">
                             <legend>Titans</legend>
                             <div class="thargoid-titans">
-                                <div *ngFor="let maelstrom of maelstroms" class="titan clickable" [ngClass]="{
+                                <div *ngFor="let maelstrom of maelstroms"
+                                     class="titan clickable"
+                                     [ngClass]="{
                                     'content-inactive': !maelstromsSelected.includes(maelstrom)
-                                }" (click)="toggleThargoidTitan(maelstrom)">
+                                }"
+                                     (click)="toggleThargoidTitan(maelstrom)">
                                     <div>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-                                            style="width: 20px; height: 20px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 512 512"
+                                             style="width: 20px; height: 20px;">
                                             <!--! Font Awesome Pro 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                                             <path fill="currentColor"
-                                                d="M154.8 94.2c.1-13 1.6-26.1 4.7-39l3.4-14.2c1.7-6.9-.4-14.2-5.5-19.3c-8-8-21-8-29 0l-8.1 8.1C70.5 79.4 53.8 149.6 70 213.1c19.3 19.4 42.9 34 68.8 42.4c-7-19.9-10.8-41.3-10.8-63.5c0-35.7 9.8-69.2 26.8-97.8zM94.2 357.2c-13-.1-26.1-1.6-39-4.7l-14.2-3.4c-6.9-1.7-14.2 .4-19.3 5.5c-8 8-8 21 0 29l8.1 8.1c49.7 49.7 119.9 66.5 183.4 50.3c19.4-19.3 34-42.9 42.4-68.8c-19.9 7-41.3 10.8-63.5 10.8c-35.7 0-69.2-9.8-97.8-26.8zm263.1 60.6c-.1 13-1.6 26.1-4.7 39l-3.4 14.2c-1.7 6.9 .4 14.2 5.5 19.3c8 8 21 8 29 0l8.1-8.1c49.7-49.7 66.5-119.9 50.3-183.4c-19.3-19.4-42.9-34-68.8-42.4c7 19.9 10.8 41.3 10.8 63.5c0 35.7-9.8 69.2-26.8 97.8zm60.6-263.1c13 .1 26.1 1.6 39 4.7l14.2 3.4c6.9 1.7 14.2-.4 19.3-5.5c8-8 8-21 0-29l-8.1-8.1C432.6 70.5 362.4 53.8 298.9 70c-19.4 19.3-34 42.9-42.4 68.8c19.9-7 41.3-10.8 63.5-10.8c35.7 0 69.2 9.8 97.8 26.8z" />
+                                                  d="M154.8 94.2c.1-13 1.6-26.1 4.7-39l3.4-14.2c1.7-6.9-.4-14.2-5.5-19.3c-8-8-21-8-29 0l-8.1 8.1C70.5 79.4 53.8 149.6 70 213.1c19.3 19.4 42.9 34 68.8 42.4c-7-19.9-10.8-41.3-10.8-63.5c0-35.7 9.8-69.2 26.8-97.8zM94.2 357.2c-13-.1-26.1-1.6-39-4.7l-14.2-3.4c-6.9-1.7-14.2 .4-19.3 5.5c-8 8-8 21 0 29l8.1 8.1c49.7 49.7 119.9 66.5 183.4 50.3c19.4-19.3 34-42.9 42.4-68.8c-19.9 7-41.3 10.8-63.5 10.8c-35.7 0-69.2-9.8-97.8-26.8zm263.1 60.6c-.1 13-1.6 26.1-4.7 39l-3.4 14.2c-1.7 6.9 .4 14.2 5.5 19.3c8 8 21 8 29 0l8.1-8.1c49.7-49.7 66.5-119.9 50.3-183.4c-19.3-19.4-42.9-34-68.8-42.4c7 19.9 10.8 41.3 10.8 63.5c0 35.7-9.8 69.2-26.8 97.8zm60.6-263.1c13 .1 26.1 1.6 39 4.7l14.2 3.4c6.9 1.7 14.2-.4 19.3-5.5c8-8 8-21 0-29l-8.1-8.1C432.6 70.5 362.4 53.8 298.9 70c-19.4 19.3-34 42.9-42.4 68.8c19.9-7 41.3-10.8 63.5-10.8c35.7 0 69.2 9.8 97.8 26.8z" />
                                             <path fill="currentColor"
-                                                d="M320 0h11.5C342.8 0 352 9.2 352 20.5c0 7.1-3.7 13.7-9.8 17.5l-12.5 7.7c-35.2 21.7-60.9 54.9-73.3 93.1c19.9-7 41.3-10.8 63.5-10.8c106 0 192 86 192 192v11.5c0 11.3-9.2 20.5-20.5 20.5c-7.1 0-13.7-3.7-17.5-9.8l-7.7-12.5c-21.7-35.2-54.9-60.9-93.1-73.3c7 19.9 10.8 41.3 10.8 63.5c0 106-86 192-192 192H180.5c-11.3 0-20.5-9.2-20.5-20.5c0-7.1 3.7-13.7 9.8-17.5l12.5-7.7c35.2-21.7 60.9-54.9 73.3-93.1c-19.9 7-41.3 10.8-63.5 10.8C86 384 0 298 0 192V180.5C0 169.2 9.2 160 20.5 160c7.1 0 13.7 3.7 17.5 9.8l7.7 12.5c21.7 35.2 54.9 60.9 93.1 73.3c-7-19.9-10.8-41.3-10.8-63.5C128 86 214 0 320 0zM256 288a32 32 0 1 0 0-64 32 32 0 1 0 0 64z" />
+                                                  d="M320 0h11.5C342.8 0 352 9.2 352 20.5c0 7.1-3.7 13.7-9.8 17.5l-12.5 7.7c-35.2 21.7-60.9 54.9-73.3 93.1c19.9-7 41.3-10.8 63.5-10.8c106 0 192 86 192 192v11.5c0 11.3-9.2 20.5-20.5 20.5c-7.1 0-13.7-3.7-17.5-9.8l-7.7-12.5c-21.7-35.2-54.9-60.9-93.1-73.3c7 19.9 10.8 41.3 10.8 63.5c0 106-86 192-192 192H180.5c-11.3 0-20.5-9.2-20.5-20.5c0-7.1 3.7-13.7 9.8-17.5l12.5-7.7c35.2-21.7 60.9-54.9 73.3-93.1c-19.9 7-41.3 10.8-63.5 10.8C86 384 0 298 0 192V180.5C0 169.2 9.2 160 20.5 160c7.1 0 13.7 3.7 17.5 9.8l7.7 12.5c21.7 35.2 54.9 60.9 93.1 73.3c-7-19.9-10.8-41.3-10.8-63.5C128 86 214 0 320 0zM256 288a32 32 0 1 0 0-64 32 32 0 1 0 0 64z" />
                                         </svg>
                                     </div>
                                     {{ maelstrom.Name }}
@@ -68,11 +82,14 @@
                         <fieldset class="custom-fieldset">
                             <legend>State</legend>
                             <div class="thargoid-states">
-                                <div *ngFor="let thargoidLevel of thargoidLevels" class="state clickable" [ngClass]="{
+                                <div *ngFor="let thargoidLevel of thargoidLevels"
+                                     class="state clickable"
+                                     [ngClass]="{
                                     'content-inactive': !thargoidLevelsSelected.includes(thargoidLevel)
-                                }" (click)="toggleThargoidLevel(thargoidLevel)">
+                                }"
+                                     (click)="toggleThargoidLevel(thargoidLevel)">
                                     <app-thargoid-level [thargoidLevel]="thargoidLevel"
-                                        [vertical]="true"></app-thargoid-level>
+                                                        [vertical]="true"></app-thargoid-level>
                                 </div>
                             </div>
                         </fieldset>
@@ -82,47 +99,90 @@
                             <legend>Features</legend>
                             <div class="features">
                                 <div class="feature-box">
-                                    <span class="clickable" (click)="toggleFeature('AXConflictZones')" [ngClass]="{
+                                    <span class="clickable"
+                                          (click)="toggleFeature('AXConflictZones')"
+                                          [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('AXConflictZones')
                                     }">
-                                        <fa-icon [icon]="faCrosshairs" size="xl"
-                                            matTooltip="AX conflict zones"></fa-icon>
+                                        <fa-icon [icon]="faCrosshairs"
+                                                 size="xl"
+                                                 matTooltip="AX conflict zones"></fa-icon>
                                     </span>
                                 </div>
                                 <div class="feature-box">
-                                    <img class="feature-icon clickable" src="assets/spire.svg"
-                                        matTooltip="Thargoid spire site present"
-                                        (click)="toggleFeature('ThargoidSpires')" [ngClass]="{
+                                    <img class="feature-icon clickable"
+                                         src="assets/spire.svg"
+                                         matTooltip="Thargoid spire site present"
+                                         (click)="toggleFeature('ThargoidSpires')"
+                                         [ngClass]="{
                                             'content-inactive': !featuresSelected.includes('ThargoidSpires')
                                         }" />
                                 </div>
+
                                 <div class="feature-box">
-                                    <div class="multi-icon clickable" matTooltip="Ground port under attack"
-                                        (click)="toggleFeature('GroundPortAXCZ')" [ngClass]="{
+                                    <img class="feature-icon clickable"
+                                         src="assets/station-attacked.png"
+                                         matTooltip="Starport under attack"
+                                         (click)="toggleFeature('StarportUnderAttack')"
+                                         [ngClass]="{
+                                        'content-inactive': !featuresSelected.includes('StarportUnderAttack')
+                                    }" />
+                                </div>
+
+                                <div class="feature-box">
+                                    <img class="feature-icon clickable"
+                                         src="assets/station-damaged.png"
+                                         matTooltip="Damaged starport"
+                                         (click)="toggleFeature('StarportDamaged')"
+                                         [ngClass]="{
+                                        'content-inactive': !featuresSelected.includes('StarportDamaged')
+                                    }" />
+                                </div>
+
+                                <div class="feature-box">
+                                    <img class="feature-icon clickable"
+                                         src="assets/station-repair.png"
+                                         matTooltip="Starport under repair"
+                                         (click)="toggleFeature('StarportUnderRepair')"
+                                         [ngClass]="{
+                                        'content-inactive': !featuresSelected.includes('StarportUnderRepair')
+                                    }" />
+                                </div>
+                                <div class="feature-box">
+                                    <div class="multi-icon clickable"
+                                         matTooltip="Ground port under attack"
+                                         (click)="toggleFeature('GroundPortAXCZ')"
+                                         [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('GroundPortAXCZ')
                                     }">
-                                        <img class="feature-icon" src="assets/surface_port.svg" />
+                                        <img class="feature-icon"
+                                             src="assets/surface_port.svg" />
                                         <div class="icon-red">
-                                            <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
+                                            <fa-icon [icon]="faCrosshairsSimple"
+                                                     size="lg"></fa-icon>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="feature-box">
-                                    <img class="feature-icon clickable" src="assets/federation.svg"
-                                        matTooltip="Federal faction(s) present"
-                                        (click)="toggleFeature('FederalFaction')" [ngClass]="{
+                                    <img class="feature-icon clickable"
+                                         src="assets/federation.svg"
+                                         matTooltip="Federal faction(s) present"
+                                         (click)="toggleFeature('FederalFaction')"
+                                         [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('FederalFaction')
                                     }" />
                                 </div>
                                 <div class="feature-box">
-                                    <img class="feature-icon clickable" src="assets/empire.svg"
-                                        matTooltip="Imperial faction(s) present"
-                                        (click)="toggleFeature('ImperialFaction')" [ngClass]="{
+                                    <img class="feature-icon clickable"
+                                         src="assets/empire.svg"
+                                         matTooltip="Imperial faction(s) present"
+                                         (click)="toggleFeature('ImperialFaction')"
+                                         [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('ImperialFaction')
                                     }" />
                                 </div>
+                                <!--
                                 <div class="feature-box feature-box-disabled">
-                                    <!--
                                     <span class="clickable"
                                         (click)="toggleFeature('ThargoidControlledReactivationMissions')" [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('ThargoidControlledReactivationMissions')
@@ -130,10 +190,8 @@
                                         <fa-icon [icon]="faBolt" size="xl"
                                             matTooltip="Hostile reboot missions"></fa-icon>
                                     </span>
-                                    -->
-                                    <fa-icon [icon]="faBolt" size="xl"
-                                        matTooltip="Hostile reboot missions - Currently not available in-game"></fa-icon>
                                 </div>
+                                -->
                                 <!--
                                 <div class="feature-box">
                                     <span class="clickable" (click)="toggleFeature('Counterstrike')" [ngClass]="{
@@ -145,9 +203,11 @@
                                 </div>
                                 -->
                                 <div class="feature-box">
-                                    <img class="feature-icon clickable" src="assets/settlement_o.svg"
-                                        matTooltip="Odyssey settlement(s) present"
-                                        (click)="toggleFeature('OdysseySettlements')" [ngClass]="{
+                                    <img class="feature-icon clickable"
+                                         src="assets/settlement_o.svg"
+                                         matTooltip="Odyssey settlement(s) present"
+                                         (click)="toggleFeature('OdysseySettlements')"
+                                         [ngClass]="{
                                         'content-inactive': !featuresSelected.includes('OdysseySettlements')
                                     }" />
                                 </div>
@@ -158,38 +218,47 @@
                 <div class="systems-filter">
                     <mat-form-field appearance="outline">
                         <mat-label>Optional columns</mat-label>
-                        <mat-select [(ngModel)]="optionalColumns" (ngModelChange)="settingChanged()" multiple>
+                        <mat-select [(ngModel)]="optionalColumns"
+                                    (ngModelChange)="settingChanged()"
+                                    multiple>
                             <mat-option *ngFor="let availableOptionalColumn of availableOptionalColumns"
-                                [value]="availableOptionalColumn.key">
+                                        [value]="availableOptionalColumn.key">
                                 {{ availableOptionalColumn.value }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
                     <div>
-                        <mat-checkbox [(ngModel)]="hideUnpopulated" (ngModelChange)="settingChanged()">
+                        <mat-checkbox [(ngModel)]="hideUnpopulated"
+                                      (ngModelChange)="settingChanged()">
                             Hide unpopulated systems (original)
                         </mat-checkbox>
-                        <mat-checkbox [(ngModel)]="hideCompleted" (ngModelChange)="settingChanged()">
+                        <mat-checkbox [(ngModel)]="hideCompleted"
+                                      (ngModelChange)="settingChanged()">
                             Hide completed systems
                         </mat-checkbox>
                     </div>
                 </div>
             </div>
             <div *ngIf="hideUnpopulated || hideCompleted || maelstromsSelected.length !== maelstroms.length || thargoidLevelsSelected.length !== thargoidLevels.length || features.length !== featuresSelected.length"
-                class="filtered-view">
+                 class="filtered-view">
                 <div>
                     <fa-icon [icon]="faFilters"></fa-icon>
                     Filtered view
                 </div>
-                <div class="clickable" (click)="resetFilter()">
+                <div class="clickable"
+                     (click)="resetFilter()">
                     <fa-icon [icon]="faCircleXmark"></fa-icon>
                     Reset filter
                 </div>
             </div>
-            <app-system-list [systems]="dataRaw" [maelstromsSelected]="maelstromsSelected"
-                [thargoidLevelsSelected]="thargoidLevelsSelected" [hideUnpopulated]="hideUnpopulated"
-                [hideCompleted]="hideCompleted" [systemNameFilter]="systemNameFilter"
-                [optionalColumns]="optionalColumns" [featuresSelected]="featuresSelected"></app-system-list>
+            <app-system-list [systems]="dataRaw"
+                             [maelstromsSelected]="maelstromsSelected"
+                             [thargoidLevelsSelected]="thargoidLevelsSelected"
+                             [hideUnpopulated]="hideUnpopulated"
+                             [hideCompleted]="hideCompleted"
+                             [systemNameFilter]="systemNameFilter"
+                             [optionalColumns]="optionalColumns"
+                             [featuresSelected]="featuresSelected"></app-system-list>
         </div>
     </div>
 </div>

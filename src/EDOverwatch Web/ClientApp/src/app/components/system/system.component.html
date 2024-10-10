@@ -1,9 +1,12 @@
 <div class="overwatch-content-container">
-    <div class="overwatch-content-large" *ngIf="starSystem">
+    <div class="overwatch-content-large"
+         *ngIf="starSystem">
         <div class="title">
             {{ starSystem.Name }}
-            <fa-icon [icon]="faClipboard" matTooltip="Copy to clipboard" class="clickable"
-                (click)="copySystemName()"></fa-icon>
+            <fa-icon [icon]="faClipboard"
+                     matTooltip="Copy to clipboard"
+                     class="clickable"
+                     (click)="copySystemName()"></fa-icon>
         </div>
         <div class="content-box">
             <div class="content-flex">
@@ -54,7 +57,8 @@
                                             {{ starSystem.Population | number }}
                                         </div>
                                         <div class="small"
-                                            *ngIf="starSystem.Population != starSystem.PopulationOriginal" [ngClass]="{
+                                             *ngIf="starSystem.Population != starSystem.PopulationOriginal"
+                                             [ngClass]="{
                                               'population-decrease': (starSystem.Population < starSystem.PopulationOriginal),
                                               'population-increase': (starSystem.Population > starSystem.PopulationOriginal)
                                             }">
@@ -64,7 +68,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="t">Player Focus</td>
+                                <td class="t">Player presence</td>
                                 <td>
                                     <div class="number">
                                         {{ starSystem.EffortFocus | percent }}
@@ -79,13 +83,14 @@
                                             <div class="progress-cell">
                                                 {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
                                                 <div class="progress-locked"
-                                                    *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
+                                                     *ngIf="starSystem.ThargoidSpireSiteInSystem && starSystem.ThargoidLevel && starSystem.ThargoidLevel.Level > 0">
                                                     <fa-icon [icon]="faHexagonExclamation"
-                                                        matTooltip="Thargoid spire site present in the system."
-                                                        size="lg"></fa-icon>
+                                                             matTooltip="Thargoid spire site present in the system."
+                                                             size="lg"></fa-icon>
                                                 </div>
                                             </div>
-                                            <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                            <div *ngIf="starSystem.StateProgress.ProgressLastChecked"
+                                                 class="small">
                                                 Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1
                                                 }}
                                             </div>
@@ -100,11 +105,15 @@
                     <b>External system links</b>
                     <br>
                     <a href="https://inara.cz/elite/starsystem/?search={{ encodeUrlPart(starSystem.Name) }}"
-                        target="_blank" rel="noreferrer" class="link">
+                       target="_blank"
+                       rel="noreferrer"
+                       class="link">
                         Inara</a>
                     <br>
-                    <a href="https://www.edsm.net/en/system?systemID64={{ starSystem.SystemAddress }}" target="_blank"
-                        rel="noreferrer" class="link">
+                    <a href="https://www.edsm.net/en/system?systemID64={{ starSystem.SystemAddress }}"
+                       target="_blank"
+                       rel="noreferrer"
+                       class="link">
                         EDSM</a>
                 </div>
             </div>
@@ -118,12 +127,13 @@
                                     <td class="t">Titan hearts</td>
                                     <td>
                                         <div class="titan-hearts"
-                                            [matTooltip]="titanHeartsRemaining == 1 ? '1 heart remaining' : titanHeartsRemaining + ' hearts remaining'">
+                                             [matTooltip]="titanHeartsRemaining == 1 ? '1 heart remaining' : titanHeartsRemaining + ' hearts remaining'">
                                             <div *ngFor="let titanHeart of titanHearts">
-                                                <fa-icon [icon]="faHeartRegular" class="heart-destroyed"
-                                                    *ngIf="titanHeartsRemaining < titanHeart"></fa-icon>
+                                                <fa-icon [icon]="faHeartRegular"
+                                                         class="heart-destroyed"
+                                                         *ngIf="titanHeartsRemaining < titanHeart"></fa-icon>
                                                 <fa-icon [icon]="faHeartSolid"
-                                                    *ngIf="titanHeartsRemaining >= titanHeart"></fa-icon>
+                                                         *ngIf="titanHeartsRemaining >= titanHeart"></fa-icon>
                                             </div>
                                         </div>
                                     </td>
@@ -135,7 +145,8 @@
                                             <div class="progress-cell">
                                                 {{ starSystem.StateProgress.ProgressUncapped | percent:'1.4-4' }}
                                             </div>
-                                            <div *ngIf="starSystem.StateProgress.ProgressLastChecked" class="small">
+                                            <div *ngIf="starSystem.StateProgress.ProgressLastChecked"
+                                                 class="small">
                                                 Last checked {{ starSystem.StateProgress.ProgressLastChecked | dateAgo:1
                                                 }}
                                             </div>
@@ -167,54 +178,103 @@
                     <div class="information hide-on-mobile"></div>
                 </div>
             </div>
-            <div *ngIf="starSystem?.Features && starSystem.Features.length > 0" class="features-list">
+            <div *ngIf="starSystem?.Features && starSystem.Features.length > 0"
+                 class="features-list">
                 <div class="subtitle">Features</div>
-                <div *ngIf="thargoidSpires" class="feature">
+                <div *ngIf="thargoidSpires"
+                     class="feature">
                     <div class="feature-icon-placeholder">
-                        <img class="feature-icon" src="assets/spire.svg" matTooltip="Thargoid spire site present" />
+                        <img class="feature-icon"
+                             src="assets/spire.svg"
+                             matTooltip="Thargoid spire site present" />
                     </div>
                     Thargoid spire site present
                     <span *ngIf="starSystem.ThargoidSpireSiteBody">on body {{ starSystem.ThargoidSpireSiteBody }}</span>
                 </div>
-                <div *ngIf="odysseySettlement" class="feature">
+                <div *ngIf="odysseySettlement"
+                     class="feature">
                     <div class="feature-icon-placeholder">
-                        <img class="feature-icon" src="assets/settlement_o.svg"
-                            matTooltip="Odyssey settlement(s) present" />
+                        <img class="feature-icon"
+                             src="assets/settlement_o.svg"
+                             matTooltip="Odyssey settlement(s) present" />
                     </div>
                     Odyssey settlement(s) present
                 </div>
-                <div *ngIf="federation" class="feature">
+                <div *ngIf="federation"
+                     class="feature">
                     <div class="feature-icon-placeholder">
-                        <img class="feature-icon" src="assets/federation.svg" matTooltip="Federal faction(s) present" />
+                        <img class="feature-icon"
+                             src="assets/federation.svg"
+                             matTooltip="Federal faction(s) present" />
                     </div>
                     Federal faction(s) present
                 </div>
-                <div *ngIf="empire" class="feature">
+                <div *ngIf="empire"
+                     class="feature">
                     <div class="feature-icon-placeholder">
-                        <img class="feature-icon" src="assets/empire.svg" matTooltip="Imperial faction(s) present" />
+                        <img class="feature-icon"
+                             src="assets/empire.svg"
+                             matTooltip="Imperial faction(s) present" />
                     </div>
                     Imperial faction(s) present
                 </div>
-                <div *ngIf="thargoidControlledReactivationMissions" class="feature">
+                <div *ngIf="thargoidControlledReactivationMissions"
+                     class="feature">
                     <div class="feature-icon-placeholder">
-                        <fa-icon class="feature-icon" [icon]="faBolt" size="xl"
-                            matTooltip="Hostile reboot missions available"></fa-icon>
+                        <fa-icon class="feature-icon"
+                                 [icon]="faBolt"
+                                 size="xl"
+                                 matTooltip="Hostile reboot missions available"></fa-icon>
                     </div>
                     Hostile reboot missions available
                 </div>
-                <div *ngIf="aXConflictZones" class="feature">
+                <div *ngIf="aXConflictZones"
+                     class="feature">
                     <div class="feature-icon-placeholder">
-                        <fa-icon class="feature-icon" [icon]="faCrosshairs" size="xl"
-                            matTooltip="AX conflict zones"></fa-icon>
+                        <fa-icon class="feature-icon"
+                                 [icon]="faCrosshairs"
+                                 size="xl"
+                                 matTooltip="AX conflict zones"></fa-icon>
                     </div>
                     AX conflict zones
                 </div>
-                <div *ngIf="groundPortAXCZ" class="feature">
+                <div *ngIf="starportUnderAttack"
+                     class="feature">
                     <div class="feature-icon-placeholder">
-                        <div class="multi-icon" matTooltip="Ground port under attack">
-                            <img class="feature-icon" src="assets/surface_port.svg" />
+                        <img class="feature-icon"
+                             src="assets/station-attacked.png"
+                             matTooltip="Starport under attack" />
+                    </div>
+                    Starport under attack
+                </div>
+                <div *ngIf="starportDamaged"
+                     class="feature">
+                    <div class="feature-icon-placeholder">
+                        <img class="feature-icon"
+                             src="assets/station-damaged.png"
+                             matTooltip="Damaged starport" />
+                    </div>
+                    Damaged starport
+                </div>
+                <div *ngIf="starportUnderRepair"
+                     class="feature">
+                    <div class="feature-icon-placeholder">
+                        <img class="feature-icon"
+                             src="assets/station-repair.png"
+                             matTooltip="Starport under repair" />
+                    </div>
+                    Starport under repair
+                </div>
+                <div *ngIf="groundPortAXCZ"
+                     class="feature">
+                    <div class="feature-icon-placeholder">
+                        <div class="multi-icon"
+                             matTooltip="Ground port under attack">
+                            <img class="feature-icon"
+                                 src="assets/surface_port.svg" />
                             <div class="icon-red">
-                                <fa-icon [icon]="faCrosshairsSimple" size="lg"></fa-icon>
+                                <fa-icon [icon]="faCrosshairsSimple"
+                                         size="lg"></fa-icon>
                             </div>
                         </div>
                     </div>
@@ -232,14 +292,19 @@
             </div>
             <div *ngIf="appService.editPermissions && starSystem.ThargoidLevel?.Level == 40">
                 <br>
-                <mat-slide-toggle [(ngModel)]="editCounterstrike" (ngModelChange)="saveSystem()">
+                <mat-slide-toggle [(ngModel)]="editCounterstrike"
+                                  (ngModelChange)="saveSystem()">
                     Counterstrike system
                 </mat-slide-toggle>
             </div>
             <br>
             <div *ngIf="lineChartData && lineChartData.labels && lineChartData.labels.length">
-                <canvas baseChart class="chart" [data]="lineChartData" [options]="lineChartOptions"
-                    [type]="lineChartType" height="300"></canvas>
+                <canvas baseChart
+                        class="chart"
+                        [data]="lineChartData"
+                        [options]="lineChartOptions"
+                        [type]="lineChartType"
+                        height="300"></canvas>
             </div>
             <br>
             <br>

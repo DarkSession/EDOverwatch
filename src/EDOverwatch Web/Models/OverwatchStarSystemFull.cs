@@ -65,13 +65,16 @@
                     Features.Add(OverwatchStarSystemFeature.ImperialFaction.ToString());
                 }
             }
-            /* AX reactivation missings are currently unavailable - likely due to a bug
+            /*
+             * AX reactivation missings are currently unavailable - likely due to a bug
+             * To be revisted in 2034, probably the time it takes them to fix it
             if ((ThargoidLevel.Level == StarSystemThargoidLevelState.Alert || ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion) && starSystem.ReactivationMissionsNearby && (StateProgress.ProgressPercent ?? 0) < 1m)
             {
                 Features.Add(OverwatchStarSystemFeature.ThargoidControlledReactivationMissions.ToString());
             }
             */
-            if (axConflictZones && (StateProgress.ProgressPercent ?? 0) < 1m
+            var isCompleted = (StateProgress.ProgressPercent ?? 0) >= 1m;
+            if (axConflictZones && !isCompleted
                 && (ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled || (ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion && StateExpiration != null && StateExpiration.RemainingCycles > 0)))
             {
                 Features.Add(OverwatchStarSystemFeature.AXConflictZones.ToString());
@@ -83,6 +86,21 @@
             if ((starSystem.ThargoidLevel?.IsCounterstrike ?? false) && ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled)
             {
                 Features.Add(OverwatchStarSystemFeature.Counterstrike.ToString());
+            }
+            if (!isCompleted)
+            {
+                if (StationsUnderRepair > 0)
+                {
+                    Features.Add(OverwatchStarSystemFeature.StarportUnderRepair.ToString());
+                }
+                if (StationsDamaged > 0)
+                {
+                    Features.Add(OverwatchStarSystemFeature.StarportDamaged.ToString());
+                }
+                if (StationsUnderAttack > 0)
+                {
+                    Features.Add(OverwatchStarSystemFeature.StarportUnderAttack.ToString());
+                }
             }
         }
 
@@ -116,5 +134,8 @@
         AXConflictZones,
         GroundPortAXCZ,
         Counterstrike,
+        StarportUnderAttack,
+        StarportDamaged,
+        StarportUnderRepair,
     }
 }

@@ -47,15 +47,28 @@ namespace EDOverwatch_Web.Models
             bool federalFaction,
             bool imperialFaction,
             bool axConflictZones) :
-            base(starSystem, effortFocus, 0, 0, 0, 0, new(), 0, 0, 0, odysseySettlements, federalFaction, imperialFaction, axConflictZones, stations.Where(s => s.State == StationState.UnderAttack && (s.Type?.IsWarGroundAsset ?? false)).Any(), predictedAttacker != null)
+            base(
+                starSystem: starSystem,
+                effortFocus: effortFocus,
+                factionAxOperations: 0,
+                factionGeneralOperations: 0,
+                factionRescueOperations: 0,
+                factionLogisticsOperations: 0,
+                specialFactionOperations: [],
+                stationsUnderRepair: stations.Where(s => s.State == StationState.UnderRepairs && StationType.WarRelevantAssetTypes.Contains(s.Type!.Name)).Count(),
+                stationsDamaged: stations.Where(s => s.State == StationState.Damaged).Count(),
+                stationsUnderAttack: stations.Where(s => s.State == StationState.UnderAttack).Count(),
+                odysseySettlements: odysseySettlements,
+                federalFaction: federalFaction,
+                imperialFaction: imperialFaction,
+                axConflictZones: axConflictZones,
+                groundPortUnderAttack: stations.Where(s => s.State == StationState.UnderAttack && (s.Type?.IsWarGroundAsset ?? false)).Any(),
+                hasAlertPrediction: predictedAttacker != null)
         {
             WarEfforts = warEfforts;
             FactionOperations = factionOperationDetails.Count;
             FactionOperationDetails = factionOperationDetails;
             Stations = stations.Select(s => new OverwatchStation(s, rescueShips, starSystem.ThargoidLevel!)).ToList();
-            StationsUnderRepair = stations.Where(s => s.State == StationState.UnderRepairs).Count();
-            StationsDamaged = stations.Where(s => s.State == StationState.Damaged).Count();
-            StationsUnderAttack = stations.Where(s => s.State == StationState.UnderAttack).Count();
             LastTickTime = WeeklyTick.GetLastTick();
             LastTickDate = DateOnly.FromDateTime(LastTickTime.DateTime);
             ProgressDetails = starSystemThargoidLevelProgress.Select(s => new OverwatchStarSystemDetailProgress(s)).ToList();
