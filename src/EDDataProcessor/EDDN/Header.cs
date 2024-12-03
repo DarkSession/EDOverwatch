@@ -21,7 +21,7 @@
         public bool IsLive => !string.IsNullOrEmpty(GameVersion) && Version.TryParse(GameVersion, out Version? gameVersion) && gameVersion.Major >= 4;
 
         [JsonIgnore]
-        public bool IsBlacklisted => Gamebuild == "r304032/r0";
+        public bool IsBlacklisted => Gamebuild?.Trim() == "r308286/r0";
 
         /// <summary>Timestamp upon receipt at the gateway. If present, this property will be overwritten by the gateway; submitters are not intended to populate this property.</summary>
         [JsonProperty("gatewayTimestamp", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
