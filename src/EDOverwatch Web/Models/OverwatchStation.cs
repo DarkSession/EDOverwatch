@@ -40,8 +40,7 @@
                 {
                     var rescueShip = rescueShips.Where(r =>
                         r.StarSystem != null &&
-                        r.MinorFaction?.Allegiance != null &&
-                        r.MinorFaction?.Allegiance?.Name == minorFaction.Allegiance.Name)
+                        r.RescueAllegianceId == minorFaction.Allegiance.Id)
                         .Select(r => new
                         {
                             RescueShip = r,

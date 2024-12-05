@@ -42,6 +42,11 @@
         [ForeignKey("PriorMinorFactionId")]
         public MinorFaction? PriorMinorFaction { get; set; }
 
+        [ForeignKey("RescueAllegianceId")]
+        public FactionAllegiance? RescueAllegiance { get; set; }
+
+        public int? RescueAllegianceId { get; set; }
+
         [Column]
         public short LandingPadSmall { get; set; }
 

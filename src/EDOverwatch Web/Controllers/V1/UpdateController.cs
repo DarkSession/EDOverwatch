@@ -44,6 +44,7 @@ namespace EDOverwatch_Web.Controllers.V1
             List<ThargoidMaelstrom> thargoidMaelstroms = await DbContext.ThargoidMaelstroms
                 .AsNoTracking()
                 .Include(t => t.StarSystem)
+                .Where(t => t.HeartsRemaining > 0)
                 .ToListAsync(cancellationToken);
             foreach (ThargoidMaelstrom maelstrom in thargoidMaelstroms)
             {

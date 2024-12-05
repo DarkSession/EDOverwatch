@@ -73,6 +73,11 @@ namespace EDDatabase
                 .HasMany(s => s.ProgressHistory)
                 .WithOne(s => s.ThargoidLevel);
 
+            modelBuilder.Entity<Station>()
+                .HasOne(s => s.RescueAllegiance)
+                .WithMany()
+                .HasForeignKey(s => s.RescueAllegianceId);
+
             modelBuilder.Entity<AlertPrediction>()
                 .Navigation(a => a.StarSystem)
                 .AutoInclude();
