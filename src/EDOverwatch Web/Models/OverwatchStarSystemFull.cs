@@ -65,14 +65,10 @@
                     Features.Add(OverwatchStarSystemFeature.ImperialFaction.ToString());
                 }
             }
-            /*
-             * AX reactivation missings are currently unavailable - likely due to a bug
-             * To be revisted in 2034, probably the time it takes them to fix it
             if ((ThargoidLevel.Level == StarSystemThargoidLevelState.Alert || ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion) && starSystem.ReactivationMissionsNearby && (StateProgress.ProgressPercent ?? 0) < 1m)
             {
                 Features.Add(OverwatchStarSystemFeature.ThargoidControlledReactivationMissions.ToString());
             }
-            */
             var isCompleted = (StateProgress.ProgressPercent ?? 0) >= 1m;
             if (axConflictZones && !isCompleted
                 && (ThargoidLevel.Level == StarSystemThargoidLevelState.Controlled || (ThargoidLevel.Level == StarSystemThargoidLevelState.Invasion && StateExpiration != null && StateExpiration.RemainingCycles > 0)))
