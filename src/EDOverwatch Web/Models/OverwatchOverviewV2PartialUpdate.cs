@@ -88,7 +88,7 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> previousCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Where(s => (s.CycleEnd == previousCycle && s.CycleStart!.Start <= s.CycleEnd!.Start && (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == previousCycle))
+                    .Where(s => (s.CycleEnd == previousCycle && s.CycleStart!.Start <= s.CycleEnd!.Start && (s.State == StarSystemThargoidLevelState.Alert || s.State == StarSystemThargoidLevelState.Invasion || s.State == StarSystemThargoidLevelState.Controlled)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == previousCycle && s.CycleEndId == null))
                     .ToListAsync(cancellationToken);
 
                 int alertsDefended = previousCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && p.CurrentProgress!.IsCompleted);
@@ -148,7 +148,7 @@ namespace EDOverwatch_Web.Models
                 List<StarSystemThargoidLevel> currentCycleStates = await dbContext.StarSystemThargoidLevels
                     .AsNoTracking()
                     .Include(s => s.StarSystem)
-                    .Where(s => (s.CycleEnd == null || (s.CycleEnd == currentThargoidCycle && s.CycleStart!.Start <= s.CycleEnd!.Start)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == currentThargoidCycle))
+                    .Where(s => (s.CycleEnd == null || (s.CycleEnd == currentThargoidCycle && s.CycleStart!.Start <= s.CycleEnd!.Start)) || (s.State == StarSystemThargoidLevelState.Titan && s.Maelstrom!.DefeatCycle == currentThargoidCycle && s.CycleEndId == null))
                     .ToListAsync(cancellationToken);
 
                 int alertsDefended = currentCycleStates.Count(p => p.State == StarSystemThargoidLevelState.Alert && (p.CurrentProgress?.IsCompleted ?? false));

@@ -64,7 +64,8 @@ namespace EDDataProcessor.Journal
                     bool titanHeartDestroyed = fsdJumpThargoidWar.WarProgress > 0.0001m &&
                         starSystem.ThargoidLevel.CurrentProgress is not null &&
                         starSystem.ThargoidLevel.State == StarSystemThargoidLevelState.Titan &&
-                        (starSystem.ThargoidLevel.CurrentProgress.ProgressPercent - fsdJumpThargoidWar.WarProgress) > 0.25m;
+                        (starSystem.ThargoidLevel.CurrentProgress.ProgressPercent - fsdJumpThargoidWar.WarProgress) > 0.25m &&
+                        (starSystem.ThargoidLevel.Maelstrom?.HeartsRemaining ?? 0) > 0;
                     if (starSystem.ThargoidLevel.CurrentProgress is null || fsdJumpThargoidWar.WarProgress > starSystem.ThargoidLevel.CurrentProgress.ProgressPercent || titanHeartDestroyed)
                     {
                         decimal warProgress = fsdJumpThargoidWar.WarProgress;
@@ -85,12 +86,14 @@ namespace EDDataProcessor.Journal
                                 thargoidMaelstromHeart.DestructionTime ??= updateTime;
                             }
 
-                            starSystem.ThargoidLevel.Maelstrom.HeartsRemaining -= 1;
                             if (starSystem.ThargoidLevel.Maelstrom.HeartsRemaining < 0)
                             {
                                 starSystem.ThargoidLevel.Maelstrom.HeartsRemaining = 0;
-                                starSystem.ThargoidLevel.Maelstrom.MeltdownTimeEstimate = updateTime.AddDays(1);
-                                starSystem.ThargoidLevel.Maelstrom.DefeatCycle = currentThargoidCycle;
+                                if (starSystem.ThargoidLevel.Maelstrom.MeltdownTimeEstimate is null)
+                                {
+                                    starSystem.ThargoidLevel.Maelstrom.MeltdownTimeEstimate = updateTime.AddDays(1);
+                                    starSystem.ThargoidLevel.Maelstrom.DefeatCycle = currentThargoidCycle;
+                                }
                                 warProgress = 1m;
                             }
                         }
