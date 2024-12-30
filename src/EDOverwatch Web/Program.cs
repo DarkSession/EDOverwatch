@@ -153,7 +153,7 @@ namespace EDOverwatch_Web
 
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src https://discord.com;");
+                context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src https://discord.com https://www.youtube.com; script-src-elem: 'self' https://discord.com;");
                 // trusted-types angular angular#bundler; require-trusted-types-for 'script';
                 context.Response.Headers.Append("X-Frame-Options", "deny");
                 context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");

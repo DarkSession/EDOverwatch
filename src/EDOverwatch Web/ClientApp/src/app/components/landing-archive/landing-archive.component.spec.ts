@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConsumerApiComponent } from './consumer-api.component';
+import { LandingArchiveComponent } from './landing-archive.component';
 
-describe('ConsumerApiComponent', () => {
-  let component: ConsumerApiComponent;
-  let fixture: ComponentFixture<ConsumerApiComponent>;
+describe('LandingArchiveComponent', () => {
+  let component: LandingArchiveComponent;
+  let fixture: ComponentFixture<LandingArchiveComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConsumerApiComponent ]
+      imports: [LandingArchiveComponent]
     })
     .compileComponents();
-
-    fixture = TestBed.createComponent(ConsumerApiComponent);
+    
+    fixture = TestBed.createComponent(LandingArchiveComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
